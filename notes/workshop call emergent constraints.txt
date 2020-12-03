@@ -1,0 +1,99 @@
+notes on zoom call emergent constraints 23.11.20
+see https://www.eventbrite.co.uk/e/virtual-emergent-constraints-and-tipping-points-workshop-registration-128023958105
+
+mark williamson: introduction to workshop
+emergent constraintm constrain real world unknown using ensembles and observations
+earth system sensitivity, trend or variation, prior infer-model uncertainty
+emergent constraint: emergent relationship combined wih value of observable in real world
+	imply a constraint on real world value of earth system sensitivity
+	first ECs snow-albedo feedback
+recent reviews: progressing emergent constraints on future climate change
+	reductin uncertainties in cliate projection with emergent constraints
+null hypothesis: they occur by chance and are not indicative of a deeper predictive mechanistic
+	relationship
+	danges of data mining and p-hacking
+how might ECs go wrong and how to guard it:
+	chance relationships
+	overconfidence in constraints
+	missing processes/ feedbacks in latest models
+	compensating errors in models
+	errors in obersvation/ obs not directly comparable
+
+tipping points:
+local bifurcation, example AMOC
+noise induced tipping: dansgaard -oeschger events?
+rate induced tipping: compost bomb
+possible tipping point dieback of amazon rainforest
+early warning signals of bifurcation tipping
+
+manuel schlund (veronika eyring) DLR:
+emergent constraints on ECS and carbon cycle feedbacks
+example sherwood et al 2014, x-axis: lower tropospheric mixing index (LTMI)
+schlund et al ESD 2020
+for all but one constraint, best estimate/uncertainty ECS is higher in CMIP6, corr is lower in CMPI6
+	likely related to higher multi-model men
+emergent constraint on carbon-climate feedback
+? should we also use different CMIP ensembles?
+constraining uncertatinty with ML
+	multi constrain multi-model projection of Y
+	multivariate lineare regression
+	schlund et al. JGR: Biogeosc (2020)
+	machine learning-based weighting
+	uncertainty is lower in ML technique
+	evaluate feature importance
+understanding understanding and modelling the earth system
+ERC synergy grand www.usmile-erc.eu/
+
+
+blueskiesreasearch.org.uk
+climate sensitivity and temperature variability
+Psi introduced as a summary of variab in surfacte temp in time series
+	non-linear and heteroskedastic -> problematic for OLS
+if theres no uncertainty (perfect model) -> invertable
+"what could we learn about climate sensitivity from variability in the surface temperature record?"
+	www.earth-syst-dynam-discuss.net/esd-2019-90
+interannual variability in global mean temperature may contain some usable information
+	but des not provide a tight constraint
+
+Varney et al 2020 Nature Communications !!!
+Soil carbon, uncertainties hera are key in uncertainties in global carbon budgets
+increased carbon input in soil by forestation, output heterotrophic respiration
+soil carbon turnover time
+! spatial temperature sensibility
+uncertainties in proj change in soil carbon storage are key components of the
+	uncertatinties in the global carbon budgets for the Paris Agreement Targets
+we use the real world spatial temp sensitivity to constrain a feature
+
+
+on generalised langevin dynamics & the modelling of global mean temperature, nick watkins
+stochastic energy balance model
+hasselmann 1976 <-> langevin, heat capacity vs mass etc
+generalised hasselmann equation
+weather macroweather and the climate, shaun lovejoy
+
+
+peter caldwell
+
+For ECs physics needs to understood #1
+
+number of independent samples in each CHMIP archive is too low, for power?
+siler et al 2018
+Caldwell et al 2018 (Jcli) method for identifying which feedbacks & regions lead to correlation
+	between an emergent constraint ECS
+evaluation of the physical mechanisms for constraints is important
+? multivariate analysis of emergent constraints? sparse regression?
+sherwood et al 2020, rev geophys
+combine multiple emerging constraints
+ridge regression, wuy not lasso regression?
+what about stability paths?
+emergent constraints produce higher ECS 
+bretherton caldwell 2020; JCli
+kalman equations? bayesian updating in the linear gaussian approximation
+power calculations for emergent constraints?
+what about bootrtrap?
+
+
+adressing structural errors in emerging constraints
+
+making climate projections conditional on historical observations, aurelien ribes.
+	sciences advances

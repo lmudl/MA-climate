@@ -1,0 +1,95 @@
+Call 01.12.20
+
+Thesis:
+They found two SST networks/ fields that are predictive for precitipation in the Amazon basin
+Now we want to rank climate models, including this mechanism and real observations
+Is this mechanism an emergent constraint?
+Are the assumptions/ requirements fulfilled?
+How are we trying to rank the climate models?
+	compare average cross correlation
+	compare the different pixels directly
+	compare network structure
+	compare causal links
+	why use only monthly averages? water monatl, regen monatl
+		why not use mean and variance
+		maybe climate models only in monthly resolution
+Do we try to make predictions about amazon droughts?
+
+Emergent Constraints:
+different climate models, give different answers about future climate
+emergent constraints can be used to narrow the range of answers
+
+basic concept: analyze large ensemble of climate model -> clear relationship emerges between variable X
+	in current simulated climate and different variable Y in model's projection of future.
+	when relationship tested in various ways -> plug in actual observations of variable X to narrow 
+	the range of answers for variable Y.
+reduce uncertainties -> identify emp relationship between inter-model spread of observable A and
+	inter-model responses B
+graphic: linear relationship
+	weight different models according to oberserved measure fit
+criteria:1.understanding of physical relationship
+	 2.correct use of observations, uncertainties not too large, obervations should be available on 
+		long time scale
+	 3.relevance of constrained climate-change projections
+		usually only correlation coefficients
+		-> ? does number of climate models and/or level of structural difference matter
+
+Peter Cox zu ECs
+Gradient aka Differenz mean SST NTAO - STAO gg Niederschlag im Amazonas ECs
+Mittlere Differenz gg Regen im Amazonas
+Minimum der Korrelation gg Regen
+Korrelation der SST, 
+
+Emergent Constraint in Modellen wiederfinden
+noch einfacher nur SST im Norden und Niederschlag
+Argument, Beobachtunsdaten niedrige Temp im Atlantik niedriger Regen
+
+mgl maße:
+	SST auf Regen
+	X Amazonas Regen Vergangenheit, Y Veränderung der Biomasse
+		regen in letzten 40 Jahren messen, beob und modelle
+		rückgang an biomasse vorhersagen, in Modellen
+	SST auf Regen und Regen auf Biomasse
+
+längen und breiten grade wie im paper
+
+Inverse correlationsmatrix
+ML methoden für Emergent Constraint
+(Kausalitätsmethoden)
+
+3 boxen definieren, 2 wasser boxen, atlantik
+Climate Data Operations, Netcdf für Klimadaten
+
+1. Rechteckige Boxen orientiert an Regionen
+
+
+TODO 
+Paper Cox, supplementary material
+Für beide aber reanalyse
+
+Beobachtungsdaten: ECMWF ERA5
+falls möglich räumlioches grid 1° (sonst 0.25°), monatliche auflösung
+alternativ jeweils
+
+SSTs:
+https://www.ncdc.noaa.gov/data-access/marineocean-data/extended-reconstructed-sea-surface-temperature-ersst-v5
+
+Regen:
+https://psl.noaa.gov/data/gridded/data.gpcc.html
+
+CDO einlesen
+
+Karten plotten python, cartopy
+
+Paper:
+	mendeley paperverwaltung
+	zetero google docs, 
+	github repository,
+	mattermost, zwischendurch fragen
+	
+	
+
+
+
+
+

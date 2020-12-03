@@ -1,0 +1,23 @@
+link von niklas boers
+https://climate-dynamics.org/tag/emergent-constraint/
+
+statistical inference with emergent constraints
+https://climate-dynamics.org/statistical-inference-with-emergent-constraints/
+
+constraints on climate sensitivity
+https://climate-dynamics.org/constraints-on-climate-sensitivity-from-space-based-measurements-of-low-cloud-reflection/
+
+evaluation of climate models
+https://dept.atmos.ucla.edu/alexhall/publications/evaluation-climate-models
+
+emergent constraints
+https://dept.atmos.ucla.edu/alexhall/emergent-constraints
+
+assumptions for emergent constraints
+https://www.nature.com/articles/s41586-018-0638-5
+
+supernovae: vae based kernel PCA for analysis of spatio-temporal Earth data
+https://www.researchgate.net/publication/330984865_SupernoVAE_VAE_based_kernel_PCA_for_analysis_of_spatio-temporal_Earth_data
+
+efficient inference for dynamical models using variational autoencoders
+https://www.microsoft.com/en-us/research/blog/efficient-inference-for-dynamical-models-using-variational-autoencoders/

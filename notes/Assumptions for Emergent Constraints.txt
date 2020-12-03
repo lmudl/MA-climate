@@ -1,0 +1,14 @@
+Assumptions for emergent constraints
+
+Uncertaint in ECS can be narrowed by using ECs, relates observable raviable to climate-model-simulated
+	ECS.
+fluctuation-dissipation-theorem: "relates mean response to impulsive external forcing of a dynamical
+	system to its natural unforced variability.
+Here: ECS is mean response to external forcing and measure of natural unforced variability
+	is psi, metric of global mean temperature variability.
+	Additionally: assumption, residual global-mean forcing time series is stationary, consists
+		of mutually independent random quantities and global-mean temp is independent of
+		previous year
+-> Important to remove any non-random forced variability from modelled and observed time series
+	before calculating psi
+

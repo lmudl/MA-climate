@@ -1,0 +1,174 @@
+notes on progressing emergent constraints on climate change
+
+emergent: aufstrebend, enstehend
+suite: Folge
+albedo: Rückstrahlvermögen
+to amplify: verstärken
+retreat: Rückzug
+flux: Fluss
+store: Speicher
+profund: fundiert
+precursor: Vorläufer
+
+?Fluctuation Dissipation-Theorem
+?These considerations underscore the possibility that ESM simulated climate 
+	variations on a variety of time scales captured
+	within the observational record might be mechanistically-linked to
+	the responses of those ESMs to future increasing greenhouse gases.
+?sensitivity and variability
+?is the early warning system confirmed
+
+further reading:
+[45] probability density function for predicted Y is derived given observational uncertainty in 
+	X and the correlation between X and Y.
+data mining in earth system models
+
+Abstract:
+
+emergent constraints (EC) is an evaluation technique for earth system models (ESM)
+	rely on strong statistical relationshiops between aspects 
+	of current climate and future change across an ESM ensemble.
+combine EC relationship with observations could reduce uncertainty surrounding future change.
+this paper: assess EC, how EC can move from strong statistical relationship to confirmation.
+	primary indicators are verified mechanism and out-of-sample testing.
+confirmed EC have potential to improve ESMs 
+
+
+Introduction:
+
+evaluate ESMs - compare simulation against observation
+ESMs became more complex but evaluation has not changed
+	if ESM can simulate suite (Folge) of observed variables, believed to characterize curent climate
+	system's basic features reasonably well, it is considered appropriate for producing
+	simulations of future climate.
+critique: comparison to  beauty contest evaluation
+	ESMs may simulate basic features reasonably well, but there is no information
+	about how well the ESM can simulate future climate
+	beauty contest, "less attractive ESM" may contain more accurate and useful
+	estimates of some key attribute of future change
+Even when ESM agree on basic aspects of climate change, spread across ESM ensebles remains
+	uncomfortably large, see IPCC
+--> how to reduce uncertainties? --> Emergent constraint (EC) approach
+Emergent constraint: combination of an ensemble of climate simulations with contemporary
+	measurements. despore major differences across ESM, relationships between X and Y
+	are implicit within ESM solutions of partial differential equations governing  physical
+	and biogeochemical systems and associated parameterizations.
+Spread between contemp X and future Y may be large but relationship f is sometimes clear.
+	-> Y = f(X) + epsilon
+If X can be measured, then relationship f places useful constraint on Y, given the uncertainty in X
+	is small compated to range of simulated values.
+"emergent": (aufstrebend, entstehend), function f cannot be found from single ESM, it becomes apparent
+	through analysis of large and structurally diverse ESM ensemble.
+traditional model evaluation and parameter tuning of parameters in ESM. Important for model's
+	climate change signals -> proto-EC, f.e sensitivity of water vapour response to temperature
+	or influence of bias in sea ice extent and thicknes on climate sensitivity
+traditional evaluation and EC are complementary, traditional must be kept on doing
+EC technique is limited by knowledge space represented by ESM ensemble
+
+
+Emergent constraints found so far:
+
+snow-albedo feedback (albedo: Rückstrahlvermögen) X, is measurable in real climate, with smaller 
+	observaitioanl uncertainty than in the ESM. -> possible to declare certain ESMs biased.
+uncertain elements of climate-carbon cycle feedbacks. Y is projected carbon loss from tropical
+	land under climate change. it can be related to an observable quantity in current climate
+	 - present-day senstivity of annual atmospheric CO2growthreate to temperature variation.
+
+
+Why ECs might exist:
+
+why should ECs be expected in ESM ensemles? startinh H_0, they emerge by change and are not indicative
+	of deeper meachanic relationships
+high dimensionality -> high correlations occur by chance
+two other reasons why strong relationships might emerge:
+	1. Fluctuation-Dissipation-Theorem: connection between sensibility and variability
+		in near-lineare systems. ESMs are highly complex -> might not be applicable
+		BUT emergent relationships between variability and senstivity expected to be common 
+		where senstitivity of net flux and sensititvity of linear store of same quantity are
+		connected by a conservation principle
+	2. Similarities between how ESM react to short-time-scale natural forcings and more sustained
+		anthropogenic forcing.
+?see above
+
+Confirmation indicators:
+
+proposed EC: emergent relationship w/ strong statistical underpinnings, BUT not accompanied by strong
+	physical/ theoretical explanation or intuition. example: strong correation between 
+	Intertropical Convergence Zone (ITCZ) bias and climate sensitivity. both shaped by 
+	multiple processes, not connected in any obvious way
+confirmed EC: strong statistical underpinning + emergent relationship arises from mechanism that work
+	in the ESM ensemble. In practice not dichotomous but degrees of confirmation
+Emergent relationshop becomes useful -> can be combined w/ observations to constrain future climate
+
+Plausible mechanism: most basic, emergent relationship has some plausible and intuitive proposed
+	mechanism associated with it. needs expert judgment. example: sensitivity of extratropical
+	cloud reflectivity to temperature in the current climate (X) and climate change (Y) im climate
+	models. mechanism was not proven to be at wotk in the ESm when EC was first porposed, but it
+	was plausible because of observed behaviour of clouds.
+
+Verficiation of mechanism: builds on first mechanism. involves scientific understanding of the proposed
+	mechanism underpinning the emergent relationship. can take the form of:
+	- more detailed analysis of ESM output, demonstrating mechanistic links, intermodel variation
+	in X leads to intermodel variation in Y. 
+	- theoretical arguments that support existence of emergence relationship
+	verification most straight forward for ECs involving same feedbck process for both X and Y.
+	becomes less straight forward as number of processes shaping X- and Y-variables increases
+
+Out-of-sample testing: operates in parallel to the first two. involves neither naming nor understanding
+	of a mechanism, indirect empirical evidence that mechanism is at work. Emergent relationship
+	can be seen in ESM ensemble that is independent of one in which relationship was first
+	diagnosed. Testing emergent relationship with new ensemble is euqivalent to enlargin original
+	ensemble and checking whether high correlation of emergent relationship remains.
+	If so, probability the relationship emerged by chance has declined.
+	BUT ESMs are developed on previous versions and and even ESMs inside one ensemble might
+	not be independent, but out of sample testing still useful.
+	Also possible: out-of-sample testing w/ perturbed parameter or physics of single models.
+	-> additional testing but less structural diversity
+
+Using ECs for uncertainty reduction now:
+
+If emergent relationship becomes confirmed EC, it can be confidently conmbined with obersvations
+	to procude constraint on Y. Few ECs ma show all confirmation indicators.
+	Dilemma, when is one allowed to use ECs?
+	use them as long they are associated with likelihood statements.
+If use ECs to make predictions, characterise uncertainty in obs values of X carefuly.
+	translation of X-values to Y-values not trivial.
+Both must be treated probabilistically, recent work [45]
+
+New directions:
+Targeted model development: uncertainty reduction in Y with ECs. ESM improvement, bias reduction in
+	X. Need for analyss of how structural and parametric variations in ESM ensemble lead to 
+	spread in X.
+	perform analysis to understand why ESMs produce spread in X. -> uncertainty around many
+	linked attributes will be reduced.
+?	If model development removes the spread in X and then Y, emergent relationships resulting 
+	from variation of each is no longer available	
+
+New and important climate variables:
+	apply EC to much broade suite of variables.
+	simulated precipitation may be systematically related across ensembles to how ESMs
+		simulate future changes in precipitation including extremes.
+	also spatial variability more exploreable
+
+Combining predictions from multiple constraints:
+	many constraints for climate sensitiivty exhibit  statistical relationships with each other
+	predictions that do not consider deendencies may be over-condfident.
+	ECs for same Y can also make contradictory predictions.
+	
+Detecting tippin points:
+	underlying assumption of tipping point precursors is that changes in system variability
+	indicate changes in sensitivity.
+	check for "critical" slowing down, as tipping point is approached -> increased auto correlation
+	
+Conclusions:
+	ECs are attractive, ESM with observations are used to reduce uncertainty
+	large number of proposed ECs but confusion about capabilities.
+	Hierarchy of credibility:
+		hypothesis testing; physical reasoning or mathematical models
+			used to explain relationship between observable aspect of current climate
+			and uncertain aspect of future climate
+		test hypothesis thouh analysisi of outputs of complex ESMs, most stay "proposed"
+		use out-of-sample-testing
+	Also possible data mining ESMs
+	keep best practices on doing
+	

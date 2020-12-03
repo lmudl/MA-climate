@@ -1,0 +1,10 @@
+Notes on "A network-based microfoundation of Granovetter's threshold model for social tipping"
+
+Abstract:
+1. social tipping = minorities trigger larger populations to engage in collective action
+2. granovetters theoretical threshold model, individual norms and preferences are crucial.
+when presented with certain decision yes/no. every nodes has threshold, threshold measures
+the proportion of the group that a individual would like to observe participating within 
+collective behaviour before joining themself. usually no one or the entire populations is joining
+-> unlike real world -> here never, always and eventually active agents
+Network theoretical approaches

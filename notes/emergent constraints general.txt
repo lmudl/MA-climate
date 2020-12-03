@@ -1,0 +1,9 @@
+notes on emergent constraints general
+https://dept.atmos.ucla.edu/alexhall/emergent-constraints
+
+different climate models, give different answers about future climate
+emergent constraints can be used to narrow the range of answers
+basic concept: analyze large ensemble of climate model -> clear relationship emerges between variable X
+	in current simulated climate and different variable Y in model's projection of future.
+	when relationship tested in various ways -> plug in actual observations of variable X to narrow 
+	the range of answers for variable Y.

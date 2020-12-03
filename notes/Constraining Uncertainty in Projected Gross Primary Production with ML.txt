@@ -1,0 +1,26 @@
+Constraining Uncertainty in Projected Gross Primary Production with ML
+
+Here EC is already known
+
+Abstract:
+More CO2 -> more Gross Primaty Production = production of carbohydrates by photosynthesis
+ESMs exhibit large range in projected GPP
+Here combine EC with ML to constrain spatial variations of multimodel GPP projections
+1st: Use observed changes in CO2 to constrain global mean GPP at end of 21st century
+2nd: Use ML model to constrain gridded future and gridded fractional GPP change in two ind approaches
+	feed observ data to ML alg. Model was trained on CMIP5 data to lern relationship betw 
+		present-day relevant diagnostics and the target.
+		CV shows superior results compared to CMIP5 ensemble mean
+
+Summary and Discussions:
+The presented approach based on machine learning is not limited to projections of the future carbon cycle,
+ which was used as an illustrative example. Indeed, since its only prerequisites are the availability of g
+ridded climate model data and gridded observation‐based data, the GBRT algorithm can be applied to any 
+variable of interest if physically relevant diagnostics that influence the target variable are known. 
+This opens a wide range of possibilities for constraining uncertainties in projected variable scenarios. 
+Additionally, maps of the local relative feature importance as shown in Figure 7c can be used to reveal 
+connections between different Earth system variables that are currently unknown. With the proposed data‐driven 
+approach, a possibly extended application could be to constrain projections of not just one but several 
+variables simultaneously. Moreover, the concept of our method is not limited to GBRT but can be used 
+with any other (machine learning) regression algorithm. 
+

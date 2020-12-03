@@ -1,0 +1,138 @@
+Notes on the paper "Machine Learning in Policy Evaluation: New Tools for Causal Inference"
+
+SUMMARY AND KEYWORDS:
+ML is primarly for prediction. But policy evaluation is mostly casual problem
+-> prediction tools can not be used directly
+-> better: ATE average treatment effect, hopefully attenuate model misspecification, etc
+	under unconfoundnes and positivity assumption aka echangeability and overlapt asump
+nuisance models: propensity score or coditional expectations of the outcome
+
+NOTATION AND ASSUMPTIONS
+	Assumptions: SUTVA (Stable Unit Treatment Value Assumptions
+		    -> no interference and consistency
+	ATE, ATT, CATE here focus ATE
+	commonly assump: no confoundness, positivity (treatment AND control impossible for i)
+	
+ILLUSTRATIVE EXAMPLE(skip)
+INTRO TO ML FOR CAUSAL INFERENCE
+	Supervised ML, Prediction vs causal inference, Lasso, Tree-Based Methods, Boosting
+	Bayesian additive regression trees, super learning ensemble
+ML METHODS TO CREATE BALANCE BETWEEN COVARIATE DISTRIBUTIONS
+	PROPENSITY SCORE METHODS:
+	Propensity score aka balancing score, cond prop of treatment a given obs covariates
+	p(x_i) = P(A_i = 1|X_i = x_i)
+
+	PS matching estimator constructs the missing potential outcome using observed outcome
+	of closest observations from other group and calculates ATE as mean difference betweeen
+	these predicted potential outcomes
+
+	Inverse probability of treatment weighting (IPTW) estimator for ATE: weighted mean 
+	difference between observed outcomes of treatment and control groups, weights are constructed
+	from estimated propensity score, IPTW estimators are sensitive to large weights
+	
+	METHODS AIMING TO DIRECTLY CREATE BALANCED SAMPLES(skip)
+	LIMITATIONS:
+	Assumptions must hold (no unobserved confounding  and positivity) etc (skip)
+
+	ML METHODS FOR THE OUTCOME MODEL:
+	predict potential outcome for level a of the treatment for individs with covariates x
+	f.e estimated via regression
+	reasons NOT to use ML for outcome predictions:
+	1. asymptotic properties of such estimators are unknown f.e BART
+	2. regularisation bias, regularisation for optimal bias-variance trade-off shrink estimates
+		towards zero -> introduces bias eso if shrunk coefficients are strong confounders
+		problem increases as number of param compares to sample size grows
+	3. difficult to conduct inferenct for causal params, no general way of constr valid CI`s
+		and nonparametric bootstrap is not generally valid
+
+	DOUBLE-ROBUST ESTIMATION WITH ML:
+	combine strength of outcome regression with balancing properties of propensity score.
+	intuition: Propensity score or matching as preprocessing step, that can be followed 
+	by regression adj to control for further residual confounding BUT asymptotic prop not well
+	understood.
+	DOUBLE ROBUST estimators use two nuisance models, consistent as long as at least one of them
+	is correctly specified. F.e AUGMENTED INVERSE PROB WEIGHTING (AIPTW) etc (skip)
+	DOUBLE ML: For simplye ATE setting, estimator combines residuals of outcome regression
+	and residuals of propensity score, for more general setting estimator corresponds to
+	AIPTW estimator where nuisance params are estimated using ML.
+
+	VARIABLE SELECTION:
+	problem, which variables to adjust for confounding. stepwise procedures regression not good
+	forward-selection: collinearity is a problem, backward-selection: in high dim settings
+	unfeasible. Also: Tests performed during variable selection are not prespecified bad
+	for vadility and intepretability
+	balancing methods only problem: may lead to adjusting for variables that are causes of exposure
+	only -> bias. modeling outcom only problem: regularisation bias.
+!!!	DOUBLE LASSO: use one model the find variables that predict the outcome and one model to find
+	the variables that predict the treatment. In final step the union of the variables is 
+	selected in either step is used as a confounder control set, to be used in the causal 
+	paramter estimator.
+
+	INSTRUMENTAL VARIABLES:
+	eventually there may be doubt about conditional exchangeability. other method possible when
+	instrumental variable is available -> a varialbe which is correlated with exposure but not
+	associated with a confounder and there isn't any pathway from the IV to the outcome, other
+	than through the exposure. 
+	Example: Local Average Treatment Effect (LATE), consider partially linear instrumental
+	variable model, in simplest form is a two-stage procedure.
+	first stage linear regression of endegenous (dependent, determined by relationship with other
+	variables) exposure A on intsrument Z, A = alpha_0 + alpha*Z + epsilon_a.
+	second stage,regress outcome on predicted exposure A^hat, Y = beta_0 + beta_1*A^hat + epsilon_y
+	first stage is estimation steps, only interested in A_hat parameters are nuisance parameters
+	so this becomes a prediction problem -> machine learning. Helps in eliviating finite sample
+	bias.
+	
+	
+	
+
+		
+
+METHODS FOR BALANCING COVARIANCE DISTRIBUTIONS
+	METHODS THAT FIT OUTCOME REGRESSION TO IMPUTE POTENTIAL OUTCOMES
+	DOUBLE-ROBUST METHODS, COMBINATION OF THE ABOVE
+	VARIABLE SELECTION
+
+
+
+DISCUSSION:
+ML methods can improve the estimation of causal effects only once the identification step
+has been firmed up and using estimators with appropriate convergence rates, so that they
+remain consistent even when using ML fits.
+-> in the big data setting d >> n, assumptions about "no unobserved confounder" may be more
+plausible!
+
+
+KNOWLEDGE:
+ATE: Average Treatment Effect E[Y_i^1 - Y_i^0] Expected difference in outcome for 2 different
+	treatments
+ATT: Average Treatment Effect on the treated
+CATE: Conditional average treatment effect
+	Assumptions: 1. Stable Unit Treatment Value Assumption (SUTVA) -> no interference 
+	the potential outcome of the i-th individual is unrelated to treatment status 
+	of all other individs
+	2. Consistency aka "does not lead to contradictions", formal
+
+potential outcomes can never be simultaneously directly observed, estimands cannot be expressed
+in terms of observed data or identified w/o further assumptions.
+-> ignorability or unconfoundness ot treatment assignment (aka conditional exchangeability).
+
+Conditional Exchangeability:
+Requires that outcomes are independent of treatment, conditional on the observed covariates.
+"Evene if there are confounding variables that differ between the treatment and control groups
+that affect the outcome, if we only look at individs who take a single value for that confounding 
+variable, then the treatment assignment within each strata is "as if" random."
+Treated and untreated individuals are exchangeable wherein the assignment of treatment depends
+only on the measured covariates
+http://www.rebeccabarter.com/blog/2017-07-05-confounding/
+#:~:text=Conditional%20exchangeability%20essentially%
+20means%20that%2C%20even%20if%20there,replace%20the%
+20first%20ignorability%20condition%20with%20the%20following%3A
+
+
+Methods that aim to balance covariate distributions:
+
+	Propensity Score aka balancing score: conditional probability of treatment A given covariates
+		balances the distributins of observed confounders amongst the treamtent and control
+		usage: control for confounding and reweighting
+	Imputation for potential outcomes (regression based)
+	Double-robust methods that combine the two above

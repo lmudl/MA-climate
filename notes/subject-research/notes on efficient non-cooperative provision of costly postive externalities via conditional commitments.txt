@@ -1,0 +1,8 @@
+notes on Efficient Non-Cooperative Provision of Costly Positive 
+Externalities via Conditional Commitments by Jobst Heitzig
+
+Coditional commitment functions. unilateral but mutual (gegenseitig)
+dependent, conditional but binding commitments.
+example we make a decision in GAG that becomes valid under the condition
+that one certain house makes a similar decision.
+In public good: I do good under the condition the other do good as well

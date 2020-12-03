@@ -1,0 +1,63 @@
+notes on potsdam klima institut research in complexity science
+
+https://www.pik-potsdam.de/research/complexity-science/research
+
+also 
+
+https://www.pik-potsdam.de/research/futurelabs/artificial-intelligence-in-the-anthropocene
+
+1. Complexity Science:
+
+Applies and develops methods to understand all aspects of the gloval climate and
+sustainability problem, from analysis of extreme weather events to network analysis
+of societal phenomena.
+
+Dynamics, stability and resilience of complex hybrid infrstructure networks:
+w/ particular focus on higly renewable power grids.
+
+!!!	BA/MA Thesis offered
+	https://www.pik-potsdam.de/research/complexity-science/research/dynamics-stability-and-resilience-of-complex-hybrid-infrastructure-networks/topics-for-bachelors-or-masters-theses
+
+
+Numerical analysis of global economic impacts:
+GL: Sven Willner
+
+	Implementation of investment strategy. investment strategy investigates different levels
+	of foresight and oversight of different economic acctors. also compute impact of extreme weather
+	events via global trade on EU economy.
+
+Development of advanced time series analysis techniques:
+	f.e. comparison f correlation analysis technques for irregularly sampled time series
+	a time series with uncertainties can be considered as a time series of probability density
+		functions.
+	recurrence plots
+	
+Data-based analysis of climate decisions:
+GL: Dr. Leonie Wenz
+
+!!!	study how different economic, private and public actors responded to past weather
+	extremes and explore a range of sustainalbe adaption strategies for the future.
+	previously: impact of extreme weather events.
+	
+
+Network- and machine-learning based predictions of extreme events:
+
+	The Working Group "Network- and machine-learning-based prediction of extreme events" focuses
+	on the application and development of modern techniques from machine learning to challenging 
+	problems of system Earth. 
+	network analysis of climate but also of networks in general f.e. power grids
+	sounds super sophisticated
+
+GaNe - FutureLab on Game Theory & Networks of Interacting Agents:
+	Agent-based modeling of social learning in key economic situations
+
+!!!	possible to write master thesis there
+
+
+Computational Methods and Visualization:
+
+	Methods for optimal decision making under uncertainty
+	domain specific languages for tipping point research
+	visual analytics methods 
+	visual data communication approaches
+

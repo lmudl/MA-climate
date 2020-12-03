@@ -1,0 +1,23 @@
+note on Constraints on Climate Sensitivity from Space-based measurements of low-cloud reflection
+
+insolation: sonneneinstrahlung
+
+clouds regulate Earth's energy balance: reflection of sunlight and absorption/re-emission of thermal radiation
+open question: how will fraction of sunlight reflected by clouds change under rising greenhouse gas concentration?
+Eqilibrium climate sensitivity (ECS): surface warming after doubling of carbon dioxide concentrations
+ECS ranges from 2.1 to 4.7 K, more than half of variance can be traced to differences in reflection of sunlight
+	by tropical clouds (TLCs)
+calculate TLC reflecion alpha_c from insolation and amount of solar radiation reflected by clouds back to space
+space-based measurements indicate that average 8.95% of incoming solar radiation is reflected by clouds in TLC
+	regions. BUT alpha_c varies around average with underlygin surface temperature
+Analysis show that TLC reflection weakens with higher underlying surface temperature
+In simulations of warmer climate higher-sensitivity model project less change or even increase
+models ECS correlates strongly with changes in TLC reflection under global warming
+	-> increase/decrease TLC reflection (resp how much changes reflection with changing temperatures)
+	-> less/more ECS
+	-> observations say higher temp, less reflection more likely
+also, changes in TLC reflection in the models correlate strongly with variations in TLC
+	reflection inferrred from temporal variations in simulations of present climate
+	-> how TLC relfection covaries with temperature in simulations of present climate
+		is strong indicator of how TLC feedback will behave under global warming
+rest see blogpost

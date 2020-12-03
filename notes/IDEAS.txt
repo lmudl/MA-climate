@@ -1,0 +1,45 @@
+IDEAS
+
+1.
+use convolutional neural nets to predict the rainfall in the amazonas 
+do this for every climate model
+use each model to predict rainfall on the real data
+the model that produces the best result stems from the most reasonable model
+
+2. 
+X sst, Y rainfall
+X consists of pixels
+Y consists of pixels? or do we put it together in a mean
+Do we then create feature importance map to get most important pixels?
+Or does each pixel get ID and IDs then might form a network
+
+3.
+how to include the different time scales/ time lags
+
+4.
+could also use attention mechanisms
+
+5.
+use sparse regression or
+MDER: multiple diagnostic ensemble regression
+https://journals.ametsoc.org/view/journals/clim/29/2/jcli-d-15-0412.1.xml
+
+6.
+use inverse covariance matrix for network detection
+
+7. !!!
+need metrics for emergent constraint
+y might be rainfall
+x sst temperatures
+
+SST field dipol apparent -> more rainfall sensitivity/ better prediction
+X SST dipol sensitivity
+Y predictability of rainfall
+
+
+X SST dipol sensitivity
+Y rainfall in the Amazonas
+
+double Emergent Constraint
+X correlation (SST dipol sensitivity) and (rainfall)
+Y biomass loss in the rainforest
