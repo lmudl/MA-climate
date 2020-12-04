@@ -21,3 +21,6 @@ https://www.researchgate.net/publication/330984865_SupernoVAE_VAE_based_kernel_P
 
 efficient inference for dynamical models using variational autoencoders
 https://www.microsoft.com/en-us/research/blog/efficient-inference-for-dynamical-models-using-variational-autoencoders/
+
+tutorial on climate data operators
+https://www.youtube.com/watch?v=pruhLDxCRTk
