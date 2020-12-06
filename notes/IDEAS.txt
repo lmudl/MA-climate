@@ -43,3 +43,13 @@ Y rainfall in the Amazonas
 double Emergent Constraint
 X correlation (SST dipol sensitivity) and (rainfall)
 Y biomass loss in the rainforest
+
+8. 
+use graphical lasso and Stars
+https://stats.stackexchange.com/questions/46031/using-sparse-inverse-covariance-matrix-in-estimating-least-squares-coefficients
+http://statweb.stanford.edu/~tibs/ftp/graph.pdf
+https://arxiv.org/pdf/1006.3316.pdf
+but we need longitudinal version, maybe:
+https://arxiv.org/abs/1610.08013
+time varying networks
+https://www.pnas.org/content/pnas/early/2009/06/30/0901910106.full.pdf
