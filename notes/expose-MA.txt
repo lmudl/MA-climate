@@ -1,0 +1,55 @@
+expose for master arbeit
+
+emergent constraints erklären
+zusammenhang amazonas wassertemperaturen
+paper nennen complex networks
+paper gbrt emergent constraints und ml methoden (vlt auch DL)
+emergent constraint quantifizieren
+dann mit ml methoden vorhersagen verbessern
+
+Improved Percipitation Forecast in the Amazon Basin
+Improve Percipitation Projections in the Amazonas Basin with Machine Learning
+
+I spent a whole lot of fortune on some shit i didnt/shouldnt need
+believe me back then my ego was even greedier with greed
+and my heart was more concerned about really why should i beat
+Troubles used to come in daily on some official sheet
+But whats the use of heavy use it only lowers self-esteem
+And brings back to places where you already have been
+breaking out this hopeless route has cost so many years
+I just hope it may help out some distant peers
+Cause I remember I once lost it and so I understand
+Progress and Change is possible you can believe in it again
+
+Importance of climate models
+Climate Models differ in their answers about future climate giving rise
+to a spread of estimates.
+One way to narrow models estimates is the use of so-called
+"Emergent Constraints".
+The idea is to constrain a climate model's future estimates by using observations.
+When analysing ensembles of climate models, a clear relationship between an observable
+variable X in the past/current climate and Y of the future climate may "emerge".
+If this relationship fulfils certain criteria, f.e. an underpinning physical explanation,
+we can then plug in observations of X to constrain the range of estimates for Y.
+- Cite complex networks paper -
+..., among others studied the relationship between Atlantic Sea Surface Temperatures (SSTs)
+and Rainfall in the Amazon Basin. Because of the large amount of Carbon stored in the
+Amazon, estimates of future rainfall are essential since droughts can lead to diebacks in 
+the rainforest.
+... showed that the average cross correlation between the north translatlantic and the south
+translatlantic ocean (NTAO and STAO respectively), can serve as an early warning system for
+amazon droughts.
+The connection of SST and rainfall in the Amazonas could potentially state an Emergent Constraint.
+Thus a first goal for the Master's Thesis is to quantify the predictive power of the SST - Rainfall 
+mechanism.
+- Cite ML paper
+Building on the concept of Emergent Constraint, ... Paper showed how to further constraint
+futer projections of models using Gradient Boosting Regression Trees.
+In a first step they constrain a climate variables future projection Y to Y_constr. Following they
+use GBRT to learn a function f(X) = Y_constr. Here X are several variables.
+Note that X so far is simulated data.
+In a last step they used the learned function f() to estimate future projections of Y based on
+observed X_obs. So f(X_obs) = Y_hat.
+The second (optional) step of the thesis is to improve rainfall predictions/ projections by
+a firstly constraining rainfall projections by the mechanism detected in (1) and 
+use the machine learning approach from ML PAPER.
