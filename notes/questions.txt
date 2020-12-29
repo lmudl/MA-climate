@@ -20,3 +20,8 @@ Create sensitivity metric maybe for amazon
 	sst -> drought/ percipitation -> biomassloss
 	meaning amazonas sensitivity to biomassloss, equilibrium stability
 1. find fields that are predictive for rain
+
+
+How well do climate models perform in general?
+https://www.klimafakten.de/behauptungen/behauptung-klimamodelle-sind-nicht-verlaesslich
+https://www.helmholtz.de/erde-und-umwelt/wie-funktionieren-klimamodelle/

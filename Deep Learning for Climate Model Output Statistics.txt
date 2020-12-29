@@ -1,0 +1,13 @@
+Deep Learning for Climate Model Output Statistics
+
+Climate Models suffer from systematic and representation errors
+Model Output Statistics (MOS) can help reducing these errors
+Fit model output to observational data with ML
+Here a DL approach with convolutional NN is used.
+
+Here:
+Fit model output to observational data with ML
+
+We:
+Find mechanism to improve predictions over longer time range
+under changing climate
