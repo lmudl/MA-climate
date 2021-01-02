@@ -1,5 +1,8 @@
 # https://rpubs.com/boyerag/297592
 # open and work with NetCDF data
+# SST data
+# from https://www.ncdc.noaa.gov/data-access/marineocean-data/extended-reconstructed-sea-surface-temperature-ersst-v5
+# Coordinate Reference Systems https://rspatial.org/raster/spatial/6-crs.html
 setwd("./Mufasa/Documents/MA-climate")
 getwd()
 library(ncdf4)
@@ -15,15 +18,42 @@ nc_data <- nc_open("data/raw/ersst.v5.185401.nc")
   print(nc_data)
   sink()
 }
+# there are two variables:
+# float sst [lon, lat, lev, time]
+# float ssta [lon, lat, lev, time]
+# sst a for anamolies
+# [] contains the dimensions
 
+# here get metadata information about file
 lon <- ncvar_get(nc_data, "lon")
+# verbose if TRUE progress information is printed
 lat <- ncvar_get(nc_data, "lat", verbose = FALSE)
-t <- ncvar_get(nc_data, "time") #here 0 bc is only first month
+# here 0 bc is only first month of data
+t <- ncvar_get(nc_data, "time") 
+
+# get sst data of interest (also of interest ssta)
 sst <- ncvar_get(nc_data, "sst")
+# 180 89, only two dimensions cause no time
+# dimension since its only first month
+dim(sst) 
+# get fill value for missing values and replace with NA
 fill_val <- ncatt_get(nc_data, "sst", "_FillValue") #-999
-nc_close(nc_data)
+nc_close(nc_data) # close file
 sst[sst == fill_val$value] <- NA
-r <- raster(t(sst), xmn=min(lon), xmx=max(lon), ymn=min(lat), ymx=max(lat), crs=CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs+ towgs84=0,0,0"))
+
+# crs string tells how we define our geospatial grid
+# proj: projection
+# ellps: the ellipsoid (how earth's roundness is calculated)
+# datum: datum refeers to 0,0 reference for coordinate system
+#   used in the projection
+# +no_defs+: ensures that no defaults are read from the defaults files. 
+#   Sometimes they cause suprising problems.
+# towgs84 = 0,0,0 conversion factor used if a datum conversion
+#   is required
+# t(sst) data needs to be transposed
+r <- raster(t(sst), xmn = min(lon), xmx = max(lon), ymn = min(lat), ymx = max(lat), 
+            crs = CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs+ towgs84=0,0,0"))
+# and flipped data usually starts at bottom left corner
+# but need try and error
 r <- flip(r, direction = "y")
 plot(r)
- 
