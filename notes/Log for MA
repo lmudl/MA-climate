@@ -1,0 +1,22 @@
+# Log for MA
+04.01.20
+To do:
+Get coordinates for boxes of general window of interest, STAO, NTAO and Amazon basin
+
+Done:
+General window of interest: 180 W - 3 W, 40 N - 40 S (degrees, lon lat)
+	STAO/ NTAO?
+	amazon basin: 10 S - 0, 70 W - 55 W
+Wrote expose short for björn
+computed narrowed graphic for window of interest
+Amazon basin first data has no values
+
+05.01.20
+Todo:
+see basic-correlation.R
+Get whole precip data
+check if values are apparent
+Compute 1 correlation
+Compute time series of correlations 
+Compute mean 
+Check values for different time lags

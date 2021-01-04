@@ -1,4 +1,4 @@
-Call 01.12.20
+﻿Call 01.12.20
 
 Thesis:
 They found two SST networks/ fields that are predictive for precitipation in the Amazon basin
@@ -67,7 +67,7 @@ TODO
 Paper Cox, supplementary material
 Für beide aber reanalyse
 
-Beobachtungsdaten: ECMWF ERA5
+Beobachtungsdaten: 
 falls möglich räumlioches grid 1° (sonst 0.25°), monatliche auflösung
 alternativ jeweils
 

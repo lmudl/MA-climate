@@ -1,0 +1,129 @@
+expose draft
+
+Main Idea:
+Improve Climate Model future projections by 
+using obersvational data and Machine Learning.
+With future climate change, droughts in the Amazon 
+forest may become more frequent and/or severe. 
+Droughts can turn Amazon regions from rain forest 
+into savanna, leading to high amounts of carbon 
+released into the atmosphere.
+Past research has shown that there is a relatioship between
+Sea Surface Temperatures (SSTs) in the Tropical 
+Atlantic/Pacific and precipation in the Amazon.
+Step one in my thesis will be trying to quantify this relationship
+using different approaches and compare them to each other.
+So I am trying to find a predictive (interpretable) model
+that can predict precipation from SSTs and possibly other variables.
+If such a mechanism is found it can be used as a so called 
+"emergent constraint" in a second step.
+Since different climate models give different answers about future 
+climate change, there is a need to narrow this "spread".
+Here we try to constrain it by using information from observations. 
+(Much simplified) We rescale a models future projection (i.e rain) 
+by how well it fits the current observable data.
+Then we can use a ML approach to learn and predict:
+f(model data) = rescaled model projection 
+f(observed data) = projection
+validation via leave-one-climate-model-out CV
+This can be learned f.e by Gradient Boosting Regression Trees
+
+
+
+Improve Climate Model future projections by 
+using obersvational data and Machine Learning.
+Find a relationship between Sea Surface Temperatures and
+Amazon rainfall. Study how well this relationship 
+is represented in climate models.
+Assign weights to climate models who are closer to observations
+and rescale their future projections of rainfall (or increased
+carbon in the atmosphere due to droughts in the Amazon).
+Use observable climate information to rescale climate model
+future projections (f.e rainfall)
+Learn and predict via ML approach:
+f(model data) = rescaled future model projection
+f(observed data) = improved future projection
+
+
+Main Idea:
+Improve Climate Model future projections by 
+using obersvational data and Machine Learning.
+Motivation: Climate Models are used to study
+possible consequences of the future climate.
+(f.e in the IPCC reports)
+But different climate models give different
+answers about future climate.
+The range of answers is referred to as "spread"
+and can be very large.
+Step 1:
+One approach to narrow the spread are "emergent constraints".
+Here we include the information from observations, to constrain
+the spread of future projections.
+We use the observations of a current/historic climate variable X
+to check how well each model fits the observed values.
+Assuming a relationship between X and a future climate variable Y,
+we can now assign weights to the models Y acccording to how well 
+they represent the current X.
+Meaning we use observable real-world climate from the past to constrain
+the future climate variables in models.
+We can use these weights also to rescale the models' outcome.
+which gives us Y' (rescaled model outcome)
+
+Step 2:
+Use a machine learning approach (f.e Gradient Boosting Regression Trees)
+to learn a function 
+f(X) = Y' in words f(model variable) = rescaled model outcome
+f(obs X) = improved Y
+
+
+Main Idea:
+Improve Climate Model future projections by 
+using obersvational data and Machine Learning.
+With future climate change, droughts in the Amazon forest may become more
+frequent and/or severe. Droughts can turn Amazon regions from
+rain forest into savanna, leading to high amounts of carbon
+released into the atmosphere.
+Past research has shown that there is a relatioship between
+Sea Surface Temperatures (SSTs) in the Tropical Atlantic/Pacific and
+precipation in the Amazon.
+Step one in my thesis will be to quantify this relationship
+using different approaches and compare them to each other.
+So I am trying to find a predictive (interpretable) model
+that can predict precipation from SSTs and possibly other variables.
+If such a mechanism is found it can be used as a so called "emergent
+constraint".
+Since different climate models give different answers about future climate change,
+there is a need to narrow this "spread".
+Here we try to constrain it by using information from observations.
+(Much simplified) We rescale a models future projection (i.e rain) by how well it fits
+the current observable data.
+Then we can use a ML approach to
+learn: f(model data) = rescaled model projection and
+predict: f(observed data) = projection
+validate with CV etc.
+This can be learned f.e by Gradient Boosting Regression Trees
+
+
+Since the mechanism in general is already studied and has a
+theoretical underpinning, it then could be used as a so called
+"emergent constraint". 
+Different climate models give different answers about future climate
+(referred to as the "spread" of answers).
+To narrow this spread, we can incorporate the information of current
+observable climate variables X (observed)
+According to how well a model represent the current climate variables X,(difference of models X and observed X)
+we assign weights to the future outcome Y of a model.
+These weights can also be used to rescale a model's outcome.
+We then may try to find a function f so that:
+f(X) = Y' (rescaled model outcome)
+
+
+
+
+
+
+
+
+
+
+

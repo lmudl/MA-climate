@@ -1,0 +1,56 @@
+File data/raw/precip.mon.total.1x1.v2018.nc (NC_FORMAT_NETCDF4):
+
+     1 variables (excluding dimension variables):
+        float precip[lon,lat,time]   (Chunking: [360,180,1])  (Compression: shuffle,level 2)
+            long_name: GPCC Monthly total of precipitation
+            missing_value: -9.96920996838687e+36
+            statistic: Total
+            valid_range: 0
+             valid_range: 8000
+            parent_stat: Observations
+            var_desc: Precipitation
+            units: mm
+            level: Surface
+            actual_range: 0
+             actual_range: 3349.61010742188
+            dataset: GPCC Precipitation 1.0degree V2018 Full Reanalysis
+
+     3 dimensions:
+        lat  Size:180
+            units: degrees_north
+            actual_range: -89.5
+             actual_range: 89.5
+            long_name: Latitude
+            standard_name: latitude
+            axis: Y
+            coordinate_defines: point
+        lon  Size:360
+            long_name: Longitude
+            units: degrees_east
+            standard_name: longitude
+            actual_range: 0.5
+             actual_range: 359.5
+            axis: X
+            coordinate_defines: point
+        time  Size:1512   *** is unlimited ***
+            long_name: Time
+            units: days since 1800-1-1 00:00:00
+            delta_t: 0000-01-00 00:00:00
+            avg_period: 0000-01-00 00:00:00
+            standard_name: time
+            axis: T
+            coordinate_defines: start
+            actual_range: 33237
+             actual_range: 79227
+
+    9 global attributes:
+        Original_Source: http://www.dwd.de/en/FundE/Klima/KLIS/int/GPCC/GPCC.htm
+ is the webpage and the data is at ftp://ftp.dwd.de/pub/data/gpcc/download.html
+        Reference: Users of the data sets are kindly requested to give feed back and to refer to GPCC publications on this webpage: http://www.dwd.de/bvbw/appmanager/bvbw/dwdwwwDesktop/?_nfpb=true&_pageLabel=_dwdwww_klima_umwelt_datenzentren_wzn&T12404518261141645246564gsbDocumentPath=Content%2FOeffentlichkeit%2FKU%2FKU4%2FKU42%2Fteaser__product__access.html&_state=maximized&_windowLabel=T12404518261141645246564&lastPageLabel=_dwdwww_klima_umwelt_datenzentren_wzn
+        original_source: ftp://ftp-anon.dwd.de/pub/data/gpcc/html/download_gate.html
+        Conventions: CF 1.0
+        dataset_title: Global Precipitation Climatology Centre (GPCC)
+        title: GPCC Full Data Reanalysis Version 2018 1.0x1.0 Monthly Total
+        history: Created 09/2018  based on V2018 data obtained via ftp
+        data_modified: 2019-03-12
+        References: https://www.psl.noaa.gov/data/gridded/data.gpcc.html
