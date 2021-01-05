@@ -11,11 +11,11 @@ library(rgdal)
 library(ggplot2)
 
 # read in netcdf file content
-nc_data <- nc_open("data/raw/ersst.v5.185401.nc")
+sst_data <- nc_open("data/raw/sst/ersst.v5.202012.nc")
 # save the print(nc) dump to a text file
 {
   sink('ersst.v5.185401.nc_metadata.txt')
-  print(nc_data)
+  print(sst_data)
   sink()
 }
 # there are two variables:
@@ -25,20 +25,20 @@ nc_data <- nc_open("data/raw/ersst.v5.185401.nc")
 # [] contains the dimensions
 
 # here get metadata information about file
-lon <- ncvar_get(nc_data, "lon")
+lon <- ncvar_get(sst_data, "lon")
 # verbose if TRUE progress information is printed
-lat <- ncvar_get(nc_data, "lat", verbose = FALSE)
+lat <- ncvar_get(sst_data, "lat", verbose = FALSE)
 # here 0 bc is only first month of data
-t <- ncvar_get(nc_data, "time") 
+t <- ncvar_get(sst_data, "time") 
 
 # get sst data of interest (also of interest ssta)
-sst <- ncvar_get(nc_data, "sst")
+sst <- ncvar_get(sst_data, "sst")
 # 180 89, only two dimensions cause no time
 # dimension since its only first month
 dim(sst) 
 # get fill value for missing values and replace with NA
-fill_val <- ncatt_get(nc_data, "sst", "_FillValue") #-999
-nc_close(nc_data) # close file
+fill_val <- ncatt_get(sst_data, "sst", "_FillValue") #-999
+nc_close(sst_data) # close file
 sst[sst == fill_val$value] <- NA
 
 # crs string tells how we define our geospatial grid

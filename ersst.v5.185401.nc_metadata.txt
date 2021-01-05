@@ -1,8 +1,7 @@
-File data/raw/ersst.v5.185401.nc (NC_FORMAT_CLASSIC):
+File data/raw/sst/ersst.v5.202012.nc (NC_FORMAT_NETCDF4):
 
      2 variables (excluding dimension variables):
-        float sst[lon,lat,lev,time]   
-            _FillValue: -999
+        float sst[lon,lat,lev,time]   (Contiguous storage)  
             long_name: Extended reconstructed sea surface temperature
             standard_name: sea_surface_temperature
             units: degree_C
@@ -10,21 +9,28 @@ File data/raw/ersst.v5.185401.nc (NC_FORMAT_CLASSIC):
             scale_factor: 1
             valid_min: -3
             valid_max: 45
-        float ssta[lon,lat,lev,time]   
+            coordinates: time lev lat lon
             _FillValue: -999
+        float ssta[lon,lat,lev,time]   (Contiguous storage)  
             long_name: Extended reconstructed SST anomalies
             units: degree_C
             add_offset: 0
             scale_factor: 1
             valid_min: -12
             valid_max: 12
+            coordinates: time lev lat lon
+            _FillValue: -999
 
      4 dimensions:
         lat  Size:89
             units: degrees_north
             long_name: Latitude
-            standard_name: latitude
+            standard_name: Latitude
             axis: Y
+            valid_min: -88
+            valid_max: 88
+            _CoordinateAxisType: Lat
+            coordinate_defines: center
             comment: Uniform grid from -88 to 88 by 2
         lev  Size:1
             units: meters
@@ -37,55 +43,94 @@ File data/raw/ersst.v5.185401.nc (NC_FORMAT_CLASSIC):
         lon  Size:180
             units: degrees_east
             long_name: Longitude
-            standard_name: longitude
+            standard_name: Longitude
             axis: X
+            valid_min: 0
+            valid_max: 358
+            _CoordinateAxisType: Lon
+            coordinate_defines: center
             comment: Uniform grid from 0 to 358 by 2
         time  Size:1
-            long_name: Start time of month
-            standard_name: time
-            axis: T
-            delta_t: 0000-01-00
+            _CoordinateAxisType: Time
             avg_period: 0000-01-00
-            calendar: 360_day
-            units: minutes since 1854-01-01 00:00
+            axis: T
+            calendar: gregorian
+            delta_t: 0000-01-00
+            long_name: Time
+            standard_name: time
+            units: days since 1854-01-15 00:00
 
-    38 global attributes:
+    70 global attributes:
         Conventions: CF-1.6, ACDD-1.3
         metadata_link: https://doi.org/10.7289/V5T72FNM
-        id: ersst.v5.185401
+        dataset_doi: https://doi.org/10.7289/V5T72FNM
+        id: gov.noaa.ncdc:C00927
         naming_authority: gov.noaa.ncei
         title: NOAA ERSSTv5 (in situ only)
-        summary: ERSST.v5 is developped based on v4 after revisions of 8 parameters using updated data sets and advanced knowledge of ERSST analysis
+        summary: ERSSTv5 is developped based on v4 and by replacing NCEP GTS by NCEI ICOADS R3.0.2 after January 2016
+        dataset_citation_product: NOAA ERSSTv5
+        dataset_citation_version: ERSSTv5
+        dataset_citation_institution: NOAA/NESDIS/NCEI/CCOG
+        dataset_citation_url: https://doi.org/10.7289/V5T72FNM
         institution: NOAA/NESDIS/NCEI/CCOG
         creator_name: Boyin Huang
         creator_email: boyin.huang@noaa.gov
-        date_created: 2017-06-30T12:18:00Z
-        date_modified: 2017-06-30T12:18:00Z
-        product_version: Version 5
-        history: Fri Jun 30 12:22:38 2017: ncatted -O -a _FillValue,ssta,o,f,-999.0 ssta.nc
-Version 5 based on Version 4
+        creator_type: group
+        creator_institution: NOAA/NESDIS/NCEI
+        contributor_name: Huai-min Zhang
+        contributor_role: Chief, NOAA/NESDIS/NCEI/CCOG/OSB Ocean Surface Section
+        publisher_name: NCEI
+        publisher_url: https://www.ncdc.noaa.gov
+        publisher_email: ncei.info@noaa.gov
+        publisher_type: institution
+        publisher_institution: NCEI
+        date_created: 2020/05/15
+        date_issued: 2020/05/15
+        date_modified: 2020/05/15
+        necdf_version_id: V4 from GrADS sdfwrite
+        netcdf_creator_name: Boyin Huang
+        netcdf_creator_email: boyin.huang@noaa.gov
+        product_version: Version v5
         creator_url: https://www.ncei.noaa.gov
         license: No constraints on data access or use
-        time_coverage_start: 1854-01-01T00:00:00Z
-        time_coverage_end: 1854-02-01T00:00:00Z
-        geospatial_lon_min: -1
-        geospatial_lon_max: 359
-        geospatial_lat_min: -89
-        geospatial_lat_max: 89
+        time_coverage_start: 2020-12-15T00:00:00Z
+        time_coverage_end: 2021-01-15T00:00:00Z
+        time_coverage_resolution: P1M
+        time_coverage_duration: P1M
+        geospatial_lon_min: 0
+        geospatial_lon_max: 358
+        geospatial_lat_min: -88
+        geospatial_lat_max: 88
         geospatial_lat_units: degrees_north
         geospatial_lat_resolution: 2
         geospatial_lon_units: degrees_east
         geospatial_lon_resolution: 2
         spatial_resolution: 2.0 degree grid
+        geospatial_bounds: 0 -88, 358 88
+        geospatial_vertical_min: 0
+        geospatial_vertical_max: 0
+        geospatial_vertical_units: meters
+        geospatial_vertical_resolution: 
+        geospatial_vertical_positive: down
         cdm_data_type: Grid
         processing_level: NOAA Level 4
+        grid_mapping_name: latitude_longitude
         standard_name_vocabulary: CF Standard Name Table (v40, 25 January 2017)
         keywords: Earth Science > Oceans > Ocean Temperature > Sea Surface Temperature
         keywords_vocabulary: NASA Global Change Master Directory (GCMD) Science Keywords
         project: NOAA Extended Reconstructed Sea Surface Temperature (ERSST)
-        platform: Ship and Buoy SSTs from ICOADS R3.0 and NCEP GTS
+        platform: Ship and Buoy SSTs from ICOADS R3.0.2 and Argo SSTs from CCOG
+        platform_vocabulary: NCEI
         instrument: Conventional thermometers
-        source: In situ data: ICOADS R3.0 before 2015, NCEP in situ GTS from 2016 to present, and Argo SST from 1999 to present. Ice data: HadISST2 ice before 2015, and NCEP ice after 2015.
+        instrument_vocabulary: NCEI
+        source: In situ data: ICOADS R3.0 before 2016, ICOADS R3.0.2 from 2016 to present, and Argo SST from 1999 to present. Ice data: HadISST2 ice before 2015, and NCEP ice after 2015.
         comment: SSTs were observed by conventional thermometers in Buckets (in sulated or un-insulated canvas and wooded buckets), Engine Room Intakers, or floats and drifters
         references: Huang et al, 2017: Extended Reconstructed Sea Surface Temperatures Version 5 (ERSSTv5): Upgrades, Validations, and Intercomparisons. Journal of Climate, https://doi.org/10.1175/JCLI-D-16-0836.1
         climatology: Climatology is based on 1971-2000 SST, Xue, Y., T. M. Smith, and R. W. Reynolds, 2003: Interdecadal changes of 30-yr SST normals during 1871.2000. Journal of Climate, 16, 1601-1612.
+        acknowledgment: The NOAA Extended Reconstructed Sea Surface Temperature (ERSST) data are provided by the NOAA National Centers for Environmental Information(NCEI)
+        history: Mon Jan  4 10:58:20 2021: ncap2 -O -s time=time/(1440)+(60965) ssta.nc ssta.nc
+Mon Jan  4 10:58:19 2021: ncatted -O -a _FillValue,ssta,o,f,-999.0 ssta.nc
+Mon Jan  4 10:58:19 2021: ncatted -O -a units,time,o,c,days since 1854-01-15 00:00 ssta.nc
+Version v5 based on Version v4
+        NCO: netCDF Operators version 4.7.5 (Homepage = http://nco.sf.net, Code = http://github.com/nco/nco)
+        nco_openmp_thread_number: 1

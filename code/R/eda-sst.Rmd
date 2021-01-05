@@ -1,0 +1,43 @@
+---
+title: "EDA SST"
+output: html_notebook
+---
+Run button = Ctrl+Shift+Enter
+Insert chunk = Ctrl + Alt + I
+Preview = Ctrl + Shift + K
+http://rmarkdown.rstudio.com
+In this notebook we want to explore the sst data from
+https://www.ncdc.noaa.gov/data-access/marineocean-data/extended-reconstructed-sea-surface-temperature-ersst-v5.
+
+```{r load packages and check working directory}
+library(ncdf4)
+library(raster)
+library(rgdal)
+library(ggplot2)
+library(assertthat)
+```
+```{r check working directory}
+#TODO 
+#should wd be ma-climate or should wd be where the markdown file is?
+```
+
+Maybe before EDA we have to bring the data together
+load each file, get the data, restrict it to the
+window we need and merge into one file
+```{r load data}
+getwd()
+sst_file <- nc_open("data/raw/sst/ersst.v5.185401.nc")
+sst <- ncvar_get(sst_file, "sst")
+dim(sst)
+```
+
+```{r}
+dim(sst)
+new <- array(NA, dim = c(180,89,2))
+new[, , 1] <- sst
+```
+```{r}
+dim(new)
+head(new[,,1])
+```
+

@@ -3,7 +3,7 @@
 ## load sst
 ## load precip
 # compute correlation
-setwd("./Mufasa/Documents/MA-climate")
+setwd("./MA-climate")
 getwd()
 library(ncdf4)
 library(raster)
@@ -11,7 +11,7 @@ library(rgdal)
 library(ggplot2)
 
 # load data and prepare data
-sst_file <- nc_open("data/raw/ersst.v5.185401.nc")
+sst_file <- nc_open("data/raw/sst/ersst.v5.202012.nc")
 lon_sst <- ncvar_get(sst_file, "lon")
 lat_sst <- ncvar_get(sst_file, "lat", verbose = FALSE)
 t_sst <- ncvar_get(sst_file, "time")
@@ -31,9 +31,11 @@ precip[precip == fillval_precip$value] <- NA
 # take on slice of each and compute correlation, basic
 # sst is already slice
 sst_slice <- sst
-precip_slice <- precip[,,1]
+dim(sst)
+precip_slice <- precip[,,1000]
+dim(precip) # 360, 180, 1512
 dim(sst_slice)
-dim(precip_slice)
+dim(precip_slice) # 360, 180
 
 # restrict to window that is of importance for us
 # general window 180 W - 3 W, 40 N - 40 S
@@ -56,6 +58,7 @@ r <- raster(t(try), xmn = 180, xmx = 360,
 r <- flip(r, direction = "y")
 plot(r)
 dim(sst_slice) # 180 and 89
+try[1:5,1:5]
 
 #this looks good# amazon window 10 S - 0, 70 W - 55 W
 head(lat_precip); tail(lat_precip);length(lat_precip) # 89.5, 88.5,.., -88.5, -89.5 and 180
