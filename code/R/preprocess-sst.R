@@ -67,3 +67,10 @@ test <- preprocess_sst("data/raw/sst/")
 f <- open_file("data/raw/sst/", "ersst.v5.202012.nc")
 d <- ncvar_get(f, "sst")
 d[1:5, 1:5]
+
+# save as nc file
+# data is output of preprocess
+# data distance is
+
+
+
