@@ -1,0 +1,59 @@
+Call 07.01.21
+
+Zuerst sorry heute Vortrag verplant, hatt vergessen in Kalender einzutragen?
+Wie war der Vortag?
+Werden die Folien hochgeladen?
+
+Was hab ich gemacht:
+DL Paper gelesen
+Daten preprocessing, alles eine einzelne file
+Files zusammenfügen
+
+Next steps:
+Expose fertig schreiben
+
+Fragen:
+Inwiefern müssen wir die Unsicherheiten in den Daten mit betrachten?
+	Beobachtungsdaten werden "enhanced using statistical methods"
+SST: beginnen iwann, alles Abschätzungen
+	Stichwort: Data Assimilation, wahrscheinl Modellzustand gg Beobachtungen
+	Unsicherheiten rauslassen unter Tisch fallen lassen.
+TODO: Paper lesen zu Daten
+
+Warum genau dieses Dataset? Hat es bestimmte Vorteile, gibts es eine
+	Qualitätsmetrik was die Datensätze angeht?
+	Warum keine Satellitendaten? Früheste 1979, evtl mit reinnehmen?
+Für SSTs: möglichst lange Zeitreihen, ERSST und HATRSST
+	Es gibt einen neuen Reanalyse Datensatz
+
+
+Wir untersuchen zuächst SST und Regen, können das aber in den Beobachtungsdaten
+	nur auf monatlichen Werten machen oder? -> Kürzeste Time-lags wären dann ein Monat?
+A: Monatlich reicht
+
+
+Sollen wir noch andere Datenquellen mit reinnehmen, wenn ja welche wären sinnvoll?
+	z.B Solar Radiation at Surface
+(Sollte man dann eventuell in Klimamodellen erst nach dem EC suchen?
+	und dann erst richtig auf die Beobachtungsdaten kommen?
+Wsl nein, weil Zusammenhang SST und Niederschlag mach ja Sinn, quantifizieren und dann
+	Zusammenhang in den Klimamodellen suchen)
+
+Regen Daten precip.comb.v2018to2016-v6monitorafter.total.nc, 1.0 mal 1.0
+CRU auch für Regen möglich
+
+Interessant: ECO State Networks! Interesant, immer Donnerstag um 14 Uhr
+
+https://www.metoffice.gov.uk/hadobs/hadisst/
+
+https://sites.uea.ac.uk/cru/data -> https://catalogue.ceda.ac.uk/uuid/89e1e34ec3554dc98594a5732622bce9
+
+
+Copernicus:
+1950 bis 1979
+
+older but should be ok
+https://cds.climate.copernicus.eu/cdsapp#!/dataset/reanalysis-era5-single-levels-monthly-means-preliminary-back-extension?tab=overview
+
+here they say its reliable
+https://cds.climate.copernicus.eu/cdsapp#!/dataset/reanalysis-era5-single-levels-monthly-means?tab=overview

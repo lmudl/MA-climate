@@ -1,3 +1,4 @@
+# (Deprecated, just did it w/ cdo)
 # preprocess sst data since they come as one file per month
 # bring them all together 
 library(ncdf4)

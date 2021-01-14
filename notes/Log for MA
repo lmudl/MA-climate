@@ -21,8 +21,6 @@ Done:
 Get whole sst data, did it with down them all, but actually the read me contained 
 	code on how to donwload alle the files
 
-
-Todo:
 see basic-correlation.R
 check if values are apparent in latest file
 Write preprocessing file for sst
@@ -43,3 +41,26 @@ Compute 1 correlation
 Compute time series of correlations 
 Compute mean 
 Check values for different time lags
+
+
+14.01.21
+start 09:30. plan to do 6 pomodoros so circa 3 hours
+
+on cdo:
+start cygwin 64, shell opens, cd bin, then cdo commans run
+questions? how to access data outside of working directory ?
+
+Done:
+Reread some of old notes
+Installed cygwin
+Installed cdo
+Write preprocessing file for sst
+	-> constrain window we need? Here or later?
+		if we constrain, then also to_be_filled needs to get other dimensions DONE solved by cdo
+	-> save processed data in a new file DONE solved by cdo
+
+To do:
+decide wether to use cdo or R or python
+work further on EDA
+write expose
+get supervisor

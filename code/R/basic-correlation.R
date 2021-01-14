@@ -11,11 +11,12 @@ library(rgdal)
 library(ggplot2)
 
 # load data and prepare data
-sst_file <- nc_open("data/raw/sst/ersst.v5.202012.nc")
+sst_file <- nc_open("data/interim/sst_all.nc")
 lon_sst <- ncvar_get(sst_file, "lon")
 lat_sst <- ncvar_get(sst_file, "lat", verbose = FALSE)
 t_sst <- ncvar_get(sst_file, "time")
 sst <- ncvar_get(sst_file, "sst")
+dim(sst) # 180 89 2004
 fillval_sst <- ncatt_get(sst_file, "sst", "_FillValue")
 nc_close(sst_file)
 sst[sst == fillval_sst$value] <- NA
@@ -25,12 +26,13 @@ lon_precip <- ncvar_get(precip_file, "lon")
 lat_precip <- ncvar_get(precip_file, "lat")
 t_precip <- ncvar_get(precip_file, "time")
 precip <- ncvar_get(precip_file, "precip")
+dim(precip) # 360 180 1512
 fillval_precip <- ncatt_get(precip_file, "precip", "missing_value")
 precip[precip == fillval_precip$value] <- NA
 
 # take on slice of each and compute correlation, basic
 # sst is already slice
-sst_slice <- sst
+sst_slice <- sst[,,2004]
 dim(sst)
 precip_slice <- precip[,,1000]
 dim(precip) # 360, 180, 1512

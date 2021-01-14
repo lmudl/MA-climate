@@ -53,3 +53,31 @@ observed X_obs. So f(X_obs) = Y_hat.
 The second (optional) step of the thesis is to improve rainfall predictions/ projections by
 a firstly constraining rainfall projections by the mechanism detected in (1) and 
 use the machine learning approach from ML PAPER.
+
+Main Idea:
+Improve Climate Model future projections by 
+using obersvational data and Machine Learning.
+With future climate change, droughts in the Amazon 
+forest may become more frequent and/or severe. 
+Droughts can turn Amazon regions from rain forest 
+into savanna, leading to high amounts of carbon 
+released into the atmosphere.
+Past research has shown that there is a relatioship between
+Sea Surface Temperatures (SSTs) in the Tropical 
+Atlantic/Pacific and precipation in the Amazon.
+Step one in my thesis will be trying to quantify this relationship
+using different approaches and compare them to each other.
+So I am trying to find a predictive (interpretable) model
+that can predict precipation from SSTs and possibly other variables.
+If such a mechanism is found it can be used as a so called 
+"emergent constraint" in a second step.
+Since different climate models give different answers about future climate change, there is a need to narrow this "spread".
+Here we try to constrain it by using information from observations. 
+(Much simplified) We rescale a models future projection (i.e rain) by how well it fits the current observable data.
+Then we can use a ML approach to learn and predict:
+f(model data) = rescaled model projection 
+f(observed data) = projection
+Validation via leave-one-climate-model-out CV
+This can be learned f.e by Gradient Boosting Regression Trees.
+
+

@@ -11,10 +11,10 @@ library(rgdal)
 library(ggplot2)
 
 # read in netcdf file content
-sst_data <- nc_open("data/raw/sst/ersst.v5.202012.nc")
+sst_data <- nc_open("data/interim/sst_all.nc")
 # save the print(nc) dump to a text file
 {
-  sink('ersst.v5.185401.nc_metadata.txt')
+  sink('sst_all_metadata.txt')
   print(sst_data)
   sink()
 }
@@ -29,17 +29,18 @@ lon <- ncvar_get(sst_data, "lon")
 # verbose if TRUE progress information is printed
 lat <- ncvar_get(sst_data, "lat", verbose = FALSE)
 # here 0 bc is only first month of data
-t <- ncvar_get(sst_data, "time") 
+t <- ncvar_get(sst_data, "time") # 2004, length
 
 # get sst data of interest (also of interest ssta)
 sst <- ncvar_get(sst_data, "sst")
-# 180 89, only two dimensions cause no time
-# dimension since its only first month
+# 180 89 2004, lon lat time respectively, each time point is one month
 dim(sst) 
 # get fill value for missing values and replace with NA
 fill_val <- ncatt_get(sst_data, "sst", "_FillValue") #-999
 nc_close(sst_data) # close file
 sst[sst == fill_val$value] <- NA
+# slice sst
+sst_slice <- sst[,,2004]
 
 # crs string tells how we define our geospatial grid
 # proj: projection
@@ -51,7 +52,7 @@ sst[sst == fill_val$value] <- NA
 # towgs84 = 0,0,0 conversion factor used if a datum conversion
 #   is required
 # t(sst) data needs to be transposed
-r <- raster(t(sst), xmn = min(lon), xmx = max(lon), ymn = min(lat), ymx = max(lat), 
+r <- raster(t(sst_slice), xmn = min(lon), xmx = max(lon), ymn = min(lat), ymx = max(lat), 
             crs = CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs+ towgs84=0,0,0"))
 # and flipped data usually starts at bottom left corner
 # but need try and error
