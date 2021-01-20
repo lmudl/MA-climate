@@ -39,7 +39,7 @@ cdo("mergetime data/raw/sst/*.nc data/interim/sst-interim.nc")
 # max(test_t)
 set_ref_time <- function(input_file_path, output_file_path,
                          reftime, unit) {
-  ClimateOperators::cdo(paste(csl("setreftime",reftime, unit), input_file_path,
+  cdo(paste(csl("setreftime",reftime, unit), input_file_path,
                               output_file_path))
 }
 
@@ -58,7 +58,23 @@ outfile <- "data/interim/sst-interim.nc"
 
 set_ref_time(input_file_path = infile, output_file_path = outfile,
              reftime = reftime, unit = unit)
-
-
 ################################################################################
+
+# we can not directly save outfile to same file as infile
+# need to save to new file and maybe delete afterwards
+# try with to delete file from first step 
+# ://stackoverflow.com/questions/14219887/how-to-delete-a-file-with-r/14220099
+# and maybe rename afterwards
+# https://stackoverflow.com/questions/10758965/how-do-i-rename-files-using-r
+time_span <- "1900/200"
+
+select_years <- function(time_span, infile) {
+  outfile <- paste0(infile,"2")
+  cdo(ssl(csl("-selyear", time_span), infile, outfile))
+  #file.remove(infile)
+  #file.rename(outfile, infile)
+}
+
+select_years(time_span = "1900/2000", "data/interim/precip-interim.nc")
+select_years(time_span = "1900/2000", "data/interim/sst-interim.nc")
 

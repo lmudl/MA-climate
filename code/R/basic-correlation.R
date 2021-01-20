@@ -11,7 +11,7 @@ library(rgdal)
 library(ggplot2)
 
 # load data and prepare data
-sst_file <- nc_open("data/interim/sst_all.nc")
+sst_file <- nc_open("data/interim/sst-all-og.nc")
 lon_sst <- ncvar_get(sst_file, "lon")
 lat_sst <- ncvar_get(sst_file, "lat", verbose = FALSE)
 t_sst <- ncvar_get(sst_file, "time")

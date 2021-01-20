@@ -83,7 +83,7 @@ finish basic correlation
 		use mergetime to bring together the file DONE
 		use setreftime to bring on same timescale
 			do on test file DONE
-			do on both data sets and save code
+			do on both data sets and save code DONE
 				use setreftime on both datasets, ref is workig directory in R
 		? use cdo to bring on same lan lot scale ?
 work further on EDA
@@ -93,7 +93,14 @@ get supervisor
 Notes:
 so what are we doin in the first steps with the raw data?
 1. use mergetime to combine the sst data DONE
-2. setreftime for both files DOING
-3. constrain time
+2. setreftime for both files DONE maybe we dont even need this!
+3. constrain time with selyear (aka selyear) should be enough
 4. constrain lot/lan
 
+DONE:
+use mergetime
+use setreftime
+use selyear, BUT we can not save to the same file we get input from
+	-> concatenate operators?
+	-> save to other file
+	-> maybe rename and delete old one
