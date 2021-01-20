@@ -1,0 +1,8 @@
+errors/warnings - solves
+
+20.01.21
+cdo("--version") gives:
+Error in system2("cdo", cmd.args, stdout = TRUE) : '"cdo"' not found
+solution:
+Sys.getenv("PATH") # shows path
+Sys.setenv(PATH = paste(Sys.getenv("PATH"), "C:\\cygwin64\\bin\\",sep = ";")) # adds cdo location to path

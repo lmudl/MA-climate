@@ -81,4 +81,32 @@ r <- raster(t(precip_slice), xmn = 180, xmx = 360,
 plot(r)
 
 
+# timestamps
+# sst data is given in minutes since 1854-01-01 00:00
+# precip data is given in days since 1800-1-1 00:00
+# we want to bring them on the same scale
+# we can actually drop all the data that was before 1900
+
+t <- t_precip[1500] #78861
+
+# 1900 is wanted as cutoff
+# 1900 - 1854 == 46
+# 46 years intp 
+
+#thoughts when days since 1.1.1800 then 1 day since is 2.1
+#so when I need the 1.1.1800 t should be 0
+#and when I need the 
+#nightmaaaare that finished
+#take sst timestamp and convert from minutes since into days since
+fac <- 60*24
+t_sst/fac
+t_sst <- t_sst/fac
+# they have different epochs
+# define new epoch, say 01.01.1900
+# find a way to get diff between old and new epoch
+# apply that to the time dim
+# test if both time dims are equal
+
+
+
 

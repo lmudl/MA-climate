@@ -58,9 +58,42 @@ Write preprocessing file for sst
 	-> constrain window we need? Here or later?
 		if we constrain, then also to_be_filled needs to get other dimensions DONE solved by cdo
 	-> save processed data in a new file DONE solved by cdo
+	-> used mergetime *.nc
+
+
+15.01.21
+start 09:00 plan to do work 4 hours.
+
+DONE:
+installed cdo for R
+	updated R
+	updated R studio
+	updated Rtools
+used setreftime on test file
+	-> months since 1900 (can be changes easily)
+
+
+20.01.21
+start 11:00 plan to work 2 hours
+
 
 To do:
-decide wether to use cdo or R or python
+finish basic correlation
+	go from raw to interim
+		use mergetime to bring together the file DONE
+		use setreftime to bring on same timescale
+			do on test file DONE
+			do on both data sets and save code
+				use setreftime on both datasets, ref is workig directory in R
+		? use cdo to bring on same lan lot scale ?
 work further on EDA
 write expose
 get supervisor
+
+Notes:
+so what are we doin in the first steps with the raw data?
+1. use mergetime to combine the sst data DONE
+2. setreftime for both files DOING
+3. constrain time
+4. constrain lot/lan
+
