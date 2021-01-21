@@ -1,0 +1,64 @@
+Call 21.01.21
+
+Zeiträume
+SST ab 1870
+PRECIP ab 1900
+
+Paper schauen was Katrin genommen hat
+
+Korrelationsdaten
+ab 1900 bis zum aktuellsten Datum
+
+EDA:
+EDA for geospatial data
+plot for geospatial data, like in paper
+über alle Jahre Januar Mittel
+über alle Jahre Februar Mittel
+von allen Januaren einzeln Januar Mittelwert abziehen
+bsp Januar 51 - Mittel Januar ges Zeitraum
+das für jeden Punkt
+Saisonaler Zyklus wird man nie ganz los
+saisonale anomalies, seasonal trend decompisition with Loess
+
+saisonalen zyklus abziehen
+bsp: nord und süd neg korreliert wg saisonalität
+	aber pos korreliert weil ansteigt -> sais raus um pos korreliert zu sehen
+
+bsp: steigenden lineare trend entfernen weil
+	wenn alle zeitreihen ansteigen wegen globaler erwärmung
+	linearen anstieg raus, damit der lineare anstieg zusammenhang den man untersuchen will
+	nicht überdeckt.
+
+stl zerlegt signal in langsamen trend, saisonalen trend + residuum
+
+
+math möglichkeiten:
+sst und niederschlag
+niederschlag projektionen gut/schlecht?
+korrelationen
+korrelationsfelder
+paper nachbauen
+lasso modelle
+ml modelle, interpretierbarkeit?
+	layerwise relevance propagation, wie sich die info rückwärts fortpflanzt
+	classification challenge, pferde, copyright rechts unten
+feature relevance in den SST, global 
+
+emergent constraint:
+beobachtbares feauture und in den modellen vorhersagbaren feature
+
+zusammenhang in modell aber in beob nicht -> error
+
+obs: sst charakteristik (x-achse)
+pred: amazonas regen (y-achse)
+
+Paper, Cox, Huntingford:
+je höher variabilität, desto höher klimasensitivität -> emergent constraint
+variabilität in historischen daten untersuchen
+dann constrainen.
+
+
+
+nächste woche explainable AI
+
+		

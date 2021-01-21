@@ -6,7 +6,8 @@ library(raster)
 library(rgdal)
 library(ggplot2)
 
-precip_data <- nc_open("data/raw/precip.mon.total.1x1.v2018.nc")
+#precip_data <- nc_open("data/raw/precip.mon.total.1x1.v2018.nc")
+precip_data <- nc_open("data/interim/precip-interim.nc")
 
 # only run once
 get_meta <- function(data, save_to){

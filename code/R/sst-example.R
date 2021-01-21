@@ -11,13 +11,13 @@ library(rgdal)
 library(ggplot2)
 
 # read in netcdf file content
-sst_data <- nc_open("data/interim/sst_all.nc")
+sst_data <- nc_open("data/interim/sst-anomalies.nc")
 # save the print(nc) dump to a text file
-{
-  sink('sst_all_metadata.txt')
-  print(sst_data)
-  sink()
-}
+# {
+#   sink('sst_all_metadata.txt')
+#   print(sst_data)
+#   sink()
+# }
 # there are two variables:
 # float sst [lon, lat, lev, time]
 # float ssta [lon, lat, lev, time]
@@ -29,7 +29,7 @@ lon <- ncvar_get(sst_data, "lon")
 # verbose if TRUE progress information is printed
 lat <- ncvar_get(sst_data, "lat", verbose = FALSE)
 # here 0 bc is only first month of data
-t <- ncvar_get(sst_data, "time") # 2004, length
+t <- ncvar_get(sst_data, "time") # 2003, length
 
 # get sst data of interest (also of interest ssta)
 sst <- ncvar_get(sst_data, "sst")
@@ -40,7 +40,7 @@ fill_val <- ncatt_get(sst_data, "sst", "_FillValue") #-999
 nc_close(sst_data) # close file
 sst[sst == fill_val$value] <- NA
 # slice sst
-sst_slice <- sst[,,2004]
+sst_slice <- sst[,,10]
 
 # crs string tells how we define our geospatial grid
 # proj: projection
@@ -58,3 +58,4 @@ r <- raster(t(sst_slice), xmn = min(lon), xmx = max(lon), ymn = min(lat), ymx = 
 # but need try and error
 r <- flip(r, direction = "y")
 plot(r)
+any(sst != 0)

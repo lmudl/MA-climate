@@ -11,6 +11,7 @@ Sys.getenv("PATH")
 Sys.setenv(PATH = paste(Sys.getenv("PATH"), "C:\\cygwin64\\bin\\",sep = ";"))
 library(ClimateOperators)
 ################################################################################
+# 1st merge single sst
 # merge all single sst files into on with mergetimce *.nc
 # single file is called ersst.v5.yearmonth.nc
 # precip is called precip.mon(thly).total.1x1.v2018.nc
@@ -20,9 +21,15 @@ library(ClimateOperators)
 # ersst.interim
 # cdo mergetime *.nc outfile
 # takes 6.52 sec test if faster on shell directly
-cdo("mergetime data/raw/sst/*.nc data/interim/sst-interim.nc")
-################################################################################
 
+merge_time <- function(infile, outfile) {
+  cdo(ssl("mergetime", infile, outfile))
+}
+
+merge_time(infile = "data/raw/sst/monthly/*.nc", outfile = "data/raw/sst/sst-merged.nc")
+
+################################################################################
+# 2nd set reftime for both files
 # we need setreftime for both files actually
 # cdo("--version")
 # infile <- "data/raw/sst/ersst.v5.202008.nc"
@@ -37,44 +44,80 @@ cdo("mergetime data/raw/sst/*.nc data/interim/sst-interim.nc")
 # }
 # test_t <- ncvar_get(test, "time")
 # max(test_t)
-set_ref_time <- function(input_file_path, output_file_path,
-                         reftime, unit) {
-  cdo(paste(csl("setreftime",reftime, unit), input_file_path,
-                              output_file_path))
+set_ref_time <- function(infile, outfile, reftime, unit) {
+  cdo(ssl(csl("setreftime",reftime, unit), infile,
+                              outfile))
 }
 
-###############################################################################
 reftime <- "1900-1-1,00:00:00"
 unit <- "months"
 
-infile <- "data/raw/precip/precip.mon.total.1x1.v2018.nc" 
-outfile <- "data/interim/precip-interim.nc"
+set_ref_time(infile = "data/raw/precip/precip.mon.total.1x1.v2018.nc" ,
+             outfile = "data/interim/precip-interim.nc",
+             reftime = reftime, unit = unit)
 
-set_ref_time(input_file_path = infile, output_file_path = outfile,
-              reftime = reftime, unit = unit)
 
-infile <- "data/interim/sst-interim.nc"
-outfile <- "data/interim/sst-interim.nc"
-
-set_ref_time(input_file_path = infile, output_file_path = outfile,
+set_ref_time(infile =  "data/raw/sst/sst-merged.nc", 
+             outfile = "data/interim/sst-interim.nc",
              reftime = reftime, unit = unit)
 ################################################################################
-
+# 3rd constrain time span
 # we can not directly save outfile to same file as infile
 # need to save to new file and maybe delete afterwards
 # try with to delete file from first step 
 # ://stackoverflow.com/questions/14219887/how-to-delete-a-file-with-r/14220099
 # and maybe rename afterwards
 # https://stackoverflow.com/questions/10758965/how-do-i-rename-files-using-r
-time_span <- "1900/200"
+time_span <- "1900/2000"
 
-select_years <- function(time_span, infile) {
-  outfile <- paste0(infile,"2")
-  cdo(ssl(csl("-selyear", time_span), infile, outfile))
-  #file.remove(infile)
-  #file.rename(outfile, infile)
+set_out <- function(infile) {
+  new <- strsplit(x = infile, ".nc", fixed = TRUE)[[1]][1]
+  out <- paste0(new, "2.nc")
+  return(out)
 }
 
-select_years(time_span = "1900/2000", "data/interim/precip-interim.nc")
-select_years(time_span = "1900/2000", "data/interim/sst-interim.nc")
+clean_names <- function(infile, outfile) {
+  file.remove(infile)
+  file.rename(outfile, infile)
+}
+
+select_years <- function(infile, time_span) {
+  outfile <- set_out(infile)
+  cdo(ssl(csl("-selyear", time_span), infile, outfile))
+  clean_names(infile, outfile)
+}
+
+select_years(infile = "data/interim/precip-interim.nc", time_span = time_span)
+select_years(infile = "data/interim/sst-interim.nc", time_span = time_span)
+
+################################################################################
+# 4th rearrange lat/lon
+
+rearrange_latlon <- function(infile, degrees){
+  outfile <- set_out(infile)
+  cdo(ssl(csl("-sellonlatbox", degrees), infile, outfile))
+  clean_names(infile, outfile)
+}
+## sst
+# our data has lon 0 to 360 paper used -180 to 180
+# our data has lat -90 to 90 is nice
+# only change lat
+
+rearrange_latlon(infile = "data/interim/precip-interim.nc",
+                 degrees = c("-180,180,-90,90"))
+rearrange_latlon(infile = "data/interim/precip-interim.nc",
+                 degrees = c("-180,-2,-40,40"))
+## precip
+# our data has lon 0 to 360 paper used -180 to 180
+# our has lat -90 to 90 is nice
+# only change lat
+
+rearrange_latlon(infile = "data/interim/sst-interim.nc",
+                 degrees = c("-180,180,-90,90"))
+rearrange_latlon(infile = "data/interim/sst-interim.nc",
+                 degrees = c("-180,-2,-40,40"))
+
+################################################################################
+#5th choose window of interest
+
 

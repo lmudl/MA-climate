@@ -77,18 +77,6 @@ used setreftime on test file
 start 11:00 plan to work 2 hours
 
 
-To do:
-finish basic correlation
-	go from raw to interim
-		use mergetime to bring together the file DONE
-		use setreftime to bring on same timescale
-			do on test file DONE
-			do on both data sets and save code DONE
-				use setreftime on both datasets, ref is workig directory in R
-		? use cdo to bring on same lan lot scale ?
-work further on EDA
-write expose
-get supervisor
 
 Notes:
 so what are we doin in the first steps with the raw data?
@@ -104,3 +92,37 @@ use selyear, BUT we can not save to the same file we get input from
 	-> concatenate operators?
 	-> save to other file
 	-> maybe rename and delete old one
+
+21.01.21
+
+DONE:
+use selyear aka select years for time filtering
+use rearrange_latlon to redefine scales of lat lon
+preprocess:
+	create raw/sst/monthly and after mergetime raw/sst/sst-merged DONE
+	inspect why mergetime "breaks" sst data DONE
+	select lat lon window DONE
+EDA:
+	create anomalie values for each grid point DONE
+	for each year and each grid point compute mean value sst DONE
+	for each year and each grid point compute g_i - mean_year, f.e g_0_0 (lon,lat) - mean_1909 DONE
+
+
+TODO:
+work further on EDA
+	mean ssts (maybe NTAO/STAO):
+		for each month 
+			compute for each year mean temperature in ongoing fashion
+			(add jan 1901 jan 1902 ... jan 1910)/len(year, here = 10) -> mean 1910
+			do that for all years
+			plot each month individually
+	how to plot anomalies? see S3, monthly anomlies, maybe plot it for a couple of random points or NTAO/STAO
+
+	FIRST THING PLOTTTT!!!
+	search EDA for geospatial data
+ASK niklas:
+	supplementary material, and paper "we compute monthly amomalies with respect to the long-term
+		mean annual cycle"
+		https://cfn-live-content-bucket-iop-org.s3.amazonaws.com/journals/1748-9326/15/9/094087/2/ERL_15_9_094087_suppdata.pdf?AWSAccessKeyId=AKIAYDKQL6LTV7YY2HIK&Expires=1611855089&Signature=eYawahUfQLQSPDIB1PKHUeVfWSI%3D
+write expose
+get supervisor

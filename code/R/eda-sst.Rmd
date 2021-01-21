@@ -23,10 +23,11 @@ library(assertthat)
 
 Maybe before EDA we have to bring the data together
 load each file, get the data, restrict it to the
-window we need and merge into one file
+window we need and merge into one file. NICE WORK
+
 ```{r load data}
 getwd()
-sst_file <- nc_open("data/raw/sst/ersst.v5.185401.nc")
+sst_file <- nc_open("data/interim/sst-interim.nc")
 sst <- ncvar_get(sst_file, "sst")
 dim(sst)
 ```
