@@ -11,13 +11,13 @@ library(rgdal)
 library(ggplot2)
 
 # read in netcdf file content
-sst_data <- nc_open("data/interim/sst-anomalies.nc")
-# save the print(nc) dump to a text file
-# {
-#   sink('sst_all_metadata.txt')
-#   print(sst_data)
-#   sink()
-# }
+sst_data <- nc_open("data/interim/sst-interim.nc")
+#save the print(nc) dump to a text file
+{
+  sink('sst_interim_metadata.txt')
+  print(sst_data)
+  sink()
+}
 # there are two variables:
 # float sst [lon, lat, lev, time]
 # float ssta [lon, lat, lev, time]
@@ -26,11 +26,14 @@ sst_data <- nc_open("data/interim/sst-anomalies.nc")
 
 # here get metadata information about file
 lon <- ncvar_get(sst_data, "lon")
+min(lon); max(lon) 
 # verbose if TRUE progress information is printed
 lat <- ncvar_get(sst_data, "lat", verbose = FALSE)
+min(lat); max(lat) 
 # here 0 bc is only first month of data
-t <- ncvar_get(sst_data, "time") # 2003, length
-
+t <- ncvar_get(sst_data, "time")
+min(t); max(t)
+sst_data$dim$time$units
 # get sst data of interest (also of interest ssta)
 sst <- ncvar_get(sst_data, "sst")
 # 180 89 2004, lon lat time respectively, each time point is one month

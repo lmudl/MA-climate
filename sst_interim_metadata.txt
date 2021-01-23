@@ -1,0 +1,85 @@
+File data/interim/sst-interim.nc (NC_FORMAT_CLASSIC):
+
+     2 variables (excluding dimension variables):
+        float sst[lon,lat,lev,time]   
+            standard_name: sea_surface_temperature
+            long_name: Extended reconstructed sea surface temperature
+            units: degree_C
+            _FillValue: -999
+            missing_value: -999
+        float ssta[lon,lat,lev,time]   
+            long_name: Extended reconstructed SST anomalies
+            units: degree_C
+            _FillValue: -999
+            missing_value: -999
+
+     4 dimensions:
+        time  Size:1212   *** is unlimited ***
+            standard_name: time
+            long_name: Start time of month
+            units: months since 1900-1-1 00:00:00
+            calendar: 360_day
+            axis: T
+        lon  Size:90
+            standard_name: longitude
+            long_name: Longitude
+            units: degrees_east
+            axis: X
+        lat  Size:41
+            standard_name: latitude
+            long_name: Latitude
+            units: degrees_north
+            axis: Y
+        lev  Size:1
+            standard_name: depth
+            long_name: Depth of sea surface temperature measurements
+            units: meters
+            positive: down
+            axis: Z
+            _CoordinateAxisType: Height
+            comment: Actual measurement depth of in situ sea surface temperature varies from 0.2 to 10 m, but corrected to the nominal depth of buoy at 0.2 m
+
+    40 global attributes:
+        CDI: Climate Data Interface version 1.9.3 (http://mpimet.mpg.de/cdi)
+        Conventions: CF-1.6, ACDD-1.3
+        history: Thu Jan 21 10:31:16 2021: cdo -sellonlatbox,-180,-2,-40,40 data/interim/sst-interim.nc data/interim/sst-interim2.nc
+Thu Jan 21 10:27:19 2021: cdo -sellonlatbox,-180,180,-90,90 data/interim/sst-interim.nc data/interim/sst-interim2.nc
+Thu Jan 21 10:27:09 2021: cdo -selyear,1900/2000 data/interim/sst-interim.nc data/interim/sst-interim2.nc
+Thu Jan 21 10:27:00 2021: cdo setreftime,1900-1-1,00:00:00,months data/raw/sst/sst-merged.nc data/interim/sst-interim.nc
+        source: In situ data: ICOADS R3.0 before 2015, NCEP in situ GTS from 2016 to present, and Argo SST from 1999 to present. Ice data: HadISST2 ice before 2015, and NCEP ice after 2015.
+        institution: NOAA/NESDIS/NCEI/CCOG
+        metadata_link: https://doi.org/10.7289/V5T72FNM
+        id: ersst.v5.185401
+        naming_authority: gov.noaa.ncei
+        title: NOAA ERSSTv5 (in situ only)
+        summary: ERSST.v5 is developped based on v4 after revisions of 8 parameters using updated data sets and advanced knowledge of ERSST analysis
+        creator_name: Boyin Huang
+        creator_email: boyin.huang@noaa.gov
+        date_created: 2017-06-30T12:18:00Z
+        date_modified: 2017-06-30T12:18:00Z
+        product_version: Version 5
+        creator_url: https://www.ncei.noaa.gov
+        license: No constraints on data access or use
+        time_coverage_start: 1854-01-01T00:00:00Z
+        time_coverage_end: 1854-02-01T00:00:00Z
+        geospatial_lon_min: -1
+        geospatial_lon_max: 359
+        geospatial_lat_min: -89
+        geospatial_lat_max: 89
+        geospatial_lat_units: degrees_north
+        geospatial_lat_resolution: 2
+        geospatial_lon_units: degrees_east
+        geospatial_lon_resolution: 2
+        spatial_resolution: 2.0 degree grid
+        cdm_data_type: Grid
+        processing_level: NOAA Level 4
+        standard_name_vocabulary: CF Standard Name Table (v40, 25 January 2017)
+        keywords: Earth Science > Oceans > Ocean Temperature > Sea Surface Temperature
+        keywords_vocabulary: NASA Global Change Master Directory (GCMD) Science Keywords
+        project: NOAA Extended Reconstructed Sea Surface Temperature (ERSST)
+        platform: Ship and Buoy SSTs from ICOADS R3.0 and NCEP GTS
+        instrument: Conventional thermometers
+        comment: SSTs were observed by conventional thermometers in Buckets (in sulated or un-insulated canvas and wooded buckets), Engine Room Intakers, or floats and drifters
+        references: Huang et al, 2017: Extended Reconstructed Sea Surface Temperatures Version 5 (ERSSTv5): Upgrades, Validations, and Intercomparisons. Journal of Climate, https://doi.org/10.1175/JCLI-D-16-0836.1
+        climatology: Climatology is based on 1971-2000 SST, Xue, Y., T. M. Smith, and R. W. Reynolds, 2003: Interdecadal changes of 30-yr SST normals during 1871.2000. Journal of Climate, 16, 1601-1612.
+        CDO: Climate Data Operators version 1.9.4rc1 (http://mpimet.mpg.de/cdo)

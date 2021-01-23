@@ -16,5 +16,5 @@ cdo("sub data/interim/sst-interim.nc data/interim/sst-yearmean.nc
 
 # checked with sst-example, looked meaningful kinda
 # maybe randomly get 10 points and display their anomalies
-# 
+
 

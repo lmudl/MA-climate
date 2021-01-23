@@ -107,6 +107,56 @@ EDA:
 	for each year and each grid point compute mean value sst DONE
 	for each year and each grid point compute g_i - mean_year, f.e g_0_0 (lon,lat) - mean_1909 DONE
 
+23.01.21
+
+NOTES:
+means ssts in paper:
+for the NTAO
+take all janaurars (feb, mar, etc):
+for i in len(years):
+	(add all i in seq(i) ) / len(i) # gives mean annual sst for one month up to a certain year
+
+mean ssts how I understood it:
+instead of each point we could take NTAO too.
+for each point, each month, each year get mean
+we already get monthly data so, each point,each year in january for example
+compute for this point the mean of all januaries
+do sst_jan_91 - sst_jan_mean_of_all_years
+
+maybe skip this plot when we don't know which area to use now (they use the NTAO)
+
+what to plot then?
+	plot all moths and look at them?
+	inspect NA's
+	inspect max and min
+
+IDEAS from rpubd post about geospatial exploratory data analysis
+	local averaging all grid points over all years
+	maybe see which grid points have warmed up the most over time, see time series
+	autocorrelation is definitely there, right?
+		autocorrelation can occur in timer but also in space
+	can we explore autocorrelation together with correlation of neighboring gridpoint?
+	queen based adjacency
+	local Moran-Koeffizient with comparison to LOCAL mean, arithmetisches Mittel der Abweichungen von den Nachbarregionen
+
+
+IDEAS fro LISA local indicators of spatial association
+	spatial autocorrelation, how strong influence regions each other
+	spatial non stationarity, spatial dependencies are not alike in all regions but locally different
+	local moran coefficient, deviance of x_i and surrounding regions from the GLOBAL mean (different than
+	above)s
+		cross prod of deviance x_i and deviance sourrounding regions is
+			positive, both deviances same direction, the higher the more deviance from mean
+			negative, deviance x_i and deviance surrounding regions different direction
+			close to zero, deviance x_i or deviance surrounding regions close to zero
+		expected value, sum of all weight values/ n - 1. weights are normed by row sum, in row either 1or0
+	expectation of local moran and global moran are equal
+		-> global moran is mean of all local moran
+		-> global moran between -1 and +1
+	Getis-org G-statistics:
+		local moran says nothing about "hot or cold spots"
+		define distance matrix
+
 
 TODO:
 work further on EDA
@@ -117,12 +167,24 @@ work further on EDA
 			do that for all years
 			plot each month individually
 	how to plot anomalies? see S3, monthly anomlies, maybe plot it for a couple of random points or NTAO/STAO
-
 	FIRST THING PLOTTTT!!!
 	search EDA for geospatial data
 ASK niklas:
 	supplementary material, and paper "we compute monthly amomalies with respect to the long-term
 		mean annual cycle"
 		https://cfn-live-content-bucket-iop-org.s3.amazonaws.com/journals/1748-9326/15/9/094087/2/ERL_15_9_094087_suppdata.pdf?AWSAccessKeyId=AKIAYDKQL6LTV7YY2HIK&Expires=1611855089&Signature=eYawahUfQLQSPDIB1PKHUeVfWSI%3D
+	El Nino index?
+read about different data sources where they come from, how they are computed etc
 write expose
 get supervisor
+
+READING LIST:
+exploring and visualisigntime series
+Exploratory Spatial Data Analysis!!!
+	https://towardsdatascience.com/what-is-exploratory-spatial-data-analysis-esda-335da79026ee
+	http://gispopsci.org/exploratory-spatial-data-analysis/
+Animating Data Visualisation for development of the temperatures over time!!!
+	https://towardsdatascience.com/animating-your-data-visualizations-like-a-boss-using-r-f94ae20843e3
+search Machine Learning attention in extreme weather prediction, gives
+	https://link.springer.com/article/10.1007/s10044-020-00898-1
+Pattern Recognition
