@@ -1,0 +1,29 @@
+Notes on interpretable AI II
+Martin Bastian
+
+Interpretable Neural Networks
+why
+	feature relevance, heatmap, pytorch-grad-cam
+	approaches: gradient based, attention based, mask/ noise based, other
+	
+attention mechanism for time series
+athmosphere is chaotic
+k nearest neighbours not nice wokring
+
+analogue method
+	compare sea level pressure for analogue candidate and samples via euclidean distance
+better use mapper (neural net) to get low dimensional representation
+
+what did the model learn, noise maps
+
+gradient
+	+ comp cheap
+	- needs differentiability
+attention
+	+ feature relevance
+	- not always applicable
+noise / mask
+	+ very robust
+	+ easy to interpret
+	- comp expensive
+	- plausible noise / zero noise needed

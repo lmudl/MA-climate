@@ -1,16 +1,11 @@
 ---
-title: "EDA SST"
-output: html_notebook
+title: "eda-precip"
+output: html_document
 ---
-Run button = Ctrl+Shift+Enter
-Insert chunk = Ctrl + Alt + I
-Preview = Ctrl + Shift + K
-http://rmarkdown.rstudio.com
-In this notebook we want to explore the sst data from
-https://www.ncdc.noaa.gov/data-access/marineocean-data/extended-reconstructed-sea-surface-temperature-ersst-v5.
-Preprocessing involved: 
-- merging monthly files, into on large file.
-- restricting the geographical window (longitude and latitude)
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
 
 ```{r load packages}
 library(ncdf4)
@@ -19,14 +14,23 @@ library(rgdal)
 library(ggplot2)
 library(assertthat)
 ```
+```{r set filepath and variable name}
+file_name <- "precip-interim.nc"
+path <- paste0("../../data/interim/", file_name)
+var <- "precip"
+fill_name <- "missing_value"
+to_flip <- FALSE
+getwd()
+```
+
 
 ```{r load data, variables and preprocess}
 # Note working directory is location of file
-file <- nc_open("../../data/interim/sst-interim.nc")
-data <- ncvar_get(file, "sst")
+file <- nc_open(path)
+data <- ncvar_get(file, var)
 lon <- ncvar_get(file, "lon")
 lat <- ncvar_get(file, "lat")
-fill_val <- ncatt_get(file, "sst", "_FillValue")
+fill_val <- ncatt_get(file, var, fill_name)
 nc_close(file)
 data[data == fill_val$value] <- NA
 ```
@@ -40,11 +44,11 @@ We randomly choose one month to plot
 
 ```{r}
 set.seed(420)
-m <- sample(seq(dim(sst)[3]), 1)
-slice <- sst[,,m]
+m <- sample(seq(dim(data)[3]), 1)
+slice <- data[,,m]
 r <- raster(t(slice), xmn = min(lon), xmx = max(lon), ymn = min(lat), ymx = max(lat), 
             crs = CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs+ towgs84=0,0,0"))
-r <- flip(r, direction = "y")
+if (to_flip) r <- flip(r, direction = "y")
 plot(r)
 ```
 Next we inspect the development of the monthly mean temperatures over tim
@@ -58,10 +62,8 @@ ggplot(data = df, aes(x = t, y = temp)) + geom_line() + geom_smooth(method = "au
 The only NA's are the the grid points that refer to continental grid points.
 
 ```{r}
-# NA is alwyas th sane, since only land is NA
+# NA is alwyas th same, since only land is NA
 gap <- which(is.na(slice), arr.ind = TRUE)
 find <- apply(data, 3, function(x) all(which(is.na(x), arr.ind = TRUE) == gap))
 length(find) == sum(find)
 ```
-
-

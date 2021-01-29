@@ -34,7 +34,6 @@ Write preprocessing file for sst
 		if we constrain then also to_be_filled needs to get other dimensions
 	-> save data TODO
 
-
 Check what time frames the data is in
 	-> do EDA
 Compute 1 correlation
@@ -157,9 +156,27 @@ IDEAS fro LISA local indicators of spatial association
 		local moran says nothing about "hot or cold spots"
 		define distance matrix
 
+29.01.20
+
+DONE:
+Did some plots for EDA
+	read "Reconstructing coupled time series in climate systemsusing three kinds of machine-learning methods", LSTMS and Reservoir Computer seem to be interesting
+	read how to read a paper
+
 
 TODO:
+read the paper niklas sent
+	use "how to read a paper approach"
+Also Transformers/Attention for Time Series Data.
+	https://www.reddit.com/r/MachineLearning/comments/ckaji4/d_transformers_for_time_series_data/ew2pet4/
+	https://towardsdatascience.com/attention-for-time-series-classification-and-forecasting-261723e0006d
+	https://arxiv.org/pdf/2001.08317.pdf
+read about different data sources where they come from, how they are computed etc
+decide on a data-set
+write expose
+get supervisor
 work further on EDA
+	FIRST THING PLOTTTT!!! DONE
 	mean ssts (maybe NTAO/STAO):
 		for each month 
 			compute for each year mean temperature in ongoing fashion
@@ -167,18 +184,16 @@ work further on EDA
 			do that for all years
 			plot each month individually
 	how to plot anomalies? see S3, monthly anomlies, maybe plot it for a couple of random points or NTAO/STAO
-	FIRST THING PLOTTTT!!!
 	search EDA for geospatial data
 ASK niklas:
 	supplementary material, and paper "we compute monthly amomalies with respect to the long-term
 		mean annual cycle"
 		https://cfn-live-content-bucket-iop-org.s3.amazonaws.com/journals/1748-9326/15/9/094087/2/ERL_15_9_094087_suppdata.pdf?AWSAccessKeyId=AKIAYDKQL6LTV7YY2HIK&Expires=1611855089&Signature=eYawahUfQLQSPDIB1PKHUeVfWSI%3D
 	El Nino index?
-read about different data sources where they come from, how they are computed etc
-write expose
-get supervisor
 
 READING LIST:
+papers from niklas
+papers about the data sets
 exploring and visualisigntime series
 Exploratory Spatial Data Analysis!!!
 	https://towardsdatascience.com/what-is-exploratory-spatial-data-analysis-esda-335da79026ee
@@ -188,3 +203,8 @@ Animating Data Visualisation for development of the temperatures over time!!!
 search Machine Learning attention in extreme weather prediction, gives
 	https://link.springer.com/article/10.1007/s10044-020-00898-1
 Pattern Recognition
+
+
+
+
+

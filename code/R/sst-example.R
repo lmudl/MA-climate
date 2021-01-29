@@ -62,3 +62,7 @@ r <- raster(t(sst_slice), xmn = min(lon), xmx = max(lon), ymn = min(lat), ymx = 
 r <- flip(r, direction = "y")
 plot(r)
 any(sst != 0)
+
+
+
+

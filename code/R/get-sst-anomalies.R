@@ -1,3 +1,5 @@
+# good that we wrote this code but actually not needed
+# sst data already contains ssta, meaning sst anomalies
 # create sst data with monthly anomalies compared to yearly means
 rm(list = ls())
 getwd()
