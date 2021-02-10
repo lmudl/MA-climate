@@ -1,0 +1,25 @@
+File data/raw/cru/scPDSI-1901-2019.nc (NC_FORMAT_NETCDF4):
+
+     1 variables (excluding dimension variables):
+        double scpdsi[longitude,latitude,time]   (Chunking: [80,36,159])  (Compression: level 5)
+            long_name: self-calibrating Palmer Drought Severity Index
+            units: scpdsi
+            _FillValue: -9999
+
+     3 dimensions:
+        longitude  Size:720
+            long_name: Longitude
+            units: degrees_east
+        latitude  Size:360
+            long_name: Latitude
+            units: degrees_north
+        time  Size:1428
+            long_name: Time
+            units: days since 1900-01-01 00:00:00
+
+    5 global attributes:
+        creation_date: 08-Feb-2020 16:55:02
+        Institution: Climatic Research Unit, University of East Anglia, UK
+        creator: Jonathan Barichivich (campsidium@gmail.com)
+        Original reference: van der Schrier G, Barichivich J, Briffa KR and Jones PD (2013) A scPDSI-based global data set of dry and wet spells for 1901-2009. J. Geophys. Res. Atmos. 118, 4025-4048 (10.1002/jgrd.50355).
+        Updated reference: Osborn TJ, Barichivich J, Harris I, van der Schrier G and Jones PD (2019) Monitoring global drought using the self-calibrating Palmer Drought Severity Index [in "State of the Climate in 2016"]. Bulletin of the American Meteorological Society xx, Sxx-Sxx

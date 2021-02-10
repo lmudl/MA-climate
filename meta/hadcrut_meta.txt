@@ -1,0 +1,51 @@
+File data/raw/hadcrut/HadCRUT.5.0.1.0.analysis.anomalies.ensemble_mean.nc (NC_FORMAT_NETCDF4):
+
+     6 variables (excluding dimension variables):
+        double tas_mean[longitude,latitude,time]   (Chunking: [72,36,1])  (Compression: shuffle,level 4)
+            _FillValue: -1e+30
+            long_name: blended air_temperature_anomaly over land with sea_water_temperature_anomaly
+            units: K
+            cell_methods: area: mean (interval: 5.0 degrees_north 5.0 degrees_east) time: mean (interval: 1 month) realization: mean
+            coordinates: realization
+        double time_bnds[bnds,time]   (Contiguous storage)  
+        double latitude_bnds[bnds,latitude]   (Contiguous storage)  
+        double longitude_bnds[bnds,longitude]   (Contiguous storage)  
+        8 byte int realization[]   (Contiguous storage)  
+            bounds: realization_bnds
+            units: 1
+            standard_name: realization
+        8 byte int realization_bnds[bnds]   (Contiguous storage)  
+
+     4 dimensions:
+        time  Size:2052
+            axis: T
+            bounds: time_bnds
+            units: days since 1850-01-01 00:00:00
+            standard_name: time
+            long_name: time
+            calendar: gregorian
+        latitude  Size:36
+            axis: Y
+            bounds: latitude_bnds
+            units: degrees_north
+            standard_name: latitude
+            long_name: latitude
+        longitude  Size:72
+            axis: X
+            bounds: longitude_bnds
+            units: degrees_east
+            standard_name: longitude
+            long_name: longitude
+        bnds  Size:2
+[1] "vobjtovarid4: **** WARNING **** I was asked to get a varid for dimension named bnds BUT this dimension HAS NO DIMVAR! Code will probably fail at this point"
+
+    9 global attributes:
+        comment: 2m air temperature over land blended with sea water temperature at a depth of 20cm expressed as monthly anomalies relative to 1961-1990 climatology.
+        history: 
+        institution: Met Office Hadley Centre / Climatic Research Unit, University of East Anglia
+        licence: HadCRUT5 is licensed under the Open Government Licence v3.0 except where otherwise stated. To view this licence, visit https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3
+        reference: C. P. Morice, J. J. Kennedy, N. A. Rayner, J. P. Winn, E. Hogan, R. E. Killick, R. J. H. Dunn, T. J. Osborn, P. D. Jones and I. R. Simpson (2020), An updated assessment of near-surface temperature change from 1850: the HadCRUT5 dataset, Submitted to J. Geophys. Res.
+        source: CRUTEM.5.0.1.0 HadSST.4.0.0.0
+        title: HadCRUT.5.0.1.0 blended land air temperature and sea-surface temperature anomaly data set
+        version: HadCRUT.5.0.1.0
+        Conventions: CF-1.7

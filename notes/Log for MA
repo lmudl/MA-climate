@@ -163,10 +163,9 @@ Did some plots for EDA
 	read "Reconstructing coupled time series in climate systemsusing three kinds of machine-learning methods", LSTMS and Reservoir Computer seem to be interesting
 	read how to read a paper
 
+01.02.21
 
 TODO:
-read the paper niklas sent
-	use "how to read a paper approach"
 Also Transformers/Attention for Time Series Data.
 	https://www.reddit.com/r/MachineLearning/comments/ckaji4/d_transformers_for_time_series_data/ew2pet4/
 	https://towardsdatascience.com/attention-for-time-series-classification-and-forecasting-261723e0006d
@@ -192,7 +191,6 @@ ASK niklas:
 	El Nino index?
 
 READING LIST:
-papers from niklas
 papers about the data sets
 exploring and visualisigntime series
 Exploratory Spatial Data Analysis!!!
@@ -205,6 +203,139 @@ search Machine Learning attention in extreme weather prediction, gives
 Pattern Recognition
 
 
+DONE:
+papers from niklas:
+	1. Reconstructing coupled time series in climate systems using three kinds of machine-learning methods,
+		recommended because Tula held presentation about it.
+		title, abstract, intro:
+		abstract:
+			coupled time series
+			how well can NN learn dynamical system
+			reservoir computer, backprop NN, LSTM
+			RC and LSTM can infer coupling in linear and nonlinear systems
+			what factors significantly influence ML reconstruction
+			how do we select suitable explanatory variables for ML reconstruction
+			if coupling is strongly linear -> reconstruction can be bidirectional
+			if coupling is nonlinear -> direction dependent, reconstruction may be only unidirectional
+			Convergent cross mapping CCM:
+				determine which variable can be taken as reconstructedd one and which explanatory
+					we probably dont need because need for SST vs Rain, we know that SST explains Rain
+					BUT maybe inside SST pixels!
+				pearson correlation may be low but CCM index may be high
+		intro:
+			skip
+		sections:
+		conclusion:
+			CCM index is strong -> quality of reconstruction is direction dependent and var dependent,
+				determined by coupling strength and causality between dynamical variables	
+			CCM larger than 0.5 good starting point 
+
+	2. Earth system models underestimate carbon fixation by plants in the high latitudes, recommmended bc 
+		no sé
+		Abstract:
+			models: rising co2 concentration and climate changes -> land continues storing carbon
+			BUT disagree on amount of carbon uptake
+			historical co2 increase enhanced carbon fixation by photosynthesis (Gross primary production,
+			GPP). Evidenced from atmospheric co2 concentration and satelitte lead area index measurements.
+			Create Emergent Constraint from leaf are sensitvity to ambient (umgebend) CO2
+			EC estimate of GPP is 60% larger than conventionally used multi-model average.
+			-> models underestimate carbon fixation, overestimate co2 abundance
+		Intro:
+			to predict climate change: how much carbon in atmosphere rains there and how much is stored
+			in oceans and lands. Historical increase of atm co2 concentration -> enhanced GPP, indirectly
+			evident in amplified seasonal swings of atmospheric co2 concentration and increase in summer time green leaf area. Use thes observables, expressed as sensitivities to ambient co2,
+			to reduce uncertainty.
+		Discussion:
+			model underestimation eventually due to representation of carbon-nitrogen interaction and vegetation dynamics. models that underestimate, show excessive nitrogen limitation, they also lack simulation of vegetation cover dynamcis (f.e northward shift of vascular plants (Gefäßpflanze)), plus higher productivity of shrubs and trees. models that overstimate show overly strong Co2 fertilization effect hence excessive greening, prob due to lack of nitrogen limitation. closest model estimate uses empirical approach that implicitly includes nutrient limition.
+	3. An observation-based constraint on permafrost loss as a function of global warming
+		recommended by Cox
+		Abstract:
+			permafrost component in eart system models, one of the most sensitive to warming.
+			permafrost loss radically changes high-latitude hydrology and biogechemical cycling.
+			-> significant feedbacks on climate change. cliamte models predict thwainf of permafrost under climate change, but widely varying magnitudes of permafrost thaw. In each model we can use present-day spatial distribution of permafrost and air temperature to infer the senitivity opof merfafrost to future global warming -> use as EC -> 20% higher estimate for sensitivity of permafrost to global warming.
+		Intro:
+			Connection between Mean Annual Air Temperature (MAAT) and probability of permafrost fraction
+			is robust over different models and time epochs
+
+
+reading list:
+https://towardsdatascience.com/inferring-causality-in-time-series-data-b8b75fe52c46
+file:///C:/Users/Mufasa/AppData/Local/Temp/CISE-13-6-CompSims15280.pdf
+https://towardsdatascience.com/inferring-causality-in-time-series-data-b8b75fe52c46
+
+TODO:
+Also Transformers/Attention for Time Series Data.
+	https://www.reddit.com/r/MachineLearning/comments/ckaji4/d_transformers_for_time_series_data/ew2pet4/
+	https://towardsdatascience.com/attention-for-time-series-classification-and-forecasting-261723e0006d
+	https://arxiv.org/pdf/2001.08317.pdf
+read about different data sources where they come from, how they are computed etc
+decide on a data-set
+write expose
+get supervisor
+work further on EDA
+	FIRST THING PLOTTTT!!! DONE
+	mean ssts (maybe NTAO/STAO):
+		for each month 
+			compute for each year mean temperature in ongoing fashion
+			(add jan 1901 jan 1902 ... jan 1910)/len(year, here = 10) -> mean 1910
+			do that for all years
+			plot each month individually
+	how to plot anomalies? see S3, monthly anomlies, maybe plot it for a couple of random points or NTAO/STAO
+	search EDA for geospatial data
+ASK niklas:
+	supplementary material, and paper "we compute monthly amomalies with respect to the long-term
+		mean annual cycle"
+		https://cfn-live-content-bucket-iop-org.s3.amazonaws.com/journals/1748-9326/15/9/094087/2/ERL_15_9_094087_suppdata.pdf?AWSAccessKeyId=AKIAYDKQL6LTV7YY2HIK&Expires=1611855089&Signature=eYawahUfQLQSPDIB1PKHUeVfWSI%3D
+	El Nino index?
+
+READING LIST:
+https://towardsdatascience.com/inferring-causality-in-time-series-data-b8b75fe52c46
+file:///C:/Users/Mufasa/AppData/Local/Temp/CISE-13-6-CompSims15280.pdf
+https://towardsdatascience.com/inferring-causality-in-time-series-data-b8b75fe52c46
+exploring and visualisigntime series
+Exploratory Spatial Data Analysis!!!
+	https://towardsdatascience.com/what-is-exploratory-spatial-data-analysis-esda-335da79026ee
+	http://gispopsci.org/exploratory-spatial-data-analysis/
+Animating Data Visualisation for development of the temperatures over time!!!
+	https://towardsdatascience.com/animating-your-data-visualizations-like-a-boss-using-r-f94ae20843e3
+search Machine Learning attention in extreme weather prediction, gives
+	https://link.springer.com/article/10.1007/s10044-020-00898-1
+Pattern Recognition
+
+DONE:
+
+paper about data sources:
+Copernicus Data
+CRU has data on precipitation and drought
+
+Read about precipitation and drought
+and decide whether to use cru or copernicus
+
+03.02.21
+
+DONE:
+Downloaded Data
+plots
+	https://nordicesmhub.github.io/climate-data-tutorial/04-visualization-R/
+	https://gis.stackexchange.com/questions/181586/remove-points-which-are-out-of-shapefile-or-raster-extent/181589
+
+TODO:
+inspect new data
+	hadcrut data, temp over whole globe, very pixely only 5°x5°
+	find out where is land where is water
+fit model
+
+TODO:
+!!
+file:///C:/Users/Mufasa/AppData/Local/Temp/3939-Article%20Text-6998-1-10-20190703.pdf
+https://www.jstor.org/stable/pdf/25765383.pdf?refreqid=excelsior%3Ab5ce8aec306af5cbaeebbfe169ea608e
 
 
 
+09.02.21
+DONE:
+Read 
+Detecting Causality in Complex Ecosystems
+
+hacrut is from 1850-2020
+drought is from 1902-2019

@@ -1,5 +1,5 @@
 ---
-title: "EDA SST"
+title: "EDA Hadcrut"
 output:
   pdf_document: default
   html_notebook: default
@@ -20,15 +20,16 @@ library(assertthat)
 
 ```{r load data, variables and preprocess}
 # Note working directory is location of file
-file <- nc_open("../../data/interim/sst-interim.nc")
-data <- ncvar_get(file, "sst")
-lon <- ncvar_get(file, "lon")
-lat <- ncvar_get(file, "lat")
-fill_val <- ncatt_get(file, "sst", "_FillValue")
+file <- nc_open("../../data/raw/hadcrut/HadCRUT.5.0.1.0.analysis.anomalies.ensemble_mean.nc")
+varname <- "tas_mean"
+data <- ncvar_get(file, varname)
+lon <- ncvar_get(file, "longitude_bnds")
+lat <- ncvar_get(file, "latitude_bnds")
+fill_val <- ncatt_get(file, varname, "_FillValue")
 nc_close(file)
 data[data == fill_val$value] <- NA
 ```
-The data contains `r dim(data)[3]` months of Sea Surface Temperature 
+The data contains `r dim(data)[3]` months of Temperature 
 data, in the geographical window from `r min(lon)` to `r max(lon)`
 longitude and `r min(lat)` to `r max(lat)` latitude respectively.
 On a resolution of a `ncatt_get(file,0)$spatial_resolution`

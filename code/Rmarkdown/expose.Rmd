@@ -1,0 +1,164 @@
+---
+title: "Expose Master Thesis Lepke"
+output: 
+  pdf_document:
+    citation_package: natbib
+bibliography: ["packages.bib", "literature.bib"]
+biblio-style: "apalike"
+---
+```{r, include=FALSE}
+knitr::write_bib(c("knitr", "stringr"), file = "packages.bib")
+```
+
+Short summary:
+Improve Climate Model future projections by 
+using obersvational data and Machine Learning
+With future climate change, droughts in the Amazon forest may become more
+frequent and/or severe. Droughts can turn Amazon regions from
+rain forest into savanna, leading to high amounts of carbon
+released into the atmosphere.
+Past research has shown that there is a relatioship between
+Sea Surface Temperatures (SSTs) in the Tropical Atlantic/Pacific and
+precipation in the Amazon.[@schneider2018statistical]
+Step one in my thesis will be to quantify this relationship further,
+using different approaches and compare them to each other.
+So I am trying to find a predictive (interpretable) model
+that can predict precipation from SST time series and possibly other variables.
+If such a mechanism is found it can be used as a so called "emergent
+constraint".
+Since different climate models give different answers about future climate change,
+there is a need to narrow the so called "spread".
+Here we try to constrain this spread by using information from observations.
+We can evaluate a climate models realism by comparing it's simulated variable
+to actual observed variables. And assume that models that simulate present climate
+well, simulate future climate variables well, too.
+The models future projections then get rescaled according to how well they fit
+the present climate variable.
+(Much simplified) We rescale a models future projection (i.e rain) by how well it fits the current observable data.
+Then we can use a ML approach to
+learn function: 
+f(model data of present climate variable) = rescaled model projection and
+predict: f(observed data of present climate variable) = projection of
+validate with CV etc.
+This can be learned f.e by Gradient Boosting Regression Trees
+
+Longer explanation:
+Motivation:
+  Amazonas, carbon sink
+  Amazonas, important for many lives water biodiversity
+Related Work SST amazonas:
+Emergent Constraint:
+Related Work GBRT:
+The data:
+Next steps
+
+
+
+
+
+written 31.01:
+Tropical rainforests constitute large global carbon sinks,
+making them an important factor for assessing future climate change.
+Droughts can have a major impact on these ecosystems and their function
+as carbon sinks, as was seen in the Amazon drought of 2010, which had a total biomass carbon impact of 2.2 PgC.
+Therefore drought forecasting poses an important challenge to solve.
+Earlier work has studied the connection between sea surface temperatures
+(SST) and precipation in the Amazon basin. The authors created an 
+early-warning indicator for Amazon droughts based on tropical Atlantic
+SSTs. While this approach worked reasonably well, they focused solely
+on the tropical Atlantic, to predict droughts indicated by a drought
+threshold. Another interesting challenge is to predict precipation
+in the Amazonas in general, based on SSTs.
+Hence the first task in my Master Thesis is to fit a predictive model,
+that can forecast the precipation in the Amazonas.
+The connection of SST and precipation might be linked to certain areas
+in the ocean or a specific mechanism. The authors named earlier,
+for example identified a dipol between the northern and southern
+transatlantic ocean (NTAO, STAO respectively), as indicator for future droughts.
+
+partly from draft, partly from alex hall and ucla:
+With future climate change, droughts in the Amazon forest may become more
+frequent and/or severe. Droughts can turn Amazon regions from
+rain forest into savanna, leading to high amounts of carbon
+released into the atmosphere.
+Past research has shown that there is a relationship between
+Sea Surface Temperatures (SSTs) in the Tropical Atlantic/Pacific and
+precipation in the Amazon.
+Step one in this thesis will be to quantify this relationship further
+using different approaches and compare them to each other.
+So I am trying to find a predictive (interpretable) model
+that can forecast precipation from SSTs and possibly other variables.
+If such a mechanism is found it can be used as a so called "emergent
+constraint".
+Since different climate models give different answers about future climate change, there is a need to narrow this so called "spread".
+When analyzing global climate models, we might find a relationship between an observable variable A of the current climate and B of future climate projections. Because the observed measurements of the predictor
+A can be used to constrina the models' responses B, relationship
+between A and B is called emergent constraint.
+Variable A may be a characteristic of the climate system (humidity, winds, etc) or characterize natural variations (in he seasonal cycle, or
+from year to year).
+Once A is estimated observationally, we can use the emergent constraint to judge a model's realism and narrow down the spread of future climate 
+projections. 
+
+
+So we need a variable, that we can measure in the real world and have historical data of (i.e. X) and a variable that is of importance for the future climate (Y).
+
+
+
+
+A classic example for an emergent constraint is the Arctic sea-ice albedo feedback. Ice 
+
+Different climate models have different values for the
+
+reflectivity of sea-ice areas. This has a direct influence on each climate
+model's projection of future global warming, measured in climate sensitivity. Climate sensitivity defined as follows, how much does 
+global average temperatures rise when the amount of CO_2 in the atmosphere is doubled, compared to the preindustrial age.
+
+
+
+OG snow albedo feedback explained
+This is an example of an early ‘emergent constraint’, a technique seeking strong statistical relationships between parameters describing aspects of current and future climate across a GCM ensemble, which can be both observed and  physically  explained
+
+
+a relationship may emerge between
+a models' simulated variable X of the current climate and Y of the
+models' projections of future climate.
+
+
+Here we try to constrain the spread by using information from observations.
+If there exists a relationship between an observable variable X
+and a future 
+
+
+First the variable 
+
+
+We rescale a models future projection of by how well it
+represents historical observations or quantities.
+
+
+
+Insert example of emerging constraint?
+
+
+
+
+
+(Much simplified) We rescale a models future projection (i.e rain) by how well it fits
+the current observable data.
+Then we can use a ML approach to
+learn: f(model data) = rescaled model projection and
+predict: f(observed data) = projection
+validate with CV etc.
+
+
+
+
+
+
+droughts means no rain
+rain prediction is important
+master thesis 2-fold
+1st create predictive model based on sst to predict precipation
+2nd use emergent constraint
+
+

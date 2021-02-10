@@ -19,3 +19,17 @@ paste0(new[1], "2.nc")
 
 sst all zeros after mergetime
 solution: raw/sst contained a test.nc file, deleting the file colved the issue
+
+03.02.21
+plots
+https://nordicesmhub.github.io/climate-data-tutorial/04-visualization-R/
+
+10.02.21
+after preprocessing file gets large
+-> use zip in cdo command, f.e.
+cdo -z zip setreftime,1910-01-01,00:00:00,months scPDSI-1901-2019.nc cru-interim.nc
+
+preprocessed the data, 
+precip has only the small window now
+temp is still global
+fit model tomorrow scurr scurr

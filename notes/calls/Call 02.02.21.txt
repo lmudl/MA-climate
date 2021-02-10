@@ -1,0 +1,69 @@
+Call 02.02.21
+
+question:
+can we use convergent cross mapping to determine which fields in the ocean influence which other fields?
+	YES 2 papers send, 
+	check reservoir computer for causality TODO
+	https://www.researchgate.net/publication/341529341_Detecting_causality_from_time_series_in_a_machine_learning_framework
+	TODO
+can incorporating green lead are index or alike help to estimate, vaporisation or similar?
+	DONE we dont it
+obs based constraint of permafrost loss: if climate stabilises at 1.5 degrees instead of 2, would save
+	approximately 2 mio km^2 of permafrost.
+is there a general overview/ review paper over different datasets?
+	DONE
+do the data sets differ in their analyisis
+	DONE
+do you think we will need data sensitivity
+	DONE
+how do you know which data sets work well and which don't?
+	DONE
+drought is precipiation and temperature together, how to use is?
+	DONE
+used time range in Paper is different for different data sets? or do they do it?
+	DONE
+what is the difference between CRU and ERA5? ERA better for SST? and CRU for precipitation?
+
+general notes:
+for expose: Ec is used to reduce uncertainties
+1.5 instead of 2 degree increas -> influence on rainforest?
+we probably dont need lot lan info if we firstly just fit a linear model, that uses only NTAO,STAO and
+their half year preceeding values. Meaning: Precip_i = NTAO_i, STAO_i, NTAO_i-1, STAO_i-1,...,, NTAO_i-5, STAO_i-5
+if needed we could add dataset specific variables, like when did satelite data some into play`?
+
+call:
+py ecostate network, pyesn
+	funktionsapproximator, rnn, zeitreihenvorhersage
+	wsl nicht so sinnvoll
+	saliency maps, pferd wassserzeichen
+multi layer perceptron, saliency map
+CRU drought index as target!!!
+https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2019MS002002
+https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2020MS002195
+Start with CRU dataset für niederschlag bzw dürre
+era hat zu wenig zeit datenpunkten
+https://www.ncdc.noaa.gov/data-access/marineocean-data/extended-reconstructed-sea-surface-temperature-ersst-v5
+https://climatedataguide.ucar.edu/climate-data/sst-data-hadisst-v11
+https://www.metoffice.gov.uk/hadobs/hadisst/
+
+CRU dürre index, und ERSST sst her.
+oder noch besser https://crudata.uea.ac.uk/cru/data/temperature/
+SSTs, SAT: HadCRUT5
+precip/ drought: CRU
+
+ratio:
+sst: entweder ersst oder hadisst
+hadcrut: zusammen sst hadisst und cru land tempertatur, also temp land und wasser
+	erstmal alle daten, wenn nichts wird
+	dann erstmal ab 1970 oder 1980
+	unsicherheiten mit reinnehmen? vielleicht selber unsicherheiten definieren
+
+baseline model: y = a*X_t oder y = b*X_t-1 aber nicht gemeinsam
+global eventuell mit lasso, und dann feature importance
+
+
+nächster termin do 11.2 16 uhr
+
+
+
+

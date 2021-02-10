@@ -45,7 +45,7 @@ merge_time(infile = "data/raw/sst/monthly/*.nc", outfile = "data/raw/sst/sst-mer
 # test_t <- ncvar_get(test, "time")
 # max(test_t)
 set_ref_time <- function(infile, outfile, reftime, unit) {
-  cdo(ssl(csl("setreftime",reftime, unit), infile,
+  cdo(ssl(csl("-z zip setreftime",reftime, unit), infile,
                               outfile))
 }
 
@@ -60,6 +60,15 @@ set_ref_time(infile = "data/raw/precip/precip.mon.total.1x1.v2018.nc" ,
 set_ref_time(infile =  "data/raw/sst/sst-merged.nc", 
              outfile = "data/interim/sst-interim.nc",
              reftime = reftime, unit = unit)
+
+set_ref_time(infile = "data/raw/cru/scPDSI-1901-2019.nc",
+             outfile = "data/interim/cru-interim.nc",
+             reftime = reftime, unit = unit)
+
+set_ref_time(infile = "data/raw/hadcrut/HadCRUT.5.0.1.0.analysis.anomalies.ensemble_mean.nc",
+             outfile = "data/interim/hadcrut-interim.nc",
+             reftime = reftime, unit = unit)
+
 ################################################################################
 # 3rd constrain time span
 # we can not directly save outfile to same file as infile
@@ -68,7 +77,7 @@ set_ref_time(infile =  "data/raw/sst/sst-merged.nc",
 # ://stackoverflow.com/questions/14219887/how-to-delete-a-file-with-r/14220099
 # and maybe rename afterwards
 # https://stackoverflow.com/questions/10758965/how-do-i-rename-files-using-r
-time_span <- "1900/2000"
+time_span <- "1902/2019"
 
 set_out <- function(infile) {
   new <- strsplit(x = infile, ".nc", fixed = TRUE)[[1]][1]
@@ -89,6 +98,9 @@ select_years <- function(infile, time_span) {
 
 select_years(infile = "data/interim/precip-interim.nc", time_span = time_span)
 select_years(infile = "data/interim/sst-interim.nc", time_span = time_span)
+
+select_years(infile = "data/interim/hadcrut-interim.nc", time_span = time_span)
+select_years(infile = "data/interim/cru-interim.nc", time_span = time_span)
 
 ################################################################################
 # 4th rearrange lat/lon
@@ -116,6 +128,9 @@ rearrange_latlon(infile = "data/interim/sst-interim.nc",
                  degrees = c("-180,180,-90,90"))
 rearrange_latlon(infile = "data/interim/sst-interim.nc",
                  degrees = c("-180,-2,-40,40"))
+
+rearrange_latlon(infile = "data/interim/cru-interim.nc",
+                 degrees = c("-72,-55,-9,0"))
 
 ################################################################################
 #5th choose window of interest

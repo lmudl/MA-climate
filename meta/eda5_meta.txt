@@ -1,0 +1,35 @@
+File data/raw/era5/era5-sst-precip.nc (NC_FORMAT_64BIT):
+
+     2 variables (excluding dimension variables):
+        short sst[longitude,latitude,expver,time]   
+            scale_factor: 0.00061697729459776
+            add_offset: 289.46490147229
+            _FillValue: -32767
+            missing_value: -32767
+            units: K
+            long_name: Sea surface temperature
+        short tp[longitude,latitude,expver,time]   
+            scale_factor: 2.35745997528798e-06
+            add_offset: 0.0772445335502858
+            _FillValue: -32767
+            missing_value: -32767
+            units: m
+            long_name: Total precipitation
+
+     4 dimensions:
+        longitude  Size:1440
+            units: degrees_east
+            long_name: longitude
+        latitude  Size:721
+            units: degrees_north
+            long_name: latitude
+        expver  Size:2
+            long_name: expver
+        time  Size:504
+            units: hours since 1900-01-01 00:00:00.0
+            long_name: time
+            calendar: gregorian
+
+    2 global attributes:
+        Conventions: CF-1.6
+        history: 2021-02-02 11:13:57 GMT by grib_to_netcdf-2.16.0: /opt/ecmwf/eccodes/bin/grib_to_netcdf -S param -o /cache/data1/adaptor.mars.internal-1612264189.5980198-23267-5-9be6d52e-7a6b-4074-b512-ad06dc160bc7.nc /cache/tmp/9be6d52e-7a6b-4074-b512-ad06dc160bc7-adaptor.mars.internal-1612264189.598574-23267-2-tmp.grib
