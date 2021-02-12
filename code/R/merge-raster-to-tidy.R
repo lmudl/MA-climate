@@ -40,11 +40,10 @@ merge_grids_parallel <- function(data) {
   return(out)
 }
 
-
 system.time(merge_grids(temp)) #user 228.96, system 40.58, verstr 269
 system.time(merge_grids_parallel(temp)) #user 0.82, system 0.45, verstr 30.92
 out <- merge_grids(temp)
-save(out, file = "data/processed/hacrut.Rda")
+save(out, file = "data/processed/hadcrut-processed.Rda")
 system.time(out_two <- merge_grids_parallel(drought))
 save(out_two, file = "data/processed/cru-processed.Rda")
 head(out_two)
