@@ -11,13 +11,13 @@ library(rgdal)
 library(ggplot2)
 
 # read in netcdf file content
-sst_data <- nc_open("data/interim/sst-interim.nc")
+sst_data <- nc_open("data/raw/sst/HadISST_sst.nc")
 #save the print(nc) dump to a text file
-{
-  sink('sst_interim_metadata.txt')
-  print(sst_data)
-  sink()
-}
+# {
+#   sink('sst_interim_metadata.txt')
+#   print(sst_data)
+#   sink()
+# }
 # there are two variables:
 # float sst [lon, lat, lev, time]
 # float ssta [lon, lat, lev, time]
@@ -25,10 +25,10 @@ sst_data <- nc_open("data/interim/sst-interim.nc")
 # [] contains the dimensions
 
 # here get metadata information about file
-lon <- ncvar_get(sst_data, "lon")
+lon <- ncvar_get(sst_data, "longitude")
 min(lon); max(lon) 
 # verbose if TRUE progress information is printed
-lat <- ncvar_get(sst_data, "lat", verbose = FALSE)
+lat <- ncvar_get(sst_data, "latitude", verbose = FALSE)
 min(lat); max(lat) 
 # here 0 bc is only first month of data
 t <- ncvar_get(sst_data, "time")
@@ -42,8 +42,13 @@ dim(sst)
 fill_val <- ncatt_get(sst_data, "sst", "_FillValue") #-999
 nc_close(sst_data) # close file
 sst[sst == fill_val$value] <- NA
+# also check for weird values
+plot(density(sst, na.rm = TRUE))
+sst[sst < -100] <- NA
+
 # slice sst
-sst_slice <- sst[,,10]
+sst_slice <- sst[,,1800]
+
 
 # crs string tells how we define our geospatial grid
 # proj: projection
@@ -59,7 +64,7 @@ r <- raster(t(sst_slice), xmn = min(lon), xmx = max(lon), ymn = min(lat), ymx = 
             crs = CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs+ towgs84=0,0,0"))
 # and flipped data usually starts at bottom left corner
 # but need try and error
-r <- flip(r, direction = "y")
+# r <- flip(r, direction = "y")
 plot(r)
 any(sst != 0)
 

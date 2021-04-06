@@ -1,0 +1,39 @@
+File data/raw/sst/HadISST_sst.nc (NC_FORMAT_CLASSIC):
+
+     2 variables (excluding dimension variables):
+        float time_bnds[nv,time]   
+        float sst[longitude,latitude,time]   
+            _FillValue: -1.00000001504747e+30
+            standard_name: sea_surface_temperature
+            long_name: sst
+            units: C
+            cell_methods: time: lat: lon: mean
+            missing_value: -1.00000001504747e+30
+
+     4 dimensions:
+        time  Size:1812   *** is unlimited ***
+            units: days since 1870-1-1 0:0:0
+            calendar: gregorian
+            long_name: Time
+            standard_name: time
+        latitude  Size:180
+            units: degrees_north
+            long_name: Latitude
+            standard_name: latitude
+        longitude  Size:360
+            units: degrees_east
+            long_name: Longitude
+            standard_name: longitude
+        nv  Size:2
+[1] "vobjtovarid4: **** WARNING **** I was asked to get a varid for dimension named nv BUT this dimension HAS NO DIMVAR! Code will probably fail at this point"
+
+    9 global attributes:
+        Title: Monthly version of HadISST sea surface temperature component
+        description: HadISST 1.1 monthly average sea surface temperature
+        institution: Met Office Hadley Centre
+        source: HadISST
+        reference: Rayner, N. A., Parker, D. E., Horton, E. B., Folland, C. K., Alexander, L. V., Rowell, D. P., Kent, E. C., Kaplan, A.  Global analyses of sea surface temperature, sea ice, and night marine air temperature since the late nineteenth century J. Geophys. Res.Vol. 108, No. D14, 4407 10.1029/2002JD002670
+        Conventions: CF-1.0
+        history: 17/2/2021 converted to netcdf from pp format
+        supplementary_information: Updates and supplementary information will be available from http://www.metoffice.gov.uk/hadobs/hadisst
+        comment: Data restrictions: for academic research use only. Data are Crown copyright see (http://www.opsi.gov.uk/advice/crown-copyright/copyright-guidance/index.htm)

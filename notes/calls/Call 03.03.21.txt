@@ -1,0 +1,17 @@
+notes gemeinsamer call:
+
+eco state network für el Nino vorhersagen
+nature cnn, 16-17 Monate vorhersage
+frau ror, fruor, 20 Monate aber science abgelehnt
+
+phillip was machst du eigentlich?
+hess:
+Regenvorhersage, Inferenz von ca. paar Stunden
+Simulationsoutput numerische wettermodelle
+aus athmosphärischen modellen interferieren.
+Optimierung von Extremen, bessere statistische Interpretationen
+
+Interpretability, neurales Netz, regen extreme zeitskala paar Tage,
+Klassifizierung, welche athmosphärischen Variablen.
+
+gröber 5x5.

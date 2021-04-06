@@ -344,3 +344,13 @@ drought is from 1902-2019
 
 factor variables in glmnet possible
 problem
+
+06.04.21
+
+Finally started again with MA thesis
+Downloaded drought data from https://crudata.uea.ac.uk/cru/data/drought/#global
+Downloaded sst data from https://www.metoffice.gov.uk/hadobs/hadisst/data/HadISST_sst.nc.gz
+
+checked on the sst_values with sst-example.R
+plot(density(sst_slice, na.rm = TRUE)) showed there are some values of -1000
+drop them and get nice plots

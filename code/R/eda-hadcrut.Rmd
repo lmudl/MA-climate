@@ -63,4 +63,3 @@ find <- apply(data, 3, function(x) all(which(is.na(x), arr.ind = TRUE) == gap))
 length(find) == sum(find)
 ```
 
-

@@ -34,7 +34,7 @@ fillvalue <- ncatt_get(precip_data, "precip", "missing_value")
 nc_close(precip_data)
 
 precip[precip == fillvalue$value] <- NA
-precip_slice <- precip[, , 1]
+precip_slice <- precip[, , 1000]
 dim(precip_slice)
 
 r <- raster(t(precip_slice), xmn = min(lon), xmx = max(lon),
@@ -42,7 +42,6 @@ r <- raster(t(precip_slice), xmn = min(lon), xmx = max(lon),
             crs = CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs+ towgs84=0,0,0"))
 #r <- flip(r, direction = "y")
 plot(r)
-
 #####
 precip[180:190,90:100,220:210]
 # mean over all years a bit much but first try

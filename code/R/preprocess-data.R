@@ -6,10 +6,16 @@
 # 4th constrain window of lon and lat
 rm(list = ls())
 getwd()
-setwd("MA-climate")
+setwd("Repos/MA-climate")
 Sys.getenv("PATH")
 Sys.setenv(PATH = paste(Sys.getenv("PATH"), "C:\\cygwin64\\bin\\",sep = ";"))
+# Sys.setenv(PATH = paste(Sys.getenv("PATH"), 
+#                          "C:\\Users\\Mufasa\\AppData\\Local\\Packages\\CanonicalGroupLimited.Ubuntu20.04onWindows_79rhkp1fndgsc\\LocalState\\rootfs\\usr\\bin"),
+#                          sep = ";")
+# Sys.setenv(PATH = paste(Sys.getenv("PATH"),
+#                         "\\wsl$\\Ubuntu-20.04\\usr\\bin\\", sep =";"))
 library(ClimateOperators)
+cdo("--version")
 ################################################################################
 # 1st merge single sst
 # merge all single sst files into on with mergetimce *.nc
@@ -55,7 +61,6 @@ unit <- "months"
 set_ref_time(infile = "data/raw/precip/precip.mon.total.1x1.v2018.nc" ,
              outfile = "data/interim/precip-interim.nc",
              reftime = reftime, unit = unit)
-
 
 set_ref_time(infile =  "data/raw/sst/sst-merged.nc", 
              outfile = "data/interim/sst-interim.nc",

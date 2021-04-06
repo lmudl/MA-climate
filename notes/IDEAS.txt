@@ -53,3 +53,15 @@ but we need longitudinal version, maybe:
 https://arxiv.org/abs/1610.08013
 time varying networks
 https://www.pnas.org/content/pnas/early/2009/06/30/0901910106.full.pdf
+
+9.
+correlate the average cross correlation with the percipitation
+get time series, get sensitvity
+use same procedure in climate models see how sensitive they are
+plot sensitivity against biomass loss?
+sst -> rainfall -> biomasslos
+what about burning of the amazonas?
+
+10.
+are sst corrleations or acc only predictive for droughts
+or for rainfall in general
