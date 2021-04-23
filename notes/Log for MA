@@ -354,3 +354,61 @@ Downloaded sst data from https://www.metoffice.gov.uk/hadobs/hadisst/data/HadISS
 checked on the sst_values with sst-example.R
 plot(density(sst_slice, na.rm = TRUE)) showed there are some values of -1000
 drop them and get nice plots
+
+12.04.21
+
+Preprocessing seems to be harder than expeced
+for some reason cygwin does not work as it used to
+doing it via ubuntu works a bit better but not completely
+out of box for all the data would be nice maybe make some data overview
+
+for sst:
+I had one file that had to be merged
+Hadcrut is Had sst and land temp
+HadIsst is Had sst and ice temp
+
+Maybe try all Hadcrut data and then see if land is also important?
+	but problem was here that we need a land mask 
+	-> Had sst data only or had ice
+Had data
+https://crudata.uea.ac.uk/cru/data/temperature/
+
+For drought:
+CRU https://sites.uea.ac.uk/cru/data/
+
+can also try to update cygwin,
+but anyway on Vm it will run on linux
+
+but code will be in R for data wrangling
+
+suddenly had sst interim selyear to had sst interim sellonlatbox
+	invalid grid type
+
+but dont need to rearrange hadisst because dimensions of long and lat
+are already ok!
+
+TODO:
+check stepwise how data files change after cdo commands
+
+13.04
+preprocessing seems to work so far Hadsst and drought-19
+
+14.04
+
+TODO
+check plots, did look ok
+HadSST is not filled in though, no reanalysis, so I dont know
+	how to handle, maybe use a filled in dataset
+OG Paper uses ERSST and CHIRPS
+ML Paper uses CRU and ERA
+
+https://www.metoffice.gov.uk/hadobs/hadsst4/HadSST.4.0.1.0_Product_User_Guide.pdf
+
+Use drought and compare with precip?
+
+read about standardized precup index 
+read about drought index I use
+
+ask ML paper authors how they handled different time availability of data sets
+
+

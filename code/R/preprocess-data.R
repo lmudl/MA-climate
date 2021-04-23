@@ -51,7 +51,7 @@ merge_time(infile = "data/raw/sst/monthly/*.nc", outfile = "data/raw/sst/sst-mer
 # test_t <- ncvar_get(test, "time")
 # max(test_t)
 set_ref_time <- function(infile, outfile, reftime, unit) {
-  cdo(ssl(csl("-z zip setreftime",reftime, unit), infile,
+  cdo(ssl(csl("setreftime",reftime,unit), infile,
                               outfile))
 }
 
@@ -73,6 +73,28 @@ set_ref_time(infile = "data/raw/cru/scPDSI-1901-2019.nc",
 set_ref_time(infile = "data/raw/hadcrut/HadCRUT.5.0.1.0.analysis.anomalies.ensemble_mean.nc",
              outfile = "data/interim/hadcrut-interim.nc",
              reftime = reftime, unit = unit)
+
+# most recent
+# set reftime for HADISST to make it compatible with drought indices
+reftime <- "1901-1-1,00:00:00"
+unit <- "months"
+
+set_ref_time(infile = "data/raw/sst/HadISST_sst.nc",
+             outfile = "data/interim/sst/had_sst_interim.nc",
+             reftime = reftime, unit = unit)
+
+# time stays the same here but we change unit from days to months
+# DOES NOT WORK FROM R with cygwin, only worked via Ubuntu
+
+set_ref_time(infile = "data/raw/drought/scPDSI_1901_2020.nc",
+             outfile = "data/interim/drought/scpdsi_interim.nc",
+             reftime = reftime, unit = unit)
+
+set_ref_time(infile = "data/raw/drought/scPDSI-1901-2019.nc",
+             outfile = "data/interim/drought/scpdsi-interim-19.nc",
+             reftime = reftime, unit = unit)
+
+
 
 ################################################################################
 # 3rd constrain time span
@@ -97,7 +119,7 @@ clean_names <- function(infile, outfile) {
 
 select_years <- function(infile, time_span) {
   outfile <- set_out(infile)
-  cdo(ssl(csl("-selyear", time_span), infile, outfile))
+  cdo(ssl(csl("-selyear", time_span), infile, outfile), debug = TRUE)
   clean_names(infile, outfile)
 }
 
@@ -106,6 +128,17 @@ select_years(infile = "data/interim/sst-interim.nc", time_span = time_span)
 
 select_years(infile = "data/interim/hadcrut-interim.nc", time_span = time_span)
 select_years(infile = "data/interim/cru-interim.nc", time_span = time_span)
+
+# most recent
+# cru starts at 1900
+# both together 1900-2000
+
+time_span <- "1901/2019"
+select_years(infile = "data/interim/sst/had_sst_interim.nc", time_span = time_span)
+# also does not work in cygwin
+# will have to do it on linux again
+select_years(infile = "data/interim/drought/scpdsi_interim.nc", time_span = time_span)
+
 
 ################################################################################
 # 4th rearrange lat/lon
@@ -136,6 +169,10 @@ rearrange_latlon(infile = "data/interim/sst-interim.nc",
 
 rearrange_latlon(infile = "data/interim/cru-interim.nc",
                  degrees = c("-72,-55,-9,0"))
+
+# most recent
+rearrange_latlon(infile = "data/interim/sst/had_sst_interim.nc",
+                 degrees = c("-180,180,-90,90"))
 
 ################################################################################
 #5th choose window of interest

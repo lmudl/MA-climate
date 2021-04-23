@@ -19,7 +19,7 @@ If such a mechanism is found it can be used as a so called
 "emergent constraint" in a second step.
 Since different climate models give different answers about future 
 climate change, there is a need to narrow this "spread".
-Here we try to constrain it by using information from observations. 
+Here we try to constrain it by using information from observations.
 (Much simplified) We rescale a models future projection (i.e rain) 
 by how well it fits the current observable data.
 Then we can use a ML approach to learn and predict:
