@@ -1,7 +1,7 @@
 ---
-title: "Master Thesis Lepke"
+title: "Master Thesis Overview"
 author: "Dario Lepke"
-date: "14.04.21"
+date: "29.04.21"
 output:
   bookdown::html_document2: default
   pdf_document: Null
@@ -16,12 +16,12 @@ frequent and/or severe. Droughts can turn Amazon regions from rain forest into
 savanna, leading to high amounts of carbon released into the atmosphere.
 Therefore, predicting future droughts and understanding the underlying mechanisms 
 is of great interest. @ciemer2020early, established an 
-early warning indicator for Amazon droughts or a drought index, based on tropical Atlantic sea surface 
+early warning indicator for droughts in the central Amazon basin (CAB), based on tropical Atlantic sea surface 
 temperatures (SSTs). In my thesis I would like to build on this work and improve the 
 predictive power by using different statistical methods.
-Meaning, we seek to build a model that is able to predict droughts based on preceding
+Meaning, we seek to build a model that is able to predict droughts (resp. rainfall) based on preceding
 sea temperatures, desirably with as much lead time as possible. Also we want to 
-identify those sea regions that are most important for doing so, making interpretability point of interest, too. A first model could be a LASSO approach
+identify those sea regions that are most important for doing so, making interpretability a point of interest, too. A first model could be a cross-validated LASSO approach
 trying to identify the most important oceanic regions and the respective time-scales.
 
 The thesis will be done in cooperation with Dr. Niklas Boers from the Postdam Institute for Climate Impact Research (@PIC).
@@ -30,11 +30,11 @@ The thesis will be done in cooperation with Dr. Niklas Boers from the Postdam In
 
 As already mentioned the paper by @ciemer2020early, created an early warning
 indicator for Amazon droughts. They did so using a complex network approach.
-For this they use two datasets, one for the Sea Surface Temperatures (@smith2008improvements) and one for
-the Rainfall (@funk2015climate) with monthly data for the time period of 1981 until 2016. The data can be downloaded for example in netcdf format and can be manipulated conventiently with Climate Data Operators (CDO, @schulzweida2019cdo). CDO in turn can be used with wrappers for R and Python. The data is organized on a longitude/latitude grid.  
-They identify 4 oceanic regions that correlate the most with rainfall in the amazon basin, using a coupled network approach.
-Figure \@ref(fig:cross) shows the cross degree towards rainfall in the Central Amazon Basin (CBA, blue box), for positive and negative correlations. Darker shades indicate a larger cross degree, hence a larger number of links and correlations with rainfall at more grid points in the CBA.  
-The correlations are measured using a spearson rank-order correlation coefficient\
+They used two datasets, one for the Sea Surface Temperatures (@smith2008improvements) and one for
+the precipitation (@funk2015climate) with monthly data for the time period of 1981 until 2016. The data can be downloaded for example in netcdf format and manipulated conventiently with Climate Data Operators (CDO, @schulzweida2019cdo). CDO in turn can be used with wrappers for R and Python. The data is organized on a longitude/latitude grid.  
+They identify 4 oceanic regions that correlate the most with rain in the amazon basin, using a coupled network approach.
+Figure \@ref(fig:cross) shows the cross degree towards rainfall in the central Amazon basin (CAB, blue box), for positive and negative correlations. Darker shades indicate a larger cross degree, hence a larger number of links and correlations with rainfall at more grid points in the CBA.  
+The correlations are measured using a spearman rank-order correlation coefficient\
 \[
  \rho = 1 - \frac{6\sum\Delta_{R_i}^2}{n(n^2-1)}  .
 \]
