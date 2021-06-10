@@ -1,0 +1,122 @@
+---
+title: "EDA ERSST Data"
+author: "Dario Lepke"
+date: "10 6 2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+We explore the sea surface temperature data set, used in the paper by Ciemer et al. 
+ERSST (Extended Reconstructed Sea Surface Temperature) is a reanalysis from observed data given in the Internation Comprehensive Ocean-Athmosphere Data Set (ICOADS). Which contains observation from 1800 on, made by ships and buoys for example.
+The data comes on a 2x2 degree grid, where data was missing interpolation techniques were used.
+See paper for reference.
+Data are more reliable after 1940.
+
+Data comes in seperate files for each month but can be downloaded to the working directory via bash.
+
+```{bash}
+yr=1880
+while [ $yr -le 2016 ]; do
+nm=1
+while [ $nm -le 12 ]; do
+if [ $nm -lt 10 ]; then
+nm=0$nm
+fi
+wget ftp://ftp.ncdc.noaa.gov/pub/data/cmb/ersst/v5/netcdf/ersst.v5.$yr$nm.nc
+nm=`expr $nm + 1`
+done
+yr=`expr $yr + 1`
+done
+```
+
+We then use the Climate Data Operators (CDO) Software to handle the files for preprocessing.
+We do so by using the CDO software on an Ubuntu distribution installed on Windows via WSL2.
+To access the files on Windows in the C folder via Ubuntu we use. 
+
+```{bash}
+cd /mnt/c
+```
+Then the working directory has to be set to the location of the repository "MA-climate".
+After that we can use the following command to merge the single files into one.
+
+```{bash}
+cdo mergetime data/raw/sst/ersst/*.nc data/raw/sst/ersst.nc
+```
+
+Note u may have to check and change the maximum number of open files.
+
+```{bash}
+ulimit -n 2000
+```
+
+Now we can load and inspect the data.
+
+```{r load packages, message = FALSE}
+library(ncdf4)
+library(raster)
+library(rgdal)
+library(ggplot2)
+library(assertthat)
+```
+
+We inspect the metadata of one single file:
+
+We see the file contains two variables that are measured across different dimensions.
+The two variables contain the sea surface temperatures and the respective SST anomalies 
+with respect to the 1971-2000 monthly climatology and are both measured in celsius.
+The dimensions describe a longitude and latitude grid, for each month. Here time dim is one
+because we only opened a single file.
+
+```{r}
+file <- nc_open("../../data/raw/sst/ersst/ersst.v5.201612.nc")
+print(file)
+```
+
+And now preprocess the whole data for first plots. We inspect the anomalies here.
+
+```{r}
+file <- nc_open("../../data/raw/sst/ersst.nc")
+data <- ncvar_get(file, "ssta")
+lon <- ncvar_get(file, "lon")
+lat <- ncvar_get(file, "lat")
+lev <- ncvar_get(file, "lev") # is 0 why?
+fill_val <- ncatt_get(file, "ssta", "_FillValue")
+nc_close(file)
+data[data == fill_val$value] <- NA
+```
+
+The data contains `r dim(data)[3]` months of Sea Surface Temperature 
+data, in the geographical window from `r min(lon)` to `r max(lon)`
+longitude and `r min(lat)` to `r max(lat)` latitude respectively.
+On a resolution of a `ncatt_get(file,0)$spatial_resolution`
+The temperature is measured in celsius.
+Let's see how this looks like.
+We randomly choose one month to plot the ssta
+
+```{r}
+set.seed(420)
+m <- sample(seq(dim(data)[3]), 1)
+slice <- data[,,m]
+r <- raster(t(slice), xmn = min(lon), xmx = max(lon), ymn = min(lat), ymx = max(lat), 
+            crs = CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs+ towgs84=0,0,0"))
+r <- flip(r, direction = "y")
+plot(r)
+```
+
+Next plot maybe a time series of the values in a certain region?
+Also need to preprocess further see cygwin fast
+
+
+
+
+Notes:
+?Which time frame and why?
+?why 1971-2000 climatology?
+?are satelitte data also used?
+ERSST and HADISST SST are both useful.
+?we can also define more precisely what SST is?
+https://www.ghrsst.org/ghrsst-data-services/products/
+Warning (cdfInqContents): Coordinates variable time can't be assigned!

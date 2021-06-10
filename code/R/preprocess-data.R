@@ -164,6 +164,7 @@ rearrange_latlon(infile = "data/interim/precip-interim.nc",
 
 rearrange_latlon(infile = "data/interim/sst-interim.nc",
                  degrees = c("-180,180,-90,90"))
+
 rearrange_latlon(infile = "data/interim/sst-interim.nc",
                  degrees = c("-180,-2,-40,40"))
 

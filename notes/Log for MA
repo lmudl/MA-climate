@@ -411,4 +411,7 @@ read about drought index I use
 
 ask ML paper authors how they handled different time availability of data sets
 
+09.06
 
+nach plotting hadsst with plot-ggplot-data-raster seen 
+that after preprocessing all values are same? Pretty large value which should not be the case, also not filled in.

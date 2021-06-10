@@ -1,0 +1,44 @@
+File data/raw/sst/HadSST.nc (NC_FORMAT_NETCDF4):
+
+     4 variables (excluding dimension variables):
+        float tos[longitude,latitude,time]   (Chunking: [36,18,1026])  (Compression: shuffle,level 4)
+            standard_name: sea_water_temperature_anomaly
+            long_name: Sea water temperature anomaly at a depth of 20cm
+            units: K
+            cell_methods: area: mean (interval: 5.0 degrees_north 5.0 degrees_east) time: mean (interval: 1 month)
+        double time_bnds[bnds,time]   (Contiguous storage)  
+        double latitude_bnds[bnds,latitude]   (Contiguous storage)  
+        double longitude_bnds[bnds,longitude]   (Contiguous storage)  
+
+     4 dimensions:
+        time  Size:2052
+            axis: T
+            bounds: time_bnds
+            units: days since 1850-01-01T00:00:00Z
+            standard_name: time
+            long_name: time
+            calendar: gregorian
+        latitude  Size:36
+            axis: Y
+            bounds: latitude_bnds
+            units: degrees_north
+            standard_name: latitude
+            long_name: latitude
+        longitude  Size:72
+            axis: X
+            bounds: longitude_bnds
+            units: degrees_east
+            standard_name: longitude
+            long_name: longitude
+        bnds  Size:2
+[1] "vobjtovarid4: **** WARNING **** I was asked to get a varid for dimension named bnds BUT this dimension HAS NO DIMVAR! Code will probably fail at this point"
+
+    8 global attributes:
+        comment: 
+        history: Converted to netcdf today
+        institution: Met Office
+        reference: Kennedy et al. (2019), https://www.metoffice.gov.uk/hadobs/hadsst4
+        source: surface observation
+        title: Ensemble-median sea-surface temperature anomalies from the HadSST.4.0.0.0 data set
+        version: HadSST.4.0.0.0
+        Conventions: CF-1.5

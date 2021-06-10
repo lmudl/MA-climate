@@ -45,7 +45,7 @@ r <- raster(t(slice), xmn = min(lon), xmx = max(lon), ymn = min(lat), ymx = max(
 r <- flip(r, direction = "y")
 plot(r)
 ```
-Next we inspect the development of the monthly mean temperatures over tim
+Next we inspect the development of the monthly mean temperatures over time
 
 ```{r}
 monthly_mean <- apply(data, 3, function(x) mean(x, na.rm = TRUE))

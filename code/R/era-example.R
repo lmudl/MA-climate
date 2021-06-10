@@ -16,4 +16,7 @@ get_meta <- function(data, save_to){
 }
 
 #get_meta(cru_data, "meta/cru_drought_meta.txt")
-
+chirps <- nc_open("data/raw/drought/chirps-v2.0.monthly.nc")
+get_meta(chirps, "meta/chirps_dorught_meta.txt")
+hadsst <- nc_open("data/raw/sst/HadSST.nc")
+get_meta(hadsst, "meta/hadsst_meta.txt")

@@ -1,0 +1,48 @@
+File data/raw/drought/chirps-v2.0.monthly.nc (NC_FORMAT_NETCDF4):
+
+     1 variables (excluding dimension variables):
+        float precip[longitude,latitude,time]   (Chunking: [379,106,25])  (Compression: level 5)
+            units: mm/month
+            standard_name: convective precipitation rate
+            long_name: Climate Hazards group InfraRed Precipitation with Stations
+            time_step: month
+            missing_value: -9999
+            _FillValue: -9999
+            geostatial_lat_min: -50
+            geostatial_lat_max: 50
+            geostatial_lon_min: -180
+            geostatial_lon_max: 180
+
+     3 dimensions:
+        longitude  Size:7200
+            units: degrees_east
+            standard_name: longitude
+            long_name: longitude
+            axis: X
+        latitude  Size:2000
+            units: degrees_north
+            standard_name: latitude
+            long_name: latitude
+            axis: Y
+        time  Size:482
+            units: days since 1980-1-1 0:0:0
+            standard_name: time
+            calendar: gregorian
+            axis: T
+
+    15 global attributes:
+        Conventions: CF-1.6
+        title: CHIRPS Version 2.0
+        history: created by Climate Hazards Group
+        version: Version 2.0
+        date_created: 2021-03-16
+        creator_name: Pete Peterson
+        creator_email: pete@geog.ucsb.edu
+        institution: Climate Hazards Group.  University of California at Santa Barbara
+        documentation: http://pubs.usgs.gov/ds/832/
+        reference: Funk, C.C., Peterson, P.J., Landsfeld, M.F., Pedreros, D.H., Verdin, J.P., Rowland, J.D., Romero, B.E., Husak, G.J., Michaelsen, J.C., and Verdin, A.P., 2014, A quasi-global precipitation time series for drought monitoring: U.S. Geological Survey Data Series 832, 4 p., http://dx.doi.org/110.3133/ds832. 
+        comments:  time variable denotes the first day of the given month.
+        acknowledgements: The Climate Hazards Group InfraRed Precipitation with Stations development process was carried out through U.S. Geological Survey (USGS) cooperative agreement #G09AC000001 "Monitoring and Forecasting Climate, Water and Land Use for Food Production in the Developing World" with funding from: U.S. Agency for International Development Office of Food for Peace, award #AID-FFP-P-10-00002 for "Famine Early Warning Systems Network Support," the National Aeronautics and Space Administration Applied Sciences Program, Decisions award #NN10AN26I for "A Land Data Assimilation System for Famine Early Warning," SERVIR award #NNH12AU22I for "A Long Time-Series Indicator of Agricultural Drought for the Greater Horn of Africa," The National Oceanic and Atmospheric Administration award NA11OAR4310151 for "A Global Standardized Precipitation Index supporting the US Drought Portal and the Famine Early Warning System Network," and the USGS Land Change Science Program.
+        ftp_url: ftp://chg-ftpout.geog.ucsb.edu/pub/org/chg/products/CHIRPS-latest/
+        website: http://chg.geog.ucsb.edu/data/chirps/index.html
+        faq: http://chg-wiki.geog.ucsb.edu/wiki/CHIRPS_FAQ
