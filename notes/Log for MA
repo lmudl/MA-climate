@@ -415,3 +415,8 @@ ask ML paper authors how they handled different time availability of data sets
 
 nach plotting hadsst with plot-ggplot-data-raster seen 
 that after preprocessing all values are same? Pretty large value which should not be the case, also not filled in.
+
+15.06
+
+preprocessed ersst, plotted some stuff
+found out which time windows chirps and ersst have

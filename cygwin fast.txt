@@ -35,7 +35,10 @@ cdo -z zip selyear,1901/2019 data/interim/sst/hadsst_setreftime.nc data/interim/
 cdo -z zip sellonlatbox,-180,180,-90,90 data/interim/sst/hadsst_selyear.nc data/interim/sst/hadsst_sellonlatbox.nc
 
 process ERSST
-cdo -z zip setreftime 1900-1-1,00:00:00, months data/raw/sst/
+setreftime, selyear and sellonlatbox
+cdo -z zip setreftime,1900-1-1,00:00:00, months data/raw/sst/ersst.nc data/interim/sst/ersst_setreftime.nc
+cdo -z zip selyear,1981/2015 data/interim/sst/ersst_setreftime.nc data/interim/sst/ersst_selyear.nc
+cdo -z zup sellonlatbox,-180,180,-90,90 data/interim/sst/ersst_selyear.nc data/interim/sst/ersst_sellonlatbox.nc
 
 preprocess drought:
 process scPDSI-1901-2019
@@ -44,7 +47,10 @@ cdo -z zip selyear,1901/2019 data/interim/drought/scpdsi19_setreftime.nc data/in
 cdo -z zip sellonlatbox,-180,180,-90,90 data/interim/drought/scpdsi19_selyear.nc data/interim/drought/scpdsi19_sellonlatbox.nc
 
 
-
+step1:
+relate errsst to chirps like in OG paper.
+preprocess ersst: we only need data from 1981 (until 2016 possible) onwards 
+	because chirps starts from there. Chirps apparently until 2015 so selyear until 2015
 
 
 
