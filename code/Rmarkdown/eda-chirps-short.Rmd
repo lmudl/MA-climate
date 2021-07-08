@@ -1,0 +1,168 @@
+---
+title: "CHIRPS-short"
+author: "Dario Lepke"
+date: "25 6 2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r load packages,message=FALSE,warning=FALSE}
+library(ncdf4)
+library(raster)
+library(rgdal)
+library(ggplot2)
+library(assertthat)
+library(lubridate)
+```
+## Introduction{-}
+
+The CHIRPS data set contains the **precipitation data**, created from in-situ and satellite measurements. It can be downloaded from here[https://www.chc.ucsb.edu/data/chirps].
+It contains observations **from 1980 to 2021**. Data comes on a **high resolution 0.05 grid**.
+
+## Quick overview{-}
+
+We open the file and inspect first infos.
+
+### Variable
+
+```{r}
+chirps <- nc_open("../../data/raw/drought/chirps-v2.0.monthly.nc")
+names(chirps$var)
+ncatt_get(chirps, "precip", attname = "units")$value
+```
+Variable of interest is precipitation over land measured in mm/month.
+
+### Dimensions
+
+```{r}
+names(chirps$dim)
+```
+
+#### Longitude and Latitude
+```{r}
+chirps_lon <- ncvar_get(chirps, "longitude")
+range(chirps_lon)
+```
+
+```{r}
+chirps_lat <- ncvar_get(chirps, "latitude")
+range(chirps_lat)
+```
+
+
+#### Time
+```{r}
+chirps_time <- ncvar_get(chirps, "time")
+range(chirps_time)
+ncatt_get(chirps, "time", attname = "units")$value
+```
+
+#### Summary CHIRPS raw{-}
+
+Precipitation is measured on a longitude/latidude grid ranging from **-180 to 180 and -50 to 50** respectively.
+The timestamps are given in **days since 1980-1-1**.
+Note the resolution is very high namely on a **0.05 x 0.05 grid**.
+
+## Preprocessing data structure
+
+The SST data ranges from 1880 until 2016 so we choose a **common time window of 1981 until 2016.**
+Subsetting the observations first will also reduce preprocessing cost in the following steps.
+We also set the orientation of the grid coordinates and choose the amazon basin
+as a geographical window and set a reference time that will be the same in both datasets.
+
+```{bash, eval = FALSE}
+# select common time period
+cdo -z zip selyear,1981/2016 data/raw/drought/chirps-v2.0.monthly.nc data/interim/drought/chirps_selyear.nc
+
+# change data orientation
+cdo -z zip sellonlatbox,-180,180,-90,90 data/interim/drought/chirps_selyear.nc data/interim/drought/chirps_rearrangelonlatbox.nc
+
+# select geographical window 
+cdo -z zip sellonlatbox,-72,-55,-9,0 data/interim/drought/chirps_rearrangelonlatbox.nc data/interim/drought/chirps_sellonlatbox.nc
+
+# change reference time and units
+cdo -z zip setreftime,1900-1-1,00:00:00,months data/interim/drought/chirps_sellonlatbox.nc data/interim/drought/chirps_setreftime.nc
+```
+
+## First Plot
+We can load the data now
+
+```{r}
+chirps <- nc_open("../../data/interim/drought/chirps_setreftime.nc")
+chirps_data<- ncvar_get(chirps, "precip")
+```
+
+
+```{r}
+chirps_lon <- ncvar_get(chirps, "longitude")
+chirps_lat <- ncvar_get(chirps, "latitude")
+chirps_time <- ncvar_get(chirps, "time")
+chirps_fill_val <- ncatt_get(chirps, "precip", "_FillValue")
+chirps_data[chirps_data == chirps_fill_val$value] <- NA
+```
+
+```{r}
+set.seed(42)
+m <- sample(dim(chirps_data)[3], 1)
+slice <- chirps_data[,,m]
+r <- raster(t(slice), xmn = min(chirps_lon), xmx = max(chirps_lon), ymn = min(chirps_lat), ymx = max(chirps_lat), 
+            crs = CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs+ towgs84=0,0,0"))
+r <- flip(r, direction = "y")
+plot(r)
+```
+
+## Appendix
+
+```{r}
+print(chirps)
+nc_close(chirps)
+```
+
+```{r}
+knitr::knit_exit()
+
+```
+
+```{r}
+ret <- list()
+ret$lat <- chirps_lat
+ret$lon <- chirps_lon
+ret$time <- ncvar_get(chirps, "time")
+ret$precip <- chirps_data
+ret$date <- paste("26-06-2021")
+str(ret)
+```
+```{r}
+melt_precip <- function(L) {
+  dimnames(L$precip) <- list(lon = L$lon, lat = L$lat)
+  ret <- melt(L$precip, value.name = "precip")
+  cbind(date=L$date, ret)
+}
+
+```
+
+```{r}
+pp <- melt_precip(ret)
+
+```
+
+```{r}
+ggplot(data = pp, aes(x = lon, y = lat, fill = precip)) + 
+  annotation_map(map_data("world")) +
+  geom_raster(interpolate = TRUE) +
+  #geom_polygon(aes(fill=sst, colour = "black")) +
+  scale_fill_viridis_c(option="A") +
+  theme_bw() +
+  coord_quickmap() 
+```
+
+```{r}
+ggplot() + geom_sf(data=worldmap) +
+  geom_raster(data=pp, aes(x=lon,y=lat,fill=precip),interpolate = TRUE)+
+  scale_fill_viridis_c(option="A") 
+
+```
+

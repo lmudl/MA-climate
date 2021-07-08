@@ -1,0 +1,155 @@
+---
+title: "eda-chirps"
+author: "Dario Lepke"
+date: "22 6 2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r load packages, message = FALSE}
+library(ncdf4)
+library(raster)
+library(rgdal)
+library(ggplot2)
+library(assertthat)
+library(lubridate)
+```
+## Introduction{-}
+
+The CHIRPS data set contains the **precipitation data**, created from in-situ and satellite measurements. It can be downloaded from here[!https://www.chc.ucsb.edu/data/chirps].
+It contains observations **from 1980 to 2021**. Data comes on a **high resolution 0.05 grid**.
+
+## Quick overview{-}
+
+We open the file and inspect first infos.
+
+### Variable
+
+```{r}
+chirps <- nc_open("../../data/raw/drought/chirps-v2.0.monthly.nc")
+names(chirps$var)
+ncatt_get(chirps, "precip", attname = "units")$value
+```
+Variable of interest is precipitation over land measured in mm/month.
+
+### Dimensions
+
+```{r}
+names(chirps$dim)
+```
+
+#### Longitude and Latitude
+```{r}
+chirps_lon <- ncvar_get(chirps, "longitude")
+range(chirps_lon)
+```
+
+```{r}
+chirps_lat <- ncvar_get(chirps, "latitude")
+range(chirps_lat)
+```
+
+
+#### Time
+```{r}
+chirps_time <- ncvar_get(chirps, "time")
+range(chirps_time)
+ncatt_get(chirps, "time", attname = "units")$value
+```
+
+#### Summary CHIRPS raw{-}
+
+Precipitation is measured on a longitude/latidude grid ranging from -180 to 180 and -50 to 50 respectively.
+The timestamps are given in days since 1980-1-1.
+Note the resolution is very high namely on a 0.05 x 0.05 grid.
+
+The data is too large to load directly so we need to preprocess the file before we can load the data, but we can quickly check the covered time period of CHIRPS.
+
+```{r}
+chirps_time <- ncvar_get(chirps, "time")
+chirps_null <- as.POSIXct("1980-1-1 00:00:00", tz = "UTC")
+first_chirps <- chirps_null + days(chirps_time[1]) #1981-01-01
+last_chirps <- chirps_null + days(chirps_time[length(chirps_time)]) #2021-02-01
+```
+So we have data from 01/1981 until 02/2021.
+
+Note: Here the time range matches the general info on the dataset from the paper/homepage.
+
+The SST data ranges from 1880 until 2016 so we choose a common time window of 1981 until 2016.
+Subsetting the observations first will also reduce preprocessing cost in the following steps.
+We also set the orientation of the grid coordinates and choose the amazon basin
+as a geographical window and set a reference time that will be the same in both datasets.
+
+
+```{bash, eval = FALSE}
+# select common time period
+cdo -z zip selyear,1981/2016 data/raw/drought/chirps-v2.0.monthly.nc data/interim/drought/chirps_selyear.nc
+
+# change data orientation
+cdo -z zip sellonlatbox,-180,180,-90,90 data/interim/drought/chirps_selyear.nc data/interim/drought/chirps_rearrangelonlatbox.nc
+
+# select geographical window 
+cdo -z zip sellonlatbox,-72,-55,-9,0 data/interim/drought/chirps_rearrangelonlatbox.nc data/interim/drought/chirps_sellonlatbox.nc
+
+# change reference time and units
+cdo -z zip setreftime,1900-1-1,00:00:00,months data/raw/drought/chirps_sellonlatbox.nc data/interim/drought/chirps_setreftime.nc
+
+```
+
+```{r}
+chirps <- nc_open("../../data/interim/drought/chirps_selyear.nc")
+print(chirps)
+chirps_data<- ncvar_get(chirps, "precip")
+```
+we can load data now
+
+```{r}
+chirps_lon <- ncvar_get(chirps, "longitude")
+chirps_lat <- ncvar_get(chirps, "latitude")
+chirps_time <- ncvar_get(chirps, "time")
+chirps_fill_val <- ncatt_get(chirps_file, "precip", "_FillValue")
+chirps_data[chirps_data == chirps_fill_val$value] <- NA
+nc_close(chirps_file)
+```
+
+```{r}
+dim(chirps_data)
+```
+
+```{r}
+chirps_null <- as.POSIXct("1900-1-1 00:00:00", tz = "UTC")
+first_chirps <- chirps_null %m+% months(chirps_time[1]) # "1981-01-01 UTC"
+last_chirps <- chirps_null %m+% months(chirps_time[length(chirps_time)]) # "2021-02-01 UTC"
+chirps_dates <- chirps_null %m+% months(chirps_time)
+last_ersst <- as.POSIXct("2014-12-28 00:06:32", tz = "UTC")
+use_chirps <- which(chirps_dates <= last_ersst)
+chirps_data <- chirps_data[,,use_chirps]
+dim(chirps_data)
+m
+first_chirps %m+% months(chirps_time[m])#2070-05-01 CEST
+?as.POSIXct
+```
+```{r}
+set.seed(42)
+#m <- sample(dim(chirps_data[], 1)
+slice <- chirp_data[,,m]
+r <- raster(t(slice), xmn = min(chirps_lon), xmx = max(chirps_lon), ymn = min(chirps_lat), ymx = max(chirps_lat), 
+            crs = CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs+ towgs84=0,0,0"))
+r <- flip(r, direction = "y")
+plot(r)
+m #1324
+dim(df)[3] #1644
+```
+```{r}
+plot(density())
+```
+
+
+
+
+
+
+

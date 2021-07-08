@@ -36,9 +36,9 @@ cdo -z zip sellonlatbox,-180,180,-90,90 data/interim/sst/hadsst_selyear.nc data/
 
 process ERSST
 setreftime, selyear and sellonlatbox
-cdo -z zip setreftime,1900-1-1,00:00:00, months data/raw/sst/ersst.nc data/interim/sst/ersst_setreftime.nc
+cdo -z zip setreftime,1900-1-1,00:00:00,months data/raw/sst/ersst.nc data/interim/sst/ersst_setreftime.nc
 cdo -z zip selyear,1981/2015 data/interim/sst/ersst_setreftime.nc data/interim/sst/ersst_selyear.nc
-cdo -z zup sellonlatbox,-180,180,-90,90 data/interim/sst/ersst_selyear.nc data/interim/sst/ersst_sellonlatbox.nc
+cdo -z zip sellonlatbox,-180,180,-90,90 data/interim/sst/ersst_selyear.nc data/interim/sst/ersst_sellonlatbox.nc
 
 preprocess drought:
 process scPDSI-1901-2019
@@ -46,6 +46,10 @@ cdo -z zip setreftime,1900-1-1,00:00:00,months data/raw/drought/scPDSI-1901-2019
 cdo -z zip selyear,1901/2019 data/interim/drought/scpdsi19_setreftime.nc data/interim/drought/scpdsi19_selyear.nc
 cdo -z zip sellonlatbox,-180,180,-90,90 data/interim/drought/scpdsi19_selyear.nc data/interim/drought/scpdsi19_sellonlatbox.nc
 
+preprocess CHIRPS
+cdo -z zip setreftime,1900-1-1,00:00:00,months data/raw/drought/chirps-v2.0.monthly.nc data/interim/drought/chirps_setreftime.nc
+cdo -z zip sellonlatbox,-180,180,-90,90 data/interim/drought/chirps_setreftime.nc data/interim/drought/chirps_rearrangelonlatbox.nc
+cdo -z zip sellonlatbox,-72,-55,-9,0 data/interim/drought/chirps_rearrangelonlatbox.nc data/interim/drought/chirps_sellonlatbox.nc
 
 step1:
 relate errsst to chirps like in OG paper.

@@ -420,3 +420,70 @@ that after preprocessing all values are same? Pretty large value which should no
 
 preprocessed ersst, plotted some stuff
 found out which time windows chirps and ersst have
+
+
+16.06
+start:12:50
+IDEA: preprocess for all, setreftime to 1900
+	and sellonlatbox
+
+21.06
+prerprocessed chirps first step
+cdo -z zip setreftime,1900-1-1,00:00:00,months data/raw/drought/chirps-v2.0.monthly.nc data/interim/drought/chirps_setreftime.nc
+
+need to preprocess chirps to see how large time variable will be
+
+22.06
+preprocessed chirps changed orientation and selected only box with relevant
+location, namely amazon basin
+
+could also plot
+
+NEXT:
+inspect timestamps so we get the right months to align etc
+create two clean documents, one for each dataset.
+
+Question:
+Do I need to do sanity check on raw and preprocessed data?
+Will it make sense to choose a global reftime for all datasets?
+	negative timestamps possible?
+
+25.06
+check for both data set first and last dates
+choose data accordingly
+
+preprocessing ersst
+	setreftime
+	selyear
+	sellonlatbox
+
+load dataset check timestamps
+preprocess according to shared time window
+
+ersst, 1880 until 2014
+chirps, 1981 until 2021
+
+shared is 1981 until 2014
+
+?Which time frame and why?
+?why 1971-2000 climatology?
+?are satelitte data also used?
+ERSST and HADISST SST are both useful.
+?we can also define more precisely what SST is?
+https://www.ghrsst.org/ghrsst-data-services/products/
+Warning (cdfInqContents): Coordinates variable time can't be assigned!
+?select geographical window first will speed up shit way more I guess
+
+General:
+what is measured
+over what time
+grid cells
+preprocessing
+plot
+
+
+
+
+TODO:
+Next plot maybe a time series of the values in a certain region?
+compare timestamps for m = 261 when sampled a slic

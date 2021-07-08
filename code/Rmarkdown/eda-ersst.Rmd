@@ -9,12 +9,24 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-We explore the sea surface temperature data set, used in the paper by Ciemer et al. 
-ERSST (Extended Reconstructed Sea Surface Temperature) is a reanalysis from observed data given in the Internation Comprehensive Ocean-Athmosphere Data Set (ICOADS). Which contains observation from 1800 on, made by ships and buoys for example.
-The data comes on a 2x2 degree grid, where data was missing interpolation techniques were used.
-See paper for reference.
-Data are more reliable after 1940.
+```{r load packages, message = FALSE, warning = FALSE, echo=FALSE}
+library(ncdf4)
+library(raster)
+library(rgdal)
+library(ggplot2)
+library(assertthat)
+library(lubridate)
+library(printr)
+```
 
+## Introduction{-}
+
+We explore the **sea surface temperature data** set, used in the paper by Ciemer et al. 
+ERSST (Extended Reconstructed Sea Surface Temperature) is a reanalysis from observed data given in the Internation Comprehensive Ocean-Athmosphere Data Set (ICOADS). Which contains observation **from 1800/01 until 2016/12**, made by ships and buoys for example.
+The data comes on a **2x2 degree grid**, where data was missing **interpolation techniques were used**.
+See paper for reference.
+
+## Download and file merging{-}
 Data comes in seperate files for each month but can be downloaded to the working directory via bash.
 
 ```{bash, eval = FALSE}
@@ -39,6 +51,7 @@ To access the files on Windows in the C folder via Ubuntu we use.
 ```{bash, eval = FALSE}
 cd /mnt/c
 ```
+
 Then the working directory has to be set to the location of the repository "MA-climate".
 After that we can use the following command to merge the single files into one.
 
@@ -48,115 +61,114 @@ cdo mergetime data/raw/sst/ersst/*.nc data/raw/sst/ersst.nc
 
 Note u may have to check and change the maximum number of open files.
 
-```{bash}
+```{bash, eval = FALSE}
 ulimit -n 2000
 ```
 
-Now we can load and inspect the data.
 
-```{r load packages, message = FALSE}
-library(ncdf4)
-library(raster)
-library(rgdal)
-library(ggplot2)
-library(assertthat)
-```
+## Quick overview {-}
 
-We inspect the metadata of one single file:
+We load and inspect the data.
 
-We see the file contains two variables that are measured across different dimensions.
-The two variables contain the sea surface temperatures and the respective SST anomalies 
-with respect to the 1971-2000 monthly climatology and are both measured in celsius.
-The dimensions describe a longitude and latitude grid, for each month. Here time dim is one
-because we only opened a single file.
+### Single file {-}
+
+We inspect the metadata of one single file, this is a large output, shown here only for a matter of completeness, we
+summarise the important information below.
 
 ```{r}
-file <- nc_open("../../data/raw/sst/ersst/ersst.v5.201612.nc")
-print(file)
+ersst<- nc_open("../../data/raw/sst/ersst/ersst.v5.201612.nc")
 ```
-
-And now preprocess the whole data for first plots. We inspect the anomalies here.
 
 ```{r}
-file <- nc_open("../../data/raw/sst/ersst.nc")
-df <- ncvar_get(file, "ssta")
-lon <- ncvar_get(file, "lon")
-lat <- ncvar_get(file, "lat")
-lev <- ncvar_get(file, "lev") # is 0 why?
-fill_val <- ncatt_get(file, "ssta", "_FillValue")
-df[df == fill_val$value] <- NA
-# print(file)
-nc_close(file)
+print(ersst)
 ```
-2016/12 is last observation
-The data contains `r dim(data)[3]` months of Sea Surface Temperature 
-data, in the geographical window from `r min(lon)` to `r max(lon)`
-longitude and `r min(lat)` to `r max(lat)` latitude respectively.
-On a resolution of a `ncatt_get(file,0)$spatial_resolution`
+
+We see the file contains **two variables** that are measured across different dimensions.
+The two variables contain the **sea surface temperatures and the respective SST anomalies** (with respect to the 1971-2000 monthly climatology). Both are measured in celsius and we are **primarly interested in the anomalies** here.
+The dimensions describe a longitude and latitude grid, one for each month. Here time dimension is one because we only opened a single file.
+
+
+### Merged file {-}
+
+We now shortly inspect the merged data.
+```{r}
+ersst <- nc_open("../../data/raw/sst/ersst.nc")
+ersst_time <- ncvar_get(ersst, "time")
+null_ersst <- as.POSIXct("1880-01-01 00:00", tz = "UTC")
+first_ersst <- null_ersst + minutes(ersst_time[1]) # "1880-01-01 UTC"
+last_ersst <- null_ersst + minutes(ersst_time[length(ersst_time)]) # 2014-12-28 UTC"
+```
+
+Note: 
+Merging the data changed the reference date for the timestamps to "minutes since 1880-01-01 00:00".
+The date of "last_ersst" differs from the actual measurement, which is 2016/12, also we can check this via 
+data dimensions. 
+
+```{r}
+ersst_data <- ncvar_get(ersst, "ssta")
+dim(ersst_data)[3]/12 #137 years of data
+1880 + 137
+```
+Since the observations start in 1880 and we have 137 years of data, last observations are in the the end of 2016. 
+(Open: Check why timestamps did not work in R.)
+
+```{r}
+ersst_lon <- ncvar_get(ersst, "lon")
+ersst_lat <- ncvar_get(ersst, "lat")
+```
+
+### Summary merged file {-}
+The data contains `r dim(ersst_data)[3]` months of Sea Surface Temperature 
+data, in the geographical window from `r min(ersst_lon)` to `r max(ersst_lon)`
+longitude and `r min(ersst_lat)` to `r max(ersst_lat)` latitude respectively.
+On a resolution of a `r ncatt_get(ersst,0)$spatial_resolution`.
 The temperature is measured in celsius.
-Let's see how this looks like.
-We randomly choose one month to plot the ssta
+The reference date for the timestamps is the 1854-01-15 measured in days.
 
-```{r}
-set.seed(420)
-m <- sample(seq(dim(df)[3]), 1)
-slice <- df[,,m]
-r <- raster(t(slice), xmn = min(lon), xmx = max(lon), ymn = min(lat), ymx = max(lat), 
-            crs = CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs+ towgs84=0,0,0"))
-r <- flip(r, direction = "y")
-plot(r)
-```
-We preprocress the raw files to make with the following code
+## Preprocessing data structure 
+
+We now preprocess the data so we can use it together with the CHIRPS data.
+Via selyear we select the time frame that is covered by both datasets, namely 1981 until 2016.
+With sellonlatbox we change the orientation of the grid cells so that they are the same in both datasets.
+By using setreftime we set the origin date for the timestamps and the respective time unit, also to be the same in both data sets.
 
 ```{bash, eval = FALSE}
-cdo -z zip setreftime,1900-1-1,00:00:00,months data/raw/sst/ersst.nc data/interim/sst/ersst_setreftime.nc
-cdo -z zip selyear,1981/2015 data/interim/sst/ersst_setreftime.nc data/interim/sst/ersst_selyear.nc
+cdo -z zip selyear,1981/2016 data/raw/sst/ersst.nc data/interim/sst/ersst_selyear.nc
+
 cdo -z zip sellonlatbox,-180,180,-90,90 data/interim/sst/ersst_selyear.nc data/interim/sst/ersst_sellonlatbox.nc
-```
-We set the null for the timestamps via setreftime, select a certain timewindow
-via selyear and finally set the orientation for the longitude and latitude information
 
-Again we inspect the data and check if the preprocessing didnt mess up anything.
+cdo -z zip setreftime,1900-1-1,00:00:00,months data/interim/sst/ersst_sellonlatbox.nc data/interim/sst/ersst_setreftime.nc
 
-```{r}
-file <- nc_open("../../data/interim/sst/ersst_selyear.nc")
-df <- ncvar_get(file, "ssta")
-lon <- ncvar_get(file, "lon")
-lat <- ncvar_get(file, "lat")
-lev <- ncvar_get(file, "lev") # is 0 why?
-fill_val <- ncatt_get(file, "ssta", "_FillValue")
-df[df == fill_val$value] <- NA
-#print(file)
-nc_close(file)
 ```
 
+## First Plot
+
+And plot one month of data.
+
 ```{r}
-#dim(df) <- NULL
-#plot(density(na.omit(df)))
+ersst <- nc_open("../../data/interim/sst/ersst_setreftime.nc")
+ersst_data <- ncvar_get(ersst, "ssta")
+ersst_lon <- ncvar_get(ersst, "lon")
+ersst_lat <- ncvar_get(ersst, "lat")
+ersst_time <- ncvar_get(ersst, "time")
+fill_val <- ncatt_get(ersst, "ssta", "_FillValue")
+ersst_data[ersst_data == fill_val$value] <- NA
+nc_close(ersst)
 ```
+
+
 ```{r}
-set.seed(420)
-m <- sample(seq(dim(df)[3]), 1)
-slice <- df[,,m]
-r <- raster(t(slice), xmn = min(lon), xmx = max(lon), ymn = min(lat), ymx = max(lat), 
+set.seed(42)
+m <- sample(seq(dim(ersst_data)[3]), 1)
+slice <- ersst_data[,,m]
+r <- raster(t(slice), xmn = min(ersst_lon), xmx = max(ersst_lon), ymn = min(ersst_lat), ymx = max(ersst_lat), 
             crs = CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs+ towgs84=0,0,0"))
 r <- flip(r, direction = "y")
 plot(r)
 ```
-Plot is different because we dont get the same 
+```{r}
+dim(ersst_data) <- NULL
+plot(density(na.omit(ersst_data)))
+```
 
 
-TODO:
-Next plot maybe a time series of the values in a certain region?
-compare timestamps for m = 261 when sampled a slice
-
-
-
-Notes:
-?Which time frame and why?
-?why 1971-2000 climatology?
-?are satelitte data also used?
-ERSST and HADISST SST are both useful.
-?we can also define more precisely what SST is?
-https://www.ghrsst.org/ghrsst-data-services/products/
-Warning (cdfInqContents): Coordinates variable time can't be assigned!

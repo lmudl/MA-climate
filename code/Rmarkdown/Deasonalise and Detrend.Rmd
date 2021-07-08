@@ -1,0 +1,161 @@
+---
+title: "Detrend and Deseaonalise Time Series"
+author: "Dario Lepke"
+date: "7 7 2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = normalizePath("./../../"))
+```
+```{r}
+set.seed(1234)
+library(raster)
+library(ggplot2)
+library(dplyr)
+getwd()
+```
+
+Load preprocessed data
+
+```{r}
+sst <- brick("data/interim/sst/ersst_setreftime.nc",
+              varname= "ssta")
+#mean_test <- calc(test, fun=mean,na.rm=TRUE)
+#plot(mean_test)
+
+precip <- brick("data/interim/drought/chirps_setreftime.nc", varname = "precip")
+#mean_test2 <- calc(test2, fun=mean, na.rm=TRUE)
+#plot(mean_test2)
+sst
+```
+
+Plot some of the time series
+
+extract one time series of values for random grid point that is not NA
+
+```{r}
+dim(sst)
+n_months <- dim(sst)[3]
+# which grid points are over land?
+  # extract one layer
+r <- raster(sst, layer = 1)
+dim(r) # 89 180 1
+  # get non NA rows and columns of our raster matrix 
+l <- length(r) # 16020
+# get the values from a raster object,
+# if matrix format is wanted as output, add format = "matrix"
+v <- getValues(r)
+# find which are not NA
+not_na <- which(!is.na(v))
+# sample one grid point that is not NA
+rnd_cell <- sample(not_na,1)
+# get the lon lat from this point
+lonlat <- xyFromCell(r, rnd_cell)
+```
+
+
+```{r}
+# Using GGPLOT, plot the Base World Map
+mp <- NULL
+mapWorld <- borders("world", colour="gray50", fill="gray50") # create a layer of borders
+mp <- ggplot() +   mapWorld
+
+#vNow Layer the cities on top
+mp <- mp+ geom_point(aes(x=lonlat[1], y=lonlat[2]), ,color="blue", size=3)
+mp
+```
+
+```{r}
+# now for this random point, take all the time series data and plot it
+vals <- c(extract(sst, rnd_cell))
+head(vals)
+df <- as.data.frame(vals)
+df$time <- 1:dim(df)[1]
+head(df)
+tail(df)
+ggplot(df, aes(x=time,y=vals)) + geom_point() +  geom_line() + geom_smooth()
+```
+Deasonalise and detrend one time series SST
+
+We decompose this time series using the stl function,
+which in turn uses loess to decompose a time series.
+We create a time series object with frequency 12, since
+we use monthly observations, looking for a yearly effect?
+
+$$Monthly Temperatures = Seasonal + Trend + Remainder$$
+Deasonalise and detrend all time series SST
+OPEN
+
+```{r}
+test <- ts(vals, frequency = 12)
+plot.ts(test)
+# test2 <- decompose(test)
+test3 <- stl(test, s.window = "periodic")
+plot(test3)
+```
+
+```{r}
+test %>% stl(t.window = 12, s.window = "periodic", robust = TRUE) %>% forecast::autoplot()
+```
+We have a strong seasonal component here, as can be seen by the bar on the right hand side of the plots.
+
+
+For Precip
+```{r}
+# data already loaded
+```
+
+choose random cell
+```{r}
+dim(precip)
+# n_months also 432
+r <- raster(precip, layer = 1)
+dim(r) # 180 340 1
+l <- length(r) # 61200
+# get the values from a raster object,
+# if matrix format is wanted as output, add format = "matrix"
+v <- getValues(r)
+rnd_cell <- sample(1:l,1)
+# get the lon lat from this point
+lonlat <- xyFromCell(r, rnd_cell)
+```
+
+Plot some of the time series
+```{r}
+# Using GGPLOT, plot the Base World Map
+mp <- NULL
+mapWorld <- borders("world", colour="gray50", fill="gray50") # create a layer of borders
+mp <- ggplot() +   mapWorld
+
+#vNow Layer the cities on top
+mp <- mp+ geom_point(aes(x=lonlat[1], y=lonlat[2]), ,color="blue", size=3)
+mp
+```
+```{r}
+# now for this random point, take all the time series data and plot it
+vals <- c(extract(precip, rnd_cell))
+head(vals)
+df <- as.data.frame(vals)
+df$time <- 1:dim(df)[1]
+head(df)
+tail(df)
+ggplot(df, aes(x=time,y=vals)) + geom_point() +  geom_line() + geom_smooth()
+```
+```{r}
+test <- ts(vals, frequency = 12)
+plot.ts(test)
+test3 <- stl(test, s.window = "periodic")
+plot(test3)
+```
+Deasonalise and detrend one time series Precip
+
+```{r}
+test %>% stl(t.window = 12, s.window = "periodic", robust = TRUE) %>% forecast::autoplot()
+```
+
+Compute mean of each month for the Precip time series,
+  get one amazonas rainfall/precip value for each month
+Deasonalise and detrend the monthly means
+
