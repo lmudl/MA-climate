@@ -14,6 +14,7 @@ set.seed(1234)
 library(raster)
 library(ggplot2)
 library(dplyr)
+library(ncdf4)
 getwd()
 ```
 Load preprocessed data
@@ -144,4 +145,254 @@ Her for the precip data we have a stronger trend, than a seasonal effect?
 Compute mean of each month for the Precip time series,
 get one amazonas rainfall/precip value for each month
 Deasonalise and detrend the monthly means
+
+```{r}
+?calc
+#mean_test <- calc(test, fun=mean,na.rm=TRUE)
+
+```
+
+```{r}
+r <- raster(ncol=10, nrow=10)
+values(r) <- 1:ncell(r)
+s <- brick(r,r,r,r,r,r)
+s <- s * 1:6
+b1 <- stackApply(s, indices=c(1,1,1,2,2,2), fun=sum)
+b1
+b2 <- stackApply(s, indices=c(1,2,3,1,2,3), fun=sum)
+b2
+m <- stackApply(s, indices = c(1), fun = mean)
+# getValues(m)
+# getValues(r)
+# getValues(s)
+# nlayers(s)
+
+```
+Use stl on each grid cell, get for each grid cell,
+monthly detrended and deseasonalised data.
+
+```{r}
+#st <- stackApply(s, indices=c(1,2,3), fun = function(x) stl(x, t.window = 12, s.window = "periodic", robust = TRUE))
+
+?stl
+f <- function(x) {
+  res <- stats::stl(x, t.window = 13, s.window = "periodic")
+  return(res)
+}
+
+# test <- calc(s, fun = function(x) stl(ts(x, frequency=12), "periodic"))
+
+# test <- apply(as.matrix(precip[[1:13]]), 1, FUN = function(x) stl(ts(x, frequency=1), "periodic"))
+
+# as.matrix, each col is one layer, meaning stl() over
+# the rows is stl() on each grid cell time series
+m <- as.matrix(precip[[1:38]])
+dim(m)
+head(m)
+
+# decomposed
+dec <- stl(ts(m[1,], frequency=13), "periodic")
+
+testtest <- apply(m[1:12,], 1, function(x) stl(ts(x, frequency = 13), "periodic"))
+
+brick_to_matrix <- function(brick_object, nlayers) {
+  m <- as.matrix(brick_object[[1:nlayers]])
+  return(m)
+}
+
+# first 2 years plus 3 months
+m_test <- brick_to_matrix(brick_object = precip, nlayers = 27)
+dim(m_test) #61200 27, all grid cells for 2 years time series data
+
+decompose_matrix <- function(matrix_with_ts, ncells) {
+  out <- apply(matrix_with_ts[1:ncells, ], 1, function(x) stl(ts(x, frequency = 13), "periodic"))
+}
+
+# first 10 grid cells
+dec_test <- decompose_matrix(matrix_with_ts = m_test, ncells = 10)
+
+# List of 10, each has list of 8, we are interested in the dec$time.series[,"remainder"]
+get_remainder <- function(list_of_decomposed_ts) {
+  l <- length(list_of_decomposed_ts)
+  out <- matrix(NA, nrow = l,
+                ncol = nrow(list_of_decomposed_ts[[1]]$time.series))
+  for (i in 1:l) {
+    out[i,] <- c(list_of_decomposed_ts[[i]]$time.series[,"remainder"])
+  }
+  return(out)
+}
+
+remainder_test <- get_remainder(list_of_decomposed = dec_test)
+head(remainder_test)
+# rows are grid points cols are months
+dim(remainder_test)
+
+str(testtest)
+# reasonable speed yeah!!!
+
+decompose_brick <- function(brick, nlayers, ncells) {
+  ts_matrix <- brick_to_matrix(brick_object = brick, nlayers = nlayers)
+  dec_list <- decompose_matrix(matrix_with_ts = ts_matrix, ncells = ncells)
+  remainder <- get_remainder(list_of_decomposed_ts = dec_list)
+  return(remainder)
+}
+
+precip_test <- decompose_brick(brick = precip, nlayers = 27, ncells = 10)
+head(test)
+dim(test)
+
+nlayers(precip)
+ncell(precip)
+#precip_big <- decompose_brick(brick = precip, nlayers = nlayers(precip),
+#                              ncell = ncell(precip))
+
+```
+```{r}
+#now take decomposed object and take colmeans because first we are only interested
+#in mean precip and how well we can predict it
+
+mean_precip <- colSums(precip_test)
+
+```
+
+```{r}
+sst_test <- decompose_brick(brick = sst, nlayers = 27, ncells = 10)
+```
+
+```{r}
+?cor()
+cor(mean_precip, sst_test[1,])
+for (i in 1:nrow(sst_test)) {
+  print(cor(mean_precip, sst_test[i,]))
+}
+
+```
+```{r}
+# trying to estimate runtim for whole precip or sst data on this laptop
+library(rbenchmark)
+benchmark("27layers" = {
+  decompose_brick(brick = precip, nlayers = 27, ncells = 10)
+},
+"54layers" = {
+  decompose_brick(brick = precip, nlayers = 54, ncells = 10)
+},
+"108layers" = {
+  decompose_brick(brick = precip, nlayers = 108, ncells = 10)
+},
+replications = 1,
+columns = c("test", "replications", "elapsed", "relative", "user.self", "sys.self"))
+
+```
+```{r}
+benchmark("27layers" = {
+  decompose_brick(brick = precip, nlayers = 27, ncells = 50)
+},
+"54layers" = {
+  decompose_brick(brick = precip, nlayers = 54, ncells = 50)
+},
+"108layers" = {
+  decompose_brick(brick = precip, nlayers = 108, ncells = 50)
+},
+replications = 1,
+columns = c("test", "replications", "elapsed", "relative", "user.self", "sys.self"))
+```
+
+```{r}
+comp_fac <- function(brick_object, nc, nl) {
+  return(ncell(brick_object)/nc)+(nlayers(brick_object)/nl)
+}
+
+comp_fac(precip, 50, 108)
+1224*0.87/60/60
+
+```
+
+
+```{r}
+#do 27 layers with all cells, start 12:53, end 12:54
+#may
+first_27 <- decompose_brick(brick = precip, nlayers = 27, ncells = ncell(precip))
+# checl once again if it all good like this
+#decomposed_precip <- decompose_brick(brick = precip, nlayers = nlayers(brick), ncells = ncell(precip))
+
+
+```
+
+```{r}
+# check size of regression matrix
+# 432 times precip, 16020 predictors
+# 432 times 16020
+ttm <- matrix(1.002, nrow = 432, ncol = 16020)
+ttdf <- as.data.frame(ttm)
+object.size(ttm)
+```
+
+```{r}
+object.size(ttdf)
+```
+
+
+```{r}
+dec$time.series[,"remainder"]
+```
+
+as.matrix, each col is one layer, meaning stl() over
+the rows is stl() on each grid cell time series
+
+We can use Raster Time Series!!!
+rts()
+https://cran.r-project.org/web/packages/rts/rts.pdf
+https://datacarpentry.org/r-raster-vector-geospatial/12-time-series-raster/
+
+https://rdrr.io/github/ffilipponi/rtsa/man/rtsa.stl.html
+
+```{r}
+library(rts)
+slice <- precip[[1:38]]
+precip
+
+slice <- rts(slice)
+
+netcdf_precip <- nc_open("data/interim/drought/chirps_setreftime.nc")
+t <- ncvar_get(netcdf_precip, "time")
+netcdf_precip
+
+?convertDateNcdf2R
+
+install.packages("ncdf4.helpers")
+?ncdf4.helpers::nc.get.time.series()
+
+t <- ncdf4.helpers::nc.get.time.series(netcdf_precip)
+t <- as.Date.POSIXct(t)
+rts_test <- rts(precip, t)
+rtsa::rtsa.stl(rts_test)
+
+
+```
+
+```{r}
+
+```
+
+
+
+
+Overnext step:
+Compute mean of each (deseasoned and detrended)precip layer with cellStats
+
+```{r}
+# for one layer
+m <- cellStats(precip[[1]], "mean")
+m
+# for all layers this will take a bit of time
+start <- Sys.time()
+??rts()
+```
+
+
+
+
+
+
+
 
