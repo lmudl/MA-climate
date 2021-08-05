@@ -22,15 +22,11 @@ Load preprocessed data
 ```{r}
 sst <- brick("data/interim/sst/ersst_setreftime.nc",
              varname= "ssta")
-#mean_test <- calc(test, fun=mean,na.rm=TRUE)
-#plot(mean_test)
-
 sst
 ```
 
-Plot some of the time series
-
-extract one time series of values for random grid point that is not NA
+Plot some of the time series:
+Extract one time series of values for random grid point that is not NA.
 
 ```{r}
 # in: brick object
@@ -49,8 +45,6 @@ get_random_cell <- function(brick) {
 }
 
 sst_cell <- get_random_cell(sst)
-
-
 ```
 
 
@@ -64,7 +58,7 @@ plot_cell <- function(cell) {
   mp <- ggplot() +   mapWorld
   
   #vNow Layer the cities on top
-  mp <- mp+ geom_point(aes(x=cell[1], y=cell[2]), ,color="blue", size=3)
+  mp <- mp + geom_point(aes(x=cell[1], y=cell[2]), ,color="blue", size=3)
   mp
 }
 
@@ -77,6 +71,7 @@ plot_cell(sst_cell)
 # out: ggplot of time series data for cellpoint
 get_ts <- function(data,cell) {
   vals <- c(extract(data,cell))
+  return(vals)
 }
 
 sst_ts <- get_ts(sst, sst_cell)
@@ -146,72 +141,32 @@ Compute mean of each month for the Precip time series,
 get one amazonas rainfall/precip value for each month
 Deasonalise and detrend the monthly means
 
-```{r}
-?calc
-#mean_test <- calc(test, fun=mean,na.rm=TRUE)
-
-```
-
-```{r}
-r <- raster(ncol=10, nrow=10)
-values(r) <- 1:ncell(r)
-s <- brick(r,r,r,r,r,r)
-s <- s * 1:6
-b1 <- stackApply(s, indices=c(1,1,1,2,2,2), fun=sum)
-b1
-b2 <- stackApply(s, indices=c(1,2,3,1,2,3), fun=sum)
-b2
-m <- stackApply(s, indices = c(1), fun = mean)
-# getValues(m)
-# getValues(r)
-# getValues(s)
-# nlayers(s)
-
-```
 Use stl on each grid cell, get for each grid cell,
 monthly detrended and deseasonalised data.
 
 ```{r}
-#st <- stackApply(s, indices=c(1,2,3), fun = function(x) stl(x, t.window = 12, s.window = "periodic", robust = TRUE))
-
-?stl
-f <- function(x) {
-  res <- stats::stl(x, t.window = 13, s.window = "periodic")
-  return(res)
-}
-
-# test <- calc(s, fun = function(x) stl(ts(x, frequency=12), "periodic"))
-
-# test <- apply(as.matrix(precip[[1:13]]), 1, FUN = function(x) stl(ts(x, frequency=1), "periodic"))
 
 # as.matrix, each col is one layer, meaning stl() over
 # the rows is stl() on each grid cell time series
-m <- as.matrix(precip[[1:38]])
-dim(m)
-head(m)
-
-# decomposed
-dec <- stl(ts(m[1,], frequency=13), "periodic")
-
-testtest <- apply(m[1:12,], 1, function(x) stl(ts(x, frequency = 13), "periodic"))
-
 brick_to_matrix <- function(brick_object, nlayers) {
   m <- as.matrix(brick_object[[1:nlayers]])
+  ind <- apply(m, 1, function(x) all(is.na(x)))
+  m <- m[!ind, ]
+  if(any(is.na(m))) stop("Matrix still contains NA")
   return(m)
 }
 
-# first 2 years plus 3 months
-m_test <- brick_to_matrix(brick_object = precip, nlayers = 27)
-dim(m_test) #61200 27, all grid cells for 2 years time series data
-
 decompose_matrix <- function(matrix_with_ts, ncells) {
-  out <- apply(matrix_with_ts[1:ncells, ], 1, function(x) stl(ts(x, frequency = 13), "periodic"))
+  # use min here, since if data contained NA (like sst),
+  # we removed the NAs (which were grid points on land)
+  # so ncell may be bigger than the actual number of 
+  # nonempty rows
+  ncells <- min(ncells, nrow(matrix_with_ts))
+  out <- apply(matrix_with_ts[1:ncells, ], 1, function(x) if(!any(is.na(x))) stl(ts(x, frequency = 13), "periodic"))
 }
 
-# first 10 grid cells
-dec_test <- decompose_matrix(matrix_with_ts = m_test, ncells = 10)
+# List of length "ncells", each has list of 8, we are interested in the dec$time.series[,"remainder"]
 
-# List of 10, each has list of 8, we are interested in the dec$time.series[,"remainder"]
 get_remainder <- function(list_of_decomposed_ts) {
   l <- length(list_of_decomposed_ts)
   out <- matrix(NA, nrow = l,
@@ -222,14 +177,6 @@ get_remainder <- function(list_of_decomposed_ts) {
   return(out)
 }
 
-remainder_test <- get_remainder(list_of_decomposed = dec_test)
-head(remainder_test)
-# rows are grid points cols are months
-dim(remainder_test)
-
-str(testtest)
-# reasonable speed yeah!!!
-
 decompose_brick <- function(brick, nlayers, ncells) {
   ts_matrix <- brick_to_matrix(brick_object = brick, nlayers = nlayers)
   dec_list <- decompose_matrix(matrix_with_ts = ts_matrix, ncells = ncells)
@@ -237,35 +184,152 @@ decompose_brick <- function(brick, nlayers, ncells) {
   return(remainder)
 }
 
-precip_test <- decompose_brick(brick = precip, nlayers = 27, ncells = 10)
-head(test)
-dim(test)
+```
 
-nlayers(precip)
-ncell(precip)
-#precip_big <- decompose_brick(brick = precip, nlayers = nlayers(precip),
-#                              ncell = ncell(precip))
+
+
+
+
+```{r}
+#do 27 layers with all cells, start 12:53, end 12:54
+#may
+first_27 <- decompose_brick(brick = precip, nlayers = 27, ncells = ncell(precip))
+# checl once again if it all good like this
+
 
 ```
 ```{r}
-#now take decomposed object and take colmeans because first we are only interested
-#in mean precip and how well we can predict it
+library(tictoc)
+tic()
+#decomposed_precip <- decompose_brick(brick = precip, nlayers = nlayers(precip), ncells = ncell(precip))
+toc() #took 90s
+#saveRDS(decomposed_precip, file = "./../../data/processed/decomposed_precip_data.rds")
+#rm(decomposed_precip)
+precip <- readRDS("data/processed/decomposed_precip_data.rds")
+```
+```{r}
+# for sst have to check if i clean the matrix from NA rows aka cells and
+# then apply decompose to it and create matrix, maybe later add the coordinats as
+# info, or I could do that as rownames YESA!! in the data matrix, SCRT
 
-mean_precip <- colSums(precip_test)
+tic()
+#decomposed_sst <- decompose_brick(brick = sst, nlayers = nlayers(sst), ncells = ncell(sst))
+#saveRDS(decomposed_sst, file = "data/processed/decomposed_sst_data.rds")
+toc()
+sst <- readRDS("data/processed/decomposed_sst_data.rds")
 
 ```
 
 ```{r}
-sst_test <- decompose_brick(brick = sst, nlayers = 27, ncells = 10)
+# okay so now I have to two data files, I can now fit a model or
+# compute the correlation coefficients for 1m, 2m,..,6m
+head(precip)[1:5,1:5]
+dim(precip)
+head(sst)[1:5,1:5]
+dim(sst)
+
+# normalize sst?
+
 ```
 
+
+also compute means of precip data easy
 ```{r}
+dim(precip)
+precip_means <- apply(precip, 2, mean)
+dim(precip_means)
+str(precip_means)
+plot(precip_means)
+plot_ts(precip_means)
+```
+
+
+
+```{r}
+dim(sst)
 ?cor()
-cor(mean_precip, sst_test[1,])
-for (i in 1:nrow(sst_test)) {
-  print(cor(mean_precip, sst_test[i,]))
+cor(precip_means, sst[1,])
+t_corr <- c()
+for (i in 1:nrow(sst)) {
+  t_corr[i] <- cor(precip_means, sst[i,])
+}
+max(t_corr)
+
+d <- function(vec, drops) {
+  object <- object[]
 }
 
+drop_lastn <- function(obj, lastn) {
+  lo <- ncol(obj)
+  startdrop <- lo - lastn
+  obj <- obj[,-c(startdrop:lo)]
+  return(obj)
+}
+
+compute_corr <- function(target, predictors, delay=0) {
+  corr_vec <- c()
+  if(delay!=0) {
+    target <- target[-c(1:delay)]
+    lp <- ncol(predictors)
+    startdrop <- lp-delay+1
+    predictors <- predictors[,-c(startdrop:lp)]
+  }
+  for (i in 1:nrow(predictors)) {
+    corr_vec[i] <- cor(target, predictors[i,])
+  }
+  return(corr_vec)
+}
+
+nolag <- compute_corr(precip_means, sst,0)
+onelag <- compute_corr(precip_means, sst, 1)
+twolag <- compute_corr()
+
+corr_matr <- matrix(nrow = 12, ncol = nrow(sst), NA)
+for (i in 1:12) {
+  corr_matr[i,] <- compute_corr(precip_means, sst, i)
+}
+
+dim(corr_matr)
+which(corr_matr == max(corr_matr), arr.ind = TRUE)
+dim(sst)
+df <- data.frame(cbind(precip_means, t(sst)))
+ggplot(data = df, aes(y = precip_means, x = sst[10830,])) + geom_point()
+
+```
+```{r}
+library(glmnet)
+df <- data.frame(cbind(precip_means, t(sst)))
+varmtx <- model.matrix(precip_means~.-1, data = df)
+dim(varmtx)
+length(response)
+response <- df$precip_means
+ridge <- glmnet(x = scale(varmtx), y = response, alpha = 0)
+plot(ridge)
+
+```
+```{r}
+cvfit <- cv.glmnet(x = scale(varmtx), y = response)
+plot(cvfit)
+```
+```{r}
+cvfit$lambda.1se
+min(cvfit$cvm)
+plot(density(log(scale(precip_means))))
+plot(density(scale(precip_means)))
+```
+
+
+```{r}
+# check size of regression matrix
+# 432 times precip, 16020 predictors
+# 432 times 16020
+ttm <- matrix(1.002, nrow = 432, ncol = 16020)
+ttdf <- as.data.frame(ttm)
+object.size(ttm)
+```
+
+```{r}
+object.size(ttdf)
 ```
 ```{r}
 # trying to estimate runtim for whole precip or sst data on this laptop
@@ -303,41 +367,9 @@ comp_fac <- function(brick_object, nc, nl) {
 }
 
 comp_fac(precip, 50, 108)
-1224*0.87/60/60
+1224*0.87/60/60 #probably will take 30m mins
 
 ```
-
-
-```{r}
-#do 27 layers with all cells, start 12:53, end 12:54
-#may
-first_27 <- decompose_brick(brick = precip, nlayers = 27, ncells = ncell(precip))
-# checl once again if it all good like this
-#decomposed_precip <- decompose_brick(brick = precip, nlayers = nlayers(brick), ncells = ncell(precip))
-
-
-```
-
-```{r}
-# check size of regression matrix
-# 432 times precip, 16020 predictors
-# 432 times 16020
-ttm <- matrix(1.002, nrow = 432, ncol = 16020)
-ttdf <- as.data.frame(ttm)
-object.size(ttm)
-```
-
-```{r}
-object.size(ttdf)
-```
-
-
-```{r}
-dec$time.series[,"remainder"]
-```
-
-as.matrix, each col is one layer, meaning stl() over
-the rows is stl() on each grid cell time series
 
 We can use Raster Time Series!!!
 rts()
@@ -369,30 +401,3 @@ rtsa::rtsa.stl(rts_test)
 
 
 ```
-
-```{r}
-
-```
-
-
-
-
-Overnext step:
-Compute mean of each (deseasoned and detrended)precip layer with cellStats
-
-```{r}
-# for one layer
-m <- cellStats(precip[[1]], "mean")
-m
-# for all layers this will take a bit of time
-start <- Sys.time()
-??rts()
-```
-
-
-
-
-
-
-
-
