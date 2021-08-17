@@ -1,24 +1,28 @@
 ---
-title: "Detrend and Deseaonalise Time Series"
+title: "Detrend and Deseasonalise Time Series"
 author: "Dario Lepke"
-date: "7 7 2021"
-output: html_document
+date: "11.08.21"
+output: 
+  html_document:
+    toc: true
+  
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 #knitr::opts_knit$set(root.dir = normalizePath("./../../"))
 knitr::opts_knit$set()
+knitr::opts_chunk$set(message = FALSE, warning = FALSE)
 ```
 
-```{r}
-# work_dir <- getwd()
-# # html file will be written to Rmd dir
-# rmarkdown::render("code/Rmarkdown/Deasonalise and Detrend.Rmd", 
-#                   # chunks will be evaluated with this working dir
-#                   knit_root_dir = work_dir, 
-#                   # md file to be converted by pandoc will be in working dir
-#                   intermediates_dir = work_dir)
+```{r, include = FALSE}
+work_dir <- getwd()
+# html file will be written to Rmd dir
+#rmarkdown::render("code/Rmarkdown/Deasonalise and Detrend.Rmd",
+                  # chunks will be evaluated with this working dir
+ #                 knit_root_dir = work_dir, 
+                  # md file to be converted by pandoc will be in working dir
+  #                intermediates_dir = work_dir)
 ```
 
 
@@ -28,9 +32,14 @@ library(raster)
 library(ggplot2)
 library(dplyr)
 library(ncdf4)
-getwd()
+#getwd()
 ```
-```{r}
+### Helper functions {.tabset}
+
+#### Hide
+
+#### Show
+```{r helper functions}
 # as.matrix, each col is one layer, meaning stl() over
 # the rows is stl() on each grid cell time series
 brick_to_matrix <- function(brick_object, nlayers) {
@@ -41,56 +50,7 @@ brick_to_matrix <- function(brick_object, nlayers) {
   if(any(is.na(m))) stop("Matrix still contains NA")
   return(m)
 }
-```
 
-
-Quick review of research question:
-- Former research suggests it is possible to predict Rainfall/drought in the Central Amazonas Basin (CAB) from preceding sea surface temperatures (SSTs)
-alone
-- In a first step we want to fit regularized linear models (f.e LASSO) to the 
-data. (Predictors: Each longitude/latitude grid point is one, Target: Precipitation in the CAB). To identify important predictive locations in the sea.
-
-What was done so far:
-- Preprocessing the raw data (choose years that are covered by both datasets,
-change orientation of grid cells, set reference time of the timestamps).
-- Applying seasonal trend composition using loess (STL) on each single time series in the data set.
-- For precipitation we compute the monthly means, which will be used as target
-in the linear model.
-
-
-Load preprocessed data
-
-```{r}
-sst <- brick("../../data/interim/sst/ersst_setreftime.nc",
-             varname= "sst")
-sst
-```
-```{r}
-vals <- values(sst)
-length(vals) == 16020*432
-range(vals, na.rm = TRUE)
-```
-```{r}
-df <- as.data.frame(c(vals))
-dense_sst <- ggplot(data = df, aes(x = vals)) + geom_density()
-#jpeg("density_sst.jpeg")
-#dense_sst
-#dev.off()
-save_plot <- function(plot, name) {
-  jpeg(name)
-  plot
-  dev.off()
-}
-```
-
-TODO: Update Text
-The maximum and minimal values for the sst data seem to be pretty rare,
-while most values lie in the range of +- 2.5.
-Are these values too extreme to be reasonable?
-
-We will now extract one time series of values for random grid point that is not NA (The sst data contains NA on continental grid points).
-
-```{r}
 # in: brick object
 # out: random gridcell that is not on land
 #      x is longitude, y is latitude
@@ -106,12 +66,6 @@ get_random_cell <- function(brick) {
   return(lonlat)
 }
 
-sst_cell <- get_random_cell(sst)
-```
-
-And plot that point on the map.
-
-```{r}
 # in: lonlat info of sea grid point
 # out: a ggplot of point on map
 plot_cell <- function(cell) {
@@ -124,28 +78,13 @@ plot_cell <- function(cell) {
   mp <- mp + geom_point(aes(x=cell[1], y=cell[2]), ,color="blue", size=3)
   mp
 }
-```
 
-
-```{r, eval = FALSE}
-plot_sst_cell <- plot_cell(sst_cell)
-plot_sst_cell
-ggsave("plot_sst_cell.jpg")
-```
-```{r}
-knitr::include_graphics("/plots/plot_sst_cell.jpg", error = FALSE)
-```
-
-We now plot the respective time series of that point.
-```{r}
 # in: dataset and respective cellpoint
 # out: ggplot of time series data for cellpoint
 get_ts <- function(data,cell) {
   vals <- c(extract(data,cell))
   return(vals)
 }
-
-sst_ts <- get_ts(sst, sst_cell)
 
 plot_ts <- function(ts) {
   df <- as.data.frame(ts)
@@ -155,27 +94,6 @@ plot_ts <- function(ts) {
   
 }
 
-# sst_ts_plot <- plot_ts(sst_ts)
-# ggsave("sst_ts_plot.jpg")
-knitr::include_graphics("./plots/sst_ts_plot.jpg")
-```
-As we would expect for temperature data there is a seasonal effect in it.
-Also it seems there is a low upward trend.
-
-
-Deasonalise and detrend one time series SST
-
-We decompose this time series now using the stl function.
-The stl algorithm uses local polynomial regression to fit a smoothing line to the data, while deconstructing it into three parts.
-$$Monthly \textit{ } Temperatures = Seasonal + Trend + Remainder$$
-The estimates for the seasonal effect and trend are computed using local
-polynomial regression. To give an estimation $\hat{y_i}$ for a given $x_i$,
-we take into account the values of the neighbouring $x_j$, while assigning more
-weight to points that are closer to $x_i$. Then a polynomial regression model is fitted to create an estimate for $\hat{y_i}$ at $x_i$. Additionally robustness weights are use that give more weight to estimations $\hat{y_i}$ that are closer to their "original" $y_i$, hence reducing the influence of outliers.
-The algorithm estimates the seasonal and trend component iteratively while also using a low-pass filter.
-
-
-```{r}
 plot_stl <- function(values) {
   time_series <- ts(values, frequency = 12)
   time_series %>% stl(t.window = 12, s.window = "periodic", robust = TRUE) %>% forecast::autoplot()
@@ -183,30 +101,90 @@ plot_stl <- function(values) {
 ```
 
 
-```{r, eval = FALSE}
-stl_sst <- plot_stl(sst_ts)
-ggsave("stl_sst.jpg")
-```
+## Quick review of research question
+
+- Former research suggests it is possible to predict rainfall/drought in the Central Amazonas Basin (CAB) from preceding sea surface temperatures (SSTs)
+alone
+- In a first step we want to fit regularized linear models (f.e LASSO) to the 
+data. (Predictors: Each longitude/latitude grid point is one, Target: Precipitation in the CAB). To identify important predictive locations in the sea.
+
+## What is done so far
+- Preprocessing the raw data (choose years that are covered by both datasets,
+change orientation of grid cells, set reference time of the timestamps).
+- Applying seasonal trend composition using loess (STL) on each single time series in the data set (see below)
+
+##  Datasets, quick overview {.tabset}
+
+### Sea Surface Temperature
+
+#### Load data
 ```{r}
-knitr::include_graphics("plots/stl_sst.jpg")
+sst <- brick("./data/interim/sst/ersst_setreftime.nc",
+             varname= "sst")
+sst
 ```
+The data is organised on a 2x2 latlon grid with 432 months of observations (=layers).
 
+#### Plot density
+```{r}
+vals <- values(sst)
+range(vals, na.rm = TRUE)
+```
 
 ```{r, eval = FALSE}
-sst_m <- brick_to_matrix(sst, nlayers = nlayers(sst))
-sst_means <- apply(sst_m, 2, mean)
-sst_means_plot <- plot_stl(sst_means)
-ggsave("sst_means_plot.jpg")
+df <- as.data.frame(c(vals))
+dense_sst <- ggplot(data = df, aes(x = vals)) + geom_density()
+dense_sst
+ggsave("plots/dense_sst.jpg")
 ```
+
+```{r, echo = FALSE}
+knitr::include_graphics("plots/dense_sst.jpg")
+```
+
+The maximum and minimal values for the sst data seem to be pretty rare,
+while most values lie in the range of +- 2.5.
+Are these values too extreme to be reasonable?
+
+#### Plot random grid cell
+
+We will now extract one time series of values for random grid point that is not NA (The SST data contains NA on continental grid points).
+
 ```{r}
-knitr::include_graphics("plots/sst_means_plot.jpg")
+sst_cell <- get_random_cell(sst)
 ```
 
+And plot that point on the map.
 
-The bars on the side show the relative size of the y-axis to the first panel ("data"). Meaning if a bar is large the graph is "zoomed in". We can see that for the "seasonal" panel, with a y-axis approximately 10 times smaller than the "data" y-axis. The small values indicate that for this time series, the seasonal effect is not as large as for example the trend component (panel two).
-We also see that we have quite large values in the remainder panel. Values that can not be denoted to either the trend or seasonal component.
+```{r, eval = FALSE}
+plot_sst_cell <- plot_cell(sst_cell)
+plot_sst_cell
+ggsave("plot_sst_cell.jpg")
+```
+```{r, echo = FALSE}
+knitr::include_graphics("plots/plot_sst_cell.jpg")
+```
+
+We now plot the respective time series of that point.
+
+```{r}
+sst_ts <- get_ts(sst, sst_cell)
+```
+
+```{r, echo = FALSE}
+# sst_ts_plot <- plot_ts(sst_ts)
+# ggsave("sst_ts_plot.jpg")
+knitr::include_graphics("./plots/sst_ts_plot.jpg")
+```
+As we would expect for temperature data there is a seasonal effect in it.
+Also it seems there is a low upward trend.
+
+### Precipitation
 
 We proceed with the same steps as before now for the precipitation data.
+
+#### Load data
+
 ```{r}
 precip <- brick("data/interim/drought/chirps_setreftime.nc", varname = "precip")
 #mean_test2 <- calc(test2, fun=mean, na.rm=TRUE)
@@ -218,22 +196,23 @@ vals <- values(precip)
 length(vals) == 61200*432
 range(vals, na.rm = TRUE)
 ```
+
+#### Plot density
+
 ```{r, eval = FALSE}
 df <- as.data.frame(c(vals))
 ggplot(data = df, aes(x = vals)) + geom_density()
 ggsave("density_precip.jpg")
 ```
-```{r}
+```{r, echo = FALSE}
 knitr::include_graphics("plots/density_precip.jpg")
 ```
-
-
 
 Here also we have some pretty rare, high values. Is this reasonable or should
 we exclude them?
 
 
-Choose random cell for precip
+#### Plot random grid cell
 ```{r}
 cell_precip <- get_random_cell(precip)
 ```
@@ -243,7 +222,7 @@ Plot the point on the map
 plot_cell(cell_precip)
 ggsave("cellplot_precip.jpg")
 ```
-```{r}
+```{r, echo = FALSE}
 knitr::include_graphics("./plots/cellplot_precip.jpg")
 ```
 
@@ -255,45 +234,87 @@ plot_ts(precip_ts)
 ggsave("precip_ts.jpg")
 ```
 
-```{r}
+```{r, echo = FALSE}
 knitr::include_graphics("plots/precip_ts.jpg")
 ```
 
 
 Here again we can recognize a seasonal effect, as well as a small downward trend.
-We now deconstruct this time series via stl.
+
+
+## STL: Seasonal Trend Decomposition using loess
+
+We decompose time series now using the stl function.
+The stl algorithm uses local polynomial regression to fit a smoothing line to the data, while deconstructing it into three parts.
+$$Monthly \textit{ } Temperatures = Seasonal + Trend + Remainder$$
+The estimates for the seasonal effect and trend are computed using local
+polynomial regression. To give an estimation $\hat{y_i}$ for a given $x_i$,
+we take into account the values of the neighbouring $x_j$, while assigning more
+weight to points that are closer to $x_i$. Then a polynomial regression model is fitted to create an estimate for $\hat{y_i}$ at $x_i$. Additionally robustness weights are used that give more weight to estimations $\hat{y_i}$ that are closer to their "original" $y_i$, hence reducing the influence of outliers.
+The algorithm estimates the seasonal and trend component iteratively while also using a low-pass filter.
+
+## STL on the data {.tabset}
+
+### Sea Surface Temperature
+```{r, eval = FALSE, include = FALSE}
+stl_sst <- plot_stl(sst_ts)
+ggsave("stl_sst.jpg")
+```
+```{r, eval = FALSE, include = FALSE}
+knitr::include_graphics("plots/stl_sst.jpg")
+```
+
+We now compute monthly means for all grid points and deconstruct
+these global sea temperatures with the stl() function.
 
 ```{r, eval = FALSE}
+sst_m <- brick_to_matrix(sst, nlayers = nlayers(sst))
+sst_means <- apply(sst_m, 2, mean)
+sst_means_plot <- plot_stl(sst_means)
+ggsave("sst_means_plot.jpg")
+sst_means_plot
+```
+```{r, echo = FALSE}
+knitr::include_graphics("plots/sst_means_plot.jpg")
+```
+
+The bars on the side show the relative size of the y-axis to the first panel ("data"). Meaning if a bar is large the graph is "zoomed in". We can see that for the "seasonal" panel, with a y-axis approximately 10 times smaller than the "data" y-axis. The small values indicate that for this time series, the seasonal effect is not as large as for example the trend component (panel two).
+We also see that we have quite large values in the remainder panel. Values that can not be denoted to either the trend or seasonal component.
+
+
+### Precipitation
+
+```{r, eval = FALSE,include=FALSE}
 plot_stl(precip_ts)
 ggsave("stl_precip.jpg")
 ```
-```{r}
+```{r, eval = FALSE, include =FALSE}
 knitr::include_graphics("plots/stl_precip.jpg")
+#Here for this specific grid point of the precipitation data we have more of a #seasonal effect, than trend effect.
 ```
 
+As for SST we compute the mean of all grid points for each month 
+and decompose the resulting time series via stl().
 
-Here for this specific gri point of the precip data we have more of a seasonal effect, than trend effect.
-
-We now decompose the monthly means of precipitation in the CAB.
 ```{r, eval = FALSE}
 precip_m <- brick_to_matrix(precip, nlayers = nlayers(precip))
 precip_means <- apply(precip_m, 2, mean)
 plot_stl(precip_means)
 ggsave("stl_precip_means.jpg")
 ```
+
 ```{r}
 knitr::include_graphics("plots/stl_precip_means.jpg")
 ```
 
+For the mean precipitation in the CAB we see that we have a strong seasonal effect, also with a lot of large remainders.
 
-For the mean precip in the CAB we see that we have a strong seasonal effect, also with a lot of large remainders.
+## Decompose both datasets
 
 We now apply the stl decomposition on the time series of each grid cell,
-on both data sets. We then extract only the remainder part of the stl output
-and use it as the input for a LASSO model.
+on both data sets. We then extract only the remainder parts of the stl decomposition so we can use them as the input for a LASSO model.
 
-```{r}
-
+```{r, include=FALSE, eval=FALSE}
 # as.matrix, each col is one layer, meaning stl() over
 # the rows is stl() on each grid cell time series
 brick_to_matrix <- function(brick_object, nlayers) {
@@ -304,7 +325,10 @@ brick_to_matrix <- function(brick_object, nlayers) {
   if(any(is.na(m))) stop("Matrix still contains NA")
   return(m)
 }
+```
 
+
+```{r}
 decompose_matrix <- function(matrix_with_ts, ncells) {
   # use min here, since if data contained NA (like sst),
   # we removed the NAs (which were grid points on land)
@@ -320,12 +344,12 @@ decompose_matrix <- function(matrix_with_ts, ncells) {
 # of "remainder" values for each time series respectively.
 # nrow depends on the number of decomposed cells
 # ncol depends on how many months were decomposed for each cell
-get_remainder_and_trend <- function(list_of_decomposed_ts) {
+get_remainder <- function(list_of_decomposed_ts) {
   l <- length(list_of_decomposed_ts)
   out <- matrix(NA, nrow = l,
                 ncol = nrow(list_of_decomposed_ts[[1]]$time.series))
   for (i in 1:l) {
-    out[i,] <- c(list_of_decomposed_ts[[i]]$time.series[,"remainder"]) + c(list_of_decomposed_ts[[i]]$time.series[,"trend"])
+    out[i,] <- c(list_of_decomposed_ts[[i]]$time.series[,"remainder"])
   }
   return(out)
 }
@@ -334,54 +358,12 @@ get_remainder_and_trend <- function(list_of_decomposed_ts) {
 decompose_brick <- function(brick, nlayers, ncells) {
   ts_matrix <- brick_to_matrix(brick_object = brick, nlayers = nlayers)
   dec_list <- decompose_matrix(matrix_with_ts = ts_matrix, ncells = ncells)
-  remainder <- get_remainder_and_trend(list_of_decomposed_ts = dec_list)
+  remainder <- get_remainder(list_of_decomposed_ts = dec_list)
   return(remainder)
 }
 
 ```
 
-```{r}
-decompose_matrix_wna <- function(matrix_with_ts, ncells) {
-  out <- apply(matrix_with_ts[1:ncells,], 1, function(x)
-    if (any(is.na(x))) {
-      NA
-    } else {
-      stl(ts(x, frequency = 13), "periodic")
-    }
-  )
-  return(out)
-}
-
-test_dec <- decompose_matrix_wna(test_m, 16020)
-which(is.na(test_m[,1]))[1]
-is.na(test_dec[[589]][1])
-
-get_remainder_and_trend_wna <- function(list_of_decomposed_ts) {
-  l <- length(list_of_decomposed_ts)
-  out <- matrix(NA, nrow = l, ncol = nrow(list_of_decomposed_ts[[1]]$time.series))
-  for (i in 1:l) {
-    if (is.na(list_of_decomposed_ts[[i]][1])) {
-      out[i,] <- NA
-    } else {
-      out[i,] <- c(list_of_decomposed_ts[[i]]$time.series[,"remainder"]) +
-        c(list_of_decomposed_ts[[i]]$time.series[,"trend"])
-    }
-  }
-  return(out)
-}
-debug(get_remainder_and_trend_wna)
-test_randt <- get_remainder_and_trend_wna(test_dec)
-
-
-decompose_brick_wna <- function(brick, nlayers, ncells) {
-  ts_matrix <- brick_to_matrix_wna(brick_object = brick, nlayers = nlayers)
-  dec_list <- decompose_matrix_wna(matrix_with_ts = ts_matrix, ncells = ncells)
-  r_and_t <- get_remainder_and_trend_wna(list_of_decomposed_ts = dec_list)
-  return(r_and_t)
-}
-
-# did the rest with decompose brick with na
-```
 
 ```{r}
 #library(tictoc)
@@ -389,20 +371,26 @@ decompose_brick_wna <- function(brick, nlayers, ncells) {
 #decomposed_precip <- decompose_brick(brick = precip, nlayers = nlayers(precip), ncells = ncell(precip))
 #toc() #took 90s
 #saveRDS(decomposed_precip, file = "./../../data/processed/decomposed_precip_data.rds")
-precip <- readRDS("../../data/processed/decomposed_precip_data.rds")
+precip <- readRDS("data/processed/decomposed_precip_data.rds")
 dim(precip)
 ```
 ```{r}
 #tic()
 #decomposed_sst <- decompose_brick(brick = sst, nlayers = nlayers(sst), ncells = ncell(sst))
-#saveRDS(decomposed_sst, file = "../../data/processed/decomposed_sst_data.rds")
+#saveRDS(decomposed_sst, file = "data/processed/decomposed_sst_data.rds")
 #toc()
 #sst <- readRDS("data/processed/decomposed_sst_data.rds")
-sst <- readRDS("../../data/processed/decomposed_sst_data.rds")
+sst <- readRDS("data/processed/decomposed_sst_data.rds")
 dim(sst)
 ```
 
-```{r}
+## Next steps
+
+- Use remainder from stl decomposition as input for LASSO model.
+- Find a Cross Validation method for the time series data
+- Visualise results
+
+```{r, echo = FALSE}
 knitr::knit_exit()
 ```
 
