@@ -37,7 +37,7 @@ TODO:
 1. sst statt ssta Daten preprocessen oder nur bei deasonalise and detrend ändern? DONE
 A: Nur bei decompose ssta zu sst
 2. change stl function insted of taking only reminder, take sum of trend + reminder DONE
-3. plot korrelations for different timelags DOING
+3. plot korrelations for different timelags DONE
 	3.1 compute correlations, is easy compute precip means first though
 		Q: Where to insert the values?
 		Q: Maybe keep raster structure before using decompose and just skip when is.na
@@ -47,12 +47,24 @@ A: Nur bei decompose ssta zu sst
 			was rounded
 	STEP: inspect raster object classes
 	3.2 refill marix with NA rows to create raster and plot it WONT FIX
+
 	3.3 turn matrix into raster DONE
 	3.4 plot raster object DONE
-	3.5 first plot created
-	3.6 write function that compute cor for different time lags NEXT
-	3.7 write function that plots respective correlations
-	3.8 spend max 2hurs to create nice plots
+	3.5 create first plot DONE
+	3.6 write function that compute cor for different time lags DONE
+	3.7 write function that plots respective correlations DONE
+	3.8 spend max 2hurs to create nice plots OPEN
+	3.9 IDEA: compute quantils and plot only "significant" correlations DONE
+I am here rn
+STEP: interpret the correlation values and the plots a bit
+	intepret changing pos and neg correlations and which fields are most interesting
+	different distribution and therefore changed colour scale in the plot for timelag 3
+	fix ggplot title when quantils are applied
+	add lines for quantils of the distribution for the correlations, density plots
+	summarise and create a document, send it to fabi and niklas and ask what they think
+	distributions of 0 and 12 pretty similar, 3 seems to change the spikes, 6 has reversed
+		compared to 0 or 12.
+	
 Maybe. Fit lineare model with only 432 features, maybe take the 432 highest correlations or create
 	confidence interval for the correlations
 4. fit lasso models with own written cross validation
