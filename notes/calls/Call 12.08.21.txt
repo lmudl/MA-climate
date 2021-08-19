@@ -64,13 +64,37 @@ STEP: interpret the correlation values and the plots a bit
 	summarise and create a document, send it to fabi and niklas and ask what they think
 	distributions of 0 and 12 pretty similar, 3 seems to change the spikes, 6 has reversed
 		compared to 0 or 12.
-	
+	create stl plots for the deseasonalised time series PRIO LOW
+	compare deseaonalised and original time series PRIO LOW
+	Play around with different settings for the density plot so we can save it and when we load
+		and arrange with the other plots together it appears mas o menos the same width
+HERE	Finish rmarkdown html output, all plots are saved in the same directory as the markdown file
+		put the plots into a folder for this markdown
+		delete the helper function code etc
+		show all plots for each time lag
+		show the density plots aligned
+		show the corr and corrq plots aligned
+			maybe make them a big bigger and add the titles again?
+		talk about symmetries and how they may influence our model?
+			if correlation is so symmetric over how many years does that hold?
+		can we maybe achieve even two year predictions?
+	Write email
+		say something about document
+		what else can we figure out from that? Ask Niklas
+		talk about linear models, take maybe only highest correlations?
+			how to account for multicollinearity here
+			how to choose then which parameters come in
+		talk about start of cross validation functions
+
 Maybe. Fit lineare model with only 432 features, maybe take the 432 highest correlations or create
 	confidence interval for the correlations
 4. fit lasso models with own written cross validation
 5. Update text from line 86
 6. Update plots for sst from deasonalise and detrend
 7. check where did I change the ssta to sst, should be done in both deseasonalise, also clean that up
+
+Quesions:
+Is correlation of two random variables again a random variable?
 
 
 Notes on 12.08, 10:00

@@ -1,0 +1,280 @@
+---
+title: "correlation overview"
+author: "Dario Lepke"
+date: "19 8 2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+```{r}
+set.seed(1234)
+library(raster)
+library(ggplot2)
+#library(ggtext)
+library(dplyr)
+library(ncdf4)
+```
+
+
+```{r}
+getwd()
+#setwd("Repos/MA-climate/")
+# load data
+precip <- readRDS("../../data/processed/decomposed_precip_data_withna.rds")
+sst <- readRDS("../../data/processed/decomposed_sst_data_withna.rds")
+dim(precip)
+dim(sst)
+
+# option front or back cut
+# for precip front cut
+# for sst back cut
+cut_matrix <- function(matrix, timelag, side=c("front,back")) {
+  if(side == "front") {
+    matrix <- matrix[, -c(1:timelag)]
+  }
+  if(side == "back"){
+    matrix <- matrix[, 1:(ncol(matrix)-timelag)]
+  }
+  return(matrix)
+}
+
+# compute correlations
+# for different time lags what do we need?
+# in: precip path, sst path, time lags
+# out: correlation vector
+# load precip and sst decomposed
+# compute precip means
+# remove precip data
+# compute correlations with time lags
+# correlations out
+
+compute_corr <- function(dec_matrix_sst, dec_matrix_precip, timelag=0) {
+  if (timelag!=0) {
+    dec_matrix_sst <- cut_matrix(dec_matrix_sst, timelag, "back")
+    dec_matrix_precip <- cut_matrix(dec_matrix_precip, timelag, "front")
+  }
+  assertthat::are_equal(ncol(dec_matrix_precip), ncol(dec_matrix_sst))
+  precip_means <- apply(dec_matrix_precip, 2, mean)
+  cor_vec <- apply(dec_matrix_sst, 1, function(x) cor(x, precip_means))
+  return(cor_vec)
+}
+
+
+#corr0 <- compute_corr(sst, precip,0)
+# create matrix/raster
+old_sst <-  brick("../../data/interim/sst/ersst_setreftime.nc",
+                  varname= "sst")
+
+
+# plot correlation 
+# in: correlation vector, old sst data, timelag for legend
+plot_corr <- function(corr_vec, old_sst, timelag,
+                      quantiles = c(TRUE,FALSE)) {
+  corr_grid <- matrix(corr_vec, nrow = old_sst@nrows, ncol = old_sst@ncols, byrow = TRUE)
+  corr_raster <- raster(corr_grid,
+                        xmn = old_sst@extent@xmin, xmx = old_sst@extent@xmax,
+                        ymn = old_sst@extent@ymin, ymx = old_sst@extent@ymax,
+                        crs = old_sst@crs)
+  df <- cbind(xyFromCell(corr_raster, 1:ncell(corr_raster)), values(corr_raster))
+  df <- base::as.data.frame(df)
+  colnames(df) <- c("Longitude","Latitude", "Correlation")
+  if(quantiles) {
+    q <- quantile(df[,"Correlation"],probs=c(0.025,0.975), na.rm = TRUE)
+    df$Correlation[df$Correlation>q["2.5%"] & df$Correlation<q["97.5%"]] <- 0
+  }
+  plt <- ggplot(data = df, aes(x = Longitude, y = Latitude, fill = Correlation)) +
+    annotation_map(map_data("world")) +
+    geom_raster(interpolate = TRUE)
+  if(!quantiles) {
+    plt <- plt #+
+      #ggtitle(paste("Correlation of Sea Surface Temperature and Precipitation for Timelag",timelag))
+  } 
+  if(quantiles) {
+    plt <- plt #+
+      #ggtitle(paste0("Correlation of Sea Surface Temperature and Precipitation for Timelag"," ",timelag,
+                     #",\nValues between quantiles threshold set to 0"))
+    
+  }
+  plt <- plt +
+    scale_fill_viridis_c(option="A") +
+    theme_bw() +
+    coord_quickmap() 
+  return(plt)
+}
+
+compute_corr_and_plot <- function(
+  dec_matrix_sst, dec_matrix_precip, old_sst,
+  timelag=0,quantiles = c(TRUE,FALSE)) {
+  
+  corr_vec <- compute_corr(dec_matrix_sst, dec_matrix_precip, timelag)
+  plt <- plot_corr(corr_vec, old_sst, timelag, quantiles)
+  return(plt)                                 
+}
+
+
+plot_density <- function(corr_vec, timelag) {
+  df <- data.frame(corr_vec)
+  plt <- ggplot(df, aes(x=corr_vec)) + geom_density() + ggtitle(paste("Density Plot of Correlations with timelag",timelag))
+  plt
+}
+
+multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
+  library(grid)
+  
+  # Make a list from the ... arguments and plotlist
+  plots <- c(list(...), plotlist)
+  
+  numPlots = length(plots)
+  
+  # If layout is NULL, then use 'cols' to determine layout
+  if (is.null(layout)) {
+    # Make the panel
+    # ncol: Number of columns of plots
+    # nrow: Number of rows needed, calculated from # of cols
+    layout <- matrix(seq(1, cols * ceiling(numPlots/cols)),
+                     ncol = cols, nrow = ceiling(numPlots/cols))
+  }
+  
+  if (numPlots==1) {
+    print(plots[[1]])
+    
+  } else {
+    # Set up the page
+    grid.newpage()
+    pushViewport(viewport(layout = grid.layout(nrow(layout), ncol(layout))))
+    
+    # Make each plot, in the correct location
+    for (i in 1:numPlots) {
+      # Get the i,j matrix positions of the regions that contain this subplot
+      matchidx <- as.data.frame(which(layout == i, arr.ind = TRUE))
+      
+      print(plots[[i]], vp = viewport(layout.pos.row = matchidx$row,
+                                      layout.pos.col = matchidx$col))
+    }
+  }
+}
+```
+
+```{r}
+library(jpeg)
+library(grid)
+library(gridExtra)
+```
+
+```{r}
+corr0_vec <- compute_corr(sst, precip,0)
+dens0 <- plot_density(corr0_vec, timelag = 0)
+ggsave("dens0.jpg", width = 10, height = 10, units = "cm")
+
+#ggsave("plots/dens0.jpg",dens0)
+corr0 <- plot_corr(corr0_vec, old_sst, timelag = 0, quantiles = FALSE)
+#ggsave("corr0.jpg", width = 30, height = 30, units = "cm")
+ggsave("corr0.jpg", scale = 2)
+corr0q <- plot_corr(corr0_vec, old_sst, timelag = 0, quantiles = TRUE)
+ggsave("corr0q.jpg", scale = 2)
+# 
+# im1 <- rasterGrob(as.raster(readJPEG("dens0.jpg")))
+# im2 <- rasterGrob(as.raster(readJPEG("corr0.jpg")))
+# grid.arrange(im1,im2, ncol=1)
+
+#ggsave("plots/corr0q.jpg", corr0q)
+
+```
+```{r}
+corr3_vec <- compute_corr(sst, precip, 3)
+dens3 <- plot_density(corr3_vec, timelag = 3)
+ggsave("dens3.jpg", width = 10, height = 10, units = "cm")
+corr3 <- plot_corr(corr3_vec,old_sst,3,FALSE)
+ggsave("corr3.jpg", scale = 2)
+corr3q <- plot_corr(corr3_vec,old_sst,3,TRUE)
+ggsave("corr3q.jpg")
+```
+```{r}
+# load and save all densities
+# dens0
+# dens3
+corr6_vec <- compute_corr(sst, precip, 6)
+dens6 <- plot_density(corr6_vec, timelag = 6)
+ggsave("dens6.jpg", width = 10, height = 10, units = "cm")
+
+corr9_vec <- compute_corr(sst, precip, 9)
+dens9 <- plot_density(corr9_vec, timelag = 9)
+ggsave("dens9.jpg", width = 10, height = 10, units = "cm")
+
+
+corr12_vec <- compute_corr(sst, precip, 12)
+dens12 <- plot_density(corr12_vec, timelag = 12)
+ggsave("dens12.jpg", width = 10, height = 10, units = "cm")
+```
+
+```{r, echo = FALSE, out.width="20%", out.height="20%",fig.cap="caption",fig.show='hold',fig.align='center'}
+knitr::include_graphics(c("dens0.jpg","dens3.jpg", "dens6.jpg","dens9.jpg", "dens12.jpg"))
+
+```
+```{r}
+corr3 <- plot_corr(corr3_vec,old_sst,3,FALSE)
+ggsave("corr3.jpg")
+corr3q <- plot_corr(corr3_vec,old_sst,3,TRUE)
+ggsave("corr3q.jpg")
+
+corr6 <- compute_corr(sst, precip, 6)
+plot_corr(corr6,old_sst,6,FALSE)
+ggsave("corr6.jpg")
+plot_corr(corr6,old_sst,6,TRUE)
+ggsave("corr6q.jpg")
+
+corr9 <- compute_corr(sst, precip, 9)
+plot_corr(corr9,old_sst,9,FALSE)
+ggsave("corr9.jpg")
+plot_corr(corr9,old_sst,9,TRUE)
+ggsave("corr9q.jpg")
+
+corr12 <- compute_corr(sst, precip, 12)
+plot_corr(corr12,old_sst,12,FALSE)
+ggsave("corr12.jpg")
+plot_corr(corr12,old_sst,12,TRUE)
+ggsave("corr12q.jpg")
+
+```
+```{r, echo = FALSE, out.width="20%", out.height="20%",fig.cap="caption",fig.show='hold',fig.align='center'}
+knitr::include_graphics(c("corr0.jpg","corr3.jpg", "corr6.jpg","corr9.jpg", "corr12.jpg"))
+```
+```{r, echo = FALSE, out.width="40%", out.height="40%",fig.cap="caption",fig.show='hold',fig.align='center'}
+knitr::include_graphics(c("corr0q.jpg","corr3q.jpg", "corr6q.jpg","corr9q.jpg", "corr12q.jpg"))
+```
+
+
+```{r, eval = FALSE}
+library(gtable)
+library(grid)
+```
+
+
+```{r, eval = FALSE}
+#https://stackoverflow.com/questions/32780320/consistent-figures-size-with-gridextra-in-rmarkdown-knitr-html
+g1 <- dens0
+g2 <- corr0
+g3 <- corr0q
+pl <- lapply(list(g1,g2,g3), ggplotGrob)
+```
+
+
+```{r, eval = FALSE}
+g123 <- rbind(pl[[1]], pl[[2]], pl[[3]], size="first")
+g123$heights <- unit.pmax(pl[[1]][["heights"]], pl[[2]][["heights"]],
+                          pl[[3]][["heights"]])
+#g34 <- cbind(pl[[3]], pl[[4]], size="first")
+#g34$heights <- unit.pmax(pl[[3]][["heights"]], pl[[4]][["heights"]])
+#g1234 <- rbind(g12, g34, size="first")
+#g123$widths <- unit.pmax(pl[[1]][["widths"]],pl[[2]][["widths"]],pl[[3]][["widths"]])
+grid.newpage()
+grid.draw(g123)
+```
+```{r, eval = FALSE}
+library(ggpubr)
+ggarrange(dens0, corr0, corr0q, ncol=1,nrow=3)
+??ggarrange
+```
+

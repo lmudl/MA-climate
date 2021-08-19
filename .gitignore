@@ -4,4 +4,7 @@ figures/
 .Rhistory
 .html
 .jpg
+.png
 plots/
+code/Rmarkdown/plots-markdown
+.bib
