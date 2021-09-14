@@ -34,6 +34,9 @@
 - aber für mich macht es auch keinen Unterschied.
 
 TODO:
+
+IMPORTANT check if decomposition was done right.
+
 1. sst statt ssta Daten preprocessen oder nur bei deasonalise and detrend ändern? DONE
 A: Nur bei decompose ssta zu sst
 2. change stl function insted of taking only reminder, take sum of trend + reminder DONE
@@ -69,7 +72,8 @@ STEP: interpret the correlation values and the plots a bit
 	Play around with different settings for the density plot so we can save it and when we load
 		and arrange with the other plots together it appears mas o menos the same width
 HERE	Finish rmarkdown html output, all plots are saved in the same directory as the markdown file
-		put the plots into a folder for this markdown
+		put the plots into a folder for this markdown DONE
+		are confidence intervals ok? Do reading on confidence intervals
 		delete the helper function code etc
 		show all plots for each time lag
 		show the density plots aligned
@@ -85,6 +89,7 @@ HERE	Finish rmarkdown html output, all plots are saved in the same directory as 
 			how to account for multicollinearity here
 			how to choose then which parameters come in
 		talk about start of cross validation functions
+	
 
 Maybe. Fit lineare model with only 432 features, maybe take the 432 highest correlations or create
 	confidence interval for the correlations
@@ -95,7 +100,11 @@ Maybe. Fit lineare model with only 432 features, maybe take the 432 highest corr
 
 Quesions:
 Is correlation of two random variables again a random variable?
-
+Would it make sense to do robust stl on the sea data but not on the precip (here outliers
+	can be more meaningful maybe)
+How should we choose s.window()
+	https://stats.stackexchange.com/questions/43398/criteria-to-set-stl-s-window-width
+	
 
 Notes on 12.08, 10:00
 

@@ -1,0 +1,103 @@
+notes on call
+time dependency zerstören oder erhaten
+trend extrapolieren?
+unterschiedlich lange Datensätze
+
+2 passes für Paper.
+
+normal CV und Zeitreihe
+
+Problem:
+wie Trend?
+Wie Einfluss von Menschen?
+Modellbildung: Identifizierung, und Schätzung,
+	keine Autoregresssion benutzen!
+Gute Idee: STL Zerlegung ernstnehmen
+
+Überlegungen zu LASSO Paper:
+sparse methode, picked sich paar raus
+	20 anbieten, 1 oder 2 raus
+Hirnforschung, räuml zeitl Daten.
+	zusammenhängende Regionen identifizieren
+ausgefuchste Varianten von LASSO
+	räuml strukturierte Penalisierung.
+
+Bottom up
+Graphical Lasso
+
+Variablenfilterung
+	vorher schon rausfiltern
+	preprocessing
+
+Wünschenswert:
+	preprocessing in jedem Schritt der Kreuzvalidierung!!!
+
+Bootstrap Varianten für Zeitreihen macht hier keinen Sinn
+
+Next Action:
+- Skalen corr Plots
+- Raster Objekte 
+- Kreuzvalidierung zu implementieren 
+- Vorfiltern, gruppieren 
+- First understand the problem then the Code
+- Welchen Lag sollten wir benutzen
+	gewichtete Lags, distributed Lag Modelle
+	
+
+Sinnvoll, jetzt:
+- Frage: Optionen
+- Am Schluss, Kompromiss zwischen was ist möglich und 
+- Problem mathematische Formalisieren
+	y_t: Niederschlag im Amazonas Becken
+	x_t: SST 
+- Was nehm ich an, wie hängt das zusammen
+- Hängt das verzögert zusammen
+- überparametrisiert, welche Orte sind relevant
+- Mathenoationen präzise aufschreiben
+- Welche Methoden, welche Annahmen
+- Wie kann ich das überprüfen
+- schafft Klarheit
+
+Welche Modelle fitten? 
+Simple Methoden
+Komplexe Methoden
+
+Alles Markdown, Latex vermeiden
+Mühsamer Layout zu gestalten
+
+Masterarbeit mit Markdown schreiben.
+
+TODO:
+mathem Problem, formalisiertes Problem
+	Modellierungsfunktion
+	Vorselektion über Korrelationsstärken
+		wie wähl ich aus, z.B quantile
+	Kreuzvalidierung und Optionen
+		auflisten was geht etc.
+		formalisierung
+		rolling window
+Zeitlags, Lags und Korrelation
+	wie geh ich damit um
+Graphical Lasso
+	was wird berücksichtigt?
+		Formulierung, wie sind Kanten definiert
+		Abh zwischen SST und Regen
+Vielleicht gute Idee, wenn eine observation öfter drin sind, kann ich
+	eventuell gewichten.
+FRMI Zeug, Paper etc.
+compare-stl-before-after.R into html
+change corr color spectrum
+change raster obj code
+
+
+
+
+
+
+
+
+
+
+
+
+

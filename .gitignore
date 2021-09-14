@@ -6,5 +6,5 @@ figures/
 .jpg
 .png
 plots/
-code/Rmarkdown/plots-markdown
+code/Rmarkdown/plots-markdown/
 .bib

@@ -1,14 +1,15 @@
 ---
-title: "correlation overview"
+title: "Correlation Analysis Overview"
 author: "Dario Lepke"
-date: "19 8 2021"
-output: html_document
+date: "23.08.2021"
+output: 
+  html_document:
+    toc: true
 ---
-
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
-```{r}
+```{r, eval = FALSE, include = FALSE}
 set.seed(1234)
 library(raster)
 library(ggplot2)
@@ -17,264 +18,208 @@ library(dplyr)
 library(ncdf4)
 ```
 
+# Short Recap 
 
-```{r}
-getwd()
-#setwd("Repos/MA-climate/")
-# load data
-precip <- readRDS("../../data/processed/decomposed_precip_data_withna.rds")
-sst <- readRDS("../../data/processed/decomposed_sst_data_withna.rds")
-dim(precip)
-dim(sst)
+We give a short overview over the correlation between monthly sea surface temperature and monthly mean precipitation in the Central Amazonas Basin (CAB).
+First we will analyse the original and then the deaseasonalised data.
+SST and precipitation data have been deseasonalised, meaning first each time series was
+decomposed by the stl algorithm according to 
+$$Monthly \textit{ } Data = Seasonal + Trend + Remainder$$
+Afterwards only trends and remainders time series were kept to constitute 
+a new time series that will be used as predictor (sst) and target (precipitation).
 
-# option front or back cut
-# for precip front cut
-# for sst back cut
-cut_matrix <- function(matrix, timelag, side=c("front,back")) {
-  if(side == "front") {
-    matrix <- matrix[, -c(1:timelag)]
-  }
-  if(side == "back"){
-    matrix <- matrix[, 1:(ncol(matrix)-timelag)]
-  }
-  return(matrix)
-}
+In a next step we compute the correlations between each sst grid point time series and the mean precipitation time series.
+Since our goal is to predict the precipitation on the sst information, we are
+also interested in predicting future precipitation some months ahead.
+To examine this we also compute the correlations for different time lags.
+For example we might use January sst data to predict precipitation in June, given
+a time lag of 6 months. 
 
-# compute correlations
-# for different time lags what do we need?
-# in: precip path, sst path, time lags
-# out: correlation vector
-# load precip and sst decomposed
-# compute precip means
-# remove precip data
-# compute correlations with time lags
-# correlations out
-
-compute_corr <- function(dec_matrix_sst, dec_matrix_precip, timelag=0) {
-  if (timelag!=0) {
-    dec_matrix_sst <- cut_matrix(dec_matrix_sst, timelag, "back")
-    dec_matrix_precip <- cut_matrix(dec_matrix_precip, timelag, "front")
-  }
-  assertthat::are_equal(ncol(dec_matrix_precip), ncol(dec_matrix_sst))
-  precip_means <- apply(dec_matrix_precip, 2, mean)
-  cor_vec <- apply(dec_matrix_sst, 1, function(x) cor(x, precip_means))
-  return(cor_vec)
-}
+We consider time lags of 0,3,6 and 12 months.
+And show the density of the correlation values as well as their spatial distribution on a map. We also display the highest positive and negative correlation based on their
+respective 2.5% and 97.5% quantiles. All correlations that are between these values are set to 0 then.
 
 
-#corr0 <- compute_corr(sst, precip,0)
-# create matrix/raster
-old_sst <-  brick("../../data/interim/sst/ersst_setreftime.nc",
-                  varname= "sst")
+# Correlation of Sea Surface Temperature and Precipitation {.tabset .tabset-fade .tabset-pills}
 
+## Original Data {.tabset .tabset-fade .tabset-pills}
 
-# plot correlation 
-# in: correlation vector, old sst data, timelag for legend
-plot_corr <- function(corr_vec, old_sst, timelag,
-                      quantiles = c(TRUE,FALSE)) {
-  corr_grid <- matrix(corr_vec, nrow = old_sst@nrows, ncol = old_sst@ncols, byrow = TRUE)
-  corr_raster <- raster(corr_grid,
-                        xmn = old_sst@extent@xmin, xmx = old_sst@extent@xmax,
-                        ymn = old_sst@extent@ymin, ymx = old_sst@extent@ymax,
-                        crs = old_sst@crs)
-  df <- cbind(xyFromCell(corr_raster, 1:ncell(corr_raster)), values(corr_raster))
-  df <- base::as.data.frame(df)
-  colnames(df) <- c("Longitude","Latitude", "Correlation")
-  if(quantiles) {
-    q <- quantile(df[,"Correlation"],probs=c(0.025,0.975), na.rm = TRUE)
-    df$Correlation[df$Correlation>q["2.5%"] & df$Correlation<q["97.5%"]] <- 0
-  }
-  plt <- ggplot(data = df, aes(x = Longitude, y = Latitude, fill = Correlation)) +
-    annotation_map(map_data("world")) +
-    geom_raster(interpolate = TRUE)
-  if(!quantiles) {
-    plt <- plt #+
-      #ggtitle(paste("Correlation of Sea Surface Temperature and Precipitation for Timelag",timelag))
-  } 
-  if(quantiles) {
-    plt <- plt #+
-      #ggtitle(paste0("Correlation of Sea Surface Temperature and Precipitation for Timelag"," ",timelag,
-                     #",\nValues between quantiles threshold set to 0"))
-    
-  }
-  plt <- plt +
-    scale_fill_viridis_c(option="A") +
-    theme_bw() +
-    coord_quickmap() 
-  return(plt)
-}
+Following, for each timelag we show the respective density of correlation values,
+their location on the map and also the 5% strongest positive and negative correlations.
 
-compute_corr_and_plot <- function(
-  dec_matrix_sst, dec_matrix_precip, old_sst,
-  timelag=0,quantiles = c(TRUE,FALSE)) {
-  
-  corr_vec <- compute_corr(dec_matrix_sst, dec_matrix_precip, timelag)
-  plt <- plot_corr(corr_vec, old_sst, timelag, quantiles)
-  return(plt)                                 
-}
+### Timelag 0
 
+```{r, echo = FALSE, out.width="40%", out.height="20%",fig.show='hold',fig.align='center'}
+knitr::include_graphics(c("./plots-markdown/og-data/dens-0.jpg"))
+```
+```{r, echo = FALSE, out.width="65%", out.height="65%",fig.show='hold',fig.align='center'}
+knitr::include_graphics("./plots-markdown/og-data/corr-0.jpg")
+```
+```{r, echo = FALSE, out.width="65%", out.height="65%",fig.show='hold',fig.align='center'}
+knitr::include_graphics("./plots-markdown/og-data/q-corr-0.jpg")
+```
+Inspecting the density plot for timelag 0, we see two modi for correlations,
+one for negative correlations around -0.8 and one for possitive correlations around 0.8. Also a small spike can be seen for low negative correlations.
+If we plot these correlations on the respective grid points we see a clear north-south negative-positive correlation distinction. The "boarder" is organised around the equator.
+The plot for the strongest 5% of correlations reveals areas with strong positive and negative correlations in the north and south respectively.
 
-plot_density <- function(corr_vec, timelag) {
-  df <- data.frame(corr_vec)
-  plt <- ggplot(df, aes(x=corr_vec)) + geom_density() + ggtitle(paste("Density Plot of Correlations with timelag",timelag))
-  plt
-}
+### Timelag 3
 
-multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
-  library(grid)
-  
-  # Make a list from the ... arguments and plotlist
-  plots <- c(list(...), plotlist)
-  
-  numPlots = length(plots)
-  
-  # If layout is NULL, then use 'cols' to determine layout
-  if (is.null(layout)) {
-    # Make the panel
-    # ncol: Number of columns of plots
-    # nrow: Number of rows needed, calculated from # of cols
-    layout <- matrix(seq(1, cols * ceiling(numPlots/cols)),
-                     ncol = cols, nrow = ceiling(numPlots/cols))
-  }
-  
-  if (numPlots==1) {
-    print(plots[[1]])
-    
-  } else {
-    # Set up the page
-    grid.newpage()
-    pushViewport(viewport(layout = grid.layout(nrow(layout), ncol(layout))))
-    
-    # Make each plot, in the correct location
-    for (i in 1:numPlots) {
-      # Get the i,j matrix positions of the regions that contain this subplot
-      matchidx <- as.data.frame(which(layout == i, arr.ind = TRUE))
-      
-      print(plots[[i]], vp = viewport(layout.pos.row = matchidx$row,
-                                      layout.pos.col = matchidx$col))
-    }
-  }
-}
+```{r, echo = FALSE, out.width="40%", out.height="20%",fig.show='hold',fig.align='center'}
+knitr::include_graphics(c("./plots-markdown/og-data/dens-3.jpg"))
+```
+```{r, echo = FALSE, out.width="65%", out.height="65%",fig.show='hold',fig.align='center'}
+knitr::include_graphics("./plots-markdown/og-data/corr-3.jpg")
+```
+```{r, echo = FALSE, out.width="65%", out.height="65%",fig.show='hold',fig.align='center'}
+knitr::include_graphics("./plots-markdown/og-data/q-corr-3.jpg")
 ```
 
-```{r}
-library(jpeg)
-library(grid)
-library(gridExtra)
+The density of correlations for timelag 3, is left-skewed and has two
+modi that are organised around 0 and -0.125 respectively.
+The correlation map shows that the high positive and negative correlations are more close to equator here.
+Note that the legend for the correlationmap is "shifted" here, because the maximal negative correlation has a higher absolute value than the
+maximal positive correlation.
+The strongest correlations also seem to be shifted towards the equator.
+
+### Timelag 6
+
+```{r, echo = FALSE, out.width="40%", out.height="20%",fig.show='hold',fig.align='center'}
+knitr::include_graphics(c("./plots-markdown/og-data/dens-6.jpg"))
+```
+```{r, echo = FALSE, out.width="65%", out.height="65%",fig.show='hold',fig.align='center'}
+knitr::include_graphics("./plots-markdown/og-data/corr-6.jpg")
+```
+```{r, echo = FALSE, out.width="65%", out.height="65%",fig.show='hold',fig.align='center'}
+knitr::include_graphics("./plots-markdown/og-data/q-corr-6.jpg")
+```
+We can see the density plot for timelag 6 is pretty similar to the one
+of timelag 0 but seems to be "flipped" around 0.
+Similarly the correlation map shows (high) negative correlations in the south now and high postive correlations in the north.
+
+### Timelag 12
+
+```{r, include = FALSE, eval = FALSE, echo = FALSE, out.width="25%", out.height="25%",fig.show='hold',fig.fullwidth=TRUE}
+knitr::include_graphics(c("./plots-markdown/corr0.jpg","./plots-markdown/corr3.jpg","./plots-markdown/corr6.jpg","./plots-markdown/corr9.jpg", "./plots-markdown/corr12.jpg"))
 ```
 
-```{r}
-corr0_vec <- compute_corr(sst, precip,0)
-dens0 <- plot_density(corr0_vec, timelag = 0)
-ggsave("dens0.jpg", width = 10, height = 10, units = "cm")
-
-#ggsave("plots/dens0.jpg",dens0)
-corr0 <- plot_corr(corr0_vec, old_sst, timelag = 0, quantiles = FALSE)
-#ggsave("corr0.jpg", width = 30, height = 30, units = "cm")
-ggsave("corr0.jpg", scale = 2)
-corr0q <- plot_corr(corr0_vec, old_sst, timelag = 0, quantiles = TRUE)
-ggsave("corr0q.jpg", scale = 2)
-# 
-# im1 <- rasterGrob(as.raster(readJPEG("dens0.jpg")))
-# im2 <- rasterGrob(as.raster(readJPEG("corr0.jpg")))
-# grid.arrange(im1,im2, ncol=1)
-
-#ggsave("plots/corr0q.jpg", corr0q)
-
+```{r, echo = FALSE, out.width="40%", out.height="20%",fig.show='hold',fig.align='center'}
+knitr::include_graphics(c("./plots-markdown/og-data/dens-12.jpg"))
 ```
-```{r}
-corr3_vec <- compute_corr(sst, precip, 3)
-dens3 <- plot_density(corr3_vec, timelag = 3)
-ggsave("dens3.jpg", width = 10, height = 10, units = "cm")
-corr3 <- plot_corr(corr3_vec,old_sst,3,FALSE)
-ggsave("corr3.jpg", scale = 2)
-corr3q <- plot_corr(corr3_vec,old_sst,3,TRUE)
-ggsave("corr3q.jpg")
+```{r, echo = FALSE, out.width="65%", out.height="65%",fig.show='hold',fig.align='center'}
+knitr::include_graphics("./plots-markdown/og-data/corr-12.jpg")
 ```
-```{r}
-# load and save all densities
-# dens0
-# dens3
-corr6_vec <- compute_corr(sst, precip, 6)
-dens6 <- plot_density(corr6_vec, timelag = 6)
-ggsave("dens6.jpg", width = 10, height = 10, units = "cm")
-
-corr9_vec <- compute_corr(sst, precip, 9)
-dens9 <- plot_density(corr9_vec, timelag = 9)
-ggsave("dens9.jpg", width = 10, height = 10, units = "cm")
-
-
-corr12_vec <- compute_corr(sst, precip, 12)
-dens12 <- plot_density(corr12_vec, timelag = 12)
-ggsave("dens12.jpg", width = 10, height = 10, units = "cm")
+```{r, echo = FALSE, out.width="65%", out.height="65%",fig.show='hold',fig.align='center'}
+knitr::include_graphics("./plots-markdown/og-data/q-corr-12.jpg")
 ```
 
-```{r, echo = FALSE, out.width="20%", out.height="20%",fig.cap="caption",fig.show='hold',fig.align='center'}
-knitr::include_graphics(c("dens0.jpg","dens3.jpg", "dens6.jpg","dens9.jpg", "dens12.jpg"))
+Giving a timelag of one year, we can see that the distribution of correlations is now again similar to the distribution for timelag 0.
+This also hold for the location of positive and negative correlations in general,
+as well as for the strongest 5% of correlations.
+ 
+## Deseasonalised Data {.tabset .tabset-fade .tabset-pills}
+Following, for each timelag we show the respective density of correlation values,
+their location on the map and also the 5% strongest positive and negative correlations.
 
+### Timelag 0
+
+```{r, echo = FALSE, out.width="40%", out.height="20%",fig.show='hold',fig.align='center'}
+knitr::include_graphics(c("./plots-markdown/des-data/dens-0.jpg"))
 ```
-```{r}
-corr3 <- plot_corr(corr3_vec,old_sst,3,FALSE)
-ggsave("corr3.jpg")
-corr3q <- plot_corr(corr3_vec,old_sst,3,TRUE)
-ggsave("corr3q.jpg")
-
-corr6 <- compute_corr(sst, precip, 6)
-plot_corr(corr6,old_sst,6,FALSE)
-ggsave("corr6.jpg")
-plot_corr(corr6,old_sst,6,TRUE)
-ggsave("corr6q.jpg")
-
-corr9 <- compute_corr(sst, precip, 9)
-plot_corr(corr9,old_sst,9,FALSE)
-ggsave("corr9.jpg")
-plot_corr(corr9,old_sst,9,TRUE)
-ggsave("corr9q.jpg")
-
-corr12 <- compute_corr(sst, precip, 12)
-plot_corr(corr12,old_sst,12,FALSE)
-ggsave("corr12.jpg")
-plot_corr(corr12,old_sst,12,TRUE)
-ggsave("corr12q.jpg")
-
+```{r, echo = FALSE, out.width="65%", out.height="65%",fig.show='hold',fig.align='center'}
+knitr::include_graphics("./plots-markdown/des-data/corr-0.jpg")
 ```
-```{r, echo = FALSE, out.width="20%", out.height="20%",fig.cap="caption",fig.show='hold',fig.align='center'}
-knitr::include_graphics(c("corr0.jpg","corr3.jpg", "corr6.jpg","corr9.jpg", "corr12.jpg"))
+```{r, echo = FALSE, out.width="65%", out.height="65%",fig.show='hold',fig.align='center'}
+knitr::include_graphics("./plots-markdown/des-data/q-corr-0.jpg")
 ```
-```{r, echo = FALSE, out.width="40%", out.height="40%",fig.cap="caption",fig.show='hold',fig.align='center'}
-knitr::include_graphics(c("corr0q.jpg","corr3q.jpg", "corr6q.jpg","corr9q.jpg", "corr12q.jpg"))
+Inspecting the density plot for timelag 0, we see that after excluding seasonality from 
+the time series we get a left-skewed distribution of correlations. With a mode around 0.
+In general the correlation values are a lot lower than in the original data.
+With a maximum at around -0.4 and +2.5 respectively.
+We plot these correlations on the respective grid and see that the clear north south
+distinction in the correlations before deseasonalising the data does not appear anymore.
+The plot for the strongest 5% of correlations reveals areas with strongest positive and negative correlations. But as stated before the values are in general much lower.
+
+### Timelag 3
+
+```{r, echo = FALSE, out.width="40%", out.height="20%",fig.show='hold',fig.align='center'}
+knitr::include_graphics(c("./plots-markdown/des-data/dens-3.jpg"))
 ```
 
 
-```{r, eval = FALSE}
-library(gtable)
-library(grid)
+```{r, echo = FALSE, out.width="65%", out.height="65%",fig.show='hold',fig.align='center'}
+knitr::include_graphics("./plots-markdown/des-data/corr-3.jpg")
 ```
 
 
-```{r, eval = FALSE}
-#https://stackoverflow.com/questions/32780320/consistent-figures-size-with-gridextra-in-rmarkdown-knitr-html
-g1 <- dens0
-g2 <- corr0
-g3 <- corr0q
-pl <- lapply(list(g1,g2,g3), ggplotGrob)
+```{r, echo = FALSE, out.width="65%", out.height="65%",fig.show='hold',fig.align='center'}
+knitr::include_graphics("./plots-markdown/des-data/q-corr-3.jpg")
+```
+
+For the density of timelag 3 we get a similar picture as for timelag 0.
+The mode is a higher and the tails get a bit more mass.
+Also the correlation map does not seem to change a lot.
+The strongest correlations appear to be shifted to the left.
+
+### Timelag 6
+
+```{r, echo = FALSE, out.width="40%", out.height="20%",fig.show='hold',fig.align='center'}
+knitr::include_graphics(c("./plots-markdown/des-data/dens-6.jpg"))
+```
+```{r, echo = FALSE, out.width="65%", out.height="65%",fig.show='hold',fig.align='center'}
+knitr::include_graphics("./plots-markdown/des-data/corr-6.jpg")
+```
+```{r, echo = FALSE, out.width="65%", out.height="65%",fig.show='hold',fig.align='center'}
+knitr::include_graphics("./plots-markdown/des-data/q-corr-6.jpg")
+```
+Since the distributions of correlation values are all unimodal we do not observe
+the "flip" we saw in the original data when comparing the densities of timelag 0 and
+6. The mode again gets larger and the maximum postive and negative correlation values
+get smaller.
+The strongest negative correlations are shifted further to left.
+
+### Timelag 12
+
+```{r, include = FALSE, eval = FALSE, echo = FALSE, out.width="25%", out.height="25%",fig.show='hold',fig.fullwidth=TRUE}
+knitr::include_graphics(c("./plots-markdown/corr0.jpg","./plots-markdown/corr3.jpg","./plots-markdown/corr6.jpg","./plots-markdown/corr9.jpg", "./plots-markdown/corr12.jpg"))
+```
+
+```{r, echo = FALSE, out.width="40%", out.height="20%",fig.show='hold',fig.align='center'}
+knitr::include_graphics(c("./plots-markdown/des-data/dens-12.jpg"))
+```
+```{r, echo = FALSE, out.width="65%", out.height="65%",fig.show='hold',fig.align='center'}
+knitr::include_graphics("./plots-markdown/des-data/corr-12.jpg")
+```
+```{r, echo = FALSE, out.width="65%", out.height="65%",fig.show='hold',fig.align='center'}
+knitr::include_graphics("./plots-markdown/des-data/q-corr-12.jpg")
+```
+
+Given a timelag of one year, the distribution now has a mode around 6, and started at around 4 when timelag was 0. Also neither the positive nor negative correlations exceed values of 2.5.
+The consistent region of strong negative and positive correlations is now less organised or more scattered.
+
+ 
+
+# Summary
+
+## Original Data
+
+We can observe that the positive and negative correlations of sst and precipitation follow a spatial and temporal pattern.
+The location and density of the positive and negative correlation "wanders" over the equator in opposite directions.
+The densities and correlationmaps for timelag 0 and 6 appear to be quite similar but "flipped".
+The densities and correlationmaps for timelag 0 and 12 appear again to be similar.
+The same pattern seems to hold for the strongest correlations.
+
+## Deseasonalised Data
+Correlation values are in general a lot lower than in the original data and decrease with
+increasing timelag.
+We still observe temporal and regional patterns, although these dissolve a bit for
+a timelag of 12.
+
+
+
+```{r, echo = FALSE}
+knitr::knit_exit()
 ```
 
 
-```{r, eval = FALSE}
-g123 <- rbind(pl[[1]], pl[[2]], pl[[3]], size="first")
-g123$heights <- unit.pmax(pl[[1]][["heights"]], pl[[2]][["heights"]],
-                          pl[[3]][["heights"]])
-#g34 <- cbind(pl[[3]], pl[[4]], size="first")
-#g34$heights <- unit.pmax(pl[[3]][["heights"]], pl[[4]][["heights"]])
-#g1234 <- rbind(g12, g34, size="first")
-#g123$widths <- unit.pmax(pl[[1]][["widths"]],pl[[2]][["widths"]],pl[[3]][["widths"]])
-grid.newpage()
-grid.draw(g123)
-```
-```{r, eval = FALSE}
-library(ggpubr)
-ggarrange(dens0, corr0, corr0q, ncol=1,nrow=3)
-??ggarrange
-```
 

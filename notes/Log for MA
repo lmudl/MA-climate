@@ -487,3 +487,87 @@ plot
 TODO:
 Next plot maybe a time series of the values in a certain region?
 compare timestamps for m = 261 when sampled a slic
+
+25.08
+
+Start writing log again:
+
+Read how to read a paper
+Set up a respective template in joplin
+Read first pass of "Evaluating time series forecasting models"
+Found ""
+Interesting evtl "Estimation Stability with Cross Validation
+(ESCV)"
+On Lasso and Stability Selection 
+	https://stats.stackexchange.com/questions/519993/how-to-combine-stability-selection-and-model-selection-with-lasso
+Stability Paths for time series
+lasso with weights, oracle properties
+
+26.08
+
+searched for top 5 papers on cv and time series
+also will check the survey on cross validation in general
+
+geospatial analysis in R, book and articles etc
+on which packages, raster vs terra etc
+
+27.08
+Start: 09:30
+
+Words to search:
+	Cross Validation for the dependent case, why again dependent errors?
+
+General Notes:
+Should we use the former precipitation as input as well, making it an 
+autoregressive approach?
+
+Questions:
+In lineare models assumption: observations are independent, errors are indepndent
+	AND identically distributed
+Why errors independent?
+	We say residuals/errors of our model are independent from the response variables
+	(observation of response)
+We assume that the correct model can be found with our smaller model?
+When we can be sure that true model is not contained in possible smaller models
+	errors must be related to outcome, how does that affect the results? Because
+	it clearly violates the assumptions
+
+Lectures:
+http://www.est.uc3m.es/amalonso/esp/TSAtema4petten.pdf
+https://www.youtube.com/playlist?list=PLvcbYUQ5t0UHOLnBzl46_Q6QKtFgfMGc3
+http://www.cmap.polytechnique.fr/~merlet/articles/probas_massart_stf03.pdf
+
+28.08:
+Read on the use of cv for time series predictor evaluation
+
+Quick look for time series in Elem of Stat Learning
+gives "additive models can replace linear models in a wide
+variety of settings for example, additive decomposition
+of time series". So we could influence of trend,season,etc
+on the rainfall.
+
+Also Open: Correlationmatrix between different grid points.
+Network theory with inverse correlation matrix.
+Or clustering, pre information maybe can give us a bayesian approach or use weights in the lasso.
+Then we can also change the loss function maybe, to
+better predict high or low precipitation values.
+
+How to deal with non stationarity?
+
+https://stats.stackexchange.com/questions/19715/why-does-a-time-series-have-to-be-stationary
+
+https://stats.stackexchange.com/questions/23479/why-do-we-assume-that-the-error-is-normally-distributed
+
+https://stats.stackexchange.com/questions/120776/why-should-we-use-t-errors-instead-of-normal-errors/120787#120787
+
+29.08
+
+keep reading
+
+general note: automated explorative data analylsis
+	https://arxiv.org/pdf/1904.02101.pdf
+
+30.08
+start time: 09:47
+finished notes and send to fabi end 14:35
+

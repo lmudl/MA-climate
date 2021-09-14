@@ -1,0 +1,154 @@
+---
+title: "Problems Summary"
+output:
+  html_document:
+    toc: true
+---
+
+# Problem Formulation
+
+We want to create a model that has predictive and
+explanatory power. Predictive power meaning it can
+predict the precipitation in the Central Amazonas Basin, "reasonably well". Explanatory power in the sense of being interpretable, so that we can identify those regions in sea
+that give us most information about future precipitation. Our problem setting is high dimensional with n << p. The number of predictors is a lot bigger than the number of actual observations.
+This creates issues with a classic linear model since the linear problem is underdefined.
+One possible model for the problem at hand is a LASSO regression model.
+
+In general for the linear model:
+
+$$y_i = \beta_0 + \pmb{x}_i^T\pmb{\beta} + \epsilon_i  $$
+Where the $Y_i$ refers to the mean precipitation for a given month $i$ and $x_i$ is the vector of sea surface temperature at different locations around the globe.
+$\epsilon_i$ is the residual and we wish to estimate the $\beta$´s from the data.
+As already stated this is not possible with a classic linear model since the number of predictors exceeds the number of observations. We therefore can not estimate a $\beta$ for every grid point in the sea.
+From a physical point of view it also seems reasonable that some regions in the ocean have a higher predictive power than others. For example regions that are closer to the Amazonas may have more influence on precipitation in the same month. But regions more far away may have more information on the precipitation half a year in the future.
+We therefore would like to use a model that can find the most important regions in the sea for predicting precipitation for some point in the future.
+One possible solution for this is a LASSO or elastic net regression model, as implemented in
+R by the glmnet package.
+This model "automatically" performs model selection, but be aware that because of the time dependencies in our data, normal Cross Validation methods may be unjustified or at least have to be applied with caution.
+The glmnet package implements the regression problem in the following manner, solving:
+
+$$\min_{\beta_0, \beta} \frac{1}{N} \sum_{i=1}^N w_il(y_i,\beta_0 + \beta^Tx_i) + \lambda [(1-\alpha)||\beta||_2^2/2 + \alpha||\beta||_1] $$
+This is a lasso regression for $\alpha = 1$ and ridge regression for $\alpha = 0$, $\alpha$ controls the overall strength of regularization or penalty.
+Intuitively this means we try to find those $\beta$´s that minimise the negative log likelihood of our data (this is equal to maximizing the log-likelihood). But at the same time we can not include too many $\beta$ since this will make the second and third term in the formula grow.
+As result the algorithm chooses only those predictors that have the most predictive power.
+How many predictors are included depends on the strength of regularization given by $\alpha$
+*Remark*: Among strongly correlated predictors only one is chosen in the classical lasso model. Ridge regression shrinks the coefficients to zero. 
+Elastic net with $\alpha=0.5$ tends to either include or drop the entire group together.
+To specifically choose a group of predictors, variations of the lasso or other models have to be considered.
+
+OPEN:
+General assumptions of linear models and LASSO
+Formulation over conditional expectation
+
+Simple linear regression:
+Resources: 
+All of statistics
+   Linear and Logistic Regression
+ESL
+  Linear Methods for Regression
+https://www.le.ac.uk/users/dsgp1/COURSES/THIRDMET/MYLECTURES/1REGRESS.pdf
+
+Notes: Difference in Formula E(Y|X) and Y= ..+epsilon
+
+General Problem:
+In our case we have information about monthly Sea Surface Temperature (SST) and monthly Precipitation in the Central Amazonas Basin.
+From a physics point of view it makes sense that we can make predictions about precipitation based on the SSTs. The question is now how well can we predict precipitation based on the SSTs. Desirably we can not only predict precipitation well, but also identify those regions that give us the most information about future precipitation. So for future predictions it may be enough to only observe these important regions.
+Conceptually we study the relationship of a covariate/predictor/feature X (SST) and its influence on a response variable Y (Precipitation).
+From the data we are studying the relation
+
+$$(Y_1,X_1),...,(Y_n,X_n) \sim F_{X,Y} $$
+Where $(Y_i,X_i)$ is a pair of precipitation and SST data for a month $i$. And $F_{X,Y}$ is the
+joint distribution.
+Note:
+Although in theory the SST and precipitation values are continous, in our data they are discrete so in our formulations we will use the discrete case.
+As stated above our main goal is predicting a value for $y$. Assume now that we could not observe $x$, therefore our best guess for a prediction, was the expected value of $y$,
+given by
+
+$$\mathbb{E}(y) = \int yP(Y=y) dy$$
+
+and discrete
+
+$$\mathbb{E}(y) = \sum yP(Y=y)$$
+
+
+and in case of data
+$$\mathbb{E}(y) = 1/n\sum_{i=1}^{n}y_i$$
+Where $y_i$ is one of $n$ realizations of the random variable $Y$.
+This is true when we use the Mean Squared Error (MSE) to asses the quality of predictions $\hat{y}$.
+
+$$MSE = 1/n\sum_{i=1}^{n}y_i-\hat{y_i}$$
+Now as we know we dont observe our $Y$ (Precipitation) in isolation but also have information from $X$ (SST).
+In the same way $\mathbb{E}(y)$ gives us the best $\hat{y}$ for MSE, it can be shown that 
+when we also observe $X$, the best predictions are given by the conditional expectation:
+
+$$\mathbb{E}(Y|X) = \int yf(y|x)dy = \int y \frac{f(x,y)}{f(y)} dy$$
+
+and discrete 
+
+$$\mathbb{E}(Y|X) = \sum yf(y|x) = \sum y \frac{f(x,y)}{f(y)}$$
+
+In the case of linear regression we may assume now, that $\mathbb{E}(Y|X)$ can be modeled by
+a linear function
+
+
+NEXT:
+add formulations for multiple regression
+add characteristics
+add rest for simple multiple linear regression
+show that normal linear model fails
+introduce LASSO 
+
+
+
+
+Least squares fitting is reasonable if trainig observations are independent random draws from population, even if not random still valid, if y_i conditionally independent given input xi.
+Question: Does that mean for example after accounting for confounders the y_i are cond independent?
+Remark: RSS makes no assumption about validity of model. If we can predict well, we say model is good enough.
+
+y continously distributed random variable with pdf f(y). If we wanted to predict a value of y without any other information, the expected value can be used given by:
+
+$$\mathbb{E}(y) = \int yf(y) dy $$
+The expectation minimises the mean square error.
+If $\hat{y}$ is the value of a prediction for $y$ the MSE is defined by:
+$MSE = \int(y - \hat{y})f(y) dy$
+
+Now we in in order to predict $y$ more accurately we gather infromation from another random variable $x$, whose value we can observe.
+We stated above that the expectation of $y$ minimises its MSE for $\hat{y}$, if we now make use of $x$ and want to minimise MSE our best prediction is given by the conditional expectation $$ \mathbb{E}(y|x) = \int y \frac{f(x,y)}{f(x)}dy$$
+
+
+# Preselection of Variables 
+Before fitting an actual model we can compute crude correlation values between precipitation and each sea grid point.
+We can thereby identify regions that are more strongly correlated with the precipitation than others.
+We might "preselect" regions and hence possible predictors by using only a certain amount of those strongly correlated sea regions.
+One possibility here would be to include the 5% percent of regions that are most correlated with precipitation. Here we can use quantiles as threshold values.
+*Question*: Do we choose them symmetrically? (0.25 and 97.5 as cutoff values or does this also depend on the number of values included on each side?)
+Another possibility here is to analyse the correlation among the sea regions themselves, group together points as one single region and average the values of these regions. 
+This can be seen or be applied as a form clustering to group variables together and start with a smaller number of predictors before applying the regression model itself.
+*Remark*: However this preselection is done, it makes sense to include it in the model selection process because this procedure is too a part of the algorithm and needs to be considered.
+
+
+# Model Selection 
+Usually to assess the performance of a model we can use Cross-Validation. We randomly assign observations to test and train sets, the model is then fitted on the train data and used to predict observations in the train set. We repeat this procedure several times and average the errors made. When this procedure is done for different models we can compare the models and choose the one who produces on average the better predictions.
+But since we have time dependencies in our data we have to account for this kind of connection in the data and can not use the basic cross validation since it assumes the observations are independent.
+Some authors suggest that for stationary time series normal CV can be used, while others argue one should use some CV variations that account for the dependencies.
+In a classical time series framework models are often validated by out-of-sample predictions. Given 10 years of data one might fit a model on the first 9 years and predict on the 10th year. While this preserves the natural time order of the data it does not make efficient use of the limited amount of data. 
+In a classical CV setting we can train, predict and report errors depending on the number of folds used.
+So we want to find a solution that maybe can account for the time order but also makes efficient use of the data.
+One possibility here is a form of blocked CV, f.e
+train on the first 4 years predict the 5th, train
+on year 2 until 5 and predict the 6th,..., train
+on year 6 until 9 and precit the 10th.
+*Question*: How do we account for the fact that some
+observations are used more often than others in this algorithm? F.e year 1 and year 9 are only used once for training while year 5 is used 4 times. Eventually weight according to appearance in train but also in test?
+
+# Timelags
+The first correlation analysis also showed that the regions with the strongest correlation change with the prediction horizon. Meaning if we want to predict precipitation 3 months from now, different regions are interesting than we want to predict 1 year from now.
+Do we fit different models for different timelags
+or do we use the information of different timepoints and regions?
+
+# Graphical LASSO
+Network approach to the regularised (grouped) prediction problem.
+
+
+
+

@@ -9,8 +9,8 @@ library(ncdf4)
 getwd()
 setwd("Repos/MA-climate/")
 # load data
-precip <- readRDS("data/processed/decomposed_precip_data_withna.rds")
-sst <- readRDS("data/processed/decomposed_sst_data_withna.rds")
+precip <- readRDS("data/processed/clean_deseasonalised_precip_data.rds")
+sst <- readRDS("data/processed/clean_deseasonalised_sst_data.rds")
 dim(precip)
 dim(sst)
 
@@ -143,14 +143,14 @@ multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
   }
 }
 
-aspect_ratio <- 1
+#aspect_ratio <- 1
 corr0_vec <- compute_corr(sst, precip,0)
 dens0 <- plot_density(corr0_vec, timelag = 0)
-ggsave("plots/dens0.jpg",dens0)
+#ggsave("plots/dens0.jpg",dens0)
 corr0 <- plot_corr(corr0_vec, old_sst, timelag = 0, quantiles = FALSE)
-ggsave("plots/corr0.jpg", corr0)
+#ggsave("plots/corr0.jpg", corr0)
 corr0q <- plot_corr(corr0_vec, old_sst, timelag = 0, quantiles = TRUE)
-ggsave("plots/corr0q.jpg", corr0q)
+#ggsave("plots/corr0q.jpg", corr0q)
 
 library(jpeg)
 library(grid)
@@ -218,7 +218,7 @@ ggsave("plots/dens3.jpg")
 corr3 <- plot_corr(corr3_vec,old_sst,3,FALSE)
 ggsave("plots/corr3.jpg")
 corr3q <- plot_corr(corr3_vec,old_sst,3,TRUE)
-ggsave("plots/corr3q.jpg")
+#ggsave("plots/corr3q.jpg")
 
 #plotcol3 <- create_plot_col(dens3, corr3, corr3q)
 ggsave("plots/coltest.jpg")
