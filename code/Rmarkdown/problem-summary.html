@@ -353,16 +353,95 @@ pre code {
 
 <div id="TOC">
 <ul>
-<li><a href="#problem-formulation">Problem Formulation</a></li>
+<li><a href="#general-problem">General Problem</a></li>
+<li><a href="#model-without-covariates">Model without covariates</a></li>
+<li><a href="#simple-linear-regression">Simple linear regression</a></li>
+<li><a href="#multiple-linear-regression">Multiple linear regression</a></li>
+<li><a href="#the-lasso">The LASSO</a></li>
 <li><a href="#preselection-of-variables">Preselection of Variables</a></li>
 <li><a href="#model-selection">Model Selection</a></li>
 <li><a href="#timelags">Timelags</a></li>
 <li><a href="#graphical-lasso">Graphical LASSO</a></li>
+<li><a href="#open">Open</a></li>
+<li><a href="#resources">Resources:</a></li>
 </ul>
 </div>
 
-<div id="problem-formulation" class="section level1">
-<h1>Problem Formulation</h1>
+<div id="general-problem" class="section level1">
+<h1>General Problem</h1>
+<p>In our case we have information about monthly sea surface emperature (SST) and monthly precipitation in the Central Amazonas Basin. From a physics point of view it makes sense that we can make predictions about precipitation based on these SSTs. The question is now how well can we predict precipitation based on the SSTs. Desirably we can not only predict precipitation well, but also identify those regions that give us the most information about future precipitation. So for future predictions it may be enough to only observe these important regions. In the following we will describe this problem from a regression perspective where we start with no covariates, then discuss the single and multiple covariate regression problem. We will see that for our problem a “normal” multiple regression model is not usable at least not with all the data at hand.</p>
+</div>
+<div id="model-without-covariates" class="section level1">
+<h1>Model without covariates</h1>
+<p>Conceptually we study the relationship of a covariate/predictor/feature <span class="math inline">\(X\)</span> (SST) and its influence on a response variable <span class="math inline">\(Y\)</span> (Precipitation). From the data we are studying the relation</p>
+<p><span class="math display">\[(Y_1,X_1),...,(Y_n,X_n) \sim F_{X,Y} \]</span> Where <span class="math inline">\((Y_i,X_i)\)</span> is a pair of precipitation and SST data for a month <span class="math inline">\(i\)</span>. And <span class="math inline">\(F_{X,Y}\)</span> is the joint distribution. As stated above our main goal is predicting a value for <span class="math inline">\(y\)</span>. Assume now that we could not observe <span class="math inline">\(x\)</span>, therefore our best guess for a prediction, was the expected value of <span class="math inline">\(y\)</span>, given by</p>
+<p><span class="math display">\[\mathbb{E}(y) = \int yP(Y=y) dy\]</span></p>
+<p>and discrete</p>
+<p><span class="math display">\[\mathbb{E}(y) = \sum yP(Y=y)\]</span></p>
+<p>and in case of data <span class="math display">\[\mathbb{E}(y) = 1/n\sum_{i=1}^{n}y_i\]</span> Where <span class="math inline">\(y_i\)</span> is one of <span class="math inline">\(n\)</span> realizations of the random variable <span class="math inline">\(Y\)</span>. This is true when we use the Mean Squared Error (MSE) to asses the quality of predictions <span class="math inline">\(\hat{y}\)</span>.</p>
+<p><span class="math display">\[MSE = 1/n\sum_{i=1}^{n}(y_i-\hat{y_i})^2\]</span> Next we inspect the simple linear regression model.</p>
+</div>
+<div id="simple-linear-regression" class="section level1">
+<h1>Simple linear regression</h1>
+<p>Now as we know we dont observe our <span class="math inline">\(Y\)</span> (Precipitation) in isolation but also have information from <span class="math inline">\(X\)</span> (SST). In the same way <span class="math inline">\(\mathbb{E}(y)\)</span> gives us the best <span class="math inline">\(\hat{y}\)</span> for MSE, it can be shown that when we also observe <span class="math inline">\(X\)</span>, the best predictions are given by the conditional expectation:</p>
+<p><span class="math display">\[\mathbb{E}(Y|X) = \int yf(y|x)dy = \int y \frac{f(x,y)}{f(y)} dy\]</span></p>
+<p>and discrete</p>
+<p><span class="math display">\[\mathbb{E}(Y|X) = \sum yf(y|x) = \sum y \frac{f(x,y)}{f(y)}\]</span> We assume that the regression function is linear and start with only one covariate</p>
+<p><span class="math display">\[f(x) = \beta_0 + \beta_1x\]</span></p>
+<p>So we say we can fit a line through the mapped values of X against Y. Then the model is</p>
+<p><span class="math display">\[ y_i = \beta_0 + \beta_1x_i + \epsilon_i\]</span> <span class="math inline">\(\mathbb{E}(\epsilon_i|x_i) = 0\)</span> and <span class="math inline">\(\mathbb{V}(\epsilon_i|x_i)=\sigma^2\)</span></p>
+<p>So given our data <span class="math inline">\(X\)</span> the errors we make (denoted by <span class="math inline">\(\epsilon\)</span>) we expect them to be 0. and that the variance of the errors does not depend on x, after we account for the <span class="math inline">\(X\)</span> in the formula. The fitted line is then</p>
+<p><span class="math display">\[ \hat{f}(x) = \hat{\beta_0} + \hat{\beta_1}x\]</span></p>
+<p>Predicted values are given by <span class="math inline">\(\hat{y_i} = \hat{f}(x_i)\)</span>. Residuals are</p>
+<p><span class="math display">\[\hat{\epsilon}_i = y_i - \hat{y}_i =  y_i - (\hat{\beta_0} + \hat{\beta_1}x_i) \]</span></p>
+<p>We then would like to find <span class="math inline">\(\hat{\beta_0}\)</span> and <span class="math inline">\(\hat{\beta_1}\)</span> that miminise the residuals sums of squares (RSS):</p>
+<p><span class="math display">\[ RSS = \sum_{i=1}^{n}\hat{\epsilon_i}^2\]</span></p>
+<p>The estimators that minimise the RSS are called the least squares estimates.</p>
+<p><span class="math display">\[\hat{\beta_1} = \frac{\sum_{i=1}^{n}(X_i-\bar{X}_n)(Y_i-\bar{Y}_n)}{\sum_{i=1}^{n}(X_i-\bar{X}_n)^2} \]</span></p>
+<p><span class="math display">\[\hat{\beta_0} = \bar{Y}_n - \hat{\beta_1}\bar{X}_n \]</span> And the unbiased estimate of <span class="math inline">\(\sigma\)</span>^2:</p>
+<p><span class="math display">\[\hat{\sigma}^2 = (\frac{1}{n-2})\sum_{i=1}^{n}\hat{\epsilon_i}^2 \]</span></p>
+</div>
+<div id="multiple-linear-regression" class="section level1">
+<h1>Multiple linear regression</h1>
+<p>We shortly revisit the data from</p>
+<p><span class="math display">\[(Y_1, X_1),...,(Y_i,X_i),...,(Y_n,X_n)\]</span> and</p>
+<p><span class="math display">\[X_i = (X_{i1},...,X_{ik})\]</span> <span class="math inline">\(X_i\)</span> is a vector of k covariate values (SST values) for the <span class="math inline">\(i^{th}\)</span> observation (the <span class="math inline">\(i^{th}\)</span> month). As we assume our problem takes the form of a linear model the linear multiple regression model is</p>
+<p><span class="math display">\[Y_i = \sum_{j=1}^{k} \beta_i X_{ij} + \epsilon_i  \]</span> for <span class="math inline">\(i = 1,...,n\)</span> and <span class="math inline">\(\mathbb{E}(\epsilon_i|X_{1i},...,X_{ki}) = 0\)</span>. An intercept can be included by setting <span class="math inline">\(X_{i1}=1,...,n\)</span>. We can write this in matrix notation with outcomes given by</p>
+<p><span class="math display">\[ Y = \begin{pmatrix} Y_1\\Y_2\\.\\.\\.\\Y_n 
+      \end{pmatrix} \]</span></p>
+<p>and the covariates matrix as</p>
+<p><span class="math display">\[X = \begin{pmatrix} 
+  X_{11} &amp; X_{12} &amp; ... &amp; X_{1k} \\
+  X_{21} &amp; X_{22} &amp; ... &amp; X_{2k} \\
+  . &amp; . &amp; . &amp; . \\
+  . &amp; . &amp; . &amp; . \\
+  . &amp; . &amp; . &amp; . \\
+  X_{n1} &amp; X_{n2} &amp; ... &amp; X_{nk}
+\end{pmatrix}
+\]</span> Each row is an observation (one month of SST values) and the columns are one of k covariates (each column is one gridpoint in the sea). X is a <span class="math inline">\((n x k)\)</span> matrix. We also write</p>
+<p><span class="math display">\[\beta = \begin{pmatrix}
+\beta_1 \\ .\\.\\.\\\beta_k 
+\end{pmatrix} \text{ and } 
+\epsilon = \begin{pmatrix}
+\epsilon_1\\.\\.\\.\\ \epsilon_n
+\end{pmatrix}.\]</span></p>
+<p>And so we can write the multiple liear regression formula in matrix notation</p>
+<p><span class="math display">\[ Y = X\beta + \epsilon\]</span></p>
+<p>Now if we assume that the <span class="math inline">\((k x k)\)</span> matrix given by <span class="math inline">\(X^TX\)</span> is invertible, we have:</p>
+<p><span class="math display">\[ \hat{\beta} = (X^TX)^{-1}X^TY \\
+  \mathbb{V}(\hat{\beta}|X^n) = \sigma^2(X^TX)^{-1} \\
+  \hat{\beta} \approx N(\beta, \sigma^2(X^TX)^{-1})
+\]</span></p>
+<p>The estimated regression function is given as:</p>
+<p><span class="math display">\[\hat{f}(x) = \sum_{j=1}^k \hat{\beta}_j x_j \]</span> and the unbiased estimator of <span class="math inline">\(\sigma^2\)</span></p>
+<p><span class="math display">\[\sigma^2 = (\frac{1}{n-k})\sum_{i=1}^n \hat{\epsilon}_i^2\]</span> where <span class="math inline">\(\epsilon\)</span> is a vector of residuals <span class="math inline">\(X\hat{\beta}-Y\)</span>. The approximate <span class="math inline">\(1-\alpha\)</span> confidence interval for <span class="math inline">\(\beta_j\)</span> is</p>
+<p><span class="math display">\[\hat{\beta_j} \pm z_{\alpha/2}\hat{se}(\hat{\beta_j})\]</span></p>
+<p>and <span class="math inline">\(\hat{se}^2(\hat{\beta_j})\)</span> is the <span class="math inline">\(j^{th}\)</span> diagonal element of the matrix <span class="math inline">\(\hat{\sigma}^2(X^TX)^{-1}\)</span>.</p>
+<p>Anyway we have to stop here, because in our case the above estimation equations can not be used since our data data matrix <span class="math inline">\(X^TX\)</span> is not invertible. <span class="math inline">\(X\)</span> is <span class="math inline">\(n x p\)</span>, and p &gt; n, therefore fat and</p>
+<p><span class="math display">\[rank(x) = rank(X^TX) \leq n &lt; p \]</span> So <span class="math inline">\(X^TX\)</span> does not have full rank and is not invertible.</p>
+</div>
+<div id="the-lasso" class="section level1">
+<h1>The LASSO</h1>
 <p>We want to create a model that has predictive and explanatory power. Predictive power meaning it can predict the precipitation in the Central Amazonas Basin, “reasonably well”. Explanatory power in the sense of being interpretable, so that we can identify those regions in sea that give us most information about future precipitation. Our problem setting is high dimensional with n &lt;&lt; p. The number of predictors is a lot bigger than the number of actual observations. This creates issues with a classic linear model since the linear problem is underdefined. One possible model for the problem at hand is a LASSO regression model.</p>
 <p>In general for the linear model:</p>
 <p><span class="math display">\[y_i = \beta_0 + \pmb{x}_i^T\pmb{\beta} + \epsilon_i  \]</span> Where the <span class="math inline">\(Y_i\)</span> refers to the mean precipitation for a given month <span class="math inline">\(i\)</span> and <span class="math inline">\(x_i\)</span> is the vector of sea surface temperature at different locations around the globe. <span class="math inline">\(\epsilon_i\)</span> is the residual and we wish to estimate the <span class="math inline">\(\beta\)</span>´s from the data. As already stated this is not possible with a classic linear model since the number of predictors exceeds the number of observations. We therefore can not estimate a <span class="math inline">\(\beta\)</span> for every grid point in the sea. From a physical point of view it also seems reasonable that some regions in the ocean have a higher predictive power than others. For example regions that are closer to the Amazonas may have more influence on precipitation in the same month. But regions more far away may have more information on the precipitation half a year in the future. We therefore would like to use a model that can find the most important regions in the sea for predicting precipitation for some point in the future. One possible solution for this is a LASSO or elastic net regression model, as implemented in R by the glmnet package. This model “automatically” performs model selection, but be aware that because of the time dependencies in our data, normal Cross Validation methods may be unjustified or at least have to be applied with caution. The glmnet package implements the regression problem in the following manner, solving:</p>
@@ -383,6 +462,14 @@ pre code {
 <div id="graphical-lasso" class="section level1">
 <h1>Graphical LASSO</h1>
 <p>Network approach to the regularised (grouped) prediction problem.</p>
+</div>
+<div id="open" class="section level1">
+<h1>Open</h1>
+<p>General assumptions of linear models General assumptions LASSO Check clean, unified notation Definition unbiased Q: intuition behind estimated <span class="math inline">\(\beta_1\)</span>, denominator looks like covariance Q: do we say when the conditional expectation is 0 and conditional variance is sigma, that they are independent? Q: how do we formalise the conditional independence of the <span class="math inline">\(y_i\)</span>´s given <span class="math inline">\(x\)</span>? Q: Expected value is minimising mean squared error but we use sum of sqaured errors, Expectation minimises both? Q: Least squares fitting is reasonable if trainig observations are independent random draws from population, even if not random still valid, if y_i conditionally independent given input xi. Q: Does that mean for example after accounting for confounders the y_i are cond independent? <em>Remark</em>: RSS makes no assumption about validity of model. If we can predict well, we say model is good enough.</p>
+</div>
+<div id="resources" class="section level1">
+<h1>Resources:</h1>
+<p>All of statistics Linear and Logistic Regression ESL Linear Methods for Regression <a href="https://www.le.ac.uk/users/dsgp1/COURSES/THIRDMET/MYLECTURES/1REGRESS.pdf" class="uri">https://www.le.ac.uk/users/dsgp1/COURSES/THIRDMET/MYLECTURES/1REGRESS.pdf</a> <a href="https://www.math.arizona.edu/~tgk/464_07/cond_exp.pdf" class="uri">https://www.math.arizona.edu/~tgk/464_07/cond_exp.pdf</a></p>
 </div>
 
 

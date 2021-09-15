@@ -5,7 +5,160 @@ output:
     toc: true
 ---
 
-# Problem Formulation
+# General Problem
+
+In our case we have information about monthly sea surface emperature (SST) and monthly precipitation in the Central Amazonas Basin.
+From a physics point of view it makes sense that we can make predictions about precipitation based on these SSTs. The question is now how well can we predict precipitation based on the SSTs. Desirably we can not only predict precipitation well, but also identify those regions that give us the most information about future precipitation. So for future predictions it may be enough to only observe these important regions.
+In the following we will describe this problem 
+from a regression perspective where we start with no covariates, then discuss the single and multiple covariate regression problem. We will see that for our problem a "normal" multiple regression model is not usable at least not with all the data at hand.
+
+# Model without covariates
+
+Conceptually we study the relationship of a covariate/predictor/feature $X$ (SST) and its influence on a response variable $Y$ (Precipitation).
+From the data we are studying the relation
+
+$$(Y_1,X_1),...,(Y_n,X_n) \sim F_{X,Y} $$
+Where $(Y_i,X_i)$ is a pair of precipitation and SST data for a month $i$. And $F_{X,Y}$ is the
+joint distribution.
+As stated above our main goal is predicting a value for $y$. Assume now that we could not observe $x$, therefore our best guess for a prediction, was the expected value of $y$,
+given by
+
+$$\mathbb{E}(y) = \int yP(Y=y) dy$$
+
+and discrete
+
+$$\mathbb{E}(y) = \sum yP(Y=y)$$
+
+
+and in case of data
+$$\mathbb{E}(y) = 1/n\sum_{i=1}^{n}y_i$$
+Where $y_i$ is one of $n$ realizations of the random variable $Y$.
+This is true when we use the Mean Squared Error (MSE) to asses the quality of predictions $\hat{y}$.
+
+$$MSE = 1/n\sum_{i=1}^{n}(y_i-\hat{y_i})^2$$
+Next we inspect the simple linear regression model.
+
+# Simple linear regression
+
+Now as we know we dont observe our $Y$ (Precipitation) in isolation but also have information from $X$ (SST).
+In the same way $\mathbb{E}(y)$ gives us the best $\hat{y}$ for MSE, it can be shown that 
+when we also observe $X$, the best predictions are given by the conditional expectation:
+
+$$\mathbb{E}(Y|X) = \int yf(y|x)dy = \int y \frac{f(x,y)}{f(y)} dy$$
+
+and discrete 
+
+$$\mathbb{E}(Y|X) = \sum yf(y|x) = \sum y \frac{f(x,y)}{f(y)}$$
+We assume that the regression function
+is linear and start with only one covariate
+ 
+$$f(x) = \beta_0 + \beta_1x$$
+
+So we say we can fit a line through the mapped values of X against Y.
+Then the model is
+
+$$ y_i = \beta_0 + \beta_1x_i + \epsilon_i$$
+$\mathbb{E}(\epsilon_i|x_i) = 0$ and $\mathbb{V}(\epsilon_i|x_i)=\sigma^2$
+
+So given our data $X$ the errors we make (denoted by $\epsilon$) we expect them to be 0.
+and that the variance of the errors does not depend on x, after we account for the $X$ in the formula.
+The fitted line is then 
+
+$$ \hat{f}(x) = \hat{\beta_0} + \hat{\beta_1}x$$
+
+Predicted values are given by $\hat{y_i} = \hat{f}(x_i)$.
+Residuals are 
+
+$$\hat{\epsilon}_i = y_i - \hat{y}_i =  y_i - (\hat{\beta_0} + \hat{\beta_1}x_i) $$
+
+We then would like to find $\hat{\beta_0}$ and
+$\hat{\beta_1}$ that miminise the residuals sums of squares (RSS):
+
+$$ RSS = \sum_{i=1}^{n}\hat{\epsilon_i}^2$$
+
+The estimators that minimise the RSS are called the least squares estimates.
+
+$$\hat{\beta_1} = \frac{\sum_{i=1}^{n}(X_i-\bar{X}_n)(Y_i-\bar{Y}_n)}{\sum_{i=1}^{n}(X_i-\bar{X}_n)^2} $$  
+
+$$\hat{\beta_0} = \bar{Y}_n - \hat{\beta_1}\bar{X}_n $$
+And the unbiased estimate of $\sigma$^2:
+
+$$\hat{\sigma}^2 = (\frac{1}{n-2})\sum_{i=1}^{n}\hat{\epsilon_i}^2 $$
+
+# Multiple linear regression
+
+We shortly revisit the data from
+
+$$(Y_1, X_1),...,(Y_i,X_i),...,(Y_n,X_n)$$
+and 
+
+$$X_i = (X_{i1},...,X_{ik})$$
+$X_i$ is a vector of k covariate values (SST values) for the $i^{th}$ observation (the $i^{th}$ month).
+As we assume our problem takes the form of a linear model the linear multiple regression model
+is
+
+$$Y_i = \sum_{j=1}^{k} \beta_i X_{ij} + \epsilon_i  $$ 
+for $i = 1,...,n$ and $\mathbb{E}(\epsilon_i|X_{1i},...,X_{ki}) = 0$.
+An intercept can be included by setting $X_{i1}=1,...,n$.
+We can write this in matrix notation with
+outcomes given by 
+
+$$ Y = \begin{pmatrix} Y_1\\Y_2\\.\\.\\.\\Y_n 
+      \end{pmatrix} $$
+
+and the covariates matrix as
+
+$$X = \begin{pmatrix} 
+  X_{11} & X_{12} & ... & X_{1k} \\
+  X_{21} & X_{22} & ... & X_{2k} \\
+  . & . & . & . \\
+  . & . & . & . \\
+  . & . & . & . \\
+  X_{n1} & X_{n2} & ... & X_{nk}
+\end{pmatrix}
+$$
+Each row is an observation (one month of SST values) and the columns are one of k covariates (each column is one gridpoint in the sea).
+X is a $(n x k)$ matrix. We also write
+
+$$\beta = \begin{pmatrix}
+\beta_1 \\ .\\.\\.\\\beta_k 
+\end{pmatrix} \text{ and } 
+\epsilon = \begin{pmatrix}
+\epsilon_1\\.\\.\\.\\ \epsilon_n
+\end{pmatrix}.$$
+
+And so we can write the multiple liear regression formula in matrix notation
+
+$$ Y = X\beta + \epsilon$$
+
+Now if we assume that the $(k x k)$ matrix given by $X^TX$ is invertible, we have:
+
+$$ \hat{\beta} = (X^TX)^{-1}X^TY \\
+  \mathbb{V}(\hat{\beta}|X^n) = \sigma^2(X^TX)^{-1} \\
+  \hat{\beta} \approx N(\beta, \sigma^2(X^TX)^{-1})
+$$
+
+The estimated regression function is given as:
+
+$$\hat{f}(x) = \sum_{j=1}^k \hat{\beta}_j x_j $$
+and the unbiased estimator of $\sigma^2$
+
+$$\sigma^2 = (\frac{1}{n-k})\sum_{i=1}^n \hat{\epsilon}_i^2$$
+where $\epsilon$ is a vector of residuals $X\hat{\beta}-Y$.
+The approximate $1-\alpha$ confidence interval for $\beta_j$ is
+
+$$\hat{\beta_j} \pm z_{\alpha/2}\hat{se}(\hat{\beta_j})$$
+
+and $\hat{se}^2(\hat{\beta_j})$ is the $j^{th}$ diagonal  element of the matrix $\hat{\sigma}^2(X^TX)^{-1}$.
+
+Anyway we have to stop here, because in our case the above estimation equations can not be used
+since our data data matrix $X^TX$ is not invertible.
+$X$ is $n x p$, and p > n, therefore fat and
+
+$$rank(x) = rank(X^TX) \leq n < p $$
+So $X^TX$ does not have full rank and is not invertible.
+
+# The LASSO
 
 We want to create a model that has predictive and
 explanatory power. Predictive power meaning it can
@@ -36,85 +189,6 @@ How many predictors are included depends on the strength of regularization given
 Elastic net with $\alpha=0.5$ tends to either include or drop the entire group together.
 To specifically choose a group of predictors, variations of the lasso or other models have to be considered.
 
-OPEN:
-General assumptions of linear models and LASSO
-Formulation over conditional expectation
-
-Simple linear regression:
-Resources: 
-All of statistics
-   Linear and Logistic Regression
-ESL
-  Linear Methods for Regression
-https://www.le.ac.uk/users/dsgp1/COURSES/THIRDMET/MYLECTURES/1REGRESS.pdf
-
-Notes: Difference in Formula E(Y|X) and Y= ..+epsilon
-
-General Problem:
-In our case we have information about monthly Sea Surface Temperature (SST) and monthly Precipitation in the Central Amazonas Basin.
-From a physics point of view it makes sense that we can make predictions about precipitation based on the SSTs. The question is now how well can we predict precipitation based on the SSTs. Desirably we can not only predict precipitation well, but also identify those regions that give us the most information about future precipitation. So for future predictions it may be enough to only observe these important regions.
-Conceptually we study the relationship of a covariate/predictor/feature X (SST) and its influence on a response variable Y (Precipitation).
-From the data we are studying the relation
-
-$$(Y_1,X_1),...,(Y_n,X_n) \sim F_{X,Y} $$
-Where $(Y_i,X_i)$ is a pair of precipitation and SST data for a month $i$. And $F_{X,Y}$ is the
-joint distribution.
-Note:
-Although in theory the SST and precipitation values are continous, in our data they are discrete so in our formulations we will use the discrete case.
-As stated above our main goal is predicting a value for $y$. Assume now that we could not observe $x$, therefore our best guess for a prediction, was the expected value of $y$,
-given by
-
-$$\mathbb{E}(y) = \int yP(Y=y) dy$$
-
-and discrete
-
-$$\mathbb{E}(y) = \sum yP(Y=y)$$
-
-
-and in case of data
-$$\mathbb{E}(y) = 1/n\sum_{i=1}^{n}y_i$$
-Where $y_i$ is one of $n$ realizations of the random variable $Y$.
-This is true when we use the Mean Squared Error (MSE) to asses the quality of predictions $\hat{y}$.
-
-$$MSE = 1/n\sum_{i=1}^{n}y_i-\hat{y_i}$$
-Now as we know we dont observe our $Y$ (Precipitation) in isolation but also have information from $X$ (SST).
-In the same way $\mathbb{E}(y)$ gives us the best $\hat{y}$ for MSE, it can be shown that 
-when we also observe $X$, the best predictions are given by the conditional expectation:
-
-$$\mathbb{E}(Y|X) = \int yf(y|x)dy = \int y \frac{f(x,y)}{f(y)} dy$$
-
-and discrete 
-
-$$\mathbb{E}(Y|X) = \sum yf(y|x) = \sum y \frac{f(x,y)}{f(y)}$$
-
-In the case of linear regression we may assume now, that $\mathbb{E}(Y|X)$ can be modeled by
-a linear function
-
-
-NEXT:
-add formulations for multiple regression
-add characteristics
-add rest for simple multiple linear regression
-show that normal linear model fails
-introduce LASSO 
-
-
-
-
-Least squares fitting is reasonable if trainig observations are independent random draws from population, even if not random still valid, if y_i conditionally independent given input xi.
-Question: Does that mean for example after accounting for confounders the y_i are cond independent?
-Remark: RSS makes no assumption about validity of model. If we can predict well, we say model is good enough.
-
-y continously distributed random variable with pdf f(y). If we wanted to predict a value of y without any other information, the expected value can be used given by:
-
-$$\mathbb{E}(y) = \int yf(y) dy $$
-The expectation minimises the mean square error.
-If $\hat{y}$ is the value of a prediction for $y$ the MSE is defined by:
-$MSE = \int(y - \hat{y})f(y) dy$
-
-Now we in in order to predict $y$ more accurately we gather infromation from another random variable $x$, whose value we can observe.
-We stated above that the expectation of $y$ minimises its MSE for $\hat{y}$, if we now make use of $x$ and want to minimise MSE our best prediction is given by the conditional expectation $$ \mathbb{E}(y|x) = \int y \frac{f(x,y)}{f(x)}dy$$
-
 
 # Preselection of Variables 
 Before fitting an actual model we can compute crude correlation values between precipitation and each sea grid point.
@@ -125,6 +199,8 @@ One possibility here would be to include the 5% percent of regions that are most
 Another possibility here is to analyse the correlation among the sea regions themselves, group together points as one single region and average the values of these regions. 
 This can be seen or be applied as a form clustering to group variables together and start with a smaller number of predictors before applying the regression model itself.
 *Remark*: However this preselection is done, it makes sense to include it in the model selection process because this procedure is too a part of the algorithm and needs to be considered.
+
+
 
 
 # Model Selection 
@@ -150,5 +226,29 @@ or do we use the information of different timepoints and regions?
 Network approach to the regularised (grouped) prediction problem.
 
 
+# Open
+General assumptions of linear models
+General assumptions LASSO
+Check clean, unified notation
+Definition unbiased
+Q:
+intuition behind estimated $\beta_1$, denominator looks like covariance
+Q: do we say when the conditional expectation is 0 and conditional variance is sigma, that they are independent?
+Q: how do we formalise the conditional independence of the $y_i$´s given $x$?
+Q:
+Expected value is minimising mean squared error
+	but we use sum of sqaured errors, 
+	Expectation minimises both?
+Q:
+Least squares fitting is reasonable if trainig observations are independent random draws from population, even if not random still valid, if y_i conditionally independent given input xi.
+Q: 
+Does that mean for example after accounting for confounders the y_i are cond independent?
+*Remark*: RSS makes no assumption about validity of model. If we can predict well, we say model is good enough.
 
-
+# Resources: 
+All of statistics
+   Linear and Logistic Regression
+ESL
+  Linear Methods for Regression
+https://www.le.ac.uk/users/dsgp1/COURSES/THIRDMET/MYLECTURES/1REGRESS.pdf
+https://www.math.arizona.edu/~tgk/464_07/cond_exp.pdf
