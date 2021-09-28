@@ -14,6 +14,7 @@ library(MASS)
 library(glmnet)
 
 # load both data sets
+# WARNINNG data does not exist anymore
 load("data/processed/hadcrut-processed.Rda")
 load("data/processed/cru-processed.Rda")
 

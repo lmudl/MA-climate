@@ -1,0 +1,42 @@
+Notes on Call 23.09
+
+fused lasso zusammenfassen
+	wie tiefa da rein?
+was verlangst du um ne 1,0 zu bekommen
+wie tief muss ich in die mathematischen Modelle einsteigen?
+	ohne Kovariablen etc, müsstest du nicht ausführlich aufschreiben
+	was ist wichtig mehr:
+		die Sachen die ich mir extra anlesen musste
+		Fused Lasso zum Beispiel auf 1-3 Seiten erklärst
+		Lasso tut folgendes, Fused Lasso tut folgendes
+		Annahmen, Voraussetzungen, Algortihmische Herausforderungen
+		Alles was über Bachelorstudium hinasaugeht
+		z-b Kreuzvalidierung und Erweiterung für räuml Abhängigkeit
+auf Doku verlassen, aber nicht als Blackbox betrachten
+asymptotische Eigenschaften und Ergebnisse und Simulaitonsstudien
+Schwerpunkte hängt auch davon ab, wie stabil sind zum Beispuel die Fused Lasso
+	Ergebnisse
+kritisch einschätzen können wir uns auf die Ergebnisse verlassen
+
+Anmerkung:
+Recherche und Recherche Ergebnisse aufschreiben.
+	direkt Anwenden!!!	
+	wenn man merkt funktioniert überhaupt nicht.
+	intuition dann ausprobieren.
+
+ETA, Gespräche ca 45 min.
+Kurse. 
+
+gespräch:
+(wie oft wiederholst du ältere Konzepte oder hast du die einfach drin?)
+
+ich fasse einfach mal meine zusammenfassung zusammen
+wenn wir keine variablen drin haben mittelwert beste schätzung
+
+Fused Lasso:
+	stellenweise Nulle
+	benachbarter Variablen werden auf ein Level gebracht
+	dadurch tendenziell, Koeffizienten auf Bereiche, räuml zusammenhängende Bereiche
+	2011 solution path generalised 
+	2014 efficient implementation
+	auf dok
