@@ -3,6 +3,7 @@
 # variables for lm/ lasso/ elastic net/ fused lasso
 library(raster)
 library(caret)
+library(glmnet)
 ?createTimeSlices
 
 setwd("Repos/MA-climate")
@@ -89,6 +90,117 @@ cbind(p,m)
 # predict can easily be done make sure that NA's are
 # also dropped for new x
 #
+
+# TODO find out values of precip
+# general units: mm per month, we then averages values
+min(mean_precip) #95
+max(mean_precip) #285
+
+# TODO write function for CV
+?createTimeSlices
+# make sure that sst data has colnames before starting
+# with CV!
+
+add_colnames <- function(path_old_sst, sst) {
+  old_sst <- brick(path_old_sst, varname = "sst")
+  coord <- coordinates(old_sst)
+  assertthat::assert_that(dim(coord)[1] == dim(sst)[1])
+  # give sst columns the coordinates as names
+  cnames <- paste(coord[,1], coord[,2])
+  
+}
+
+# maybe exclude skip and make sure that there is no
+# overlap
+# Or if overlap = FALSE, then skip is function
+# maybe later add functionality for overlap TRUE/FALSE
+# for now we always say no overlap
+# initialwindow+horizon-1
+# if overlap = FALSE, skip is ignpred
+# type could be lasso, fusedlasso etc
+# but for these we can write own helper functions
+# like cv_for_ts_lasso etc
+# fixedWindow is always TRUE here
+# so possible add-on, decide if overlap yes/no
+# and which type of regression mode should we use
+# like lasso or fused lasso etc.
+#TODO when testing this also remember to leave some
+#observations for validation set.
+cv_for_ts <- function(sst, precip, nfold, initialWindow, horizon) {
+  set.seed(1234)
+  #TODO aswer question:compute precip mean here or before?
+  sst <- prepare_sst(sst)
+  obs_to_drop <- get_obs_to_drop(nrow, nfold)
+  sst <- drop_obs(sst, obs_to_drop)
+  precip <- drop_obs(precip, obs_to_drop)
+  # now we made sure that nrow(data) %% nfold == 0
+  assertthat::assert_that(initialWindow+horizon==nrow(sst)/nfold)
+  index_list <- createTimeSlices(1:nrow(sst), initialWindow, horizon,
+                                 skip=initialwindow+horizon-1)
+  err_vec <- c()
+  #TODO create list with glmnet objects so we can plot
+  #their paths and coefficients on map
+  #TODO safe index_list as well
+  #TODO for each lambda
+  #         for each fold
+  #             fit model and predict on test, save err
+  # now we have for each lambda 5 MSE
+  # find best lambda
+  # refit on all train+test data with lambda
+  # predict on validation set and report error final
+  # error final can then be compared among diff models
+  for(i in 1:length(index_list$train)) {
+    id_train <- unlist(index_list$train[i], use.names = FALSE)
+    id_test <- unlist(index_list$test[i], use.names = FALSE)
+    x_train <- sst[id_train,]
+    y_train <- precip[id_train,]
+    x_test <-  sst[id_test,]
+    y_test <- precip[id_test,]
+    # die cross validaion is done here classically
+    # does not work!!!
+    trained_model <- glmnet(x_train, y_train)
+    #TODO change value her for s
+    predicted <- predict(trained_model, newx = x_test, s = 0.17)
+    err <- mean((predicted-y_test)^2)
+    err_vec[i] <- err
+    save(trained_model, file=paste0("results/CV-lasso/model",i,".RData"))
+    save(index_list, file="results/CV-lasso/index_list")
+  }
+  return(err_vec)
+  # until here we keep the error for each fold
+  # but with fixed regularisation
+  #TODO add loop for different regularisation values
+  #TODO add parameters for glmnet
+  #TODO create function that computes number of observations
+  #for each fold so that all windows have same number
+  #of observations
+  #make sure that nrow(data) %% nfold == 0
+  #AND initialwindow+horizon == nrow(data)/nfold
+  
+}
+
+prepare_sst <- function(sst) {
+  #transpose sst,rows are months, cols are coord after transposing
+  sst <- t(sst)
+  #drop sst info that contains NA
+  drop <- apply(sst, 2, function(x) all(is.na(x)))
+  sst <- sst[,!drop]
+  return(sst)
+}
+
+get_obs_to_drop <- function(nrow, nfold) {
+  if (nrow %% nfold != 0) {
+    obs_used <- floor(nrow/nfold)
+    # drop difference in rows, drop first observations
+    drop_n_first_obs <- nrow-obs_used
+    return(drop_n_first_obs)
+  }
+}
+
+drop_obs <- function(data, obs_to_drop) {
+  data <- data[-c(1:obs_to_drop),]
+}
+
 
 #Maybe
 # TODO give rows months and years. maybe
