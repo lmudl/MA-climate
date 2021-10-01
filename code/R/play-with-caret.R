@@ -176,6 +176,7 @@ cv_for_ts <- function(sst, precip, nfold, initialWindow, horizon) {
   #of observations
   #make sure that nrow(data) %% nfold == 0
   #AND initialwindow+horizon == nrow(data)/nfold
+  #TODO read about standardisation ?glmnet()
   
 }
 
@@ -201,6 +202,35 @@ drop_obs <- function(data, obs_to_drop) {
   data <- data[-c(1:obs_to_drop),]
 }
 
+# In this function we want to get the lambda values,
+# that glmnet uses
+# according to 
+# https://stats.stackexchange.com/questions/174897/choosing-the-range-and-grid-density-for-regularization-parameter-in-lasso
+# we have a formula for lambda_max 
+# and min is then chosen from that lambda_max
+# lambda_max is data derived meaning from the data
+# we choose the lambda that forces all coefficients
+# to be zero
+# TODO find out how that works
+# https://datascience.stackexchange.com/questions/48885/covariance-as-inner-product
+# meaning compute all inner products and choose
+# lambda_max as lambda_max  = max abs val(inner product)/N
+get_lambda_values <- function(){
+  #TODO compute inner product with target
+  # for all variables
+  # target_vec %*% feature_matrix
+  #TODO get the max abs value
+  #TODO comput lambdamax
+  #TODO compute lambdamin
+  #TODO create vector with lambda values
+  #TODO decide n_obs should be number of obs in CV right?
+}
+
+inner_test <- precip_test %*% sst_test
+max_inner <- max(abs(inner_test))
+max_lambda <- max_inner/nrow(sst_test)
+# with this max_lambda all betas should become zero
+# TODO lets test this tomorrow :)
 
 #Maybe
 # TODO give rows months and years. maybe
