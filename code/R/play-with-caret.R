@@ -4,17 +4,17 @@
 library(raster)
 library(caret)
 library(glmnet)
-?createTimeSlices
+#?createTimeSlices?
 
 setwd("Repos/MA-climate")
-# TODO load datasets
-m_sst_des <- readRDS("data/processed/deseasonalised_sst.rds")
-dim(m_sst_des) # 16020 432
-m_precip_des <- readRDS("data/processed/deseasonalised_precip.rds")
-dim(m_precip_des) # 61200 432
-# TODO compute mean of precip
-mean_precip <- apply(m_precip_des, 2, mean)
-rm(m_precip_des)
+# Load datasetss
+sst <- readRDS("data/processed/deseasonalised_sst.rds")
+dim(sst) # 16020 432
+precip <- readRDS("data/processed/deseasonalised_precip.rds")
+dim(precip) # 61200 432
+# Compute mean of precip
+precip <- apply(precip, 2, mean)
+precip <- matrix(precip)
 # TODO think about which prediction windows etc make sense
 #      also which forms of CV make sense
 #   we have 432 months of data if we go for 5 fold CV
@@ -32,52 +32,7 @@ rm(m_precip_des)
 #   non overlapping data?
 # TODO write helper function for this or use caret
 #   will return the indices for test and train
-createTimeSlices(17:32,5,3, skip = 7)
-#   if we want non-overlapping fold then skip
-#   should be initialwindow+horizon-1
-createTimeSlices(17:32,5,3, skip = 7)
-ind <- createTimeSlices(1:20,4,2, skip = 5)
-#   check for any overlaps
-any(duplicated(unlist(ind, use.names = FALSE)))
-#   no overlaps
-#   for our data, 430 works out equally for all months
-#   meaning we drop the first two months of observations
-#   for example
-# TODO try if  partition works
-test1 <- createTimeSlices(1:430,74, 12, skip=(74+12-1))
-# TODO check data form needed aka data frame or the like
-# load old dataset to get coordinate names for variables
-old_sst <- brick("data/interim/sst/ersst_setreftime.nc", varname = "sst")
-coord <- coordinates(old_sst)
-dim(coord)[1] == dim(m_sst_des)[1]
-# TODO give sst columns the coordinates as names
-cnames <- paste(coord[,1], coord[,2])
-# rows are months, cols are coord after transposing
-sst <- t(m_sst_des)
-rm(m_sst_des)
-colnames(sst) <- cnames
-dim(sst)
-# TODO fit lasso on small data set
-# TODO prepare data for lasso
-# TODO use only 5 years of data
-sst_test <- sst[1:60,]
-precip_test <- mean_precip[1:60]
-drop <- apply(sst_test, 2, function(x) all(is.na(x)))
-sst_test <- sst_test[,!drop]
-dim(sst_test)
-fit_test <- glmnet(sst_test, precip_test)
-plot(fit_test)
-print(fit_test)
-nx <- sst[61:72,]
-dim(nx)
-nx <- nx[,!drop]
-dim(nx)
-
-p <- predict(fit_test, newx = nx, s=0.1790)
-m <- mean_precip[61:72]
-sum((p-m)^2)/12
-cbind(p,m)
-
+################################################################################
 # Summary
 # we can easily use caret package to do CV as wanted
 # no reshape needed apparently
@@ -91,25 +46,35 @@ cbind(p,m)
 # also dropped for new x
 #
 
-# TODO find out values of precip
+# TODO use not precip but drought index as
+# target
+# TODO how is drught index defined
+# TODO how to compute drought index
+# TODO should we first compute drought index and then
+# mean or other way around?
+# in paper they compute first drought index and then
+# the mean
+# Find out values of precip
 # general units: mm per month, we then averages values
-min(mean_precip) #95
-max(mean_precip) #285
-
-# TODO write function for CV
-?createTimeSlices
-# make sure that sst data has colnames before starting
-# with CV!
+min(precip) #95
+max(precip) #285
 
 add_colnames <- function(path_old_sst, sst) {
   old_sst <- brick(path_old_sst, varname = "sst")
   coord <- coordinates(old_sst)
-  assertthat::assert_that(dim(coord)[1] == dim(sst)[1])
+  sst <- t(sst)
+  assertthat::assert_that(dim(coord)[1] == dim(sst)[2])
   # give sst columns the coordinates as names
   cnames <- paste(coord[,1], coord[,2])
-  
+  colnames(sst) <- cnames
+  return(sst)
 }
 
+#sst <- t(sst)
+sst <- add_colnames("data/interim/sst/ersst_setreftime.nc", sst)
+# For testing, smaller set
+# sst <- sst[1:60,]
+# precip <- precip[1:60]
 # maybe exclude skip and make sure that there is no
 # overlap
 # Or if overlap = FALSE, then skip is function
@@ -124,20 +89,21 @@ add_colnames <- function(path_old_sst, sst) {
 # so possible add-on, decide if overlap yes/no
 # and which type of regression mode should we use
 # like lasso or fused lasso etc.
-#TODO when testing this also remember to leave some
-#observations for validation set.
-cv_for_ts <- function(sst, precip, nfold, initialWindow, horizon) {
+# TODO when testing this also remember to leave some
+# observations for validation set.
+cv_for_ts <- function(sst, precip, nfold, size_train, size_test) {
   set.seed(1234)
   #TODO aswer question:compute precip mean here or before?
   sst <- prepare_sst(sst)
-  obs_to_drop <- get_obs_to_drop(nrow, nfold)
+  assertthat::are_equal(nrow(sst), length(precip))
+  n_row <- nrow(sst)
+  obs_to_drop <- get_obs_to_drop(n_row, nfold)
   sst <- drop_obs(sst, obs_to_drop)
   precip <- drop_obs(precip, obs_to_drop)
   # now we made sure that nrow(data) %% nfold == 0
-  assertthat::assert_that(initialWindow+horizon==nrow(sst)/nfold)
-  index_list <- createTimeSlices(1:nrow(sst), initialWindow, horizon,
-                                 skip=initialwindow+horizon-1)
-  err_vec <- c()
+  assertthat::are_equal(size_train+size_test, nrow(sst)/nfold)
+  index_list <- createTimeSlices(1:nrow(sst), initialWindow=size_train, horizon=size_test,
+                                 skip=size_train+size_test-1)
   #TODO create list with glmnet objects so we can plot
   #their paths and coefficients on map
   #TODO safe index_list as well
@@ -149,24 +115,29 @@ cv_for_ts <- function(sst, precip, nfold, initialWindow, horizon) {
   # refit on all train+test data with lambda
   # predict on validation set and report error final
   # error final can then be compared among diff models
-  for(i in 1:length(index_list$train)) {
-    id_train <- unlist(index_list$train[i], use.names = FALSE)
-    id_test <- unlist(index_list$test[i], use.names = FALSE)
-    x_train <- sst[id_train,]
-    y_train <- precip[id_train,]
-    x_test <-  sst[id_test,]
-    y_test <- precip[id_test,]
-    # die cross validaion is done here classically
-    # does not work!!!
-    trained_model <- glmnet(x_train, y_train)
-    #TODO change value her for s
-    predicted <- predict(trained_model, newx = x_test, s = 0.17)
-    err <- mean((predicted-y_test)^2)
-    err_vec[i] <- err
-    save(trained_model, file=paste0("results/CV-lasso/model",i,".RData"))
-    save(index_list, file="results/CV-lasso/index_list")
+  lambda_vec <- get_lambda_values(sst, precip)
+  err_mat <- matrix(NA, ncol = nfold, nrow = length(lambda_vec))
+  for(i in 1:length(lambda_vec)) {
+    for(j in 1:length(index_list$train)) {
+      id_train <- unlist(index_list$train[j], use.names = FALSE)
+      id_test <- unlist(index_list$test[j], use.names = FALSE)
+      x_train <- sst[id_train,]
+      y_train <- precip[id_train]
+      x_test <- sst[id_test,]
+      y_test <- precip[id_test]
+      # die cross validaion is done here classically
+      # does not work!!!
+      trained_model <- glmnet(x_train, y_train)
+      #TODO change value her for s
+      predicted <- predict(trained_model, newx = x_test, s = lambda_vec[i])
+      err <- mean((predicted-y_test)^2)
+      err_mat[i,j] <- err
+      #save(trained_model, file=paste0("results/CV-lasso/model-","lambda-",i,"fold-",j,".RData"))
+    }
   }
-  return(err_vec)
+  save(index_list, file="results/CV-lasso/index_list")
+  save(lambda_vec, file="results/CV-lasso/lambda_vec")
+  return(err_mat)
   # until here we keep the error for each fold
   # but with fixed regularisation
   #TODO add loop for different regularisation values
@@ -180,27 +151,42 @@ cv_for_ts <- function(sst, precip, nfold, initialWindow, horizon) {
   
 }
 
+# function for dropping NA in sst
 prepare_sst <- function(sst) {
   #transpose sst,rows are months, cols are coord after transposing
-  sst <- t(sst)
+  #sst <- t(sst)
+  #sst will be transposed before
   #drop sst info that contains NA
+  old_dim <- dim(sst)
   drop <- apply(sst, 2, function(x) all(is.na(x)))
   sst <- sst[,!drop]
+  new_dim <- dim(sst)
+  if(old_dim[2] == new_dim[2]) message("No rows were dropped")
   return(sst)
 }
 
+# function for finding out which and how many rows to drop in the creaetimseslices
+# function
 get_obs_to_drop <- function(nrow, nfold) {
   if (nrow %% nfold != 0) {
-    obs_used <- floor(nrow/nfold)
+    # fold is train+test
+    obs_in_fold <- floor(nrow/nfold)
+    obs_used <- nfold*obs_in_fold
     # drop difference in rows, drop first observations
     drop_n_first_obs <- nrow-obs_used
     return(drop_n_first_obs)
   }
 }
 
+# and then actually dropping the rows
 drop_obs <- function(data, obs_to_drop) {
-  data <- data[-c(1:obs_to_drop),]
+  if(!is.null(obs_to_drop)) {
+    data <- data[-c(1:obs_to_drop),]
+    return(data)
+  }
+  return(data)
 }
+
 
 # In this function we want to get the lambda values,
 # that glmnet uses
@@ -215,24 +201,108 @@ drop_obs <- function(data, obs_to_drop) {
 # https://datascience.stackexchange.com/questions/48885/covariance-as-inner-product
 # meaning compute all inner products and choose
 # lambda_max as lambda_max  = max abs val(inner product)/N
-get_lambda_values <- function(){
+get_lambda_values <- function(sst, precip){
   #TODO compute inner product with target
   # for all variables
   # target_vec %*% feature_matrix
+  inner_prods <- precip %*% scale(sst, center = TRUE, scale = TRUE)
   #TODO get the max abs value
+  max_inner <- max(abs(inner_prods))
   #TODO comput lambdamax
+  max_lambda <- max_inner/nrow(sst)
   #TODO compute lambdamin
-  #TODO create vector with lambda values
-  #TODO decide n_obs should be number of obs in CV right?
+  min_lambda <- 0.001*max_lambda
+  # TODO create vector with lambda values
+  # create vector of lambdas
+  # evenly spaced points on log scale between mx and mn
+  lambda_vec <- exp(seq(log(min_lambda),log(max_lambda), length.out = 100))
+  return(lambda_vec)
 }
 
-inner_test <- precip_test %*% sst_test
-max_inner <- max(abs(inner_test))
-max_lambda <- max_inner/nrow(sst_test)
-# with this max_lambda all betas should become zero
-# TODO lets test this tomorrow :)
+undebug(get_lambda_values)
+l <- get_lambda_values(sst, precip)
+?glmnet
+glmnet(x=sst,y=precip,lambda = max(l))
+ip <- precip%*%scale(sst, center = TRUE, scale = TRUE)
+mx <- max(abs(ip))
+mx <- mx/60
 
-#Maybe
+em <- cv_for_ts(sst=sst,precip=precip,nfold = 5,size_train = 68, size_test = 18)
+em
+
+#test cv_for_ts 
+#but only do one fold
+#namely say 432-60 last 5 years we dont want do use for test/train but for validation
+#then we have 372, 372/5= 74.4 so 74 per fold and 60 train 14 test
+#so 358-372 is test, 298-358 is train
+train <- 298:358
+test <- 359:372
+sst <- add_colnames("data/interim/sst/ersst_setreftime.nc", sst)
+sst <- prepare_sst(sst)
+sst_train <- sst[train,]
+sst_test<- sst[test,]
+precip_train <- precip[train,]
+precip_test <- precip[test,]
+
+lambdas <- get_lambda_values(sst[c(train,test),], precip[c(train,test),])
+
+# TODO
+#I dont have to use two loops
+#I can define get_lambdas and then for each fold 
+#fit models with the whole lambda vector
+#then for i in lambda pred
+
+mod <- glmnet(sst, precip, lambda=rev(lambdas))
+plot(mod)
+coef(mod, )
+predict
+
+err <- c(NA)
+for (i in 1:length(lambdas)) {
+  pred <- predict(mod, newx = sst_test, s = lambdas[i])
+  err_i <- sum((pred-precip_test)^2)
+  err[i] <- err_i
+}
+plot(err)
+p <- predict(mod,newx = sst_test, s=lambdas[1])
+
+cbind(p,precip_test)
+length(p)
+length(precip_test)
+#22:21 start
+undebug(cv_for_ts)
+#430/5
+
+#Maybe###############################
 # TODO give rows months and years. maybe
+
+# function (x, sign.lambda = 1, ...) 
+# {
+#   cvobj = x
+#   xlab = expression(Log(lambda))
+#   if (sign.lambda < 0) 
+#     xlab = paste("-", xlab, sep = "")
+#   plot.args = list(x = sign.lambda * log(cvobj$lambda), y = cvobj$cvm, 
+#                    ylim = range(cvobj$cvup, cvobj$cvlo), xlab = xlab, ylab = cvobj$name, 
+#                    type = "n")
+#   new.args = list(...)
+#   if (length(new.args)) 
+#     plot.args[names(new.args)] = new.args
+#   do.call("plot", plot.args)
+#   error.bars(sign.lambda * log(cvobj$lambda), cvobj$cvup, cvobj$cvlo, 
+#              width = 0.01, col = "darkgrey")
+#   points(sign.lambda * log(cvobj$lambda), cvobj$cvm, pch = 20, 
+#          col = "red")
+#   axis(side = 3, at = sign.lambda * log(cvobj$lambda), labels = paste(cvobj$nz), 
+#        tick = FALSE, line = 0)
+#   abline(v = sign.lambda * log(cvobj$lambda.min), lty = 3)
+#   abline(v = sign.lambda * log(cvobj$lambda.1se), lty = 3)
+#   invisible()
+# }
+
+glmnet::plot.cv.glmnet(em)
+plot(em)
+plot(em[,])
+
 
 

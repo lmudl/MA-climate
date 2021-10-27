@@ -181,3 +181,83 @@ compute_corr <- function(dec_matrix_sst, dec_matrix_precip, timelag=0) {
   return(cor_vec)
 }
 
+#######################For Time Series Cv##################################
+
+add_colnames <- function(path_old_sst, sst) {
+  old_sst <- brick(path_old_sst, varname = "sst")
+  coord <- coordinates(old_sst)
+  sst <- t(sst)
+  assertthat::assert_that(dim(coord)[1] == dim(sst)[2])
+  # give sst columns the coordinates as names
+  cnames <- paste(coord[,1], coord[,2])
+  colnames(sst) <- cnames
+  return(sst)
+}
+
+# function for dropping NA in sst
+prepare_sst <- function(sst) {
+  #transpose sst,rows are months, cols are coord after transposing
+  #sst <- t(sst)
+  #sst will be transposed before
+  #drop sst info that contains NA
+  old_dim <- dim(sst)
+  drop <- apply(sst, 2, function(x) all(is.na(x)))
+  sst <- sst[,!drop]
+  new_dim <- dim(sst)
+  if(old_dim[2] == new_dim[2]) message("No rows were dropped")
+  return(sst)
+}
+
+# function for finding out which and how many rows to drop in the creaetimseslices
+# function
+get_obs_to_drop <- function(nrow, nfold) {
+  if (nrow %% nfold != 0) {
+    # fold is train+test
+    obs_in_fold <- floor(nrow/nfold)
+    obs_used <- nfold*obs_in_fold
+    # drop difference in rows, drop first observations
+    drop_n_first_obs <- nrow-obs_used
+    return(drop_n_first_obs)
+  }
+}
+
+# and then actually dropping the rows
+drop_obs <- function(data, obs_to_drop) {
+  if(!is.null(obs_to_drop)) {
+    data <- data[-c(1:obs_to_drop),]
+    return(data)
+  }
+  return(data)
+}
+
+# In this function we want to get the lambda values,
+# that glmnet uses
+# according to 
+# https://stats.stackexchange.com/questions/174897/choosing-the-range-and-grid-density-for-regularization-parameter-in-lasso
+# we have a formula for lambda_max 
+# and min is then chosen from that lambda_max
+# lambda_max is data derived meaning from the data
+# we choose the lambda that forces all coefficients
+# to be zero
+# TODO find out how that works
+# https://datascience.stackexchange.com/questions/48885/covariance-as-inner-product
+# meaning compute all inner products and choose
+# lambda_max as lambda_max  = max abs val(inner product)/N
+get_lambda_values <- function(sst, precip){
+  #TODO compute inner product with target
+  # for all variables
+  # target_vec %*% feature_matrix
+  inner_prods <- precip %*% scale(sst, center = TRUE, scale = TRUE)
+  #TODO get the max abs value
+  max_inner <- max(abs(inner_prods))
+  #TODO comput lambdamax
+  max_lambda <- max_inner/nrow(sst)
+  #TODO compute lambdamin
+  min_lambda <- 0.001*max_lambda
+  # TODO create vector with lambda values
+  # create vector of lambdas
+  # evenly spaced points on log scale between mx and mn
+  lambda_vec <- exp(seq(log(min_lambda),log(max_lambda), length.out = 100))
+  return(lambda_vec)
+}
+
