@@ -10,6 +10,7 @@ library(SPEI)
 data(wichita)
 ?wichita
 ?thornthwaite
+setwd("Repos/MA-climate/")
 
 precip <- readRDS("data/processed/deseasonalised_precip.rds")
 dim(precip) # 61200 432
@@ -41,8 +42,29 @@ precip[1,1:10]
 #input: precip data, wanted time window
 #output:spi 
 #possible other parameters, distr, ref window
-precip_to_spi <- function(precip_data, spi_window) {
-  spi-matrix <- apply(precip_data, 1, function(x) spi(x,spi_window)$fitted)
-  return(t(spi-matrix))
+library(foreach)
+
+precip_to_spi <- function(precip_data, spi_window, 
+                          comp_parallel, ncores) {
+  if(!comp_parallel) { 
+    spi_matrix <- apply(precip_data, 1, function(x) spi(x,spi_window)$fitted)
+    return(t(spi_matrix))
+  }
+  if(comp_parallel) {
+    cl <- parallel::makeCluster(ncores)
+    doParallel::registerDoParallel(cl)
+    spi_matrix <- foreach(i=1:nrow(precip_data), .combine = rbind) %dopar% {
+      c(SPEI::spi(precip_data[i,],spi_window)$fitted)
+    }
+    parallel::stopCluster(cl)
+    return(spi_matrix)
+  }
 }
 
+#parallel computing rentiert sich erst ab 100 ro
+#system.time({par <- precip_to_spi(precip[1:100,], 6, parallel = c(TRUE, ncores))})
+#system.time({nonpar <- precip_to_spi(precip[1:100,], 6, parallel = c(FALSE))})
+
+# TODO save the data matrix for 3, 6, 12 spi
+system.time({spi_3 <- precip_to_spi(precip, spi_window = 3, comp_parallel = TRUE, 5)})
+saveRDS(spi_3, "data/processed/spi_3.rds")

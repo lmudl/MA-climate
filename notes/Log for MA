@@ -571,3 +571,11 @@ general note: automated explorative data analylsis
 start time: 09:47
 finished notes and send to fabi end 14:35
 
+28.10.21
+start time: 12:34, exp 2h
+
+TODO:
+drop NA's from spi matrix 
+resolution vergröbern für precip, für schnellere Laufzeiten
+	wenn precip definiert wird.
+
