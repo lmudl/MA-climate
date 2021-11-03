@@ -273,6 +273,27 @@ length(precip_test)
 undebug(cv_for_ts)
 #430/5
 
+### with precip we need to drop number of observations before
+# because computing the spi means we loose some observations
+#TODO load rds object
+spi_3 <- readRDS("data/processed/spi_3.rds")
+dim(spi_3)
+spi_3[1:3,1:5]
+# name split after underscore, here 3, then -1 is number of
+# rows to drop
+# or just do it by function input
+load_spi <- function(path_to_spi, spi_window) {
+  spi <- readRDS(path_to_spi)
+  drop <- spi_window-1
+  spi <- spi[,-c(1:drop)]
+  return(spi)
+}
+
+spi_3 <- load_spi("data/processed/spi_3.rds", 3)
+dim(spi_3) # now only 432 before 430
+
+#plan for cv
+
 #Maybe###############################
 # TODO give rows months and years. maybe
 

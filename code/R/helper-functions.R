@@ -261,3 +261,84 @@ get_lambda_values <- function(sst, precip){
   return(lambda_vec)
 }
 
+# For testing, smaller set
+# sst <- sst[1:60,]
+# precip <- precip[1:60]
+# maybe exclude skip and make sure that there is no
+# overlap
+# Or if overlap = FALSE, then skip is function
+# maybe later add functionality for overlap TRUE/FALSE
+# for now we always say no overlap
+# initialwindow+horizon-1
+# if overlap = FALSE, skip is ignpred
+# type could be lasso, fusedlasso etc
+# but for these we can write own helper functions
+# like cv_for_ts_lasso etc
+# fixedWindow is always TRUE here
+# so possible add-on, decide if overlap yes/no
+# and which type of regression mode should we use
+# like lasso or fused lasso etc.
+# TODO when testing this also remember to leave some
+# observations for validation set.
+cv_for_ts <- function(sst, precip, nfold, size_train, size_test, save_folder) {
+  set.seed(1234)
+  #TODO aswer question:compute precip mean here or before?
+  sst <- prepare_sst(sst)
+  assertthat::are_equal(nrow(sst), length(precip))
+  n_row <- nrow(sst)
+  obs_to_drop <- get_obs_to_drop(n_row, nfold)
+  sst <- drop_obs(sst, obs_to_drop)
+  precip <- drop_obs(precip, obs_to_drop)
+  # now we made sure that nrow(data) %% nfold == 0
+  assertthat::are_equal(size_train+size_test, nrow(sst)/nfold)
+  index_list <- createTimeSlices(1:nrow(sst), initialWindow=size_train, horizon=size_test,
+                                 skip=size_train+size_test-1)
+  #TODO create list with glmnet objects so we can plot
+  #their paths and coefficients on map
+  #TODO safe index_list as well
+  #TODO for each lambda
+  #         for each fold
+  #             fit model and predict on test, save err
+  # now we have for each lambda 5 MSE
+  # find best lambda
+  # refit on all train+test data with lambda
+  # predict on validation set and report error final
+  # error final can then be compared among diff models
+  lambda_vec <- get_lambda_values(sst, precip)
+  err_mat <- matrix(NA, ncol = nfold, nrow = length(lambda_vec))
+  for(i in 1:length(lambda_vec)) {
+    for(j in 1:length(index_list$train)) {
+      id_train <- unlist(index_list$train[j], use.names = FALSE)
+      id_test <- unlist(index_list$test[j], use.names = FALSE)
+      x_train <- sst[id_train,]
+      y_train <- precip[id_train]
+      x_test <- sst[id_test,]
+      y_test <- precip[id_test]
+      # die cross validaion is done here classically
+      # does not work!!!
+      trained_model <- glmnet(x_train, y_train)
+      #TODO change value her for s
+      predicted <- predict(trained_model, newx = x_test, s = lambda_vec[i])
+      err <- mean((predicted-y_test)^2)
+      err_mat[i,j] <- err
+      #save(trained_model, file=paste0("results/CV-lasso/model-","lambda-",i,"fold-",j,".RData"))
+    }
+  }
+  index_list_path <- paste0("results/CV-lasso/", save_folder, "index_list")
+  lambda_vec_path <- paste0("results/CV-lasso/", save_folder, "lambda_vec")
+  save(index_list, file = index_list_path)
+  save(lambda_vec, file = lambda_vec_path) 
+  return(err_mat)
+  # until here we keep the error for each fold
+  # but with fixed regularisation
+  #TODO add loop for different regularisation values
+  #TODO add parameters for glmnet
+  #TODO create function that computes number of observations
+  #for each fold so that all windows have same number
+  #of observations
+  #make sure that nrow(data) %% nfold == 0
+  #AND initialwindow+horizon == nrow(data)/nfold
+  #TODO read about standardisation ?glmnet()
+  
+}
+

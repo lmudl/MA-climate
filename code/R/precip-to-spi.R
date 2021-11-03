@@ -66,5 +66,19 @@ precip_to_spi <- function(precip_data, spi_window,
 #system.time({nonpar <- precip_to_spi(precip[1:100,], 6, parallel = c(FALSE))})
 
 # TODO save the data matrix for 3, 6, 12 spi
-system.time({spi_3 <- precip_to_spi(precip, spi_window = 3, comp_parallel = TRUE, 5)})
-saveRDS(spi_3, "data/processed/spi_3.rds")
+#system.time({spi_3 <- precip_to_spi(precip, spi_window = 3, comp_parallel = TRUE, 5)})
+#saveRDS(spi_3, "data/processed/spi_3.rds")
+spi_3 
+#system.time({spi_6 <- precip_to_spi(precip, spi_window = 6, comp_parallel = TRUE, 5)})
+#User      System verstrichen 
+#77.49       22.01      460.54 
+#saveRDS(spi_6, "data/processed/spi_6.rds")
+#system.time({spi_12 <- precip_to_spi(precip, spi_window = 12, comp_parallel = TRUE, 5)})
+#User      System verstrichen 
+#70.74       20.20      411.80 
+#saveRDS(spi_12, "data/processed/spi_12.rds")
+
+#TODO load spi data frame and check how many rows are NA
+
+
+
