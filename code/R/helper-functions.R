@@ -324,10 +324,12 @@ cv_for_ts <- function(sst, precip, nfold, size_train, size_test, save_folder) {
       #save(trained_model, file=paste0("results/CV-lasso/model-","lambda-",i,"fold-",j,".RData"))
     }
   }
-  index_list_path <- paste0("results/CV-lasso/", save_folder, "index_list")
-  lambda_vec_path <- paste0("results/CV-lasso/", save_folder, "lambda_vec")
-  save(index_list, file = index_list_path)
-  save(lambda_vec, file = lambda_vec_path) 
+  index_list_path <- paste0("results/CV-lasso/", save_folder, "/index-list.rds")
+  lambda_vec_path <- paste0("results/CV-lasso/", save_folder, "/lambda-vec.rds")
+  err_mat_path <- paste0("results/CV-lasso/", save_folder, "/err-mat.rds")
+  saveRDS(index_list, file = index_list_path)
+  saveRDS(lambda_vec, file = lambda_vec_path) 
+  saveRDS(err_mat, file = err_mat_path)
   return(err_mat)
   # until here we keep the error for each fold
   # but with fixed regularisation
@@ -341,4 +343,5 @@ cv_for_ts <- function(sst, precip, nfold, size_train, size_test, save_folder) {
   #TODO read about standardisation ?glmnet()
   
 }
+
 

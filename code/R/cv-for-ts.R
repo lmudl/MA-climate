@@ -10,8 +10,8 @@
 
 # here maybe define some variables/ modes for CV/ parameters etc.
 # path to target
-# target <- "data/processed/deseasonalised_precip.rds"
-target_path <- "data/processed/spi_3.rds"
+target_path <- "data/processed/deseasonalised_precip.rds"
+#target_path <- "data/processed/spi_3.rds"
 # spi_mode, then also drop NAs from target and drop observations from sst
 is_spi <- logical()
 spi_window <- numeric()
@@ -40,15 +40,17 @@ setwd("Repos/MA-climate")
 library(raster)
 library(caret)
 library(glmnet)
+# load helper functions
+source("code/R/helper-functions.R")
 
 # load sst
 # rows are coord, cols are months
 
-load_features <- function(feature_path) {
-  features <- readRDS("data/processed/deseasonalised_sst.rds")
+load_features <- function(features_path) {
+  features <- readRDS(features_path)
   return(features)
 }
-features <- load_features(feature_path)
+features <- load_features(features_path)
 dim(features)
 
 # load precip or spi
@@ -60,6 +62,7 @@ load_target <- function(target_path, is_spi) {
 }
 
 target <- load_target(target_path)
+dim(target)
 
 # computing the spi results in "loosing" some observations, creating NA's
 # we drop these columns in target nd features with the following function
@@ -91,8 +94,6 @@ features <- add_colnames("data/interim/sst/ersst_setreftime.nc", sst = features)
 # possibility 2
 # apply glmnet function to lambdas directly
 
-source("code/R/helper-functions.R")
-
 features <- prepare_sst(features)
 
 # test cv_for_ts 
@@ -116,12 +117,12 @@ start_test <- start_train+n_train+1
 train_ind <- start_train:(start_train+n_train)
 test_ind <- (start_train+n_train+1):(start_test+n_test)
 
-features_train <- features[train,]
-features_test <- features[test, ]
-target_train <- target[train,]
-target_test <- target[test,]
+features_train <- features[train_ind,]
+features_test <- features[test_ind, ]
+target_train <- target[train_ind,]
+target_test <- target[test_ind,]
 
-lambdas <- get_lambda_values(features[c(train,test),], target[c(train,test),])
+lambdas <- get_lambda_values(features[c(train_ind,test_ind),], target[c(train_ind,test_ind),])
 
 mod <- glmnet(features_train, target_train, lambda=rev(lambdas))
 plot(mod)
@@ -129,7 +130,7 @@ plot(mod)
 err <- c(NA)
 for(i in 1:length(lambdas)) {
   pred <- predict(mod, newx = features_test, s = lambdas[i])
-  err_i <- sum((pred-target_test)^2)
+  err_i <- sum((pred-target_test)^2)/length(pred)
   err[i] <- err_i
 }
 plot(err)
@@ -145,12 +146,43 @@ rm(features)
 
 #TODO find out why trouble with lambda values
 
-example_model <- cv_for_ts(features_cv, target_cv, nfold = 5, size_train = 60, size_test = 14,
-                           save_folder = "spi-3")
-debug(cv_for_ts)
-debug(get_lambda_values)
-get_lambda_values(features_cv, target_cv)
 
 # possibility 1
 # do 2 loops like in cv for ts
 
+
+example_model <- cv_for_ts(features_cv, target_cv, nfold = 5, size_train = 60, size_test = 14,
+                           save_folder = "cv-lasso-08-11-21")
+370/5
+
+#debug(cv_for_ts)
+#debug(get_lambda_values)
+get_lambda_values(features_cv, target_cv)
+
+glmnet::plot.cv.glmnet(em)
+plot(example_model[,5])
+
+# Plot results
+ids <- createTimeSlices(1:370, initialWindow=60, horizon=14,
+                               skip=60+14-1)
+# ids$train alle 60, für test alle 14 passt
+lapply(ids$test, length)
+
+# get lambda vec
+lambdas <- readRDS("results/CV-lasso/cv-lasso-08-11-21lambda-vec.rds")
+err_mat <- readRDS("results/CV-lasso/cv-lasso-08-11-21err-mat.rds")
+plot(err_mat[,5])
+min(err_mat[,5])
+err_mat[,5]
+err_mat[67,5]
+lambdas[67]
+
+# now fit a model with the lambda from the best performing model
+ids$train$Training356
+dim(features_cv)
+mod <- glmnet(features_cv[ids$train$Training356,], target_cv[ids$train$Training356],
+              lambda = lambdas[67])
+nonzero <- coeffs[,1] != 0
+names(coeffs[nonzero,1])
+
+#TODO how to plot that
