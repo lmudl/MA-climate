@@ -9,3 +9,5 @@ plots/
 code/Rmarkdown/plots-markdown/
 .bib
 results/
+code/R/depr/
+code/Rmarkdown/depr/

@@ -579,3 +579,7 @@ drop NA's from spi matrix
 resolution vergröbern für precip, für schnellere Laufzeiten
 	wenn precip definiert wird.
 
+03.01.22
+
+tried to regrid netcdf of chrips to 5x4 latitude lingtude but cdi
+regridding not workintg atm

@@ -11,7 +11,7 @@
 # here maybe define some variables/ modes for CV/ parameters etc.
 # path to target
 target_path <- "data/processed/deseasonalised_precip.rds"
-#target_path <- "data/processed/spi_3.rds"
+# target_path <- "data/processed/spi_3.rds"
 # spi_mode, then also drop NAs from target and drop observations from sst
 is_spi <- logical()
 spi_window <- numeric()
@@ -144,7 +144,7 @@ target_cv <- target[1:rows_left,]
 
 rm(features)
 
-#TODO find out why trouble with lambda values
+# TODO find out why trouble with lambda values
 
 
 # possibility 1
@@ -183,6 +183,42 @@ dim(features_cv)
 mod <- glmnet(features_cv[ids$train$Training356,], target_cv[ids$train$Training356],
               lambda = lambdas[67])
 nonzero <- coeffs[,1] != 0
-names(coeffs[nonzero,1])
+coef_names <- names(coeffs[nonzero,1])
+all_coef_names <- names(coef(mod)[,1])
 
-#TODO how to plot that
+# TODO how to plot that
+# raster object with dim of old sst
+# must contain NA's for land
+# 0 for any zero coefficient
+# idea: fill original old_sst vector with values from coefficient
+# or get NAs from old_sst
+co <- coordinates(old_sst)
+names(coeffs)
+
+# these are NA in the original sst vector
+# also all NA are the same locations, make sense
+
+# idea get original vector, give that vector names according to coordinates
+# then access the values with coord names and give either 0 or NA
+# for testing we can also just plot points from coordinate names
+v <- (vals[,1])
+length(v)
+names(v) <- paste(coordinates(old_sst)[,1], coordinates(old_sst)[,2])
+all_coef <- coef(mod)[-1] #without intercept
+all_coef_names <- names(coef(mod)[,1])[-1] #without intercept
+v[all_coef_names] <- all_coef
+length(v)
+is.vector(v)
+
+grid <- matrix(v, nrow = old_sst@nrows, ncol = old_sst@ncols, byrow = TRUE)
+test_raster <- raster(grid, xmn = old_sst@extent@xmin, xmx = old_sst@extent@xmax,
+                     ymn = old_sst@extent@ymin, ymx = old_sst@extent@ymax,
+                     crs = old_sst@crs)
+df <- cbind(xyFromCell(test_raster, 1:ncell(test_raster)), values(test_raster))
+df <- base::as.data.frame(df)
+colnames(df) <- c("Longitude","Latitude", "Vals")
+plt <- ggplot(data = df, aes(x = Longitude, y = Latitude, fill = Vals)) +
+  annotation_map(map_data("world")) +
+  geom_raster(interpolate = TRUE)
+plt
+max(df, na.rm = TRUE)

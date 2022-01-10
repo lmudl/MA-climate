@@ -1,0 +1,10 @@
+Read a bit about SST data
+general meta information
+	what
+	which time frame
+	how measured
+	development over time
+	alternatives
+	why this one
+	Summary/ EDA
+Same for Precipitation

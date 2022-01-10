@@ -1,4 +1,5 @@
-cd /mnt/c/Users/Mufasa/Documents/Repos/MA-climate
+ cd /mnt/c/Users/Mufasa/Documents/Repos/MA-climate
+ or use cygdrive/c
 
 cdo -z zip setreftime,1900-1-1,00:00:00,months data/raw/drought/scPDSI_1901_2020.nc data/interim/drought/scpdsi_interim.nc
 
@@ -50,6 +51,12 @@ preprocess CHIRPS
 cdo -z zip setreftime,1900-1-1,00:00:00,months data/raw/drought/chirps-v2.0.monthly.nc data/interim/drought/chirps_setreftime.nc
 cdo -z zip sellonlatbox,-180,180,-90,90 data/interim/drought/chirps_setreftime.nc data/interim/drought/chirps_rearrangelonlatbox.nc
 cdo -z zip sellonlatbox,-72,-55,-9,0 data/interim/drought/chirps_rearrangelonlatbox.nc data/interim/drought/chirps_sellonlatbox.nc
+change resolution of chirps to 5 degrees
+cdo -f nc -sellonlatbox,-180,180,-50,50 -random,r180x91 template.nc, creates template in wd
+try to regrid with
+*cdo -remapcon,template.nc input_file.nc output_file.nc*
+but currently not working
+
 
 step1:
 relate errsst to chirps like in OG paper.

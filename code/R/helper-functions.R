@@ -1,4 +1,24 @@
 # helper functions
+################## Meta Data ######################################
+# needs ncdf4
+# In: f.e. path <- "data/raw/hadsst/HadISST_sst.nc"
+# out: text file with metadata 
+# load data data <- nc_open(path)
+# get meta data only run once
+
+get_meta <- function(data, path){
+  end <- tail(strsplit(path, "/")[[1]], n = 1)
+  save_to <- paste0("meta/", end, "_meta.txt")
+  if (!file.exists(save_to)) {
+    sink(save_to)
+    print(data)
+    sink()
+  }
+  else {
+    print("metadata file already exists")
+  }
+}
+
 ################## For Plots ###################################################
 # in: brick object
 # out: random gridcell that is not on land
@@ -16,6 +36,7 @@ get_random_cell <- function(brick) {
 }
 
 # in: lonlat info of sea grid point
+#     class is matrix,array
 # out: a ggplot of point on map
 plot_cell <- function(cell) {
   # Using GGPLOT, plot the Base World Map
@@ -24,7 +45,7 @@ plot_cell <- function(cell) {
   mp <- ggplot() + mapWorld
   
   #vNow Layer the cities on top
-  mp <- mp + geom_point(aes(x=cell[1], y=cell[2]), ,color="blue", size=3)
+  mp <- mp + geom_point(aes(x=cell[,1], y=cell[,2]), ,color="blue", size=3)
   mp
 }
 
@@ -92,7 +113,7 @@ plot_corr <- function(corr_vec, old_sst, timelag,
     
   }
   plt <- plt +
-    scale_fill_viridis_c(option="A") +
+    scale_fill_gradient2() +
     theme_bw() +
     coord_quickmap() 
   return(plt)

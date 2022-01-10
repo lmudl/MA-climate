@@ -8,8 +8,38 @@ output:
 # The Data
 OPEN: Summarise the data here and where they come from
 Also explain autocorrelation and time structure
-# General Problem
 
+## SST Data
+https://psl.noaa.gov/data/gridded/data.noaa.ersst.v5.html#detail
+
+Data is derived from ICOADS (International Comprehensive Ocean-Atmosphere Data Set). https://icoads.noaa.gov/
+
+Spatial completeness enhanced using statistical methods. Final product is given on a 2°x 2° grid.
+Monthly analysis begins in January 1854 until present (date depends on version).
+
+Download data f.e.
+https://www.ncei.noaa.gov/access/metadata/landing-page/bin/iso?id=gov.noaa.ncdc:C00927
+
+Summary of Methods:
+https://journals.ametsoc.org/view/journals/clim/30/20/jcli-d-16-0836.1.xml
+
+Probably will need to read first papers too.
+
+In general data comes from boys etc. and are enhanced using statistical methods
+
+Next action:
+Read paper on reconstructing of sst
+
+Questions:
+1. why use anomalies in reference to recent climatology?(we use normal temperatures anyway)?
+2. which statistical methods are used
+3. how are the statistical methods used.
+
+
+
+## Precipitation Data
+
+# General Problem
 In our case we have information about monthly sea surface emperature (SST) and monthly precipitation in the Central Amazonas Basin.
 From a physics point of view it makes sense that we can make predictions about precipitation based on these SSTs. The question is now how well can we predict precipitation based on the SSTs. Desirably we can not only predict precipitation well, but also identify those regions that give us the most information about future precipitation. So for future predictions it may be enough to only observe these important regions.
 In the following we will describe this problem 
