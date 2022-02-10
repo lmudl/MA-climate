@@ -1,0 +1,92 @@
+---
+title: "Clustering-Analysis"
+author: "Dario Lepke"
+date: "27 1 2022"
+output: pdf_document
+---
+
+In this chapter we will first summarise the main ideas of clustering
+and then apply it to the precipitation data.
+
+# Main Idea Clustering
+We can describe an object by a set of measurements or its
+relation to other objects.
+Group collection of objects into subgroups.
+After that the objects within groups should be more
+similar to one another than to objects of different clusters.
+Internal homogenity outside heterogenity.
+With the clustering analysis applied to the precipitation data we want to study if there are distinct groups (regions)
+apparent in the CAB. So that if we later apply the regression models we predict the precipitation for each group and not for the whole region.
+
+To explore the grouping in the data we need a measure
+of (dis)similarity. This measure is central and depends 
+on subject matter considerations.
+We construct the dissimilarities based on the measurements taken for each month.
+So given the area in the CAB (resolution 5°x5°),
+we have 612 cells and 432 months.
+We interpret this as a multivariate analysis where,
+we want to cluster cells into homogen groups.
+
+# Algorithms we use
+## Kmeans
+## PAM
+
+# Evaluation
+## Gap statistic, number of B
+### Assumptions gap statistic
+## Comparison of different algorithms only for same parameters possible
+### same B, same number of score cols, standard yes/no
+
+# Preprocessing
+## Normalisation as 1st step 
+## PCA, number of score cols used
+## Normalisation after PCA
+
+
+# Results
+## Kmeans
+### Without normalisation
+```{r}
+(kmeans_gap_b50_plot <- readRDS("results/clustering/kmeans_gap_b50_plot.rds"))
+```
+
+We can see that the gap statistic increases with increasing number of clusters,
+so that there is no optimal k found.
+
+### After normalisation of variables
+```{r}
+(norm_kmean_gap_plot <- readRDS("results/clustering/norm_kmean_gap_plot.rds"))
+```
+
+For the normalised data we get the same result
+
+
+## PAM/ Kmeans, standardised, swap
+```{r}
+(med_swap_gap_b50_plot <- readRDS("results/clustering/med_swap_gap_b50_plot.rds"))
+```
+
+
+
+
+
+
+
+## PCA Sreeplot
+```{r}
+(scree_plot_pca <- readRDS("results/clustering/scree_plot_pca.rds"))
+```
+
+
+
+
+
+
+
+# Describe Algorithm like
+## Normalisation, Kmeans
+## PCA, kmeans
+## PCA, pam (param here)
+
+
+
