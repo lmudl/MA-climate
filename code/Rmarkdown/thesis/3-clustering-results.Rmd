@@ -1,0 +1,81 @@
+# Clustering results
+
+We summarise the results with and without centering the data before
+the PCA.
+
+## with centering
+### kmeans
+```{r}
+(gap_kmeans_centered_plot <- readRDS("../../../results/clustering/gap_kmeans_centered_plot.rds"))
+```
+
+### pam
+```{r}
+# need to rerun
+#(gap_pam_centered_plot <- readRDS("/../../../results/clustering/gap_pam_centered_plot.rds"))
+```
+### scree plot
+```{r}
+(scree_plot_pca_centered <- readRDS("../../../results/scree_plot_pca_centered.rds"))
+```
+### pca kmeans
+
+```{r}
+(gap_pc3_centered_kmeans_plot <- readRDS("../../../results/clustering/gap_pc3_centered_kmeans_plot.rds"))
+```
+```{r}
+(gap_pc4_centered_kmeans_plot <- readRDS("../../../results/clustering/gap_pc4_centered_kmeans_plot.rds"))
+```
+
+### pca pam
+```{r}
+(gap_pc3_centered_pam_plot <- readRDS( "../../../results/clustering/gap_pc3_centered_pam_plot.rds"))
+```
+```{r}
+(gap_pc4_centered_pam_plot <- readRDS( "../../../results/clustering/gap_pc4_centered_pam_plot.rds"))
+```
+
+
+
+## without centering
+### kmeans
+```{r}
+(gap_kmeans_plot <- readRDS("../../../results/clustering/gap_kmeans_plot.rds"))
+
+```
+
+### pam
+```{r}
+#need to rerun
+```
+
+### scree plot
+```{r}
+(scree_plot_pca_uncentered <- readRDS("../../../results/scree_plot_pca_uncentered.rds"))
+```
+### pca kmeans
+```{r}
+(pc2_gap_uncentered_plot <- readRDS("../../../results/clustering/gap_pc2_uncentered_kmeans_plot.rds"))
+
+```
+
+```{r}
+(pc3_gap_uncentered_plot <- readRDS("../../../results/clustering/gap_pc3_uncentered_kmeans_plot.rds"))
+
+```
+
+### pca pam
+
+```{r}
+(pam_pca_uncentered_2_plot <- readRDS("../../../results/clustering/pam_pca_uncentered_2_plot.rds"))
+```
+
+
+
+
+```{r}
+(pam_pca_uncentered_3_plot <- readRDS("../../../results/clustering/pam_pca_uncentered_3_plot.rds"))
+
+```
+
+

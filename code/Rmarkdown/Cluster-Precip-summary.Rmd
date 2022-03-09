@@ -21,6 +21,7 @@ library(rnaturalearth)
 library(rnaturalearthdata)
 library(raster)
 ```
+
 ```{r}
 source("../R/helper-functions.R")
 ```

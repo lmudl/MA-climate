@@ -185,6 +185,7 @@ saveRDS(norm_kmean_gap_plot, "results/clustering/norm_kmean_gap_plot.rds")
 # saveRDS(norm_kmean_gap_b50, "results/norm_kmean_gap_b50.rds")
 norm_kmean_gap_b50 <- readRDS("results/norm_kmean_gap_b50.rds")
 norm_kmean_gap_b50_plot <- factoextra::fviz_gap_stat(norm_kmean_gap_b50)
+saveRDS(norm_kmean_gap_b50_plot, "results/norm_kmean_gap_b50_plot.rds")
 
 # on normalised pretty stable too
 
@@ -354,7 +355,8 @@ scree_plot_pca <- qplot(c(1:30), var_exp_plot) +
   ggtitle(" Scree Plot") +
   ylim(0, 1)
 saveRDS(scree_plot_pca, "results/clustering/scree_plot_pca.rds")
-
+ggsave("results/clustering/scree_plot.jpg", scree_plot_pca)
+?readPNG
 # used first 6 main components
 dim(res$x)
 sum(var_exp[1:3])
@@ -420,17 +422,16 @@ p_stand_l <- factoextra::fviz_gap_stat(pca_stand_large_gap)
 # influence gap pca after pca ####
 set.seed(1234)
 # set.seed(12345)
-pca_after_pca <- clusGap(res$x[,1:5], FUN=kmeans,B=100, K.max = 20, nstart = 10,
+pca_after_pca <- clusGap(res$x[,1:3], FUN=kmeans,B=100, K.max = 20, nstart = 10,
                          iter.max = 30)
 pca_double_plot <- factoextra::fviz_gap_stat(pca_after_pca)
 set.seed(1234)
-no_double_pca <-  clusGap(res$x[,1:5], FUN=kmeans,B=100, K.max = 20, nstart = 10,
+no_double_pca <-  clusGap(res$x[,1:3], FUN=kmeans,B=100, K.max = 20, nstart = 10,
                           iter.max = 30, spaceH0 = "original")
 no_double_pca_plot <- factoextra::fviz_gap_stat(no_double_pca)
 # pca_double_plot2 <- factoextra::fviz_gap_stat(pca_after_pca)
 
-
-
+# doesnt make difference
 
 
 # influence number of pca components ####
@@ -445,13 +446,13 @@ clus_4 <- clusGap(res$x[,1:4], FUN=kmeans,B=100, K.max = 20, nstart = 10,
                   iter.max = 30)
 pc4_gap_plot <- factoextra::fviz_gap_stat(clus_4)
 saveRDS(pc4_gap_plot, "results/clustering/pc4_gap_plot.rds")
-
 factoextra::fviz_gap_stat(clus_4)
 set.seed(1234)
 clus_5 <- clusGap(res$x[,1:5], FUN=kmeans,B=100, K.max = 20, nstart = 10,
                   iter.max = 30)
 pc5_gap_plot <- factoextra::fviz_gap_stat(clus_5)
 saveRDS(pc5_gap_plot, "results/clustering/pc5_gap_plot.rds")
+
 # seems that seeds can change the results a bit
 # but for 4 it seems stable NOT
 # 4321 gives different results than 1234 as seed
@@ -459,14 +460,36 @@ saveRDS(pc5_gap_plot, "results/clustering/pc5_gap_plot.rds")
 # setseed1234 and dim 4 i like though
 
 # how would function for this look like? #####
-# cluster alg, stand, seed, data, k.max, seed, save result etc.
+# cluster alg, stand, seed, data, k.max, seed, save result etc. ####
 
 # pam after pca
 set.seed(1234)
-pam_pca <- clusGap(res$x[,1:3], FUN = pam, K.max = 20,
+pam_pca_3 <- clusGap(res$x[,1:3], FUN = pam, K.max = 20,
                    B = 50, nstart = 10, keep.diss = FALSE,
                    keep.data = FALSE, do.swap = TRUE,
                    stand = TRUE)
+pam_pca_3_plot <- factoextra::fviz_gap_stat(pam_pca_3)
+saveRDS(pam_pca_3_plot, "results/clustering/pam_pca_3_plot.rds")
+# chooses 1 but 3 seems to be very reasonable as well
+set.seed(1234)
+pam_pca_4 <- clusGap(res$x[,1:4], FUN = pam, K.max = 20,
+                     B = 50, nstart = 10, keep.diss = FALSE,
+                     keep.data = FALSE, do.swap = TRUE,
+                     stand = TRUE)
+(pam_pca_4_plot <- factoextra::fviz_gap_stat(pam_pca_4))
+saveRDS(pam_pca_4_plot, "results/clustering/pam_pca_4_plot.rds")
+
+set.seed(4567)
+pam_pca_5 <-  clusGap(res$x[,1:5], FUN = pam, K.max = 20,
+                      B = 50, nstart = 10, keep.diss = FALSE,
+                      keep.data = FALSE, do.swap = TRUE,
+                      stand = TRUE)
+(pam_pca_5_plot <- factoextra::fviz_gap_stat(pam_pca_5))
+saveRDS(pam_pca_5_plot, "results/clustering/pam_pca_5_plot.rds")
+p <- readRDS("results/clustering/pam")
+p
+#start 17:59
+
 
 
 # with coordinates addded as variable#####
@@ -499,6 +522,118 @@ qplot(c(1:30), var_expb) +
   ylab(" Variance Explained") +
   ggtitle(" Scree Plot3") +
   ylim(0, 1)
+
+
+
+# replot results
+# we choose 3 principal components for clustering
+# pam
+pam_result <- pam(res$x[,1:3], k = 3)
+
+
+
+plot_pam <- function(data, pam_solution) {
+  df <- base::as.data.frame(cbind(coordinates(data), pam_solution$clustering))
+  colnames(df) <- c("Longitude","Latitude", "Cluster")
+  df$Cluster <- factor(df$Cluster)
+  plt <- ggplot(data = df, aes(x = Longitude, y = Latitude, fill = Cluster)) +
+    annotation_map(map_data("world")) +
+    geom_raster(interpolate = TRUE)
+  plt
+}
+
+plot_pam(precip, pam_result)
+
+
+kmeans_result <- kmeans(res$x[,1:3], centers=3)
+plot_kmeans(precip, kmeans_result)
+
+# kmeans and pam give slightly different results
+
+# inspect kmeans, each cluster
+k1_id <- kmeans_result$cluster==1
+k1 <- getValues(precip)[k1_id,]
+dim(k1)
+plot(density(k1))
+head(k1)
+dim(k1)
+
+z <- 1:432
+z <- z[k1_id]
+z
+k1 <- cbind(z, k1)
+k1 <- as.data.frame(k1)
+dim(k1)
+k1[1:5,1:5]
+
+test <- tidyr::pivot_longer(k1, cols = 2:433, names_to="month",
+                            values_to = "precip")
+head(test)
+
+plt <- ggplot(data = test, aes(x=month, y=precip, group=z,
+                               colour = z)) +
+  geom_line() + labs(y="Precipitation", x = "month")
+plt
+
+k1_id <- kmeans_result$cluster==1
+k1 <- getValues(precip)[k1_id,]
+
+add_cell_number <- function(df, ids) {
+  l <- 1:ncol(df)
+  z <-  l[ids]
+  df <- as.data.frame(cbind(z, df))
+  return(df)
+}
+
+k1 <- add_cell_number(k1, k1_id)
+
+tidy_df <- function(df) {
+  df <- tidyr::pivot_longer(df, cols = 2:ncol(df),
+                            names_to = "month",
+                            values_to = "precip")
+  return(df)
+}
+
+k1 <- tidy_df(k1)
+
+gg_result <- function(df) {
+  plt <- ggplot(data = df, aes(x=month, y = precip, group = z,
+                               colour = z)) +
+    geom_line() + labs(y="Precipitation", x = "month")
+  return(plt)
+}
+
+gg_result(k1)
+
+plot_cluster_intern_km <- function(og_data, cluster_result, cluster_number) {
+  cluster_id <- cluster_result$cluster==cluster_number
+  cluster_df <- getValues(og_data)[cluster_id,]
+  cluster_df <- add_cell_number(cluster_df, cluster_id)
+  cluster_df <- tidy_df(cluster_df)
+  plt <- gg_result(cluster_df)
+  return(plt)
+}
+
+plot_cluster_intern_km(precip, kmeans_result, 1)
+plot_cluster_intern_km(precip, kmeans_result, 2)
+plot_cluster_intern_km(precip, kmeans_result, 3)
+
+
+
+k2_id <- kmeans_result$cluster==2
+k2 <- getValues(precip)[k2_id,]
+dim(k2)
+plot(density(k2))
+
+k3_id <- kmeans_result$cluster==3
+k3 <- getValues(precip)[k3_id,]
+dim(k3)
+plot(density(k3))
+
+
+
+
+
 
 
 # depr ###########################

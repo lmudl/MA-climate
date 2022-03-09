@@ -13,3 +13,5 @@ code/R/depr/
 code/Rmarkdown/depr/
 code/Rmarkdown/Cluster-Precip_files/figure-html/
 figure-html/
+.log
+.pdf

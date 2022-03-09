@@ -1,0 +1,148 @@
+---
+title: "Master Thesis Lepke"
+author: "Dario Lepke"
+date: "8.3.2022"
+site: bookdown::bookdown_site
+output: 
+  bookdown::pdf_document2:
+    toc: yes
+---
+---
+title: "Master Thesis Lepke"
+author: "Dario Lepke"
+date: "8.3.2022"
+site: bookdown::bookdown_site
+output: 
+  bookdown::pdf_document2:
+    toc: yes
+---
+
+<!--chapter:end:index.Rmd-->
+
+In this chapter we will first summarize the main ideas of clustering
+and then apply it to the precipitation data.
+If not indicated otherwise the information is taken
+from Elements of Statistical Learning.
+
+# Main Idea Clustering
+We can describe an object by a set of measurements or its similarity to other objects.
+Using this similarity we can put a collection of objects into subgroups or clusters.
+The objects in the subgroups should then be more
+similar to one another than to objects of different subgroups.
+This means inside the clusters we aim for homogeneity 
+and for observations of different clusters for heterogeneity.
+With the clustering analysis applied to the precipitation data we want to study if there are distinct groups (regions)
+apparent in the CAB. So that if we later apply the regression models we predict the precipitation for each group and not for the whole region.
+
+To explore the grouping in the data we need a measure
+of (dis)similarity. This measure is central and depends 
+on subject matter considerations.
+We construct the dissimilarities based on the measurements taken for each month.
+We interpret this as a multivariate analysis where,
+each month is one variable.
+So given the area in the CAB (resolution 5°x5°),
+we have 612 cells and 432 months, resulting in
+a $612 \times 432$ data matrix.
+we want to cluster cells into homogen groups.
+
+<!--chapter:end:1-main-idea-clustering.Rmd-->
+
+
+# Clustering Methods
+
+Placeholder
+
+
+## K-means
+### Kmeans characteristics
+## K-medoids
+### K-medoids characteristics
+## PCA (Multivariate Verfahren und ESL2)
+## Gap statistic
+
+<!--chapter:end:2-clustering-methods.Rmd-->
+
+# Clustering results
+
+We summarise the results with and without centering the data before
+the PCA.
+
+## with centering
+### kmeans
+```{r}
+(gap_kmeans_centered_plot <- readRDS("../../../results/clustering/gap_kmeans_centered_plot.rds"))
+```
+
+### pam
+```{r}
+# need to rerun
+#(gap_pam_centered_plot <- readRDS("/../../../results/clustering/gap_pam_centered_plot.rds"))
+```
+### scree plot
+```{r}
+(scree_plot_pca_centered <- readRDS("../../../results/scree_plot_pca_centered.rds"))
+```
+### pca kmeans
+
+```{r}
+(gap_pc3_centered_kmeans_plot <- readRDS("../../../results/clustering/gap_pc3_centered_kmeans_plot.rds"))
+```
+```{r}
+(gap_pc4_centered_kmeans_plot <- readRDS("../../../results/clustering/gap_pc4_centered_kmeans_plot.rds"))
+```
+
+### pca pam
+```{r}
+(gap_pc3_centered_pam_plot <- readRDS( "../../../results/clustering/gap_pc3_centered_pam_plot.rds"))
+```
+```{r}
+(gap_pc4_centered_pam_plot <- readRDS( "../../../results/clustering/gap_pc4_centered_pam_plot.rds"))
+```
+
+
+
+## without centering
+### kmeans
+```{r}
+(gap_kmeans_plot <- readRDS("../../../results/clustering/gap_kmeans_plot.rds"))
+
+```
+
+### pam
+```{r}
+#need to rerun
+```
+
+### scree plot
+```{r}
+(scree_plot_pca_uncentered <- readRDS("../../../results/scree_plot_pca_uncentered.rds"))
+```
+### pca kmeans
+```{r}
+(pc2_gap_uncentered_plot <- readRDS("../../../results/clustering/gap_pc2_uncentered_kmeans_plot.rds"))
+
+```
+
+```{r}
+(pc3_gap_uncentered_plot <- readRDS("../../../results/clustering/gap_pc2_uncentered_kmeans_plot.rds"))
+
+```
+
+### pca pam
+
+```{r}
+(pam_pca_uncentered_2_plot <- readRDS("../../../results/clustering/pam_pca_uncentered_2_plot.rds"))
+```
+
+
+
+
+```{r}
+pam_pca_uncentered_3_plot <- readRDS("../../../results/clustering/pam_pca_uncentered_3_plot.rds")
+
+```
+
+
+
+<!--chapter:end:3-clustering-results.Rmd-->
+

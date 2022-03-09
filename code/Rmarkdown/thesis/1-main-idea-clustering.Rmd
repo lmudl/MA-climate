@@ -1,0 +1,25 @@
+In this chapter we will first summarize the main ideas of clustering
+and then apply it to the precipitation data.
+If not indicated otherwise the information is taken
+from Elements of Statistical Learning.
+
+# Main Idea Clustering
+We can describe an object by a set of measurements or its similarity to other objects.
+Using this similarity we can put a collection of objects into subgroups or clusters.
+The objects in the subgroups should then be more
+similar to one another than to objects of different subgroups.
+This means inside the clusters we aim for homogeneity 
+and for observations of different clusters for heterogeneity.
+With the clustering analysis applied to the precipitation data we want to study if there are distinct groups (regions)
+apparent in the CAB. So that if we later apply the regression models we predict the precipitation for each group and not for the whole region.
+
+To explore the grouping in the data we need a measure
+of (dis)similarity. This measure is central and depends 
+on subject matter considerations.
+We construct the dissimilarities based on the measurements taken for each month.
+We interpret this as a multivariate analysis where,
+each month is one variable.
+So given the area in the CAB (resolution 5°x5°),
+we have 612 cells and 432 months, resulting in
+a $612 \times 432$ data matrix.
+we want to cluster cells into homogen groups.

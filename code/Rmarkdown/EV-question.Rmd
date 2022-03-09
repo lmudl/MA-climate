@@ -1,0 +1,46 @@
+---
+title: "EV-question"
+author: "Dario Lepke"
+date: "4 3 2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+```
+
+We apply a PCA on the data after scaling and centering.
+The prcomp function gives a rotation and a x matrix.
+The rotation matrix columns contains the eigenvectors.
+The x matrix contains the values of the rotated data. 
+Meaning the scaled and centered data multiplied by the rotation matrix.
+We wanted to know if the eigenvectors given in the rotation matrix are already normalised by their respective eigenvalues or not.
+
+Idea: Compare the eigenvectors from the rotation matrix
+with the right eigenvectors from an SVD.
+If they are the same the eigenvectors in the rotation
+matrix are not divided by their respective eigenvalues.
+
+
+```{r}
+library(raster)
+source("../R/helper-functions.R")
+precip <- readRDS("../../data/interim/drought/chirps_setreftime_aggregated.rds")
+precip <- getValues(precip)
+#prcomp center is default TRUE, scale default FALSE
+res_pca <- prcomp(precip, center = TRUE, scale. = TRUE)
+res_svd <- svd(base::scale(precip, center = TRUE, scale = TRUE))
+```
+
+For PCA, data gets centered and scaled.
+Centering is done by substracting column means.
+Scaling is done by dividing columns by their standard
+deviations if center is true.
+The scale() function centers and scales columns by default.
+
+```{r}
+base::all.equal(res_pca$rotation, res_svd$v, check.attributes = FALSE)
+```
+The rotation matrix contains the variable loadings, i.e the eigenvectors in the columns.
+These eigenvectors are the same as the right eigenvectors we get from the SVD.
