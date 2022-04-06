@@ -34,7 +34,7 @@ res_svd <- svd(base::scale(precip, center = TRUE, scale = TRUE))
 ```
 
 For PCA, data gets centered and scaled.
-Centering is done by substracting column means.
+Centering is done by subtracting column means.
 Scaling is done by dividing columns by their standard
 deviations if center is true.
 The scale() function centers and scales columns by default.
@@ -44,3 +44,51 @@ base::all.equal(res_pca$rotation, res_svd$v, check.attributes = FALSE)
 ```
 The rotation matrix contains the variable loadings, i.e the eigenvectors in the columns.
 These eigenvectors are the same as the right eigenvectors we get from the SVD.
+
+## new
+```{r}
+res_svd$d
+?svd
+all.equal(res_svd$u %*% diag(res_svd$d), diag(res_svd$d) %*% res_svd$v, check.attributes=FALSE)
+
+dim(res_svd$u)
+dim(res_svd$v)
+dim(res_pca$rotation)
+dim(precip)
+```
+
+
+```{r}
+all.equal(res_pca$x, scale(precip, scale=TRUE,center=TRUE) %*% res_pca$rotation, res_svd$u %*% diag(res_svd$d))
+```
+
+```{r}
+test1 <- scale(res_pca$x, scale=TRUE)
+test2 <- scale(precip, scale=TRUE, center=TRUE) %*% scale(res_pca$rotation, scale=TRUE)
+
+all.equal(test1,test2, check.attribues=FALSE)
+```
+```{r}
+# if I normalise left EV, do I get same
+# scores as if when I normalise right EV
+```
+
+```{r}
+dim(test1)
+```
+```{r}
+ud <- res_svd$u %*% diag(res_svd$d)
+av <- scale(precip, scale=TRUE, center=TRUE) %*%res_svd$v
+ar <- scale(precip, scale=TRUE, center=TRUE) %*% res_pca$rotation
+all.equal(av,ar, check.attributes=FALSE)
+all.equal(ud,av, check.attributes=FALSE)
+```
+```{r}
+dim(res_svd$u)
+
+```
+
+
+
+
+

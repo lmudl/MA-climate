@@ -18,7 +18,7 @@ k_values <- seq(10,100,5)
 precip <- readRDS("data/interim/drought/chirps_setreftime_aggregated.rds")
 nlayers(precip) # 432
 # current data resolution
-res(precip) # 0.05000001, 0.05
+res(precip) # 0.05000001, 0.05, og after aggregation, 0.5,0.5
 
 # Step 0, change data resolution
 # degrees from preprocess data  degrees = c("-72,-55,-9,0"))

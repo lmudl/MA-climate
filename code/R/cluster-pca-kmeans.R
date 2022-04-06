@@ -27,6 +27,17 @@ scree_plot_pca_centered <- qplot(c(1:30), var_exp_centered_plot) +
 
 saveRDS(scree_plot_pca_centered, "results/scree_plot_pca_centered.rds")
 
+scree_df_centered <- data.frame(PC = 1:30, var_exp = var_exp_centered[1:30])
+scree_plot_pca_centered <- ggplot(data=scree_df_centered, aes(x=PC, y=var_exp))+
+  geom_line() + 
+  geom_point() +
+  xlab(" Principal Component") + 
+  ylab(" Variance Explained") +
+  ggtitle(" Scree Plot, PCA centered") +
+  ylim(0, 1)
+saveRDS(scree_plot_pca_centered,"results/scree_plot_pca_centered.rds")
+
+
 # kmeans after pca, 2,3,4,5 components ####
 
 # set.seed(1234)
@@ -86,8 +97,21 @@ scree_plot_pca_uncentered <- qplot(c(1:30), var_exp_uncentered_plot) +
   ylab(" Variance Explained") +
   ggtitle(" Scree Plot") +
   ylim(0, 1)
-
+plot(pca_uncentered)
 saveRDS(scree_plot_pca_uncentered,"results/scree_plot_pca_uncentered.rds")
+
+scree_df_uncentered <- data.frame(PC = 1:30, var_exp = var_exp_uncentered[1:30])
+scree_plot_pca_uncentered <- ggplot(data=scree_df_uncentered, aes(x=PC, y=var_exp))+
+  geom_line() + 
+  geom_point() +
+  xlab(" Principal Component") + 
+  ylab(" Variance Explained") +
+  ggtitle(" Scree Plot, PCA uncentered") +
+  ylim(0, 1)
+saveRDS(scree_plot_pca_uncentered,"results/scree_plot_pca_uncentered.rds")
+
+
+?qplot
 
 # set.seed(1234)
 # clus_1_uncentered <- clusGap(as.matrix(pca_uncentered$x[,1]), FUN=kmeans,B=100, K.max = 20, nstart = 20,
@@ -97,19 +121,21 @@ saveRDS(scree_plot_pca_uncentered,"results/scree_plot_pca_uncentered.rds")
 
 
 set.seed(1234)
-clus_2_uncentered <- clusGap(pca_uncentered$x[,1:2], FUN=kmeans,B=100, K.max = 20, nstart = 20,
+gap_pc2_uncentered_kmeans <- clusGap(pca_uncentered$x[,1:2], FUN=kmeans,B=100, K.max = 20, nstart = 20,
                   iter.max = 30)
-pc2_gap_uncentered_plot <- factoextra::fviz_gap_stat(clus_2_uncentered) + ggtitle("Gap statistic, PC2 uncentered, kmeans ")
-saveRDS(pc2_gap_uncentered_plot, "results/clustering/gap_pc2_uncentered_kmeans_plot.rds")
+gap_pc2_uncentered_kmeans_plot <- factoextra::fviz_gap_stat(gap_pc2_uncentered_kmeans) + ggtitle("Gap statistic, PC2 uncentered, kmeans ")
+saveRDS(gap_pc2_uncentered_kmeans_plot, "results/clustering/gap_pc2_uncentered_kmeans_plot.rds")
+
+
 
 #kmeans_uncentered_result <- kmeans(pca_uncentered$x[,1:2], centers = 3)
 #plot_kmeans(precip, kmeans_uncentered_result)
 
 set.seed(1234)
-clus_3_uncentered <- clusGap(pca_uncentered$x[,1:3], FUN=kmeans,B=100, K.max = 20, nstart = 20,
+gap_pc3_uncentered_kmeans <- clusGap(pca_uncentered$x[,1:3], FUN=kmeans,B=100, K.max = 20, nstart = 20,
                              iter.max = 30)
-pc3_gap_uncentered_plot <- factoextra::fviz_gap_stat(clus_3_uncentered) + ggtitle("Gap statistic, PC3 uncentered, kmeans ")
-saveRDS(pc3_gap_uncentered_plot, "results/clustering/gap_pc3_uncentered_kmeans_plot.rds")
+gap_pc3_uncentered_kmeans_plot <- factoextra::fviz_gap_stat(gap_pc3_uncentered_kmeans) + ggtitle("Gap statistic, PC3 uncentered, kmeans ")
+saveRDS(gap_pc3_uncentered_kmeans_plot, "results/clustering/gap_pc3_uncentered_kmeans_plot.rds")
 
 
 # plot

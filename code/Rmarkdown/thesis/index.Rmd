@@ -1,9 +1,0 @@
----
-title: "Master Thesis Lepke"
-author: "Dario Lepke"
-date: "8.3.2022"
-site: bookdown::bookdown_site
-output: 
-  bookdown::pdf_document2:
-    toc: yes
----

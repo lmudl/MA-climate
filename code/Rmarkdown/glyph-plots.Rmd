@@ -1,0 +1,53 @@
+# glyph plots
+```{r}
+#pathtoplots = ptp
+ptp <- "../../results/"
+make_path <- function(plot_name, path_to_plots = path_to_plots) {
+  a <- paste0(path_to_plots, plot_name)
+  return(a)
+}
+```
+
+
+```{r}
+seasonal_plot <- readRDS(paste0(ptp, "seasonal_plot.rds"))
+seasonal_plot
+```
+
+The above figure is a glyph-map of seasonal precipitation
+patterns (averages for each month) in the Central Amazon Basin.
+The grey reference lines show the mid-range for easier comparison
+of the patterns.
+We see differences in the seasonal patterns across the map.
+In the upper left for example, the seasonal patterns stay
+above mid-range while on the bottom-left they have values
+clearly towards the low end of the range. 
+Also some areas have multimodal patterns.
+The patterns differ in range and month of maximum and minimun precipitation.
+
+
+
+```{r}
+smoothed_plot <- readRDS(paste0(ptp, "smoothed_plot.rds"))
+smoothed_plot
+```
+
+This plot shows the smoothed de-seasonalized monthly precipitation, after global scaling. The same position
+within each cell corresponds to the same value in all locations.
+Some areas have almost a linear course, increasing, decreasing
+or constant. Others show a more "wiggly" courses.
+As overall pattern we can see that the forms of the patterns
+have a spatial connection, patterns are close to similar patterns,
+at the same latitude.
+Also regarding latitude the closer to the equator the less precipitation.
+
+```{r}
+smoothed_scaled_colour_plot <- readRDS(paste0(ptp, "smoothed_scaled_colour_plot.rds"))
+smoothed_scaled_colour_plot
+```
+Now we inspect the glyph-map with deseasonalised locally scaled values. This form of scaling emphasizes the individual shapes.
+Because of the applied scaling, big patterns may be just be tiny effects. Therefore colors are added according to range.
+Areas with lighter colour have larger ranges than darker areas.
+The areas with steep linear increases and decreases have smaller ranger than or example the areas below -2.5 latitude.
+
+

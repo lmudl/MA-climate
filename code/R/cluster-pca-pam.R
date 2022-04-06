@@ -56,6 +56,13 @@ gap_pc4_centered_pam <- clusGap(pca_centered$x[,1:4], FUN = pam, K.max = 20,
 (gap_pc4_centered_pam_plot <- factoextra::fviz_gap_stat(gap_pc4_centered_pam)) + ggtitle("4 PC, centered, PAM")
 saveRDS(gap_pc4_centered_pam_plot, "results/clustering/gap_pc4_centered_pam_plot.rds")
 
+# # change name
+# p <- readRDS("results/clustering/gap_pc4_centered_pam_plot.rds")
+# p <- p + ggtitle("PC 4, centered, PAM")
+# saveRDS(p, "results/clustering/gap_pc4_centered_pam_plot.rds")
+# gap_pc4_centered_pam_plot <- readRDS("results/clustering/gap_pc4_centered_pam_plot.rds")
+
+
 # # 5 ####
 # set.seed(1234)
 # pam_pca_centered_5 <-  clusGap(pca_centered$x[,1:5], FUN = pam, K.max = 20,
@@ -87,12 +94,18 @@ scree_plot_pca_uncentered
 
 # 2 ####
 set.seed(1234)
+# gap_pc2_uncentered_pam
 pam_pca_uncentered_2 <- clusGap(pca_uncentered$x[,1:2], FUN = pam, K.max = 20,
                      B = 50, nstart = 10, keep.diss = FALSE,
                      keep.data = FALSE, do.swap = TRUE,
                      stand = FALSE) # stand should be FALSE as well
-pam_pca_uncentered_2_plot <- factoextra::fviz_gap_stat(pam_pca_uncentered_2) + ggtitle("Gap statistic, PC 2 uncentered, pam")
+#gap_pc2_uncentered_pam_plt 
+pam_pca_uncentered_2_plot <- factoextra::fviz_gap_stat(gap_pc2_uncentered_pam) + ggtitle("Gap statistic, PC 2 uncentered, pam")
 saveRDS(pam_pca_uncentered_2_plot, "results/clustering/pam_pca_uncentered_2_plot.rds")
+# renaming plot/rds
+gap_pc2_uncentered_pam_plot <- readRDS("results/clustering/pam_pca_uncentered_2_plot.rds")
+saveRDS(gap_pc2_uncentered_pam_plot, "results/clustering/gap_pc2_uncentered_pam_plot.rds")
+
 
 # 3 ####
 set.seed(1234)
@@ -102,5 +115,7 @@ pam_pca_uncentered_3 <- clusGap(pca_uncentered$x[,1:3], FUN = pam, K.max = 20,
                                 stand = FALSE) # stand should be FALSE as well
 pam_pca_uncentered_3_plot <- factoextra::fviz_gap_stat(pam_pca_uncentered_3) + ggtitle("Gap statistic, PC 3 uncentered, pam")
 saveRDS(pam_pca_uncentered_3_plot, "results/clustering/pam_pca_uncentered_3_plot.rds")
-
+# renaming plot/rds
+gap_pc3_uncentered_pam_plot <- readRDS("results/clustering/pam_pca_uncentered_3_plot.rds")
+saveRDS(gap_pc3_uncentered_pam_plot, "results/clustering/gap_pc3_uncentered_pam_plot.rds")
 

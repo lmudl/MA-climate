@@ -1,0 +1,67 @@
+# Analyse clustering results
+
+
+```{r, include=FALSE}
+library(patchwork)
+#bookdown::preview_chapter("code/Rmarkdown/thesis/3-clustering-results.Rmd")
+gettorepo <- "../../../"
+```
+
+We now analyse further the results we found.
+Namely the clusters we find after performing a PCA on the data,
+using the 3 first principal components and searching for 5 clusters
+using k-means.
+
+```{r}
+
+plot <- readRDS(paste0(gettorepo, "results/clustering/gap_pc3_centered_kmeans_plot.rds"))
+get_tibsh_k_from_gapplot <- function(df) {
+  gk <- df[,"gap"]
+  l <- length(gk)
+  gk <- gk[-l]
+  gk1 <- df[,"gap"][-1]
+  sk1 <- df[,"SE.sim"][-1]
+  d <- gk1 - sk1
+  return(which(gk >= d)[1])
+}
+get_tibsh_k_from_gapplot(plot$data)
+```
+The graphic shows as of now a different method to find the optimal 
+k. When we use the definition from Tibshirani (Ref), we find 5 as
+the optimal number of clusters.
+
+We show the map plot for the kmeans clustering after pca
+And the time series of the clusters
+
+```{r}
+km_pca_map_plot <- readRDS(paste0(gettorepo,("results/clustering/km_pca_map_plot.rds")))
+c1_pca_km <- readRDS(paste0(gettorepo,"results/clustering/c1_pca_km_plot.rds"))
+c2_pca_km <- readRDS(paste0(gettorepo,"results/clustering/c2_pca_km_plot.rds"))
+c3_pca_km <- readRDS(paste0(gettorepo,"results/clustering/c3_pca_km_plot.rds"))
+c4_pca_km <- readRDS(paste0(gettorepo,"results/clustering/c4_pca_km_plot.rds"))
+c5_pca_km <- readRDS(paste0(gettorepo,"results/clustering/c5_pca_km_plot.rds"))
+```
+
+```{r}
+km_pca_map_plot
+```
+
+The plot above shows the grid cells in the Central Amazon Basin coloured according the clusters that are assigned by kmeans. The clusters are almost
+completely spatially coherent. Meaning that the clusters are not scattered
+across the area. One exception can be seen for Cluster 1 and 5. Parts of
+cluster 5 are inside cluster 1 and on the edge to cluster 4. 
+
+```{r}
+c1_pca_km + c2_pca_km + c3_pca_km + c4_pca_km +
+  c5_pca_km
+```
+
+We now inspect the time series inside the clusters.
+The time series are shown in grey and the monthly mean in the cluster is shown in blue. Since the time series are centered before applying the pca ad clustering, the zero value is the mean of the respective month of the whole region.
+The clusters defer in their monthly differences from the monthly CAB mean (here 0 because the time series were centered before PCA and kmeans) and their fluctuation/ variance. Also the size of the clusters are not all the same. 
+The mean in cluster 3 has lowest variability around the CAB mean, followed by clusters 2 and 5, and clusters 1 and 4 have the highest variability.
+On average cluster 3 is on the level of the CAB overall mean.
+The clusters 2 and 5 are slightly below and cluster 4 is above the CAB mean,
+on average. Cluster 1 is on average also on tha CAB mean but shows more variance than cluster 3.
+
+

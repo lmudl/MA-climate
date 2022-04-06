@@ -25,10 +25,10 @@ gap_pam_centered_plot <- factoextra::fviz_gap_stat(gap_pam_centered) +
 saveRDS(gap_pam_centered_plot, "results/clustering/gap_pam_centered_plot.rds")
 
 set.seed(1234)
-pam_gap <- clusGap(getValues(precip), FUN = pam, K.max = 20,
+gap_pam <- clusGap(getValues(precip), FUN = pam, K.max = 20,
                             B = 50, nstart = 10, keep.diss = FALSE,
                             keep.data = FALSE, do.swap = TRUE,
                             stand = FALSE)
-pam_gap_plot <- factoextra::fviz_gap_stat(pam_b50_gap) + ggtitle("Gap statistic, pam uncentered")
-saveRDS(pam_b50_gap_plot, "results/clustering/pam_gap_plot.rds")
+gap_pam_plot <- factoextra::fviz_gap_stat(gap_pam) + ggtitle("Gap statistic, pam uncentered")
+saveRDS(gap_pam_plot, "results/clustering/gap_pam_plot.rds")
 
