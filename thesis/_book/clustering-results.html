@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>4 Clustering results | Predicting Droughts in the Amazon Basin based on Global Sea Surface Temperatures</title>
+  <meta name="description" content="4 Clustering results | Predicting Droughts in the Amazon Basin based on Global Sea Surface Temperatures" />
+  <meta name="generator" content="bookdown 0.24 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="4 Clustering results | Predicting Droughts in the Amazon Basin based on Global Sea Surface Temperatures" />
+  <meta property="og:type" content="book" />
+  
+  
+  
+  
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="4 Clustering results | Predicting Droughts in the Amazon Basin based on Global Sea Surface Temperatures" />
+  
+  
+  
+
+<meta name="author" content="Dario Lepke" />
+
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="analyse-clustering-results.html"/>
+
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<script src="libs/accessible-code-block-0.0.1/empty-anchor.js"></script>
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
+
+
+<style type="text/css">
+code.sourceCode > span { display: inline-block; line-height: 1.25; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="index.html#introduction">Introduction<span></span></a></li>
+<li><a href="related-work-ciemer2020early.html#related-work-ciemer2020early">Related work <span class="citation">@ciemer2020early</span><span></span></a><ul>
+<li><a href="related-work-ciemer2020early.html#summary">Summary<span></span></a></li>
+</ul></li>
+<li class="chapter" data-level="1" data-path="main-idea-clustering.html"><a href="main-idea-clustering.html"><i class="fa fa-check"></i><b>1</b> Main Idea Clustering<span></span></a></li>
+<li class="chapter" data-level="2" data-path="clustering-methods.html"><a href="clustering-methods.html"><i class="fa fa-check"></i><b>2</b> Clustering Methods<span></span></a><ul>
+<li class="chapter" data-level="2.1" data-path="clustering-methods.html"><a href="clustering-methods.html#k-means"><i class="fa fa-check"></i><b>2.1</b> K-means<span></span></a><ul>
+<li class="chapter" data-level="2.1.1" data-path="clustering-methods.html"><a href="clustering-methods.html#kmeans-characteristics"><i class="fa fa-check"></i><b>2.1.1</b> Kmeans characteristics<span></span></a></li>
+</ul></li>
+<li class="chapter" data-level="2.2" data-path="clustering-methods.html"><a href="clustering-methods.html#k-medoids"><i class="fa fa-check"></i><b>2.2</b> K-medoids<span></span></a><ul>
+<li class="chapter" data-level="2.2.1" data-path="clustering-methods.html"><a href="clustering-methods.html#k-medoids-characteristics"><i class="fa fa-check"></i><b>2.2.1</b> K-medoids characteristics<span></span></a></li>
+</ul></li>
+<li class="chapter" data-level="2.3" data-path="clustering-methods.html"><a href="clustering-methods.html#pca-multivariate-verfahren-und-esl2"><i class="fa fa-check"></i><b>2.3</b> PCA (Multivariate Verfahren und ESL2)<span></span></a></li>
+<li class="chapter" data-level="2.4" data-path="clustering-methods.html"><a href="clustering-methods.html#gap-statistic"><i class="fa fa-check"></i><b>2.4</b> Gap statistic<span></span></a></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="analyse-clustering-results.html"><a href="analyse-clustering-results.html"><i class="fa fa-check"></i><b>3</b> Analyse clustering results<span></span></a></li>
+<li class="chapter" data-level="4" data-path="clustering-results.html"><a href="clustering-results.html"><i class="fa fa-check"></i><b>4</b> Clustering results<span></span></a><ul>
+<li class="chapter" data-level="4.1" data-path="clustering-results.html"><a href="clustering-results.html#with-centering"><i class="fa fa-check"></i><b>4.1</b> With centering<span></span></a><ul>
+<li class="chapter" data-level="4.1.1" data-path="clustering-results.html"><a href="clustering-results.html#kmeans-and-pam-gap-statistics-without-pca"><i class="fa fa-check"></i><b>4.1.1</b> Kmeans and PAM gap statistics without PCA<span></span></a></li>
+<li class="chapter" data-level="4.1.2" data-path="clustering-results.html"><a href="clustering-results.html#scree-plot"><i class="fa fa-check"></i><b>4.1.2</b> Scree plot<span></span></a></li>
+<li class="chapter" data-level="4.1.3" data-path="clustering-results.html"><a href="clustering-results.html#k-means-and-pam-gap-statistics-after-applying-pca"><i class="fa fa-check"></i><b>4.1.3</b> K-means and PAM gap statistics after applying PCA<span></span></a></li>
+</ul></li>
+<li class="chapter" data-level="4.2" data-path="clustering-results.html"><a href="clustering-results.html#without-centering"><i class="fa fa-check"></i><b>4.2</b> Without centering<span></span></a><ul>
+<li class="chapter" data-level="4.2.1" data-path="clustering-results.html"><a href="clustering-results.html#k-means-and-pam-gap-statistics-without-pca"><i class="fa fa-check"></i><b>4.2.1</b> K-means and PAM gap statistics without PCA<span></span></a></li>
+<li class="chapter" data-level="4.2.2" data-path="clustering-results.html"><a href="clustering-results.html#scree-plot-1"><i class="fa fa-check"></i><b>4.2.2</b> Scree plot<span></span></a></li>
+<li class="chapter" data-level="4.2.3" data-path="clustering-results.html"><a href="clustering-results.html#kmean-and-pam-gap-statistics-after-applying-pca"><i class="fa fa-check"></i><b>4.2.3</b> Kmean and PAM gap statistics after applying PCA<span></span></a></li>
+</ul></li>
+<li class="chapter" data-level="4.3" data-path="clustering-results.html"><a href="clustering-results.html#summary-1"><i class="fa fa-check"></i><b>4.3</b> Summary<span></span></a></li>
+</ul></li>
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Predicting Droughts in the Amazon Basin based on Global Sea Surface Temperatures</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="clustering-results" class="section level1 hasAnchor">
+<h1><span class="header-section-number">4</span> Clustering results<a href="clustering-results.html#clustering-results" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<p>We summarize and compare the results we obtain
+if we center or don’t center the data.</p>
+<div id="with-centering" class="section level2 hasAnchor">
+<h2><span class="header-section-number">4.1</span> With centering<a href="clustering-results.html#with-centering" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="kmeans-and-pam-gap-statistics-without-pca" class="section level3 hasAnchor">
+<h3><span class="header-section-number">4.1.1</span> Kmeans and PAM gap statistics without PCA<a href="clustering-results.html#kmeans-and-pam-gap-statistics-without-pca" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="clustering-results.html#cb3-1"></a>gap_kmeans_centered_plot <span class="op">+</span><span class="st"> </span>gap_pam_centered_plot</span></code></pre></div>
+<p><img src="_main_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+<p>We can see that on the original data, neither K-means nor PAM
+find an optimal number of clusters that is lower than the maximum
+number specified.</p>
+</div>
+<div id="scree-plot" class="section level3 hasAnchor">
+<h3><span class="header-section-number">4.1.2</span> Scree plot<a href="clustering-results.html#scree-plot" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="clustering-results.html#cb4-1"></a>scree_plot_pca_centered &lt;-<span class="st"> </span><span class="kw">readRDS</span>(<span class="st">&quot;../results/scree_plot_pca_centered.rds&quot;</span>)</span>
+<span id="cb4-2"><a href="clustering-results.html#cb4-2"></a>scree_plot_pca_centered</span></code></pre></div>
+<p><img src="_main_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+<p>We apply a PCA on the centered data.
+The variance that is explained by the principal components indicates that, the 3 principal components already explain a lot of the appearing variance in the data. We now study the gap statistic results for K-means and K-medoids (here, meaning PAM) after applying the PCA and choosing the number of principal components to be used.</p>
+<p>Following we compare the results of a gap statistic when the first 3 and 4 principal components are used, for K-means and PAM respectively.</p>
+</div>
+<div id="k-means-and-pam-gap-statistics-after-applying-pca" class="section level3 hasAnchor">
+<h3><span class="header-section-number">4.1.3</span> K-means and PAM gap statistics after applying PCA<a href="clustering-results.html#k-means-and-pam-gap-statistics-after-applying-pca" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="clustering-results.html#cb5-1"></a>summary_plot_centered &lt;-<span class="st"> </span><span class="kw">readRDS</span>(<span class="st">&quot;../results/clustering/summary_plot_pca_centered.rds&quot;</span>)</span>
+<span id="cb5-2"><a href="clustering-results.html#cb5-2"></a>summary_plot_centered</span></code></pre></div>
+<p><img src="_main_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+<p>The graphic shows the gap statistics resulting from K-means and PAM for 3 and 4 principal components respectively. For 3 principal components
+K-means and PAM settle for 12 as optimal number of clusters. For 4 principal components K-means chooses 16 and PAM the maximum number possible here 20.</p>
+</div>
+</div>
+<div id="without-centering" class="section level2 hasAnchor">
+<h2><span class="header-section-number">4.2</span> Without centering<a href="clustering-results.html#without-centering" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="k-means-and-pam-gap-statistics-without-pca" class="section level3 hasAnchor">
+<h3><span class="header-section-number">4.2.1</span> K-means and PAM gap statistics without PCA<a href="clustering-results.html#k-means-and-pam-gap-statistics-without-pca" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="clustering-results.html#cb6-1"></a>gap_kmeans_plot <span class="op">+</span><span class="st"> </span>gap_pam_plot</span></code></pre></div>
+<p><img src="_main_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
+<p>As for the centered data, K-means and PAM choose the maximum number
+of possible clusters as optimal.</p>
+</div>
+<div id="scree-plot-1" class="section level3 hasAnchor">
+<h3><span class="header-section-number">4.2.2</span> Scree plot<a href="clustering-results.html#scree-plot-1" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="clustering-results.html#cb7-1"></a>scree_plot_pca_uncentered &lt;-<span class="st"> </span><span class="kw">readRDS</span>(<span class="st">&quot;../results/scree_plot_pca_uncentered.rds&quot;</span>)</span>
+<span id="cb7-2"><a href="clustering-results.html#cb7-2"></a>scree_plot_pca_uncentered</span></code></pre></div>
+<p><img src="_main_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
+<p>We now apply a PCA on the uncentered data.
+The first principal component now explains a lot more variance.
+See <a href="https://eigenvector.com/wp-content/uploads/2020/06/EffectofCenteringonPCA.pdf" class="uri">https://eigenvector.com/wp-content/uploads/2020/06/EffectofCenteringonPCA.pdf</a></p>
+<p>We proceed as for the centered data but use 2 and 3 principal components respectively</p>
+</div>
+<div id="kmean-and-pam-gap-statistics-after-applying-pca" class="section level3 hasAnchor">
+<h3><span class="header-section-number">4.2.3</span> Kmean and PAM gap statistics after applying PCA<a href="clustering-results.html#kmean-and-pam-gap-statistics-after-applying-pca" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="clustering-results.html#cb8-1"></a>summary_plot_pca_uncentered &lt;-<span class="st"> </span><span class="kw">readRDS</span>(<span class="st">&quot;../results/clustering/summary_plot_pca_uncentered.rds&quot;</span>)</span>
+<span id="cb8-2"><a href="clustering-results.html#cb8-2"></a>summary_plot_pca_uncentered</span></code></pre></div>
+<p><img src="_main_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
+<p>The graphic shows the gap statistics resulting from K-means and PAM for 2 and 3 principal components respectively. For 2 principal components
+K-means and PAM both choose 3 as the optimal number of clusters, while
+for 3 principal components hey choose 12.
+The gap statistic “spike” for 2 principal components is more distinct.</p>
+</div>
+</div>
+<div id="summary-1" class="section level2 hasAnchor">
+<h2><span class="header-section-number">4.3</span> Summary<a href="clustering-results.html#summary-1" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>We used the gap statistic as evaluation tool to find the optimal number
+of clusters in our data.<br />
+It was applied by using K-means and PAM as cluster algorithms, on
+the raw and centered data with and without applying a pca beforehand.
+When applied without PCA, PAM and K-means found the maximal number of
+clusters optimal, regardless of centering.<br />
+The results differed regarding centering the data when a PCA was applied.<br />
+When the data was centered before the PCA, we find 12 (3 principal components,
+both K-means and PAM) and 16 or 20 (4 principal components, K-means
+and PAM respectively) as optimal number of clusters. Without centering,
+we find 3 and 12 as optimal number of clusters (2 and 3 principal components, K-means and PAM agree).<br />
+The results overall vary greatly and are sensitive to choices such as
+centering.<br />
+The value of the clustering itself can be evaluated only when used in
+combination with regression.<br />
+If useful, fitting different models for the different clusters should result
+in a lower overall average prediction error.
+We will proceed by using K-means or PAM for finding 3 clusters after applying a PCA on the uncentered data and use 2 principal components, since the results for this procedure gave more clear cut results.</p>
+
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="analyse-clustering-results.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"whatsapp": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": null,
+"text": null
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": null,
+"text": null
+},
+"download": null,
+"search": {
+"engine": "fuse",
+"options": null
+},
+"toc": {
+"collapse": "subsection"
+}
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>

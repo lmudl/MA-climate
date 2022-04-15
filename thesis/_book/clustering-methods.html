@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>2 Clustering Methods | Predicting Droughts in the Amazon Basin based on Global Sea Surface Temperatures</title>
+  <meta name="description" content="2 Clustering Methods | Predicting Droughts in the Amazon Basin based on Global Sea Surface Temperatures" />
+  <meta name="generator" content="bookdown 0.24 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="2 Clustering Methods | Predicting Droughts in the Amazon Basin based on Global Sea Surface Temperatures" />
+  <meta property="og:type" content="book" />
+  
+  
+  
+  
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="2 Clustering Methods | Predicting Droughts in the Amazon Basin based on Global Sea Surface Temperatures" />
+  
+  
+  
+
+<meta name="author" content="Dario Lepke" />
+
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="main-idea-clustering.html"/>
+<link rel="next" href="analyse-clustering-results.html"/>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<script src="libs/accessible-code-block-0.0.1/empty-anchor.js"></script>
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
+
+
+<style type="text/css">
+code.sourceCode > span { display: inline-block; line-height: 1.25; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="index.html#introduction">Introduction<span></span></a></li>
+<li><a href="related-work-ciemer2020early.html#related-work-ciemer2020early">Related work <span class="citation">@ciemer2020early</span><span></span></a><ul>
+<li><a href="related-work-ciemer2020early.html#summary">Summary<span></span></a></li>
+</ul></li>
+<li class="chapter" data-level="1" data-path="main-idea-clustering.html"><a href="main-idea-clustering.html"><i class="fa fa-check"></i><b>1</b> Main Idea Clustering<span></span></a></li>
+<li class="chapter" data-level="2" data-path="clustering-methods.html"><a href="clustering-methods.html"><i class="fa fa-check"></i><b>2</b> Clustering Methods<span></span></a><ul>
+<li class="chapter" data-level="2.1" data-path="clustering-methods.html"><a href="clustering-methods.html#k-means"><i class="fa fa-check"></i><b>2.1</b> K-means<span></span></a><ul>
+<li class="chapter" data-level="2.1.1" data-path="clustering-methods.html"><a href="clustering-methods.html#kmeans-characteristics"><i class="fa fa-check"></i><b>2.1.1</b> Kmeans characteristics<span></span></a></li>
+</ul></li>
+<li class="chapter" data-level="2.2" data-path="clustering-methods.html"><a href="clustering-methods.html#k-medoids"><i class="fa fa-check"></i><b>2.2</b> K-medoids<span></span></a><ul>
+<li class="chapter" data-level="2.2.1" data-path="clustering-methods.html"><a href="clustering-methods.html#k-medoids-characteristics"><i class="fa fa-check"></i><b>2.2.1</b> K-medoids characteristics<span></span></a></li>
+</ul></li>
+<li class="chapter" data-level="2.3" data-path="clustering-methods.html"><a href="clustering-methods.html#pca-multivariate-verfahren-und-esl2"><i class="fa fa-check"></i><b>2.3</b> PCA (Multivariate Verfahren und ESL2)<span></span></a></li>
+<li class="chapter" data-level="2.4" data-path="clustering-methods.html"><a href="clustering-methods.html#gap-statistic"><i class="fa fa-check"></i><b>2.4</b> Gap statistic<span></span></a></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="analyse-clustering-results.html"><a href="analyse-clustering-results.html"><i class="fa fa-check"></i><b>3</b> Analyse clustering results<span></span></a></li>
+<li class="chapter" data-level="4" data-path="clustering-results.html"><a href="clustering-results.html"><i class="fa fa-check"></i><b>4</b> Clustering results<span></span></a><ul>
+<li class="chapter" data-level="4.1" data-path="clustering-results.html"><a href="clustering-results.html#with-centering"><i class="fa fa-check"></i><b>4.1</b> With centering<span></span></a><ul>
+<li class="chapter" data-level="4.1.1" data-path="clustering-results.html"><a href="clustering-results.html#kmeans-and-pam-gap-statistics-without-pca"><i class="fa fa-check"></i><b>4.1.1</b> Kmeans and PAM gap statistics without PCA<span></span></a></li>
+<li class="chapter" data-level="4.1.2" data-path="clustering-results.html"><a href="clustering-results.html#scree-plot"><i class="fa fa-check"></i><b>4.1.2</b> Scree plot<span></span></a></li>
+<li class="chapter" data-level="4.1.3" data-path="clustering-results.html"><a href="clustering-results.html#k-means-and-pam-gap-statistics-after-applying-pca"><i class="fa fa-check"></i><b>4.1.3</b> K-means and PAM gap statistics after applying PCA<span></span></a></li>
+</ul></li>
+<li class="chapter" data-level="4.2" data-path="clustering-results.html"><a href="clustering-results.html#without-centering"><i class="fa fa-check"></i><b>4.2</b> Without centering<span></span></a><ul>
+<li class="chapter" data-level="4.2.1" data-path="clustering-results.html"><a href="clustering-results.html#k-means-and-pam-gap-statistics-without-pca"><i class="fa fa-check"></i><b>4.2.1</b> K-means and PAM gap statistics without PCA<span></span></a></li>
+<li class="chapter" data-level="4.2.2" data-path="clustering-results.html"><a href="clustering-results.html#scree-plot-1"><i class="fa fa-check"></i><b>4.2.2</b> Scree plot<span></span></a></li>
+<li class="chapter" data-level="4.2.3" data-path="clustering-results.html"><a href="clustering-results.html#kmean-and-pam-gap-statistics-after-applying-pca"><i class="fa fa-check"></i><b>4.2.3</b> Kmean and PAM gap statistics after applying PCA<span></span></a></li>
+</ul></li>
+<li class="chapter" data-level="4.3" data-path="clustering-results.html"><a href="clustering-results.html#summary-1"><i class="fa fa-check"></i><b>4.3</b> Summary<span></span></a></li>
+</ul></li>
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Predicting Droughts in the Amazon Basin based on Global Sea Surface Temperatures</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="clustering-methods" class="section level1 hasAnchor">
+<h1><span class="header-section-number">2</span> Clustering Methods<a href="clustering-methods.html#clustering-methods" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<div id="k-means" class="section level2 hasAnchor">
+<h2><span class="header-section-number">2.1</span> K-means<a href="clustering-methods.html#k-means" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>In the following we briefly describe the K-means procedure.
+Beforehand we have to specify a number of clusters <span class="math inline">\(C\)</span> we believe exist in our data. Then we randomly initialize <span class="math inline">\(C\)</span> cluster centers in the feature space.
+Now two steps are repeated until convergence:</p>
+<ol style="list-style-type: decimal">
+<li>For each center we identify the points that are the closest to this center.<br />
+These points “belong” now to a cluster <span class="math inline">\(C\)</span>.</li>
+<li>In each cluster we compute the mean of each variable and get a vector of means.
+This mean vector is now the new center of the cluster.</li>
+</ol>
+<p>As a measure of dissimilarity we use the Euclidean distance:</p>
+<p><span class="math display">\[ d(x_i,x_{i´}) = \sum_{i=1}^p(x_{ij}-x_{i´j})^2=||x_i-x_{i´}||^2 \]</span>
+Meaning for the points <span class="math inline">\(i\)</span> and <span class="math inline">\(i´\)</span> we compute the squared difference for each
+variable and sum them up.
+As stated above we are searching for clusters that are
+themselves compact, meaning homogeneous.
+We do so by minimizing the mean scatter inside the clusters.
+We summarize this scatter as within-sum-of-squares</p>
+<p><span class="math display">\[ W(C) = \frac{1}{2} \sum_{k=1}^{K} \sum_{C(i)=k} \sum_{C(i´)=k} ||x_i-x_{i´}||^2 \\
+        = \sum_{k=1}^K N_k \sum_{C(i)=k} ||x_i-\bar{x}_k ||^2
+\]</span></p>
+<p>where <span class="math inline">\(\bar{x} = (\bar{x}_{1k},...,\bar{x}_{pk})\)</span> stands for the mean vectors of the <span class="math inline">\(k\)</span>th
+cluster and <span class="math inline">\(N_k = \sum_{i=1}^N I(C(i)=k)\)</span>.</p>
+<div id="kmeans-characteristics" class="section level3 hasAnchor">
+<h3><span class="header-section-number">2.1.1</span> Kmeans characteristics<a href="clustering-methods.html#kmeans-characteristics" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>variance of each distribution of each
+attribute (variable) is spherical, variance is
+symmetrical?
+all variables have same variance, not the case
+in our example, therefore scaling or pca
+equal number of observations in each clusters, we don`t know</p>
+<p>Since we use the Euclidean distance the similarity measures will be sensitive to outliers and scale.
+K-means assumes that the variance of a variable´s distribution is spherical, meaning it wight not work well in situations that violate this assumptions (f.e non-spherical data). Further assumptions are same variance of the variables, and equally sized clusters.
+Now how “large” these violations have to be so that
+k-means does not work well anymore has no clear-cut answer.</p>
+</div>
+</div>
+<div id="k-medoids" class="section level2 hasAnchor">
+<h2><span class="header-section-number">2.2</span> K-medoids<a href="clustering-methods.html#k-medoids" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>We can adjust k-means procedure so that we can use other distances
+than the Euclidean distance. The only part of the k-means algorithm
+that uses Euclidean distance is when we compute the cluster centers.
+We can replace this step by formalizing an optimization with respect
+to the cluster members. For example so that each center
+has to be one of the observations assigned to the cluster. K-medoids is far more computationally intensive than K-means.</p>
+<div id="k-medoids-characteristics" class="section level3 hasAnchor">
+<h3><span class="header-section-number">2.2.1</span> K-medoids characteristics<a href="clustering-methods.html#k-medoids-characteristics" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>K-medoids is Less sensitive to outliers, because it minimizes sum of pairwise dissimilarities instead of sum of squared Euclidean distances. As stated above it is also more computationally intensive.</p>
+</div>
+</div>
+<div id="pca-multivariate-verfahren-und-esl2" class="section level2 hasAnchor">
+<h2><span class="header-section-number">2.3</span> PCA (Multivariate Verfahren und ESL2)<a href="clustering-methods.html#pca-multivariate-verfahren-und-esl2" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Goal is reduction of correlated and eventually large number p variables to a few.
+We accomplish this by creating new variables that are linear combinations of the
+original ones. We call these new variables principle components.
+The new variables are not correlated any more and ordered according
+to the variance they explain. The first <span class="math inline">\(k &lt; p\)</span> principal components then contain the majority
+of variance. (Multivariate Verfahren)
+As they are ordered they also provide a sequence of best linear approximations
+of our data.
+Let <span class="math inline">\(x_1, x_2,...,x_N\)</span>, be our observations and we represent them by a rank-q linear
+model</p>
+<p><span class="math display">\[ f(\lambda) = \mu + V_q\lambda\]</span></p>
+<p>with <span class="math inline">\(\mu\)</span> a location vector in <span class="math inline">\(\mathbb{R}^p\)</span> and <span class="math inline">\(V_q\)</span> is a <span class="math inline">\(p \times q\)</span> matrix
+with columns being orthogonal unit vectors as columns. <span class="math inline">\(\lambda\)</span> is a <span class="math inline">\(q\)</span> vector
+of parameters.
+In other words we are trying to fit a hyperplane of rank q to the data.
+If we fit this model to minimize reconstruction error using least squares we solve</p>
+<p><span class="math display">\[ \min_{\mu, \{\lambda_i\}, V_q } \sum_{i=1}^N||x_i - \mu - V_q\lambda_i ||^2 \]</span></p>
+<p>If we partially optimize for <span class="math inline">\(\mu\)</span> and <span class="math inline">\(\lambda_i\)</span> we obtain</p>
+<p><span class="math display">\[ \hat{\mu} = \bar{x},\]</span>
+<span class="math display">\[\hat{\lambda_i} = V_q^T(x_i - \bar{x}) \]</span>
+Therefore we need to search for the orthogonal matrix <span class="math inline">\(V_q\)</span></p>
+<p><span class="math display">\[ \min_{V_q} \sum_{i=1}^N ||(x_i-\bar{x}) - V_qV_q^t(x_i-\bar{x})||^2 \]</span></p>
+<p>We can assume here that <span class="math inline">\(\bar{x}\)</span> is 0, if this not the case we can simply
+center the observations <span class="math inline">\(\tilde{x}_i = x_i - \bar{x}\)</span>.
+<span class="math inline">\(H_q = V_qV_q^T\)</span> projects each observation <span class="math inline">\(x_i\)</span> from the
+original feature space onto the subspace that is spanned by the columns of <span class="math inline">\(V_q\)</span>.
+<span class="math inline">\(H_qx_i\)</span> is then the orthogonal projection of <span class="math inline">\(x_i\)</span>
+Hence <span class="math inline">\(H_q\)</span> is also called the <em>projection matrix</em>.
+Stackoverflow post (<a href="https://math.stackexchange.com/questions/3982195/what-are-left-and-right-singular-vectors-in-svd" class="uri">https://math.stackexchange.com/questions/3982195/what-are-left-and-right-singular-vectors-in-svd</a>)
+We find <span class="math inline">\(V_q\)</span> then by constructing the <em>singular value decomposition</em> of our data matrix X.
+<span class="math inline">\(X\)</span> contains the (centered) observations in rows, giving a <span class="math inline">\(N \times p\)</span> matrix.
+The SVD is then:</p>
+<p><span class="math display">\[ X = UDV^T \]</span></p>
+<p>Where <span class="math inline">\(U\)</span> is an orthogonal matrix containing the <em>left singular vectors</em> <span class="math inline">\(u_j\)</span> as columns, and <span class="math inline">\(V\)</span> contains the <em>right singular vectors</em> <span class="math inline">\(v_j\)</span>. The columns of <span class="math inline">\(U\)</span> span the columns space of <span class="math inline">\(X\)</span> and the columns of <span class="math inline">\(V\)</span> span the row space. <span class="math inline">\(D\)</span> is diagonal matrix which contains <em>singular values</em>, <span class="math inline">\(d_1 \leq d_2 \leq ... \leq d_p \leq 0\)</span>. <em>Singular values</em> are square roots of non-negative eigenvalues.
+The columns of <span class="math inline">\(UD\)</span> are the principal components of <span class="math inline">\(X\)</span>.
+So the SVD gives us the matrix <span class="math inline">\(V\)</span> (the first <span class="math inline">\(q\)</span> columns give the solution to the minimization problem above) as well as the principal components from <span class="math inline">\(UD\)</span>.</p>
+</div>
+<div id="gap-statistic" class="section level2 hasAnchor">
+<h2><span class="header-section-number">2.4</span> Gap statistic<a href="clustering-methods.html#gap-statistic" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>(see gap statistic in plain english stackoverflow)
+(see clusgap paper)
+As stated above we usually measure how compact our clusters are
+by assessing <span class="math inline">\(W(C)\)</span> or <span class="math inline">\(log(W_c)\)</span>. Where are a low value indicates compact clusters. To compare the value we need a reference.
+We therefore want to estimate how large <span class="math inline">\(W_c\)</span> were if there were
+no clusters present in our data.
+The larger the difference between the <span class="math inline">\(W_c\)</span> from the data and
+the one from the reference the more likely we are to say that
+the found number of clusters is indeed correct.
+We construct reference data by sampling from a uniform distribution
+based on our data. Say we have <span class="math inline">\(p\)</span> variables. We sample <span class="math inline">\(n\)</span> times from
+each of the <span class="math inline">\(p\)</span> uniformly distributed variables, where maximum and
+minimum are obtained from our data.
+We then cluster the reference data in the same we cluster our observed data and compute <span class="math inline">\(W_c\)</span>. We repeat this process several times and compute the average of <span class="math inline">\(W_c\)</span>, <span class="math inline">\(E \{log(W_c)\}\)</span>.
+The gap statistic is then the difference
+<span class="math display">\[E \{log(W_c) \} - log(W_c)\]</span>.
+So in cases where our data is formed of clusters we would expect
+a high gap statistic.
+As Tibshirani et al. note and as it is also done in the used R function
+clusgap, doing a PCA on the data and compute the gap statistic on the
+PCA scores can improves the results of gap statistic.</p>
+
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="main-idea-clustering.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="analyse-clustering-results.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"whatsapp": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": null,
+"text": null
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": null,
+"text": null
+},
+"download": null,
+"search": {
+"engine": "fuse",
+"options": null
+},
+"toc": {
+"collapse": "subsection"
+}
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>

@@ -188,7 +188,8 @@ smoothed_models <- dlply(dplyr::select(precip_df,long,lat,precip,month,cyc_month
                          c("long", "lat"), function(df) {
                            gam(precip ~ s(month) + factor(cyc_month), data = df)
                          })
-
+saveRDS(smoothed_models, "results/smoothed_models.rds")
+smoothed_models <- readRDS("results/smoothed_models.rds")
 # deseasonalised because we fit a seasonal component, here
 # factor(cyc_month) but in the predictions we use the same
 # month for all predictions
@@ -255,7 +256,7 @@ grid <- unique(smoothed_preds2[c("lat", "long", "range")])
 range(grid$range)
 
 smoothed_scaled_colour_plot <- ggplot(smoothed_preds2) + 
-  geom_tile(aes(long, lat, fill = range), data = grid, alpha = 0.5) +
+  geom_tile(aes(long, lat, fill = range), data = grid, alpha = 0.5) + #alpha=0.5
   geom_path(aes(gx, gy, group = gid)) +
   theme_bw() + 
   scale_fill_gradient("Precipitation\nrange",

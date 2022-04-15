@@ -324,7 +324,7 @@ clusGapKB <- function (
 }
 
 
-#######################For Correlatio Analysis##################################
+#######################For Correlation Analysis##################################
 
 # option front or back cut
 # for precip front cut
@@ -355,7 +355,7 @@ compute_corr <- function(dec_matrix_sst, dec_matrix_precip, timelag=0) {
   return(cor_vec)
 }
 
-#######################For Time Series Cv##################################
+#######################For Time Series CV##################################
 
 add_colnames <- function(path_old_sst, sst) {
   old_sst <- brick(path_old_sst, varname = "sst")

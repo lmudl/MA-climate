@@ -14,8 +14,8 @@ if we center or don't center the data.
 ### Kmeans and PAM gap statistics without PCA
 
 ```{r, include = FALSE}
-gap_kmeans_centered_plot <- readRDS("../../../results/clustering/gap_kmeans_centered_plot.rds")
-gap_pam_centered_plot <- readRDS("../../../results/clustering/gap_pam_centered_plot.rds")
+gap_kmeans_centered_plot <- readRDS("../results/clustering/gap_kmeans_centered_plot.rds")
+gap_pam_centered_plot <- readRDS("../results/clustering/gap_pam_centered_plot.rds")
 ```
 
 
@@ -30,7 +30,7 @@ number specified.
 ### Scree plot
 
 ```{r}
-scree_plot_pca_centered <- readRDS("../../../results/scree_plot_pca_centered.rds")
+scree_plot_pca_centered <- readRDS("../results/scree_plot_pca_centered.rds")
 scree_plot_pca_centered
 ```
 
@@ -43,7 +43,7 @@ Following we compare the results of a gap statistic when the first 3 and 4 princ
 
 
 ```{r}
-summary_plot_centered <- readRDS("../../../results/clustering/summary_plot_pca_centered.rds")
+summary_plot_centered <- readRDS("../results/clustering/summary_plot_pca_centered.rds")
 summary_plot_centered
 ```
 
@@ -55,12 +55,12 @@ K-means and PAM settle for 12 as optimal number of clusters. For 4 principal com
 
 ### K-means and PAM gap statistics without PCA 
 ```{r, include = FALSE}
-gap_kmeans_plot <- readRDS("../../../results/clustering/gap_kmeans_plot.rds")
+gap_kmeans_plot <- readRDS("../results/clustering/gap_kmeans_plot.rds")
 
 ```
 
 ```{r, include = FALSE}
-gap_pam_plot <- readRDS("../../../results/clustering/gap_pam_plot.rds")
+gap_pam_plot <- readRDS("../results/clustering/gap_pam_plot.rds")
 
 ```
 
@@ -74,7 +74,7 @@ of possible clusters as optimal.
 
 ### Scree plot
 ```{r}
-scree_plot_pca_uncentered <- readRDS("../../../results/scree_plot_pca_uncentered.rds")
+scree_plot_pca_uncentered <- readRDS("../results/scree_plot_pca_uncentered.rds")
 scree_plot_pca_uncentered
 ```
 
@@ -88,7 +88,7 @@ We proceed as for the centered data but use 2 and 3 principal components respect
 
 
 ```{r}
-summary_plot_pca_uncentered <- readRDS("../../../results/clustering/summary_plot_pca_uncentered.rds")
+summary_plot_pca_uncentered <- readRDS("../results/clustering/summary_plot_pca_uncentered.rds")
 summary_plot_pca_uncentered
 ```
 
