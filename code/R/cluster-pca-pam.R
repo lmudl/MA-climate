@@ -18,7 +18,7 @@ pca_centered <- prcomp(getValues(precip), retx = TRUE,
 
 var_exp_centered <- pca_centered$sdev^2 / sum(pca_centered$sdev^2)
 var_exp_centered_plot <- var_exp_centered[1:30]
-scree_plot_pca_centered <- qplot(c(1:30), var_exp_centered_plot) + 
+scree_searplot_pca_centered <- qplot(c(1:30), var_exp_centered_plot) + 
   geom_line() + 
   xlab(" Principal Component") + 
   ylab(" Variance Explained") +

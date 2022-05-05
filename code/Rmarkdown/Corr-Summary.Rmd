@@ -2,9 +2,11 @@
 title: "Correlation Analysis Overview"
 author: "Dario Lepke"
 date: "23.08.2021"
-output: 
+output:
+  pdf_document:
+    toc: yes
   html_document:
-    toc: true
+    toc: yes
 ---
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)

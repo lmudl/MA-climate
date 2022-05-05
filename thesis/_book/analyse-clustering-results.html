@@ -4,11 +4,11 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>3 Analyse clustering results | Predicting Droughts in the Amazon Basin based on Global Sea Surface Temperatures</title>
-  <meta name="description" content="3 Analyse clustering results | Predicting Droughts in the Amazon Basin based on Global Sea Surface Temperatures" />
+  <title>5 Analyse clustering results | Predicting Droughts in the Amazon Basin based on Global Sea Surface Temperatures</title>
+  <meta name="description" content="5 Analyse clustering results | Predicting Droughts in the Amazon Basin based on Global Sea Surface Temperatures" />
   <meta name="generator" content="bookdown 0.24 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="3 Analyse clustering results | Predicting Droughts in the Amazon Basin based on Global Sea Surface Temperatures" />
+  <meta property="og:title" content="5 Analyse clustering results | Predicting Droughts in the Amazon Basin based on Global Sea Surface Temperatures" />
   <meta property="og:type" content="book" />
   
   
@@ -16,7 +16,7 @@
   
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="3 Analyse clustering results | Predicting Droughts in the Amazon Basin based on Global Sea Surface Temperatures" />
+  <meta name="twitter:title" content="5 Analyse clustering results | Predicting Droughts in the Amazon Basin based on Global Sea Surface Temperatures" />
   
   
   
@@ -30,8 +30,9 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-<link rel="prev" href="clustering-methods.html"/>
-<link rel="next" href="clustering-results.html"/>
+<link rel="prev" href="clustering-results.html"/>
+<link rel="next" href="references.html"/>
+<script src="libs/header-attrs-2.12/header-attrs.js"></script>
 <script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -49,25 +50,24 @@
 
 
 
-<script src="libs/accessible-code-block-0.0.1/empty-anchor.js"></script>
 <link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
 <link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
 <script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
 
 
 <style type="text/css">
-code.sourceCode > span { display: inline-block; line-height: 1.25; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-code.sourceCode > span:empty { height: 1.2em; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
-code.sourceCode { white-space: pre; position: relative; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
 pre.sourceCode { margin: 0; }
 @media screen {
 div.sourceCode { overflow: auto; }
 }
 @media print {
-code.sourceCode { white-space: pre-wrap; }
-code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
   { counter-reset: source-line 0; }
@@ -87,7 +87,7 @@ pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-le
 div.sourceCode
   {   }
 @media screen {
-code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 code span.al { color: #ff0000; font-weight: bold; } /* Alert */
 code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
@@ -120,6 +120,28 @@ code span.vs { color: #4070a0; } /* VerbatimString */
 code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
 </style>
 
+<style type="text/css">
+/* Used with Pandoc 2.11+ new --citeproc when CSL is used */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
+</style>
 
 </head>
 
@@ -134,34 +156,32 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 <ul class="summary">
 <li><a href="index.html#introduction">Introduction<span></span></a></li>
-<li><a href="related-work-ciemer2020early.html#related-work-ciemer2020early">Related work <span class="citation">@ciemer2020early</span><span></span></a><ul>
-<li><a href="related-work-ciemer2020early.html#summary">Summary<span></span></a></li>
+<li class="chapter" data-level="1" data-path="related-work.html"><a href="related-work.html"><i class="fa fa-check"></i><b>1</b> Related work<span></span></a></li>
+<li class="chapter" data-level="2" data-path="main-idea-clustering.html"><a href="main-idea-clustering.html"><i class="fa fa-check"></i><b>2</b> Main Idea Clustering<span></span></a></li>
+<li class="chapter" data-level="3" data-path="clustering-methods.html"><a href="clustering-methods.html"><i class="fa fa-check"></i><b>3</b> Clustering Methods<span></span></a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="clustering-methods.html"><a href="clustering-methods.html#k-means"><i class="fa fa-check"></i><b>3.1</b> K-means<span></span></a>
+<ul>
+<li class="chapter" data-level="3.1.1" data-path="clustering-methods.html"><a href="clustering-methods.html#kmeans-characteristics"><i class="fa fa-check"></i><b>3.1.1</b> Kmeans characteristics<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="1" data-path="main-idea-clustering.html"><a href="main-idea-clustering.html"><i class="fa fa-check"></i><b>1</b> Main Idea Clustering<span></span></a></li>
-<li class="chapter" data-level="2" data-path="clustering-methods.html"><a href="clustering-methods.html"><i class="fa fa-check"></i><b>2</b> Clustering Methods<span></span></a><ul>
-<li class="chapter" data-level="2.1" data-path="clustering-methods.html"><a href="clustering-methods.html#k-means"><i class="fa fa-check"></i><b>2.1</b> K-means<span></span></a><ul>
-<li class="chapter" data-level="2.1.1" data-path="clustering-methods.html"><a href="clustering-methods.html#kmeans-characteristics"><i class="fa fa-check"></i><b>2.1.1</b> Kmeans characteristics<span></span></a></li>
+<li class="chapter" data-level="3.2" data-path="clustering-methods.html"><a href="clustering-methods.html#k-medoids"><i class="fa fa-check"></i><b>3.2</b> K-medoids<span></span></a>
+<ul>
+<li class="chapter" data-level="3.2.1" data-path="clustering-methods.html"><a href="clustering-methods.html#k-medoids-characteristics"><i class="fa fa-check"></i><b>3.2.1</b> K-medoids characteristics<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="2.2" data-path="clustering-methods.html"><a href="clustering-methods.html#k-medoids"><i class="fa fa-check"></i><b>2.2</b> K-medoids<span></span></a><ul>
-<li class="chapter" data-level="2.2.1" data-path="clustering-methods.html"><a href="clustering-methods.html#k-medoids-characteristics"><i class="fa fa-check"></i><b>2.2.1</b> K-medoids characteristics<span></span></a></li>
+<li class="chapter" data-level="3.3" data-path="clustering-methods.html"><a href="clustering-methods.html#pca"><i class="fa fa-check"></i><b>3.3</b> PCA<span></span></a></li>
+<li class="chapter" data-level="3.4" data-path="clustering-methods.html"><a href="clustering-methods.html#gap-statistic"><i class="fa fa-check"></i><b>3.4</b> Gap statistic<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="2.3" data-path="clustering-methods.html"><a href="clustering-methods.html#pca-multivariate-verfahren-und-esl2"><i class="fa fa-check"></i><b>2.3</b> PCA (Multivariate Verfahren und ESL2)<span></span></a></li>
-<li class="chapter" data-level="2.4" data-path="clustering-methods.html"><a href="clustering-methods.html#gap-statistic"><i class="fa fa-check"></i><b>2.4</b> Gap statistic<span></span></a></li>
+<li class="chapter" data-level="4" data-path="clustering-results.html"><a href="clustering-results.html"><i class="fa fa-check"></i><b>4</b> Clustering results<span></span></a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="clustering-results.html"><a href="clustering-results.html#k-means-and-pam-gap-statistics-without-pca"><i class="fa fa-check"></i><b>4.1</b> K-means and PAM gap statistics without PCA<span></span></a>
+<ul>
+<li class="chapter" data-level="4.1.1" data-path="clustering-results.html"><a href="clustering-results.html#scree-plot"><i class="fa fa-check"></i><b>4.1.1</b> Scree plot<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="3" data-path="analyse-clustering-results.html"><a href="analyse-clustering-results.html"><i class="fa fa-check"></i><b>3</b> Analyse clustering results<span></span></a></li>
-<li class="chapter" data-level="4" data-path="clustering-results.html"><a href="clustering-results.html"><i class="fa fa-check"></i><b>4</b> Clustering results<span></span></a><ul>
-<li class="chapter" data-level="4.1" data-path="clustering-results.html"><a href="clustering-results.html#with-centering"><i class="fa fa-check"></i><b>4.1</b> With centering<span></span></a><ul>
-<li class="chapter" data-level="4.1.1" data-path="clustering-results.html"><a href="clustering-results.html#kmeans-and-pam-gap-statistics-without-pca"><i class="fa fa-check"></i><b>4.1.1</b> Kmeans and PAM gap statistics without PCA<span></span></a></li>
-<li class="chapter" data-level="4.1.2" data-path="clustering-results.html"><a href="clustering-results.html#scree-plot"><i class="fa fa-check"></i><b>4.1.2</b> Scree plot<span></span></a></li>
-<li class="chapter" data-level="4.1.3" data-path="clustering-results.html"><a href="clustering-results.html#k-means-and-pam-gap-statistics-after-applying-pca"><i class="fa fa-check"></i><b>4.1.3</b> K-means and PAM gap statistics after applying PCA<span></span></a></li>
+<li class="chapter" data-level="4.2" data-path="clustering-results.html"><a href="clustering-results.html#k-means-and-pam-gap-statistics-after-applying-pca"><i class="fa fa-check"></i><b>4.2</b> K-means and PAM gap statistics after applying PCA<span></span></a></li>
+<li class="chapter" data-level="4.3" data-path="clustering-results.html"><a href="clustering-results.html#summary"><i class="fa fa-check"></i><b>4.3</b> Summary<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="4.2" data-path="clustering-results.html"><a href="clustering-results.html#without-centering"><i class="fa fa-check"></i><b>4.2</b> Without centering<span></span></a><ul>
-<li class="chapter" data-level="4.2.1" data-path="clustering-results.html"><a href="clustering-results.html#k-means-and-pam-gap-statistics-without-pca"><i class="fa fa-check"></i><b>4.2.1</b> K-means and PAM gap statistics without PCA<span></span></a></li>
-<li class="chapter" data-level="4.2.2" data-path="clustering-results.html"><a href="clustering-results.html#scree-plot-1"><i class="fa fa-check"></i><b>4.2.2</b> Scree plot<span></span></a></li>
-<li class="chapter" data-level="4.2.3" data-path="clustering-results.html"><a href="clustering-results.html#kmean-and-pam-gap-statistics-after-applying-pca"><i class="fa fa-check"></i><b>4.2.3</b> Kmean and PAM gap statistics after applying PCA<span></span></a></li>
-</ul></li>
-<li class="chapter" data-level="4.3" data-path="clustering-results.html"><a href="clustering-results.html#summary-1"><i class="fa fa-check"></i><b>4.3</b> Summary<span></span></a></li>
-</ul></li>
+<li class="chapter" data-level="5" data-path="analyse-clustering-results.html"><a href="analyse-clustering-results.html"><i class="fa fa-check"></i><b>5</b> Analyse clustering results<span></span></a></li>
+<li><a href="references.html#references">References<span></span></a></li>
 </ul>
 
       </nav>
@@ -179,26 +199,31 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="analyse-clustering-results" class="section level1 hasAnchor">
-<h1><span class="header-section-number">3</span> Analyse clustering results<a href="analyse-clustering-results.html#analyse-clustering-results" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<div id="analyse-clustering-results" class="section level1 hasAnchor" number="5">
+<h1><span class="header-section-number">5</span> Analyse clustering results<a href="analyse-clustering-results.html#analyse-clustering-results" class="anchor-section" aria-label="Anchor link to header"></a></h1>
 <p>We now analyze further the results we found.
 Namely the clusters we find after performing a PCA on the data,
 using the 3 first principal components and searching for 5 clusters using k-means. The first 3 principal components explain 67.8% of the variance
 We found 5 as optimal number of clusters based on the gap statistic and the criteria from Tibsherani.</p>
 <p>We show the map plot for the k-means clustering after applying the PCA as well as the time series of the resulting clusters.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="analyse-clustering-results.html#cb1-1"></a>km_pca_map_plot <span class="op">+</span><span class="st"> </span></span>
-<span id="cb1-2"><a href="analyse-clustering-results.html#cb1-2"></a><span class="kw">ggtitle</span>(<span class="st">&quot;Precipitation clusters in the CAB,</span></span>
-<span id="cb1-3"><a href="analyse-clustering-results.html#cb1-3"></a><span class="st">after centered PCA, using 3 PC&#39;s and applying kmeans&quot;</span>)</span></code></pre></div>
-<p><img src="_main_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<div class="figure"><span style="display:block;" id="fig:unnamed-chunk-37"></span>
+<img src="_main_files/figure-html/unnamed-chunk-37-1.png" alt="Spatial distribution of the found clusters in the CAB. We applied a centered PCA on the data and used 3 principal components before applying the K-means algorithm" width="672" />
+<p class="caption">
+Figure 5.1: Spatial distribution of the found clusters in the CAB. We applied a centered PCA on the data and used 3 principal components before applying the K-means algorithm
+</p>
+</div>
 <p>The plot above shows the grid cells in the Central Amazon Basin colored according to the clusters that are assigned by k-means. The clusters are almost
 completely spatially coherent. Meaning that the clusters are not scattered
 across different areas. One exception can be seen for Cluster 1 and 4. Parts of cluster 1 (orange) are inside cluster 4 (blue) and on the edge to cluster 3 (green).</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="analyse-clustering-results.html#cb2-1"></a>c1_pca_km <span class="op">+</span><span class="st"> </span>c2_pca_km <span class="op">+</span><span class="st"> </span>c3_pca_km <span class="op">+</span><span class="st"> </span>c4_pca_km <span class="op">+</span></span>
-<span id="cb2-2"><a href="analyse-clustering-results.html#cb2-2"></a><span class="st">  </span>c5_pca_km</span></code></pre></div>
-<p><img src="_main_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<div class="figure"><span style="display:block;" id="fig:unnamed-chunk-38"></span>
+<img src="_main_files/figure-html/unnamed-chunk-38-1.png" alt="Plots of the time series in the clusters we found using the K-means algorithm. The x-axis shows the month of measurement, the y-axis the centered precipitation. Centering was done according to the overall CAB mean in each month. The mean inside each cluster for a month is displayed in blue." width="672" />
+<p class="caption">
+Figure 5.2: Plots of the time series in the clusters we found using the K-means algorithm. The x-axis shows the month of measurement, the y-axis the centered precipitation. Centering was done according to the overall CAB mean in each month. The mean inside each cluster for a month is displayed in blue.
+</p>
+</div>
 <p>We now inspect the original (centered) time series inside the clusters.<br />
 The time series are shown in gray and the monthly mean in the cluster is shown in blue. Since the time series are centered before applying the PCA and clustering, the zero value is the mean of the respective month of the whole CAB.<br />
-The clusters differ in their monthly differences from the monthly CAB mean (here 0 because the time series were centered before PCA and k-means) and their fluctuation/ variance. Also the size of the clusters are not all the same.<br />
+The clusters differ in their monthly differences from the monthly CAB mean (here 0 because the time series were centered before PCA and K-means) and their fluctuation/ variance. Also the size of the clusters are not all the same.<br />
 The mean in cluster 3 has lowest variability around the CAB mean, followed by clusters 2 and 5, and clusters 1 and 4 have the highest variability.<br />
 On average cluster 3 is on the level of the CAB overall mean.
 The clusters 2 and 5 are slightly below and cluster 4 is above the CAB mean,
@@ -210,8 +235,8 @@ on average. Cluster 1 is on average also on the CAB mean but shows more variance
           </div>
         </div>
       </div>
-<a href="clustering-methods.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="clustering-results.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="clustering-results.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="references.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>

@@ -1,0 +1,48 @@
+## Without centering
+
+### K-means and PAM gap statistics without PCA 
+```{r, include = FALSE}
+gap_kmeans_plot <- readRDS("../results/clustering/gap_kmeans_plot.rds")
+
+```
+
+```{r, include = FALSE}
+gap_pam_plot <- readRDS("../results/clustering/gap_pam_plot.rds")
+
+```
+
+```{r}
+gap_kmeans_plot + gap_pam_plot
+```
+
+As for the centered data, K-means and PAM choose the maximum number
+of possible clusters as optimal.
+
+
+### Scree plot
+```{r}
+scree_plot_pca_uncentered <- readRDS("../results/scree_plot_pca_uncentered.rds")
+scree_plot_pca_uncentered
+```
+
+We now apply a PCA on the uncentered data.
+The first principal component now explains a lot more variance.
+See https://eigenvector.com/wp-content/uploads/2020/06/EffectofCenteringonPCA.pdf
+
+We proceed as for the centered data but use 2 and 3 principal components respectively
+
+### Kmean and PAM gap statistics after applying PCA
+
+
+```{r}
+summary_plot_pca_uncentered <- readRDS("../results/clustering/summary_plot_pca_uncentered.rds")
+summary_plot_pca_uncentered
+```
+
+The graphic shows the gap statistics resulting from K-means and PAM for 2 and 3 principal components respectively. For 2 principal components
+K-means and PAM both choose 3 as the optimal number of clusters, while
+for 3 principal components hey choose 12.
+The gap statistic "spike" for 2 principal components is more distinct.
+
+
+

@@ -9,7 +9,7 @@ knitr::opts_chunk$set(warning = FALSE)
 #pathtoplots = ptp
 library(ggplot2)
 library(ggtext)
-ptp <- "../../results/"
+ptp <- "../results/"
 ```
 
 

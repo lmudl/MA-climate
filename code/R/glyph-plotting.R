@@ -266,4 +266,25 @@ smoothed_scaled_colour_plot <- ggplot(smoothed_preds2) +
 saveRDS(smoothed_scaled_colour_plot, "results/smoothed_scaled_colour_plot.rds")
 smoothed_scaled_colour_plot <- readRDS("results/smoothed_scaled_colour_plot.rds")
 
+###### outline the glyphs according to cluster ######
+outline <- readRDS("results/clustering/km_cluster_outline.rds")
+smoothed_plot <- readRDS("results/smoothed_plot.rds")
 
+smoothed_outlined_plot <- smoothed_plot + geom_path(aes(x = long, y = lat, group = group), data = outline, 
+                          size=1.5, col="black")
+saveRDS(smoothed_outlined_plot, "results/smoothed_outlined_plot.rds")
+### maybe more up when the data is created we could add
+# the clusters there or find a good grouping procedure for adding
+# the clusters
+
+smoothed_scaled_colour_plot <- readRDS("results/smoothed_scaled_colour_plot.rds")
+smoothed_scaled_colour_plot + geom_path(aes(x = long, y = lat, group = group), data = outline, 
+                                       size=1.5, col="black")
+
+# for grouping we could also merge dataframes
+
+# seasonal with outline ####
+outline <- readRDS("results/clustering/km_cluster_outline.rds")
+seasonal_plot <- readRDS("results/seasonal_plot.rds")
+seasonal_outlined_plot <- seasonal_plot + geom_path(aes(x = long, y = lat, group = group), data = outline, 
+                        size=1.5, col="black")

@@ -6,6 +6,7 @@ library(patchwork)
 library(cluster)
 library(ggplot2)
 library(ggfortify)
+#source("code/R/helper-functions.R")
 set.seed(1234)
 plot <- readRDS("results/clustering/gap_pc3_centered_kmeans_plot.rds")
 get_tibsh_k_from_gapplot <- function(df) {
@@ -76,6 +77,7 @@ km_map_plot <- plot_kmeans(precip, kmeans_result)
 
 # kmeans on map after pca
 km_pca_result <- kmeans(pca_centered$x[,1:3], centers=5,nstart=20,iter.max = 20)
+saveRDS(km_pca_result, "results/clustering/km_pca_result.rds")
 km_pca_map_plot <- plot_kmeans(precip, km_pca_result)
 #saveRDS(km_pca_map_plot, "./results/clustering/km_pca_map_plot.rds")
 
