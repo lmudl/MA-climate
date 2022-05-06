@@ -1,5 +1,5 @@
-# Corr-summary
-# Short Recap 
+# Correlation analysis
+## Short Recap 
 
 We give a short overview over the correlation between monthly sea surface temperature and monthly mean precipitation in the Central Amazonas Basin (CAB).
 First we will analyse the original and then the deaseasonalised data.
@@ -21,39 +21,39 @@ And show the density of the correlation values as well as their spatial distribu
 respective 2.5% and 97.5% quantiles. All correlations that are between these values are set to 0 then.
 
 
-# Correlation of Sea Surface Temperature and Precipitation {.tabset .tabset-fade .tabset-pills}
+## Correlation of Sea Surface Temperature and Precipitation {.tabset .tabset-fade .tabset-pills}
 
-## Original Data {.tabset .tabset-fade .tabset-pills}
+### Original Data {.tabset .tabset-fade .tabset-pills}
 
 Following, for each timelag we show the respective density of correlation values,
 their location on the map and also the 5% strongest positive and negative correlations.
 
-### Timelag 0
+#### Timelag 0
 
 ```{r, echo = FALSE, out.width="40%", out.height="20%",fig.show='hold',fig.align='center'}
-knitr::include_graphics(c("./plots-markdown/og-data/dens-0.jpg"))
+knitr::include_graphics(c("../code/Rmarkdown/plots-markdown/og-data/dens-0.jpg"))
 ```
 ```{r, echo = FALSE, out.width="65%", out.height="65%",fig.show='hold',fig.align='center'}
-knitr::include_graphics("./plots-markdown/og-data/corr-0.jpg")
+knitr::include_graphics("../code/Rmarkdown/plots-markdown/og-data/corr-0.jpg")
 ```
 ```{r, echo = FALSE, out.width="65%", out.height="65%",fig.show='hold',fig.align='center'}
-knitr::include_graphics("./plots-markdown/og-data/q-corr-0.jpg")
+knitr::include_graphics("../code/Rmarkdown/plots-markdown/og-data/q-corr-0.jpg")
 ```
 Inspecting the density plot for timelag 0, we see two modi for correlations,
 one for negative correlations around -0.8 and one for possitive correlations around 0.8. Also a small spike can be seen for low negative correlations.
 If we plot these correlations on the respective grid points we see a clear north-south negative-positive correlation distinction. The "boarder" is organised around the equator.
 The plot for the strongest 5% of correlations reveals areas with strong positive and negative correlations in the north and south respectively.
 
-### Timelag 3
+#### Timelag 3
 
 ```{r, echo = FALSE, out.width="40%", out.height="20%",fig.show='hold',fig.align='center'}
-knitr::include_graphics(c("./plots-markdown/og-data/dens-3.jpg"))
+knitr::include_graphics(c("../code/Rmarkdown/plots-markdown/og-data/dens-3.jpg"))
 ```
 ```{r, echo = FALSE, out.width="65%", out.height="65%",fig.show='hold',fig.align='center'}
-knitr::include_graphics("./plots-markdown/og-data/corr-3.jpg")
+knitr::include_graphics("../code/Rmarkdown/plots-markdown/og-data/corr-3.jpg")
 ```
 ```{r, echo = FALSE, out.width="65%", out.height="65%",fig.show='hold',fig.align='center'}
-knitr::include_graphics("./plots-markdown/og-data/q-corr-3.jpg")
+knitr::include_graphics("../code/Rmarkdown/plots-markdown/og-data/q-corr-3.jpg")
 ```
 
 The density of correlations for timelag 3, is left-skewed and has two
@@ -63,55 +63,55 @@ Note that the legend for the correlationmap is "shifted" here, because the maxim
 maximal positive correlation.
 The strongest correlations also seem to be shifted towards the equator.
 
-### Timelag 6
+#### Timelag 6
 
 ```{r, echo = FALSE, out.width="40%", out.height="20%",fig.show='hold',fig.align='center'}
-knitr::include_graphics(c("./plots-markdown/og-data/dens-6.jpg"))
+knitr::include_graphics(c("../code/Rmarkdown/plots-markdown/og-data/dens-6.jpg"))
 ```
 ```{r, echo = FALSE, out.width="65%", out.height="65%",fig.show='hold',fig.align='center'}
-knitr::include_graphics("./plots-markdown/og-data/corr-6.jpg")
+knitr::include_graphics("../code/Rmarkdown/plots-markdown/og-data/corr-6.jpg")
 ```
 ```{r, echo = FALSE, out.width="65%", out.height="65%",fig.show='hold',fig.align='center'}
-knitr::include_graphics("./plots-markdown/og-data/q-corr-6.jpg")
+knitr::include_graphics("../code/Rmarkdown/plots-markdown/og-data/q-corr-6.jpg")
 ```
 We can see the density plot for timelag 6 is pretty similar to the one
 of timelag 0 but seems to be "flipped" around 0.
 Similarly the correlation map shows (high) negative correlations in the south now and high postive correlations in the north.
 
-### Timelag 12
+#### Timelag 12
 
 ```{r, include = FALSE, eval = FALSE, echo = FALSE, out.width="25%", out.height="25%",fig.show='hold',fig.fullwidth=TRUE}
-knitr::include_graphics(c("./plots-markdown/corr0.jpg","./plots-markdown/corr3.jpg","./plots-markdown/corr6.jpg","./plots-markdown/corr9.jpg", "./plots-markdown/corr12.jpg"))
+knitr::include_graphics(c("../code/Rmarkdown/plots-markdown/corr0.jpg","../code/Rmarkdown/plots-markdown/corr3.jpg","../code/Rmarkdown/plots-markdown/corr6.jpg","../code/Rmarkdown/plots-markdown/corr9.jpg", "../code/Rmarkdown/plots-markdown/corr12.jpg"))
 ```
 
 ```{r, echo = FALSE, out.width="40%", out.height="20%",fig.show='hold',fig.align='center'}
-knitr::include_graphics(c("./plots-markdown/og-data/dens-12.jpg"))
+knitr::include_graphics(c("../code/Rmarkdown/plots-markdown/og-data/dens-12.jpg"))
 ```
 ```{r, echo = FALSE, out.width="65%", out.height="65%",fig.show='hold',fig.align='center'}
-knitr::include_graphics("./plots-markdown/og-data/corr-12.jpg")
+knitr::include_graphics("../code/Rmarkdown/plots-markdown/og-data/corr-12.jpg")
 ```
 ```{r, echo = FALSE, out.width="65%", out.height="65%",fig.show='hold',fig.align='center'}
-knitr::include_graphics("./plots-markdown/og-data/q-corr-12.jpg")
+knitr::include_graphics("../code/Rmarkdown/plots-markdown/og-data/q-corr-12.jpg")
 ```
 
 Giving a timelag of one year, we can see that the distribution of correlations is now again similar to the distribution for timelag 0.
 This also hold for the location of positive and negative correlations in general,
 as well as for the strongest 5% of correlations.
  
-## Deseasonalised Data {.tabset .tabset-fade .tabset-pills}
+### Deseasonalised Data {.tabset .tabset-fade .tabset-pills}
 Following, for each timelag we show the respective density of correlation values,
 their location on the map and also the 5% strongest positive and negative correlations.
 
-### Timelag 0
+#### Timelag 0
 
 ```{r, echo = FALSE, out.width="40%", out.height="20%",fig.show='hold',fig.align='center'}
-knitr::include_graphics(c("./plots-markdown/des-data/dens-0.jpg"))
+knitr::include_graphics(c("../code/Rmarkdown/plots-markdown/des-data/dens-0.jpg"))
 ```
 ```{r, echo = FALSE, out.width="65%", out.height="65%",fig.show='hold',fig.align='center'}
-knitr::include_graphics("./plots-markdown/des-data/corr-0.jpg")
+knitr::include_graphics("../code/Rmarkdown/plots-markdown/des-data/corr-0.jpg")
 ```
 ```{r, echo = FALSE, out.width="65%", out.height="65%",fig.show='hold',fig.align='center'}
-knitr::include_graphics("./plots-markdown/des-data/q-corr-0.jpg")
+knitr::include_graphics("../code/Rmarkdown/plots-markdown/des-data/q-corr-0.jpg")
 ```
 Inspecting the density plot for timelag 0, we see that after excluding seasonality from 
 the time series we get a left-skewed distribution of correlations. With a mode around 0.
@@ -121,20 +121,20 @@ We plot these correlations on the respective grid and see that the clear north s
 distinction in the correlations before deseasonalising the data does not appear anymore.
 The plot for the strongest 5% of correlations reveals areas with strongest positive and negative correlations. But as stated before the values are in general much lower.
 
-### Timelag 3
+#### Timelag 3
 
 ```{r, echo = FALSE, out.width="40%", out.height="20%",fig.show='hold',fig.align='center'}
-knitr::include_graphics(c("./plots-markdown/des-data/dens-3.jpg"))
+knitr::include_graphics(c("../code/Rmarkdown/plots-markdown/des-data/dens-3.jpg"))
 ```
 
 
 ```{r, echo = FALSE, out.width="65%", out.height="65%",fig.show='hold',fig.align='center'}
-knitr::include_graphics("./plots-markdown/des-data/corr-3.jpg")
+knitr::include_graphics("../code/Rmarkdown/plots-markdown/des-data/corr-3.jpg")
 ```
 
 
 ```{r, echo = FALSE, out.width="65%", out.height="65%",fig.show='hold',fig.align='center'}
-knitr::include_graphics("./plots-markdown/des-data/q-corr-3.jpg")
+knitr::include_graphics("../code/Rmarkdown/plots-markdown/des-data/q-corr-3.jpg")
 ```
 
 For the density of timelag 3 we get a similar picture as for timelag 0.
@@ -142,16 +142,16 @@ The mode is a higher and the tails get a bit more mass.
 Also the correlation map does not seem to change a lot.
 The strongest correlations appear to be shifted to the left.
 
-### Timelag 6
+#### Timelag 6
 
 ```{r, echo = FALSE, out.width="40%", out.height="20%",fig.show='hold',fig.align='center'}
-knitr::include_graphics(c("./plots-markdown/des-data/dens-6.jpg"))
+knitr::include_graphics(c("../code/Rmarkdown/plots-markdown/des-data/dens-6.jpg"))
 ```
 ```{r, echo = FALSE, out.width="65%", out.height="65%",fig.show='hold',fig.align='center'}
-knitr::include_graphics("./plots-markdown/des-data/corr-6.jpg")
+knitr::include_graphics("../code/Rmarkdown/plots-markdown/des-data/corr-6.jpg")
 ```
 ```{r, echo = FALSE, out.width="65%", out.height="65%",fig.show='hold',fig.align='center'}
-knitr::include_graphics("./plots-markdown/des-data/q-corr-6.jpg")
+knitr::include_graphics("../code/Rmarkdown/plots-markdown/des-data/q-corr-6.jpg")
 ```
 Since the distributions of correlation values are all unimodal we do not observe
 the "flip" we saw in the original data when comparing the densities of timelag 0 and
@@ -159,20 +159,20 @@ the "flip" we saw in the original data when comparing the densities of timelag 0
 get smaller.
 The strongest negative correlations are shifted further to left.
 
-### Timelag 12
+#### Timelag 12
 
 ```{r, include = FALSE, eval = FALSE, echo = FALSE, out.width="25%", out.height="25%",fig.show='hold',fig.fullwidth=TRUE}
-knitr::include_graphics(c("./plots-markdown/corr0.jpg","./plots-markdown/corr3.jpg","./plots-markdown/corr6.jpg","./plots-markdown/corr9.jpg", "./plots-markdown/corr12.jpg"))
+knitr::include_graphics(c("../code/Rmarkdown/plots-markdown/corr0.jpg","../code/Rmarkdown/plots-markdown/corr3.jpg","../code/Rmarkdown/plots-markdown/corr6.jpg","../code/Rmarkdown/plots-markdown/corr9.jpg", "../code/Rmarkdown/plots-markdown/corr12.jpg"))
 ```
 
 ```{r, echo = FALSE, out.width="40%", out.height="20%",fig.show='hold',fig.align='center'}
-knitr::include_graphics(c("./plots-markdown/des-data/dens-12.jpg"))
+knitr::include_graphics(c("../code/Rmarkdown/plots-markdown/des-data/dens-12.jpg"))
 ```
 ```{r, echo = FALSE, out.width="65%", out.height="65%",fig.show='hold',fig.align='center'}
-knitr::include_graphics("./plots-markdown/des-data/corr-12.jpg")
+knitr::include_graphics("../code/Rmarkdown/plots-markdown/des-data/corr-12.jpg")
 ```
 ```{r, echo = FALSE, out.width="65%", out.height="65%",fig.show='hold',fig.align='center'}
-knitr::include_graphics("./plots-markdown/des-data/q-corr-12.jpg")
+knitr::include_graphics("../code/Rmarkdown/plots-markdown/des-data/q-corr-12.jpg")
 ```
 
 Given a timelag of one year, the distribution now has a mode around 6, and started at around 4 when timelag was 0. Also neither the positive nor negative correlations exceed values of 2.5.
@@ -180,9 +180,9 @@ The consistent region of strong negative and positive correlations is now less o
 
  
 
-# Summary
+## Summary
 
-## Original Data
+### Original Data
 
 We can observe that the positive and negative correlations of sst and precipitation follow a spatial and temporal pattern.
 The location and density of the positive and negative correlation "wanders" over the equator in opposite directions.
@@ -190,17 +190,13 @@ The densities and correlationmaps for timelag 0 and 6 appear to be quite similar
 The densities and correlationmaps for timelag 0 and 12 appear again to be similar.
 The same pattern seems to hold for the strongest correlations.
 
-## Deseasonalised Data
+### Deseasonalised Data
 Correlation values are in general a lot lower than in the original data and decrease with
 increasing timelag.
 We still observe temporal and regional patterns, although these dissolve a bit for
 a timelag of 12.
 
 
-
-```{r, echo = FALSE}
-knitr::knit_exit()
-```
 
 
 
