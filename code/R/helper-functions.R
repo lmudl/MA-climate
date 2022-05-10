@@ -344,14 +344,16 @@ cut_matrix <- function(matrix, timelag, side=c("front,back")) {
 # for different time lags what do we need?
 # in: precip path, sst path, time lags
 # out: correlation vector
-compute_corr <- function(dec_matrix_sst, dec_matrix_precip, timelag=0) {
+compute_corr <- function(dec_matrix_sst, dec_matrix_precip, timelag=0,
+                         cor_method="pearson") {
   if (timelag!=0) {
     dec_matrix_sst <- cut_matrix(dec_matrix_sst, timelag, "back")
     dec_matrix_precip <- cut_matrix(dec_matrix_precip, timelag, "front")
   }
   assertthat::are_equal(ncol(dec_matrix_precip), ncol(dec_matrix_sst))
   precip_means <- apply(dec_matrix_precip, 2, mean)
-  cor_vec <- apply(dec_matrix_sst, 1, function(x) cor(x, precip_means))
+  cor_vec <- apply(dec_matrix_sst, 1, function(x) cor(x, precip_means, 
+                                                      method = cor_method))
   return(cor_vec)
 }
 

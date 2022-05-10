@@ -9,7 +9,6 @@ We use the location that is also used in @ciemer2020early.
 knitr::opts_chunk$set(echo=FALSE)
 ```
 
-
 ```{r}
 library(ggplot2)
 library(sf)
@@ -63,7 +62,7 @@ plot_trends <- function(data, trends) {
 
 Below the are of the Central Amazon Basin that is object of our study.
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, fig.cap="Localisation of the area under study. The central amazon basin (CAB) spanning across 0,-10 latitude and -70,-55 longitude"}
 ggplot(data = world) +
   geom_sf() +
   coord_sf(xlim = c(-100,-20), ylim = c(40,-40), expand = TRUE) +   geom_rect(xmin = -70, xmax = -55, ymin = -10, ymax = 0,
@@ -76,13 +75,13 @@ precip <- raster::aggregate(precip, fact = 10)
 ```
 
 ## Mean at each location
-```{r}
+```{r, fig.cap="Precipitation mean at each location. The mean was computed over the whole time period"}
 r_mean <- calc(precip, mean)
 #plot(r_mean)
 plot_summary(r_mean) + ggtitle("Mean of precipitation for each location")
 ```
 
-```{r}
+```{r, fig.cap="Density of means, means were computed for each location over the whole time period"}
 df_mean <- data.frame(means = values(r_mean))
 ggplot(df_mean, aes(x = means)) + geom_density() + ggtitle("Density of means computed on each location")
 ```
@@ -97,13 +96,13 @@ For example in the upper right corner and on the bottom, right of the middle.
 
 
 ## SD at each location
-```{r}
+```{r, fig.cap="Precipitation standard deviation at each location. The standard deviation was computed over the whole time period"}
 r_sd <- calc(precip, sd)
 #plot(r_sd)
 plot_summary(r_sd) + ggtitle("SD of precipitation for each location")
 ```
 
-```{r}
+```{r, fig.cap="Density of standard deviations, standard deviations were computed for each location over the whole time period"}
 df_sd <- data.frame(sd = values(r_sd))
 ggplot(df_sd, aes(x = sd)) + geom_density()
 ```

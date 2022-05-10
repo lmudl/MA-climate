@@ -12,7 +12,11 @@ This mean vector is now the new center of the cluster.
 
 As a measure of dissimilarity we use the Euclidean distance:
 
-$$ d(x_i,x_{i´}) = \sum_{i=1}^p(x_{ij}-x_{i´j})^2=||x_i-x_{i´}||^2 $$
+\begin{equation} 
+d(x_i,x_{i´}) = \sum_{i=1}^p(x_{ij}-x_{i´j})^2=||x_i-x_{i´}||^2
+(\#eq:eucl-dist)
+\end{equation}
+
 Meaning for the points $i$ and $i´$ we compute the squared difference for each
 variable and sum them up.
 As stated above we are searching for clusters that are
@@ -20,9 +24,11 @@ themselves compact, meaning homogeneous.
 We do so by minimizing the mean scatter inside the clusters.
 We summarize this scatter as within-sum-of-squares
 
-$$ W(C) = \frac{1}{2} \sum_{k=1}^{K} \sum_{C(i)=k} \sum_{C(i´)=k} ||x_i-x_{i´}||^2 \\
+\begin{equation} 
+W(C) = \frac{1}{2} \sum_{k=1}^{K} \sum_{C(i)=k} \sum_{C(i´)=k} ||x_i-x_{i´}||^2 \\
         = \sum_{k=1}^K N_k \sum_{C(i)=k} ||x_i-\bar{x}_k ||^2
-$$
+(\#eq:wss)
+\end{equation}
 
 where $\bar{x} = (\bar{x}_{1k},...,\bar{x}_{pk})$ stands for the mean vectors of the $k$th
 cluster and $N_k = \sum_{i=1}^N I(C(i)=k)$. 
@@ -65,7 +71,10 @@ of our data.
 Let $x_1, x_2,...,x_N$, be our observations and we represent them by a rank-q linear
 model 
 
-$$ f(\lambda) = \mu + V_q\lambda$$
+\begin{equation}
+f(\lambda) = \mu + V_q\lambda
+(\#eq:rank-lin)
+\end{equation}
 
 with $\mu$ a location vector in $\mathbb{R}^p$ and $V_q$ is a $p \times q$ matrix
 with columns being orthogonal unit vectors as columns. $\lambda$ is a $q$ vector
@@ -73,7 +82,9 @@ of parameters.
 In other words we are trying to fit a hyperplane of rank q to the data.
 If we fit this model to minimize reconstruction error using least squares we solve
 
-$$ \min_{\mu, \{\lambda_i\}, V_q } \sum_{i=1}^N||x_i - \mu - V_q\lambda_i ||^2 $$
+\begin{equation} \min_{\mu, \{\lambda_i\}, V_q } \sum_{i=1}^N||x_i - \mu - V_q\lambda_i ||^2
+(\#eq:min-rec-1)
+\end{equation}
 
 If we partially optimize for $\mu$ and $\lambda_i$ we obtain
 
@@ -81,7 +92,10 @@ $$ \hat{\mu} = \bar{x},$$
 $$\hat{\lambda_i} = V_q^T(x_i - \bar{x}) $$ 
 Therefore we need to search for the orthogonal matrix $V_q$
 
-$$ \min_{V_q} \sum_{i=1}^N ||(x_i-\bar{x}) - V_qV_q^t(x_i-\bar{x})||^2 $$
+\begin{equation}
+\min_{V_q} \sum_{i=1}^N ||(x_i-\bar{x}) - V_qV_q^t(x_i-\bar{x})||^2
+(\#eq:min-rec-2)
+\end{equation}
 
 We can assume here that $\bar{x}$ is 0, if this not the case we can simply
 center the observations $\tilde{x}_i = x_i - \bar{x}$.
@@ -97,7 +111,10 @@ We find $V_q$ then by constructing the *singular value decomposition* of our dat
 $X$ contains the (centered) observations in rows, giving a $N \times p$ matrix.
 The SVD is then:
 
-$$ X = UDV^T $$
+\begin{equation} 
+X = UDV^T
+(\#eq:svd)
+\end{equation}
 
 
 Where $U$ is an orthogonal matrix containing the *left singular vectors* $u_j$ as columns, and $V$ contains the *right singular vectors* $v_j$. The columns of $U$ span the columns space of $X$ and the columns of $V$ span the row space. $D$ is diagonal matrix which contains *singular values*, $d_1 \leq d_2 \leq ... \leq d_p \leq 0$. *Singular values* are square roots of non-negative eigenvalues.
@@ -122,8 +139,13 @@ based on our data. Say we have $p$ variables. We sample $n$ times from
 each of the $p$ uniformly distributed variables, where maximum and 
 minimum are obtained from our data. 
 We then cluster the reference data in the same we cluster our observed data and compute $W_c$. We repeat this process several times and compute the average of $W_c$, $E \{log(W_c)\}$.
-The gap statistic is then the difference 
-$$E \{log(W_c) \} - log(W_c)$$.
+The gap statistic is then the difference
+
+\begin{equation}
+E \{log(W_c) \} - log(W_c).
+(\#eq:gap)
+\end{equation}
+
 So in cases where our data is formed of clusters we would expect
 a high gap statistic.
 As @tibshirani2001estimating note and as it is also done in the used R function

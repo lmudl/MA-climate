@@ -16,7 +16,5 @@ figure-html/
 .log
 .pdf
 .rds
-.Rproj.user
-thesis/_book
-thesis/_bookdown_files
-rsconnect
+.Rproj.user/
+

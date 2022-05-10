@@ -68,3 +68,17 @@ scree-plot
 k-means-and-pam-gap-statistics-after-applying-pca
 summary-1
 analyse-clustering-results
+fig:unnamed-chunk-9
+fig:unnamed-chunk-3
+fig:unnamed-chunk-4
+fig:unnamed-chunk-5
+eq:spearman-rank
+eq:adj-mat
+eq:cross-deg
+eq:eucl-dist
+eq:wss
+eq:rank-lin
+eq:min-rec-1
+eq:min-rec-2
+eq:svd
+eq:gap

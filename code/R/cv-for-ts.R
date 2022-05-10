@@ -98,7 +98,7 @@ features <- prepare_sst(features)
 
 # test cv_for_ts 
 # but only do one fold
-# namely say 430-60 last 5 years we dont want do use for test/train but for validation
+# namely say 430-60 last 5 years we don't want do use for test/train but for validation
 # then we have 370, 372/5= 74 so 74 per fold and 60 train 14 test
 # so 356-370 is test, 298-355 is train
 

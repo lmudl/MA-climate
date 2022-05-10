@@ -7,18 +7,22 @@ the precipitation (@funk2015climate) with monthly data for the time period of 19
 They identify 4 oceanic regions that correlate the most with rain in the amazon basin, using a coupled network approach.
 Figure \@ref(fig:cross) shows the cross degree towards rainfall in the central Amazon basin (CAB, blue box), for positive and negative correlations. Darker shades indicate a larger cross degree, hence a larger number of links and correlations with rainfall at more grid points in the CBA.  
 The correlations are measured using a spearman rank-order correlation coefficient\
-\[
+\begin{equation}
  \rho = 1 - \frac{6\sum\Delta_{R_i}^2}{n(n^2-1)}  .
-\]
+ (\#eq:spearman-rank)
+\end{equation}
+
 Where $\Delta_{R_i}$ denotes the difference between the ranks of observations of both variables at the same time $i$ and $n$ is the number of observations.
 An Adjacency Matrix describes the resulting network, where the threshold $p_{th}$ was chosen so that only 10% of the strongest correlations are represented as links in the network\
-\[
+\begin{equation}
 A_{ij} = \begin{cases}0 \textrm{ } p_{ij} < p_{th}\\ 1 \textrm{ } p_{ij}\geq p_{th}\\\end{cases}  .
-\]
+(\#eq:adj-mat)
+\end{equation}
 The cross degree then gives the strength of correlation between a specific grid point $i$ of network $V_l$ (oceanic grid point) and another (sub)network $V_m$ (all grid points $j$ in central amazon basin)\
-\[
+\begin{equation}
 k_{i}^{lm} = \sum\limits_{j \in V_m} A_{ij}, i \in V_l\  .
-\]
+(\#eq:cross-deg)
+\end{equation}
 
 ```{r cross, echo = FALSE, fig.align = 'center', out.width = "50%", fig.cap='"Cross degree between sea surface temperature and continental rainfall anomalies. For each sea surface temperature grid cell of the Atlantic and Pacific Ocean, the cross degree towards rainfall in the Central Amazon Basin (blue box) is shown, for a positive correlations and b negative correlations. Darker shading indicates a larger cross degree, implying a larger number of links, and thus significant correlations with rainfall at more grid points in the Central Amazon Basin. Red areas outline coherent oceanic regions with a the 20% highest cross degrees for positive correlations, found in the Southern Pacific Ocean (SPO) and Southern Tropical Atlantic Ocean (STAO), and b the 20% highest cross degrees for negative correlations, found in the Central Pacific Ocean (CPO) and Northern Tropical Atlantic Ocean (NTAO)" [@ciemer2020early]'}
 knitr::include_graphics("../figures/cross-degree.jpg")

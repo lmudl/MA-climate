@@ -20,6 +20,8 @@ We consider time lags of 0,3,6 and 12 months.
 And show the density of the correlation values as well as their spatial distribution on a map. We also display the highest positive and negative correlation based on their
 respective 2.5% and 97.5% quantiles. All correlations that are between these values are set to 0 then.
 
+The correlation measure we use is the 
+
 
 ## Correlation of Sea Surface Temperature and Precipitation {.tabset .tabset-fade .tabset-pills}
 

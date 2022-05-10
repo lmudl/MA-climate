@@ -13,7 +13,7 @@ ptp <- "../results/"
 ```
 
 
-```{r}
+```{r, fig.cap="Glyph map of seasonal precipitaton pattern. Each location is presented by a time series. The time series are seperated by boxes. The gray reference lines inside the boxes show the mid-range for easier comparison."}
 seasonal_plot <- readRDS(paste0(ptp, "seasonal_plot.rds"))
 seasonal_plot + ggtitle("Glyph map of seasonal precipitation patterns (averages for each month)") +
   theme(plot.title = element_textbox_simple())
@@ -32,7 +32,7 @@ The patterns differ in range and month of maximum and minimum precipitation.
 
 
 
-```{r}
+```{r, fig.cap="Glyph map of de-seasonalised and smoothed precipitation. Each location is presented by a time series. The time series are seperated by boxes. The gray reference lines inside the boxes show the mid-range for easier comparison. The time series are scaled globally, same positions inside the cells correspond to the same values in all locations."}
 smoothed_plot <- readRDS(paste0(ptp, "smoothed_plot.rds"))
 smoothed_plot + ggtitle("Glyph map of smoothed de-seasonalised monthly precipitation") +
   theme(plot.title = element_textbox_simple())
@@ -47,7 +47,7 @@ have a spatial connection, patterns are close to similar patterns,
 at the same latitude.
 Also regarding latitude the closer to the equator the less precipitation.
 
-```{r}
+```{r, fig.cap="Glyph map of de-seasonalised and smoothed precipitation. The time series are scaled locally, ranges are not the same in all cells. The different ranges are given in color shades, where lighter shading indicates a larger range and darker shades smaller ranges."}
 smoothed_scaled_colour_plot <- readRDS(paste0(ptp, "smoothed_scaled_colour_plot.rds"))
 smoothed_scaled_colour_plot + ggtitle("Glyph map of smoothed de-seasonalised monthly precipitation, locally scaled") +
   theme(plot.title = element_textbox_simple()) +
