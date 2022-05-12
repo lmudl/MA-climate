@@ -1,6 +1,7 @@
 # plot cv results
 setwd("Repos/MA-climate/")
 source("code/R/helper-functions.R")
+library(caret)
 
 # load data from cv-for-ts before running this code
 # need features_cv and target_cv
@@ -9,6 +10,7 @@ source("code/R/helper-functions.R")
 ids <- createTimeSlices(1:370, initialWindow=60, horizon=14,
                         skip=60+14-1)
 # ids$train alle 60, für test alle 14 passt
+lapply(ids$train, length)
 lapply(ids$test, length)
 
 # get lambda vec
@@ -106,14 +108,14 @@ plt_fold3 <- plot_nonzero_from_fold(error_matrix = err_mat, fold = 3,
                                     target_data = target_cv)
 
 plt_fold4 <- plot_nonzero_from_fold(error_matrix = err_mat, fold = 4, 
-                                   cv_ids = ids, lambdas = lambdas,
-                                   feature_data = features_cv,
-                                   target_data = target_cv)
+                                    cv_ids = ids, lambdas = lambdas,
+                                    feature_data = features_cv,
+                                    target_data = target_cv)
 
 plt_fold5 <- plot_nonzero_from_fold(error_matrix = err_mat, fold = 5, 
-                                   cv_ids = ids, lambdas = lambdas,
-                                   feature_data = features_cv,
-                                   target_data = target_cv)
+                                    cv_ids = ids, lambdas = lambdas,
+                                    feature_data = features_cv,
+                                    target_data = target_cv)
 
 
 

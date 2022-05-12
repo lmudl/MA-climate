@@ -64,6 +64,12 @@ load_target <- function(target_path, is_spi) {
 target <- load_target(target_path)
 dim(target)
 
+# with new dataload function #####
+features <- load_data(features_path)
+target <- load_data(target_path)
+
+# rest of it ####
+
 # computing the spi results in "loosing" some observations, creating NA's
 # we drop these columns in target nd features with the following function
 trim_data <- function(data, spi_window) {
@@ -87,7 +93,6 @@ target <- matrix(target)
 #transpose sst and add coord as colnames
 #transpose so that each month is one observation, usable for glmnet then
 features <- add_colnames("data/interim/sst/ersst_setreftime.nc", sst = features)
-
 
 ########TESTING#########
 
@@ -125,7 +130,9 @@ target_test <- target[test_ind,]
 lambdas <- get_lambda_values(features[c(train_ind,test_ind),], target[c(train_ind,test_ind),])
 
 mod <- glmnet(features_train, target_train, lambda=rev(lambdas))
+mod2 <- glmnet(features_train, target_train)
 plot(mod)
+plot(mod2)
 
 err <- c(NA)
 for(i in 1:length(lambdas)) {

@@ -208,13 +208,13 @@ deseasonalise_brick_wna <- function(brick, nlayers, ncells) {
 #######################For clustering###########################################
 # Taken from https://github.com/kevinblighe/clusGapKB/blob/master/clusGapKB.R
 clusGapKB <- function (
-  x,
-  FUNcluster,
-  K.max,
-  B=100,
-  d.power=1,
-  verbose=interactive(),
-  ...)
+    x,
+    FUNcluster,
+    K.max,
+    B=100,
+    d.power=1,
+    verbose=interactive(),
+    ...)
 {
   stopifnot(is.function(FUNcluster), length(dim(x))==2, K.max>=2, (n<-nrow(x))>=1, ncol(x)>=1)
   
@@ -359,6 +359,19 @@ compute_corr <- function(dec_matrix_sst, dec_matrix_precip, timelag=0,
 
 #######################For Time Series CV##################################
 
+load_data <- function(data_path, varname) {
+  isrds <- stringr::str_detect(data_path, ".rds")
+  isnc <- stringr::str_detect(data_path, ".nc")
+  if(isrds) data_loaded <- readRDS(data_path)
+  if(isnc) {
+    data_loaded <- brick(data_path, varname = varname)
+    data_loaded <- as.data.frame(data_loaded)
+  }
+  if(!(isrds | isnc)) stop("data should be either rds or nc")
+  return(data_loaded)
+}
+
+
 add_colnames <- function(path_old_sst, sst) {
   old_sst <- brick(path_old_sst, varname = "sst")
   coord <- coordinates(old_sst)
@@ -423,8 +436,13 @@ get_lambda_values <- function(sst, precip){
   #TODO compute inner product with target
   # for all variables
   # target_vec %*% feature_matrix
+  # drop non-numeric variables for lambda computing
+  # numerics <- sapply(sst, class) == "numeric"
+  numerics <- unname(apply(sst, 2, class) == "numeric")
+  sst <- as.matrix(sst[,numerics])
   inner_prods <- precip %*% scale(sst, center = TRUE, scale = TRUE)
   #TODO get the max abs value
+  inner_prods <- na.omit(c(inner_prods))
   max_inner <- max(abs(inner_prods))
   #TODO comput lambdamax
   max_lambda <- max_inner/nrow(sst)
@@ -458,7 +476,7 @@ get_lambda_values <- function(sst, precip){
 # observations for validation set.
 cv_for_ts <- function(sst, precip, nfold, size_train, size_test, save_folder) {
   set.seed(1234)
-  #TODO aswer question:compute precip mean here or before?
+  # TODO answer question:compute precip mean here or before?
   sst <- prepare_sst(sst)
   assertthat::are_equal(nrow(sst), length(precip))
   n_row <- nrow(sst)
@@ -467,7 +485,7 @@ cv_for_ts <- function(sst, precip, nfold, size_train, size_test, save_folder) {
   precip <- drop_obs(precip, obs_to_drop)
   # now we made sure that nrow(data) %% nfold == 0
   assertthat::are_equal(size_train+size_test, nrow(sst)/nfold)
-  index_list <- createTimeSlices(1:nrow(sst), initialWindow=size_train, horizon=size_test,
+  index_list <- caret::createTimeSlices(1:nrow(sst), initialWindow=size_train, horizon=size_test,
                                  skip=size_train+size_test-1)
   #TODO create list with glmnet objects so we can plot
   #their paths and coefficients on map
@@ -482,24 +500,30 @@ cv_for_ts <- function(sst, precip, nfold, size_train, size_test, save_folder) {
   # error final can then be compared among diff models
   lambda_vec <- get_lambda_values(sst, precip)
   err_mat <- matrix(NA, ncol = nfold, nrow = length(lambda_vec))
-  for(i in 1:length(lambda_vec)) {
-    for(j in 1:length(index_list$train)) {
-      id_train <- unlist(index_list$train[j], use.names = FALSE)
-      id_test <- unlist(index_list$test[j], use.names = FALSE)
-      x_train <- sst[id_train,]
-      y_train <- precip[id_train]
-      x_test <- sst[id_test,]
-      y_test <- precip[id_test]
-      # die cross validaion is done here classically
-      # does not work!!!
-      trained_model <- glmnet(x_train, y_train)
-      #TODO change value her for s
-      predicted <- predict(trained_model, newx = x_test, s = lambda_vec[i])
-      err <- mean((predicted-y_test)^2)
-      err_mat[i,j] <- err
-      #save(trained_model, file=paste0("results/CV-lasso/model-","lambda-",i,"fold-",j,".RData"))
-    }
+  #for(i in 1:length(lambda_vec)) {
+  for(j in 1:length(index_list$train)) {
+    id_train <- unlist(index_list$train[j], use.names = FALSE)
+    id_test <- unlist(index_list$test[j], use.names = FALSE)
+    x_train <- sst[id_train,]
+    y_train <- precip[id_train]
+    x_test <- sst[id_test,]
+    y_test <- precip[id_test]
+    # die cross validaion is done here classically
+    # does not work!!!
+    # trained_model <- glmnet(x_train, y_train)
+    trained_model <- glmnet(x_train, y_train, lambda=rev(lambda_vec))
+    #TODO change value her for s
+    predicted <- predict(trained_model, newx = data.matrix(x_test), s = rev(lambda_vec))
+    err_col <- apply(predicted, 2, function(x) mean((x-y_test)^2))
+    err_mat[,j] <- err_col
+    #save(trained_model, file=paste0("results/CV-lasso/model-","lambda-",i,"fold-",j,".RData"))
+    #print(paste("lambda", i, "fold", j))
+    print(paste("finished fold", j))
   }
+  #print(paste("finished lambda", i))
+  #}
+  print("finished fitting")
+  dir.create(paste("results/CV-lasso/",save_folder))
   index_list_path <- paste0("results/CV-lasso/", save_folder, "/index-list.rds")
   lambda_vec_path <- paste0("results/CV-lasso/", save_folder, "/lambda-vec.rds")
   err_mat_path <- paste0("results/CV-lasso/", save_folder, "/err-mat.rds")
@@ -518,6 +542,76 @@ cv_for_ts <- function(sst, precip, nfold, size_train, size_test, save_folder) {
   #AND initialwindow+horizon == nrow(data)/nfold
   #TODO read about standardisation ?glmnet()
   
+}
+
+############ Plotting the CV-results ###########
+plot_and_save_cv_results <- function(error_matrix, number_of_folds,
+                                     cv_ids, lambdas, feature_data,
+                                     target_data, save_to) {
+  # plot maps
+  plot_all_err(error_matrix, save_to)
+  # plot err-mats
+  plot_all_coef_maps(error_matrix, number_of_folds,
+                     cv_ids, lambdas, feature_data,
+                     target_data, save_to)
+}
+
+plot_all_err <- function(error_matrix, save_to) {
+  dir.create(paste0(save_to,"/err-mat-plots/"))
+  for(i in 1:ncol(error_matrix)) {
+    p <- plot(error_matrix[,i])
+    saveRDS(p, paste0(save_to,"/err-mat-plots/","err-plot-fold-",i,".rds"))
+  }
+}
+
+plot_all_coef_maps <- function(error_matrix, number_of_folds,
+                               cv_ids, lambdas, feature_data,
+                               target_data, save_to) {
+  dir.create(paste0(save_to,"/coef-plots/"))
+  for(i in 1:number_of_folds) {
+    p <- plot_nonzero_from_fold(error_matrix = error_matrix, fold = i,
+                                cv_ids = cv_ids, lambdas = lambdas, 
+                                feature_data = feature_data,
+                                target_data = target_data)
+    saveRDS(p, paste0(save_to, "/coef-plots/", "coef-plot-fold-", i,".rds"))
+  }
+}
+
+plot_nonzero_from_fold <- function(error_matrix, fold, cv_ids, lambdas,
+                                   feature_data, target_data) {
+  id_min <- which.min(error_matrix[,fold])
+  ids <- cv_ids$train[[fold]]
+  min_lambda <- lambdas[id_min]
+  # watch out for target dimensions and that feature_data
+  # is prepared f.e via prepare_sst
+  mod <- glmnet(feature_data[ids,], target_data[ids],
+                lambda = min_lambda)
+  all_coef <- coef(mod)[-1,1]
+  nonzero_coef <- all_coef != 0
+  nonzero_coef_names <- names(all_coef[nonzero_coef])
+  num_coef_names <- coef_names_to_numeric(nonzero_coef_names)
+  coef_mat <- cbind(num_coef_names, all_coef[nonzero_coef])
+  plt <- plot_nonzero_coefficients(coef_mat)
+  return(plt)
+}
+
+coef_names_to_numeric <- function(coefficient_names) {
+  a <- unlist(strsplit(coefficient_names, " "))
+  b <- as.numeric(a)
+  c <- matrix(b, ncol = 2, byrow = TRUE)
+  return(c)
+}
+
+plot_nonzero_coefficients <- function(nonzero_coef) {
+  # Using GGPLOT, plot the Base World Map
+  mp <- NULL
+  mapWorld <- borders("world", colour="gray50", fill="gray50") # create a layer of borders
+  mp <- ggplot() + mapWorld
+  
+  #vNow Layer the cities on top
+  mp <- mp + geom_point(aes(x=nonzero_coef[,1], y=nonzero_coef[,2], 
+                            colour = nonzero_coef[,3]), size=3) + scale_colour_gradient2()
+  mp
 }
 
 

@@ -1,20 +1,22 @@
 # no data upload
 data/
 figures/
-.Rhistory
-.html
-.jpg
-.png
 plots/
 code/Rmarkdown/plots-markdown/
-.bib
 results/
 code/R/depr/
 code/Rmarkdown/depr/
 code/Rmarkdown/Cluster-Precip_files/figure-html/
 figure-html/
+.Rproj.user/
+
 .log
 .pdf
 .rds
-.Rproj.user/
+.Rhistory
+.html
+.jpg
+.png
+.bib
+.nc
 

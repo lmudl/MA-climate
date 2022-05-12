@@ -11,7 +11,7 @@ library(ggplot2)
 
 plot_summary <- function(data, summary) {
   df <- base::as.data.frame(cbind(coordinates(data), summary@data@values))
-  colnames(df) <- c("Longitude","Latitude", "val")
+  colnames(df) <- c("Longitude", "Latitude", "val")
   plt <- ggplot(data = df, aes(x = Longitude, y = Latitude, fill = val)) +
     geom_raster(interpolate = FALSE) +
     scale_fill_gradient2(low = "red", high = "blue", midpoint = mean(df$val))
