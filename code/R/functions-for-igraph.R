@@ -20,6 +20,7 @@ source("code/R/helper-functions.R")
 
 # remember to load sst first IMPORTANT WORKS!!!! ####
 #ext <- extent(-180,0,-50,40)
+library(patchwork)
 library(raster)
 library(igraph)
 library(ggplot2)
@@ -120,12 +121,15 @@ length(b)
 
 ex_mod2 <- fusedlasso(y=pr, X=s, graph=g)
 saveRDS(ex_mod2, "results/second_fused_lasso.rds")
+ex_mod2 <- readRDS("results/second_fused_lasso.rds")
+
 date()
+
 
 co2 <- coef.genlasso(ex_mod2)
 length(co2$beta)
 dim(co2$beta)
-a <- co2$beta[,1000]
+a <- co2$beta[,2000]
 plot(density(a))
 names(a)
 length(cnames)
@@ -133,6 +137,28 @@ num_coef_names <- coef_names_to_numeric(colnames(s))
 dim(num_coef_names)
 coef_mat <- cbind(num_coef_names, a)
 plot <- plot_nonzero_coefficients(coef_mat)
+
+#replot without large values
+a[a< -1] <- 0
+coef_mat <- cbind(num_coef_names, a)
+plot <- plot_nonzero_coefficients(coef_mat)
+
+
+#softthreshhold
+l <- (ex_mod2$lambda)[2000]
+b2 <- coef.genlasso(ex_mod2, lambda=l)$beta
+# the_wanted is lambda * gamma = th,
+# meaning gamma = th/lambda
+th_wanted <- 0.1
+g <- th_wanted/l
+bb <- softthresh(ex_mod2, lambda=l, gamma = g)
+bb
+all(b2 == bb, TRUE)
+#num_coef_names <- coef_names_to_numeric(colnames(s))
+plot(density(b2)) + plot(density(bb))
+coef_mat <- cbind(num_coef_names, bb)
+plot <- plot_nonzero_coefficients(coef_mat)
+plot
 
 
 
