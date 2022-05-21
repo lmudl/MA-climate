@@ -3,15 +3,19 @@ title: "Predicting Droughts in the Amazon Basin based on Global Sea Surface Temp
 author: "Dario Lepke"
 site: bookdown::bookdown_site
 output:
-  bookdown::gitbook: default
-  bookdown::pdf_book: default
+  bookdown::gitbook:
+    split_bib: FALSE
+#  bookdown::pdf_book:
 bibliography: ref-lib.bib
 biblio-style: apalike
 link-citations: yes
 documentclass: book
 ---
-
 # Introduction {-}
+
+```{r, include=FALSE}
+knitr::opts_chunk$set(echo=FALSE, warning = FALSE, message = FALSE)
+```
 
 With future climate change droughts in the Amazon forest may become more
 frequent and/or severe. Droughts can turn Amazon regions from rain forest into

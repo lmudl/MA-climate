@@ -13,7 +13,7 @@ This mean vector is now the new center of the cluster.
 As a measure of dissimilarity we use the Euclidean distance:
 
 \begin{equation} 
-d(x_i,x_{i´}) = \sum_{i=1}^p(x_{ij}-x_{i´j})^2=||x_i-x_{i´}||^2
+d(x_i,x_{i´}) = \sum_{j=1}^p(x_{ij}-x_{i´j})^2=||x_i-x_{i´}||^2
 (\#eq:eucl-dist)
 \end{equation}
 

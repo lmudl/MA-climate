@@ -55,6 +55,70 @@
 <script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
 
 
+<style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
 
 <style type="text/css">
 /* Used with Pandoc 2.11+ new --citeproc when CSL is used */
@@ -204,7 +268,7 @@ This mean vector is now the new center of the cluster.</li>
 </ol>
 <p>As a measure of dissimilarity we use the Euclidean distance:</p>
 <p><span class="math display" id="eq:eucl-dist">\[\begin{equation}
-d(x_i,x_{i´}) = \sum_{i=1}^p(x_{ij}-x_{i´j})^2=||x_i-x_{i´}||^2
+d(x_i,x_{i´}) = \sum_{j=1}^p(x_{ij}-x_{i´j})^2=||x_i-x_{i´}||^2
 \tag{6.1}
 \end{equation}\]</span></p>
 <p>Meaning for the points <span class="math inline">\(i\)</span> and <span class="math inline">\(i´\)</span> we compute the squared difference for each
@@ -254,7 +318,7 @@ We accomplish this by creating new variables that are linear combinations of the
 original ones. We call these new variables principle components.
 The new variables are not correlated any more and ordered according
 to the variance they explain. The first <span class="math inline">\(k &lt; p\)</span> principal components then contain the majority
-of variance (<span class="citation">Fahrmeir et al. (<a href="#ref-fahrmeir1996multivariate" role="doc-biblioref">1996</a>)</span>).
+of variance (<span class="citation">Fahrmeir et al. (<a href="references.html#ref-fahrmeir1996multivariate" role="doc-biblioref">1996</a>)</span>).
 As they are ordered they also provide a sequence of best linear approximations
 of our data.
 Let <span class="math inline">\(x_1, x_2,...,x_N\)</span>, be our observations and we represent them by a rank-q linear
@@ -294,11 +358,11 @@ X = UDV^T
 \end{equation}\]</span></p>
 <p>Where <span class="math inline">\(U\)</span> is an orthogonal matrix containing the <em>left singular vectors</em> <span class="math inline">\(u_j\)</span> as columns, and <span class="math inline">\(V\)</span> contains the <em>right singular vectors</em> <span class="math inline">\(v_j\)</span>. The columns of <span class="math inline">\(U\)</span> span the columns space of <span class="math inline">\(X\)</span> and the columns of <span class="math inline">\(V\)</span> span the row space. <span class="math inline">\(D\)</span> is diagonal matrix which contains <em>singular values</em>, <span class="math inline">\(d_1 \leq d_2 \leq ... \leq d_p \leq 0\)</span>. <em>Singular values</em> are square roots of non-negative eigenvalues.
 The columns of <span class="math inline">\(UD\)</span> are the principal components of <span class="math inline">\(X\)</span>.
-So the SVD gives us the matrix <span class="math inline">\(V\)</span> (the first <span class="math inline">\(q\)</span> columns give the solution to the minimization problem above) as well as the principal components from <span class="math inline">\(UD\)</span> (<span class="citation">Hastie et al. (<a href="#ref-hastie2009elements" role="doc-biblioref">2009</a>)</span>).</p>
+So the SVD gives us the matrix <span class="math inline">\(V\)</span> (the first <span class="math inline">\(q\)</span> columns give the solution to the minimization problem above) as well as the principal components from <span class="math inline">\(UD\)</span> (<span class="citation">Hastie et al. (<a href="references.html#ref-hastie2009elements" role="doc-biblioref">2009</a>)</span>).</p>
 </div>
 <div id="gap-statistic" class="section level2 hasAnchor" number="6.4">
 <h2><span class="header-section-number">6.4</span> Gap statistic<a href="clustering-methods.html#gap-statistic" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>The idea of the gap statistic was introduced by <span class="citation">Tibshirani, Walther, and Hastie (<a href="#ref-tibshirani2001estimating" role="doc-biblioref">2001</a>)</span>
+<p>The idea of the gap statistic was introduced by <span class="citation">Tibshirani, Walther, and Hastie (<a href="references.html#ref-tibshirani2001estimating" role="doc-biblioref">2001</a>)</span>
 As stated above we usually measure how compact our clusters are
 by assessing <span class="math inline">\(W(C)\)</span> or <span class="math inline">\(log(W_c)\)</span>. Where low values indicate compact clusters. To compare the value then, we need a reference.
 We therefore want to estimate how large <span class="math inline">\(W_c\)</span> were if there were
@@ -318,22 +382,10 @@ E \{log(W_c) \} - log(W_c).
 \end{equation}\]</span></p>
 <p>So in cases where our data is formed of clusters we would expect
 a high gap statistic.
-As <span class="citation">Tibshirani, Walther, and Hastie (<a href="#ref-tibshirani2001estimating" role="doc-biblioref">2001</a>)</span> note and as it is also done in the used R function
+As <span class="citation">Tibshirani, Walther, and Hastie (<a href="references.html#ref-tibshirani2001estimating" role="doc-biblioref">2001</a>)</span> note and as it is also done in the used R function
 clusgap, doing a PCA on the data and compute the gap statistic on the
 PCA scores can improves the results of gap statistic.</p>
 
-</div>
-</div>
-<h3>References<a href="references.html#references" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<div id="refs" class="references csl-bib-body hanging-indent">
-<div id="ref-fahrmeir1996multivariate" class="csl-entry">
-Fahrmeir, Ludwig, Wolfgang Brachinger, Alfred Hamerle, and Gerhard Tutz. 1996. <em>Multivariate Statistische Verfahren</em>. Walter de Gruyter.
-</div>
-<div id="ref-hastie2009elements" class="csl-entry">
-Hastie, Trevor, Robert Tibshirani, Jerome H Friedman, and Jerome H Friedman. 2009. <em>The Elements of Statistical Learning: Data Mining, Inference, and Prediction</em>. Vol. 2. Springer.
-</div>
-<div id="ref-tibshirani2001estimating" class="csl-entry">
-Tibshirani, Robert, Guenther Walther, and Trevor Hastie. 2001. <span>“Estimating the Number of Clusters in a Data Set via the Gap Statistic.”</span> <em>Journal of the Royal Statistical Society: Series B (Statistical Methodology)</em> 63 (2): 411–23.
 </div>
 </div>
             </section>

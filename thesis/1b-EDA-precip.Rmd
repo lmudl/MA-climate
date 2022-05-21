@@ -5,8 +5,8 @@ Central Amazon Basin.
 
 We use the location that is also used in @ciemer2020early.
 
-```{r}
-knitr::opts_chunk$set(echo=FALSE)
+```{r, include = FALSE}
+knitr::opts_chunk$set(echo=FALSE, warning = FALSE, message = FALSE)
 ```
 
 ```{r}
@@ -16,6 +16,7 @@ library(rnaturalearth)
 library(rnaturalearthdata)
 library(raster)
 library(patchwork)
+library(ggpubr)
 ```
 
 ```{r}
@@ -60,7 +61,7 @@ plot_trends <- function(data, trends) {
 ```
 
 
-Below the are of the Central Amazon Basin that is object of our study.
+Below the area of the Central Amazon Basin that is object of our study.
 
 ```{r, echo=FALSE, fig.cap="Localisation of the area under study. The central amazon basin (CAB) spanning across 0,-10 latitude and -70,-55 longitude"}
 ggplot(data = world) +
@@ -78,12 +79,13 @@ precip <- raster::aggregate(precip, fact = 10)
 ```{r, fig.cap="Precipitation mean at each location. The mean was computed over the whole time period"}
 r_mean <- calc(precip, mean)
 #plot(r_mean)
-plot_summary(r_mean) + ggtitle("Mean of precipitation for each location")
+(mean_locs_plot <- plot_summary(r_mean) + ggtitle("Mean of precipitation for each location"))
 ```
 
 ```{r, fig.cap="Density of means, means were computed for each location over the whole time period"}
 df_mean <- data.frame(means = values(r_mean))
-ggplot(df_mean, aes(x = means)) + geom_density() + ggtitle("Density of means computed on each location")
+(mean_dens_plot<- ggplot(df_mean, aes(x = means)) + geom_density() + ggtitle("Density of means computed on each location"))
+
 ```
 
 As we can see most locations have a mean precipitation of around 200 mm/month, over
@@ -99,12 +101,12 @@ For example in the upper right corner and on the bottom, right of the middle.
 ```{r, fig.cap="Precipitation standard deviation at each location. The standard deviation was computed over the whole time period"}
 r_sd <- calc(precip, sd)
 #plot(r_sd)
-plot_summary(r_sd) + ggtitle("SD of precipitation for each location")
+(sd_locs_plot <- plot_summary(r_sd) + ggtitle("SD of precipitation for each location"))
 ```
 
 ```{r, fig.cap="Density of standard deviations, standard deviations were computed for each location over the whole time period"}
 df_sd <- data.frame(sd = values(r_sd))
-ggplot(df_sd, aes(x = sd)) + geom_density()
+(sd_dens_plot <- ggplot(df_sd, aes(x = sd)) + geom_density())
 ```
 
 For the standard deviation we also see regional patterns. These patterns overlap
@@ -118,6 +120,16 @@ and standard deviations. Should we therefore NOT normalise the time series, prio
 to clustering? Mean and SD contain information and the variables are all measured 
 on the same scale. (Consideration: seasonality might play a role, meaning
 that the values of different months come a different distribution)
+
+## Mean and SD at each location
+
+```{r}
+mean_locs_plot + sd_locs_plot
+```
+```{r}
+(mean_dens_plot + ggtitle("Density of means")) + (sd_dens_plot + ggtitle("Density of sd"))
+```
+
 
 ## Trend at each location
 ```{r, include=FALSE}
@@ -159,7 +171,14 @@ mon_plots <- function(precip_data) {
     mon <- subset(precip_data, ind_mat[i,])
     mon_means <- calc(mon, mean)
     mon_sd <- calc(mon, sd)
-    m_plot <- plot_summary(mon_means) + ggtitle(paste("Means for month", i))
+    m_plot <- plot_summary(mon_means) + #ggtitle(paste("Means for month", i)) +
+      theme(#axis.text.x=element_blank(), #remove x axis labels
+        #axis.ticks.x=element_blank(), #remove x axis ticks
+        #axis.text.y=element_blank(),  #remove y axis labels
+        #axis.ticks.y=element_blank(), #remove y axis ticks
+        axis.title.x = element_blank(),
+        axis.title.y = element_blank()
+        )
     sd_plot <- plot_summary(mon_sd)  + ggtitle(paste("SD for month", i))
     plot_list_m[[i]] <- m_plot
     plot_list_sd[[i]] <- sd_plot
@@ -177,7 +196,6 @@ mon_sd <- plt_list[[2]]
 
 
 ## Means per month
-
 
 
 ### January
@@ -207,7 +225,7 @@ mon_mean[[4]]
 ### May
 
 ```{r}
-mon_mean[5]
+mon_mean[[5]]
 ```
 
 ### June
@@ -260,6 +278,12 @@ For example: From May until August there is a spatial separation in
 two parts that dissolves in september.
 As expected there is a large seasonal component regarding the means.
 
+## Means per month TEST
+
+```{r}
+mean_arrange <- ggarrange(plotlist = mon_mean, ncol = 3, nrow = 4, common.legend = TRUE, legend = "bottom")
+mean_arrange 
+```
 
 ## SD per month
 
@@ -347,3 +371,13 @@ during different months of the year.
 #### Open: summarise CAB for each month (mean Jan, Feb, etc.)
 
 ```
+
+
+## SD per month TEST
+
+```{r}
+sd_arrange <- ggarrange(plotlist = mon_sd, ncol = 3, nrow = 4, common.legend = TRUE, legend = "bottom")
+sd_arrange
+```
+
+
