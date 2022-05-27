@@ -168,5 +168,3 @@ names(test)
 d <- getValues(precip_centered)
 cbind(d, kmeans_result$cluster)
 
-
-

@@ -90,3 +90,7 @@ bookdownpdf_book
 mean-and-sd-at-each-location
 means-per-month-test
 sd-per-month-test
+trend-per-month-test
+fig:unnamed-chunk-13
+precipitation-values-raw
+eda-sst

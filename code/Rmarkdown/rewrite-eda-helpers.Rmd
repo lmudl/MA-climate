@@ -1,0 +1,74 @@
+---
+title: "testestest"
+author: "Dario Lepke"
+date: '2022-05-27'
+output: html_document
+---
+# File to test the helper functions used in the EDA
+# should work on precip and on sst data
+# should not matter if deseasonalised or not or aggregated or not
+```{r}
+getwd()
+setwd("Repos/MA-climate/")
+```
+```{r}
+library(raster)
+```
+
+```{r}
+# load data
+precip <- brick("data/interim/drought/chirps_setreftime.nc")
+sst <- brick("../../data/interim/sst/ersst_setreftime.nc", varname = "sst")
+precip_des <- readRDS("../../data/processed/deseasonalised_precip.rds")
+precip_des_agg2 <- readRDS("../../data/processed/rtsa_deseasonalised_precip.rds")
+sst_des <- readRDS("../../data/processed/deseasonalised_sst.rds")
+sst_des2 <- readRDS("../../data/processed/rtsa_deseasonalised_sst.rds")
+precip_des_agg <- readRDS("../../data/processed/deasonalised_precip_aggregated.rds")
+
+
+
+
+```
+
+```{r}
+# compare data there are some small differences 
+# but probably rather work with rts results
+dim(sst_des)
+d <- getValues(sst_des2@trend) + getValues(sst_des2@remainder)
+dim(d)
+all(round(sst_des,3)==round(d,3))
+plot(density(sst_des - d, na.rm=TRUE) )
+```
+
+
+# create density plot with ggplot
+```{r}
+plot_dens_gg <- function(raster_obj) {
+  
+}
+# we need dataframe, when raster object we can easily call
+# raster::as.data.frame(raster_obj, long = TRUE)
+
+t1 <- raster::as.data.frame(precip, long = TRUE) # works
+class(precip)
+head(t1)
+t2 <- raster::as.data.frame(sst, long = TRUE) # works
+class(sst)
+head(t2)
+t3 <- raster::as.data.frame(precip_des, long = TRUE) # works
+class(precip_des)
+dim(precip_des)
+head(t3)
+class(precip_des)
+t11 <- c(values(precip))
+t31 <- c(precip_des)
+length(t11)
+dim(t11)
+values(precip_des)
+
+```
+
+```{r}
+# Idea can we just vectorize the whole data and make data frame out 
+```
+

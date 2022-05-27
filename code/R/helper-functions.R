@@ -156,6 +156,33 @@ get_trend <- function(vec) {
 
 ###############For Decomposition################################################
 
+# create timestamps that are the first day of a month, from a raster obj
+# in: raster object and a reference string
+# out: timestamps as Dates
+prepare_timestamps <- function(raster_obj, ref_string) {
+  cnames <- as.integer(as.numeric(str_replace(names(raster_obj), "X", "")))
+  ref_s <- RNetCDF::utcal.nc(ref_string, cnames, type ="s")
+  tstamps_og <- as.Date(ref_s)
+  # change vector so that
+  # its always the first of the month
+  l <- length(tstamps_og)
+  start <- ceiling_date(tstamps_og[1], "month")
+  end <- ceiling_date(tstamps_og[l], "month")
+  tstamps <- seq(start, end, by = "month")
+  return(tstamps)
+}
+
+# create a mask that can be used by the rtsa.stl function
+# in: raster object
+# out: raster mask with 1 for nonNA and 0 for NA
+prepare_mask <- function(raster_obj) {
+  mask <- raster_obj[[1]]
+  names(mask) <- "mask"
+  values(mask) <- 1
+  mask[which(is.na(getValues(raster_obj[[1]])))] <- 0
+  return(mask)
+}
+
 # in: brick object
 # out: matrix with dim ncell x nlayers
 brick_to_matrix_wna <- function(brick_object, nlayers) {

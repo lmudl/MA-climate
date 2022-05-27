@@ -1,74 +1,61 @@
 Masterarbeit gibt 25 ECTS, 1 ECTS entspricht 30 Std Arbeitszeit
 
-ab 19.01. bis 12.07 25 Wochen Zeit.
-
-25 ECTS in 25 Wochen -> 1 ECTS pro Woche -> 30 Std Arbeitszeit pro Woche. pro Tag 6 Stunden
-
-Einplanen: Urlaub, konservativ planen, etc.
-
-Im letzten Monat nur noch schreiben -> bis 12.06 code fertig.
-
-Datum: 24.05.12
+Datum 25.05.12, Abgabe 12.07.
+6 Wochen Zeit, 42 Tage.
+22 Tage sind hier verplant für coden und grob schreiben
+20 Tage wären übrig für schreiben und fertigstellen
 
 
-19.01 bis 16.02. (4 Wochen, 28 Tage, 20 AT, 18 Tage geplant, 2 Tage puffer)
+EDA (Precip und SST):
 
-"Organisatorisch": Grundgerüst Rmarkdown Thesis (2 Tage), Repo sauber (2 Tage). DONE
-
-Intro am Ende schreiben aber Ideen sammeln und Einführung in das Problem fertig "schreiben"
-
-Related Work/ Ciemer Zusammenfassung (siehe Exposé) (2 Tage)
-
-EDA (Precip und SST) (5 Tage): DONE
-
-Ziel/ Fragestellung: 
+Ziel/ Fragestellung (2 Tage): 
 	1. Überblick über die Rohdaten verschaffen (auch um Clustering zu motivieren oder neue
 	Fragen aufzuwerfen:
-	regionale Unterschiede in mean und var
+
+	TODO:
+​	Info Datensatz: Relevanz der Variable/ was wird gemessen/ wie wird gemessen/ welcher Zeitraum 			
+		Unsicherheiten der Daten
+	Outlier detection schon hier, oder erst in Modelling/STL part
+	Definiere local/ global scaling in glyph plots
+	Glyph plots für SST
+​	
+	DONE:
+	regionale Unterschiede in mean und var 
 	zeitl Unterschiede in mean und var (für jeden Monat)
 	verschiedene Trends untersuchen
 	eventuell stl()
-	Perioden mit hohem/niedrigem Niederschlag finden(v.a Dürren)
 
-​	Info Datensatz: Relevanz der Variable/ was wird gemessen/ wie wird gemessen/ welcher Zeitraum 			
-	Unsicherheiten der Daten
-
-​	Visualisierung der Daten/Untersuchen räumlicher und zeitlicher Unterschiede:        									
+	Visualisierung der Daten/Untersuchen räumlicher und zeitlicher Unterschiede:        									
 	Alle Zeitreihen Überblick/Mittelwerte/SD der Zeitreihen räumlich geplotted, Mean 										
 	und SD für die jeweiligen Monate
 
-Clustering Precip (7 Tage):
+	Backlog:
+	Perioden mit hohem/niedrigem Niederschlag finden(v.a Dürren)
+		betrachten aktuell nur Nierderschlag ohne Dürreindex
+
+Clustering Precip DONE:
 
 Ziel/ Fragestellung: 
 	1. Kann man das Amazonasbecken hinsichtlich Niederschlagsverläufen 
 		in eine Handvoll in sich homogener, untereinander heterogener Teilbereiche zerlegen
 	2. Sind die resultierenden Cluster stabil ggü der gewählten Methoden?
 
+	DONE:
 ​	Motivation
-
 ​	Mathematische Grundlage
-
-​	Normalisieren vs nicht Normalisieren
-
 ​	Hauptfaktorenanalyse vs ohne Hauptfaktorenanalyse
-
 ​	kmeans clustering
-
 ​	pam clustering
 
+	Backlog:
 ​	hierarchical clustering?
-
 	take into account temporal dependencies?
-	
 	take into account spatial dependencies?
 
+STL Algorithmus (2 Tage)
 	
 
-
-
-18.02. bis 22.04 (9 Wochen, 63 Tage, 45 AT, 37 Tage geplant, 8 Tage Puffer)
-
-Regressionsmodelle (27 Tage + 3 Tage Puffer = 30 Arbeitstage):
+Regressionsmodelle (18 Tage):
 
 Ziel/ Fragestellung:
 	1. Können wir den Niederschlag im Amazonasbecken anhand von SST mit einem (regularisierten)
@@ -80,39 +67,27 @@ Ziel/ Fragestellung:
 	5. Sind die Ergebnisse über verschiedene Folds hinweg einer CV stabil?
 
 ​	Mathematische Formulierung, Precip = f(SST) (3 Tage)
-
-​	Precipitation in Dürreindex umrechnen? Wenn ja, Dürreindex beschreiben, eventuell EDA anpassen
-
 ​	Verschiedene Timelags (miteinbauen in Funktionen)
-
 	weitere Variablen (welcher Monat, rolling mean etc) einbauen?
 
-​	LASSO (7 Tage)
+​	LASSO (3 Tage + Experimente)
+​		mathematische Formulierung schreiben (3 Tage) 
+​		Experimente laufen lassen
+			Entscheiden über Parameter (Zeitlags considered etc)
 
-​		mathematische Formulierung (2 Tage) 
+​	Fused LASSO (5 Tage + Experimente)
+​		mathematische Formulierung (5 Tage)
+​		Experimente laufen lassen
 
-​		implementieren/ coden (5 Tage)
-
-​	Fused LASSO (12 Tage)
-
-​		mathematische Formulierung (3 Tage)
-
-​		implementieren/ coden (9 Tage)
-
-​	Cross Validation (11 Tage)
-
+​	Cross Validation (3 Tage schreiben + Experimente)
 ​		CV für Zeitreihen, klassische CV für Zeitreihen mit Stationarität?
-
 ​		verschiedene CV Methoden ausprobieren und vergleichen:
-
 			classic CV?
-
 			Blocked CV
-
 			overlapped CV (evtl)
 	
-	Vergleichen der Modelle (7 Tage):
-	
+	Experimente laufen lassen/ Vergleichen der Modelle (7 Tage):
+
 		Für jedes Modell mittels CV beste Regularisierung finden
 		und anschließend auf Testset evaluieren und vergleichen.
 
@@ -120,7 +95,14 @@ Ziel/ Fragestellung:
 		dann sind wir bei 6 Modellen die miteinander verglichen werden müssen.
 
 
+	DONE:
+	LASSO imlementierung
+	FUSED LASSO implementierung
+	CV, Blocked CV implmentierung
+
+	Backlog:
+	Precipitation in Dürreindex umrechnen? Wenn ja, Dürreindex beschreiben, eventuell EDA anpassen
 
 
-22.04 bis 12.06 noch nicht geplant (wird aber bestimmt gebraucht)
+
 				

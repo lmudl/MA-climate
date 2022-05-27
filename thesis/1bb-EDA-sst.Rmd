@@ -1,0 +1,199 @@
+# EDA SST
+
+We explore the **sea surface temperature data** set, used in the paper by Ciemer et al (@ciemer2020early). 
+ERSST (Extended Reconstructed Sea Surface Temperature, @huang2017noaa) is a reanalysis from observed data given in the International Comprehensive Ocean-Athmosphere Data Set (ICOADS). Which contains observations **from 1800/01 until 2016/12**, made by ships and buoys for example.
+The data comes on a **2x2 degree grid**, where data was missing **interpolation techniques were used**.
+See paper for reference.
+the file contains **two variables** that are measured across different dimensions.
+The two variables contain the **sea surface temperatures and the respective SST anomalies** (with respect to the 1971-2000 monthly climatology).
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(echo=FALSE, warning = FALSE, message = FALSE)
+```
+
+```{r}
+library(ggplot2)
+library(sf)
+library(rnaturalearth)
+library(rnaturalearthdata)
+library(raster)
+library(patchwork)
+library(ggpubr)
+```
+
+```{r}
+source("../code/R/helper-functions.R")
+```
+
+```{r, include=FALSE}
+# helpers
+plot_summary_sst <- function(summary) {
+  df <- base::as.data.frame(cbind(coordinates(summary), values(summary)))
+  colnames(df) <- c("Longitude","Latitude", "val")
+  plt <- ggplot(data = df, aes(x = Longitude, y = Latitude, fill = val)) +
+    geom_raster(interpolate = FALSE) +
+    scale_fill_gradient2(low = "red", high = "blue", midpoint = mean(df$val, na.rm=TRUE))
+  return(plt)
+}
+
+plot_trends <- function(data, trends) {
+  df <- base::as.data.frame(cbind(coordinates(data), trends))
+  colnames(df) <- c("Longitude","Latitude", "val")
+  plt <- ggplot(data = df, aes(x = Longitude, y = Latitude, fill = val)) +
+    geom_raster(interpolate = FALSE) +
+    scale_fill_gradient2(low = "red", high = "blue", midpoint = mean(df$val, na.rm=TRUE))
+  return(plt)
+}
+
+get_trend <- function(vec) {
+  if(!any(is.na(vec))) {
+    b <- seq(length(vec))
+    trend <- lm(vec ~ b)$coefficients[2]
+    return(trend)
+  } else {
+    return(NA)
+  }
+}
+
+create_ind_mat <- function(precip_data) {
+  ind_mat <- matrix(NA, nrow = 12, ncol = nlayers(precip_data)/12)
+  for(i in 1:12) {
+    ind_mat[i,] <- seq(i, nlayers(precip_data), 12)
+  }
+  return(ind_mat)
+}
+
+mon_plots_sst <- function(precip_data) {
+  ind_mat <- create_ind_mat(precip_data)
+  plot_list_m <- list()
+  plot_list_sd <- list()
+  plot_list_trend <- list()
+  pvals <- getValues(precip_data)
+  for(i in 1:nrow(ind_mat)) {
+    mon <- subset(precip_data, ind_mat[i,])
+    mon_means <- calc(mon, mean)
+    mon_sd <- calc(mon, sd)
+    #mon_trend <- calc(mon, get_trend)
+    m_plot <- plot_summary_sst(mon_means) + #ggtitle(paste("Means for month", i)) +
+      theme(#axis.text.x=element_blank(), #remove x axis labels
+        #axis.ticks.x=element_blank(), #remove x axis ticks
+        #axis.text.y=element_blank(),  #remove y axis labels
+        #axis.ticks.y=element_blank(), #remove y axis ticks
+        axis.title.x = element_blank(),
+        axis.title.y = element_blank()
+      )
+    sd_plot <- plot_summary_sst(mon_sd)  + ggtitle(paste("SD for month", i)) +
+      #ggtitle(paste("Means for month", i)) +
+      theme(#axis.text.x=element_blank(), #remove x axis labels
+        #axis.ticks.x=element_blank(), #remove x axis ticks
+        #axis.text.y=element_blank(),  #remove y axis labels
+        #axis.ticks.y=element_blank(), #remove y axis ticks
+        axis.title.x = element_blank(),
+        axis.title.y = element_blank(),
+        plot.title = element_text(size=5)
+      )
+    # trend_plot <- plot_summary_sst(mon_trend) + #ggtitle(paste("trend for month", i)) +
+    #   #ggtitle(paste("Means for month", i)) +
+    #   theme(#axis.text.x=element_blank(), #remove x axis labels
+    #     #axis.ticks.x=element_blank(), #remove x axis ticks
+    #     #axis.text.y=element_blank(),  #remove y axis labels
+    #     #axis.ticks.y=element_blank(), #remove y axis ticks
+    #     axis.title.x = element_blank(),
+    #     axis.title.y = element_blank(),
+    #     plot.title = element_text(size=5)
+    #   )
+    plot_list_m[[i]] <- m_plot
+    plot_list_sd[[i]] <- sd_plot
+    #plot_list_trend[[i]] <- trend_plot
+  }
+  return(list(plot_list_m,plot_list_sd))#, plot_list_trend))
+}
+
+```
+
+```{r}
+
+```
+
+```{r}
+sst <- brick("../data/interim/sst/ersst_setreftime.nc", varname = "sst")
+sst_df <- raster::as.data.frame(sst, long = TRUE)
+dim(sst)
+head(sst)
+# cn <- colnames(sst)
+# colnames(sst) <- as.integer(as.numeric(stringr::str_replace(cn, "X", "")))
+range(na.omit(sst$value))
+```
+
+
+```{r}
+ggplot(sst_df, aes(x=value)) +
+  geom_histogram(aes(y = ..density..),
+                 colour = 1, fill = "white",
+                 bins=50) +
+  geom_density(lwd = 1, colour = 4,
+               fill = 4, alpha = 0.25)
+
+```
+
+```{r}
+s_mean <- calc(sst, mean)
+plot(s_mean)
+plot_summary_sst(s_mean)
+```
+```{r}
+df <- base::as.data.frame(cbind(coordinates(s_mean),
+                                values(s_mean)))
+colnames(df) <- c("Longitude", "Latitude", "val")
+plt <- ggplot(data = df, aes(x = Longitude, y = Latitude, fill = val)) +
+  geom_raster(interpolate = FALSE) +
+  scale_fill_gradient2(low = "blue", high = "red", midpoint = mean(df$val, na.rm=TRUE))
+plt
+
+```
+```{r}
+df_mean <- data.frame(means = values(s_mean))
+(mean_dens_plot<- ggplot(df_mean, aes(x = means)) + geom_density() + ggtitle("Density of means computed on each location"))
+```
+
+```{r}
+sst_sd <- calc(sst, sd)
+plot(sst_sd)
+plot_summary_sst(sst_sd
+)
+```
+```{r}
+df_sd <- data.frame(sd = values(sst_sd))
+(sd_dens_plot <- ggplot(df_sd, aes(x = sd)) + geom_density())
+```
+
+```{r}
+#sst <- as.data.frame(sst)
+trends <- apply(getValues(sst), 1, get_trend)
+plot_trends(sst, trends)
+df_trends <- data.frame(tr = trends)
+ggplot(df_trends, aes(x = tr)) + geom_density()
+
+```
+```{r}
+plt_list <- mon_plots(sst)
+mon_mean <- plt_list[[1]]
+mon_sd <- plt_list[[2]]
+#mon_trend <- plt_list[[3]]
+```
+
+```{r}
+mean_arrange <- ggarrange(plotlist = mon_mean, ncol = 3, nrow = 4, common.legend = TRUE, legend = "bottom")
+mean_arrange 
+```
+
+
+```{r}
+sd_arrange <- ggarrange(plotlist = mon_sd, ncol = 3, nrow = 4, common.legend = TRUE, legend = "bottom")
+sd_arrange
+```
+
+```{r}
+# trend_arrange <- ggarrange(plotlist = mon_trend, ncol = 3, nrow = 4, common.legend = TRUE, legend = "bottom")
+# trend_arrange
+```
