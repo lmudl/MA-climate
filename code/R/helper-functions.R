@@ -119,16 +119,48 @@ plot_corr <- function(corr_vec, old_sst, timelag,
   return(plt)
 }
 
+
+# plot the denstiy from a raster object ignoring spatial and temporal
+# dependencies
+# in: raster object
+# out: ggplot of the values density
+plot_dens_gg <- function(raster_obj) {
+  df <- raster::as.data.frame(raster_obj, long = TRUE)
+  if(anyNA(df)) df <- na.omit(df)
+  p <- ggplot(df, aes(x=value)) +
+    geom_histogram(aes(y = ..density..),
+                   colour = 1, fill = "white",
+                   bins=50) +
+    geom_density(lwd = 1, colour = 4,
+                 fill = 4, alpha = 0.25)
+  return(p)
+}
+
+
+
 # plot a summary done by raster calc function, f.e plot(precip, calc(precip, mean))
 # in: here, precip <- aggregate::precip() and the summary computed by calc()
 # out: plot showing the summary on a map
-plot_summary <- function(data, summary) {
-  df <- base::as.data.frame(cbind(coordinates(data), summary@data@values))
+plot_summary <- function(summary) {
+  df <- base::as.data.frame(cbind(coordinates(summary), getValues(summary)))
   colnames(df) <- c("Longitude","Latitude", "val")
   plt <- ggplot(data = df, aes(x = Longitude, y = Latitude, fill = val)) +
     geom_raster(interpolate = FALSE) +
-    scale_fill_gradient2(low = "red", high = "blue", midpoint = mean(df$val))
-  plt
+    scale_fill_gradient2(low = "red", high = "blue", midpoint = mean(df$val, na.rm = TRUE))
+  return(plt)
+}
+
+# rather use the trendslope from the stl deseasonalised data
+# get the trends of raster time series by computing a linear model w/ intercept
+# to be applied in a apply function call, f.e. trends <- apply(m, 1, get_trend)
+# in: vector/ row of a matrix that consists row is lot/lan col is month
+# out: the trend over the respective time series
+
+get_trend <- function(vec) {
+  if(all(is.na(vec))) return(NA)
+  b <- seq(length(vec))
+  trend <- lm(vec ~ b)$coefficients[2]
+  return(trend)
 }
 
 # plot the trends of the data after computing it from the data
@@ -139,20 +171,76 @@ plot_trends <- function(data, trends) {
   colnames(df) <- c("Longitude","Latitude", "val")
   plt <- ggplot(data = df, aes(x = Longitude, y = Latitude, fill = val)) +
     geom_raster(interpolate = FALSE) +
-    scale_fill_gradient2(low = "red", high = "blue", midpoint = mean(df$val))
-  plt
+    scale_fill_gradient2(low = "red", high = "blue", midpoint = mean(df$val, na.rm=TRUE))
+  return(plt)
 }
 
-# get the trends of raster time series by computing a linear model w/ intercept
-# to be applied in a apply function call, f.e. trends <- apply(m, 1, get_trend)
-# in: vector/ row of a matrix that consists row is lot/lan col is month
-# out: the trend over the respective time series
-
-get_trend <- function(vec) {
-  b <- seq(length(vec))
-  trend <- lm(vec ~ b)$coefficients[2]
-  return(trend)
+# helper function for the mon plots
+# create a indices matrix to plot all Januaries all Februaries etc together
+# in: raster object
+# out: indices matrix with 12 rows in the first row all Januaries,..
+create_ind_mat <- function(raster_obj) {
+  ind_mat <- matrix(NA, nrow = 12, ncol = nlayers(raster_obj)/12)
+  for(i in 1:12) {
+    ind_mat[i,] <- seq(i, nlayers(raster_obj), 12)
+  }
+  return(ind_mat)
 }
+
+# creates a list which contains 3 lists with each 12 plots
+# first list for loc means for each month
+# second list for loc sds for each month
+# third list for loc trends for each month
+# Note trend list is commented out since we rather plot
+# the trends from the deseasonalised data
+# in: raster object
+# out: list with 1. list of month mean 2. list of month sd
+mon_plots <- function(raster_obj) {
+  ind_mat <- create_ind_mat(raster_obj)
+  plot_list_m <- list()
+  plot_list_sd <- list()
+  plot_list_trend <- list()
+  pvals <- getValues(raster_obj)
+  for(i in 1:nrow(ind_mat)) {
+    mon <- subset(raster_obj, ind_mat[i,])
+    mon_means <- calc(mon, mean)
+    mon_sd <- calc(mon, sd)
+    mon_trend <- calc(mon, get_trend)
+    m_plot <- plot_summary(mon_means) + #ggtitle(paste("Means for month", i)) +
+      theme(#axis.text.x=element_blank(), #remove x axis labels
+        #axis.ticks.x=element_blank(), #remove x axis ticks
+        #axis.text.y=element_blank(),  #remove y axis labels
+        #axis.ticks.y=element_blank(), #remove y axis ticks
+        axis.title.x = element_blank(),
+        axis.title.y = element_blank()
+      )
+    sd_plot <- plot_summary(mon_sd)  + ggtitle(paste("SD for month", i)) +
+      #ggtitle(paste("Means for month", i)) +
+      theme(#axis.text.x=element_blank(), #remove x axis labels
+        #axis.ticks.x=element_blank(), #remove x axis ticks
+        #axis.text.y=element_blank(),  #remove y axis labels
+        #axis.ticks.y=element_blank(), #remove y axis ticks
+        axis.title.x = element_blank(),
+        axis.title.y = element_blank(),
+        plot.title = element_text(size=5)
+      )
+    trend_plot <- plot_summary(mon_trend) + #ggtitle(paste("trend for month", i)) +
+      #ggtitle(paste("Means for month", i)) +
+      theme(#axis.text.x=element_blank(), #remove x axis labels
+        #axis.ticks.x=element_blank(), #remove x axis ticks
+        #axis.text.y=element_blank(),  #remove y axis labels
+        #axis.ticks.y=element_blank(), #remove y axis ticks
+        axis.title.x = element_blank(),
+        axis.title.y = element_blank(),
+        plot.title = element_text(size=5)
+      )
+    plot_list_m[[i]] <- m_plot
+    plot_list_sd[[i]] <- sd_plot
+    plot_list_trend[[i]] <- trend_plot
+  }
+  return(list(plot_list_m, plot_list_sd, plot_list_trend))
+}
+
 
 ###############For Decomposition################################################
 

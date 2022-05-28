@@ -1,32 +1,29 @@
----
-title: "testestest"
-author: "Dario Lepke"
-date: '2022-05-27'
-output: html_document
----
 # File to test the helper functions used in the EDA
-# should work on precip and on sst data
-# should not matter if deseasonalised or not or aggregated or not
+<!-- # should work on precip and on sst data -->
+<!-- # should not matter if deseasonalised or not or aggregated or not -->
+
+
 ```{r}
 getwd()
-setwd("Repos/MA-climate/")
+setwd("../../")
 ```
 ```{r}
 library(raster)
+library(ggplot2)
+library(patchwork)
 ```
 
 ```{r}
 # load data
-precip <- brick("data/interim/drought/chirps_setreftime.nc")
+# precip <- brick("../../data/interim/drought/chirps_setreftime.nc")
+precip_agg <- readRDS("../../data/interim/drought/chirps_setreftime_aggregated.rds")
+class(precip_agg)
 sst <- brick("../../data/interim/sst/ersst_setreftime.nc", varname = "sst")
 precip_des <- readRDS("../../data/processed/deseasonalised_precip.rds")
 precip_des_agg2 <- readRDS("../../data/processed/rtsa_deseasonalised_precip.rds")
 sst_des <- readRDS("../../data/processed/deseasonalised_sst.rds")
 sst_des2 <- readRDS("../../data/processed/rtsa_deseasonalised_sst.rds")
 precip_des_agg <- readRDS("../../data/processed/deasonalised_precip_aggregated.rds")
-
-
-
 
 ```
 
@@ -37,38 +34,94 @@ dim(sst_des)
 d <- getValues(sst_des2@trend) + getValues(sst_des2@remainder)
 dim(d)
 all(round(sst_des,3)==round(d,3))
-plot(density(sst_des - d, na.rm=TRUE) )
+plot(hist(sst_des - d, na.rm=TRUE) )
+range(sst_des - d, na.rm=TRUE)
 ```
 
 
 # create density plot with ggplot
 ```{r}
 plot_dens_gg <- function(raster_obj) {
-  
+  df <- raster_obj <- raster::as.data.frame(raster_obj, long = TRUE)
+  if(anyNA(df)) df <- na.omit(df)
+  p <- ggplot(df, aes(x=value)) +
+    geom_histogram(aes(y = ..density..),
+                    colour = 1, fill = "white",
+                 bins=50) +
+  geom_density(lwd = 1, colour = 4,
+               fill = 4, alpha = 0.25)
+  return(p)
 }
-# we need dataframe, when raster object we can easily call
-# raster::as.data.frame(raster_obj, long = TRUE)
-
-t1 <- raster::as.data.frame(precip, long = TRUE) # works
-class(precip)
-head(t1)
-t2 <- raster::as.data.frame(sst, long = TRUE) # works
-class(sst)
-head(t2)
-t3 <- raster::as.data.frame(precip_des, long = TRUE) # works
-class(precip_des)
-dim(precip_des)
-head(t3)
-class(precip_des)
-t11 <- c(values(precip))
-t31 <- c(precip_des)
-length(t11)
-dim(t11)
-values(precip_des)
-
 ```
 
 ```{r}
-# Idea can we just vectorize the whole data and make data frame out 
+p1 <- plot_dens_gg(sst)
+p2 <- plot_dens_gg(precip_agg)
 ```
+```{r}
+plot_summary <- function(summary) {
+  df <- base::as.data.frame(cbind(coordinates(summary), getValues(summary)))
+  colnames(df) <- c("Longitude","Latitude", "val")
+  plt <- ggplot(data = df, aes(x = Longitude, y = Latitude, fill = val)) +
+    geom_raster(interpolate = FALSE) +
+    scale_fill_gradient2(low = "red", high = "blue", midpoint = mean(df$val, na.rm = TRUE))
+  return(plt)
+}
+```
+
+
+```{r}
+sst_mean <- calc(sst, function(x) mean(x))
+precip_mean <- calc(precip_agg, function(x) mean(x))
+```
+
+
+```{r}
+sst_mean_plot <- plot_summary(sst_mean)
+precip_mean_plot <- plot_summary(precip_mean)
+```
+
+```{r}
+tp <- plot(precip_des_agg2@trend_slope)
+tp2 <- plot_tr
+```
+```{r}
+get_trend <- function(vec) {
+  if(all(is.na(vec))) return(NA)
+  b <- seq(length(vec))
+  trend <- lm(vec ~ b)$coefficients[2]
+  return(trend)
+}
+
+plot_trends <- function(data, trends) {
+  df <- base::as.data.frame(cbind(coordinates(data), trends))
+  colnames(df) <- c("Longitude","Latitude", "val")
+  plt <- ggplot(data = df, aes(x = Longitude, y = Latitude, fill = val)) +
+    geom_raster(interpolate = FALSE) +
+    scale_fill_gradient2(low = "red", high = "blue", midpoint = mean(df$val, na.rm = TRUE))
+  return(plt)
+}
+```
+
+```{r}
+precip_trends <- apply(getValues(precip_agg), 1, get_trend)
+precip_trends_plot1 <- plot_trends(precip_agg, precip_trends)
+precip_trends_plot2 <- plot_trends(precip_agg, getValues(precip_des_agg2@trend_slope))
+precip_trends_plot1 + precip_trends_plot2
+
+plot(density(precip_trends))
+plot(density(getValues(precip_des_agg2@trend_slope)))
+
+# maybe use rather stl trend slope here
+```
+```{r}
+sst_trends <- apply(getValues(sst),1, get_trend)
+sst_trend_plot <- plot_trends(sst, sst_trends)
+sst_trend_plot2 <- plot_trends(sst, getValues(sst_des2@trend_slope))
+sst_trend_plot + sst_trend_plot2
+
+plot_summary(sst_des2@trend_slope)
+```
+
+
 

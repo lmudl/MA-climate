@@ -5,9 +5,11 @@ Central Amazon Basin.
 The CHIRPS data set contains the **precipitation data**, created from in-situ and satellite measurements (@funk2015climate). It can be downloaded for example from here [https://www.chc.ucsb.edu/data/chirps].
 It contains observations **from 1981 to 2021**. Data comes on a **high resolution of 0.05 grid**.
 
-```{r, include = FALSE}
+```{r setup, include = FALSE}
 knitr::opts_chunk$set(echo=FALSE, warning = FALSE, message = FALSE)
+#knitr::opts_knit$set(root.dir="../")
 ```
+
 
 ```{r}
 library(ggplot2)
@@ -25,62 +27,24 @@ source("../code/R/helper-functions.R")
 
 ```{r, include=FALSE}
 world <- ne_countries(scale = "medium", returnclass = "sf")
-class(world)
+# class(world)
 theme_set(theme_bw())
 ```
-
-```{r, include=FALSE}
-ggplot(data = world) +
-  geom_sf() +
-  xlab("Longitude") + ylab("Latitude") +
-  ggtitle("World map", subtitle = paste0("(", length(unique(world$name)), " countries)"))
-```
-
 Time frame: 1980 to 2016
 
 ## Overview
-```{r, include=FALSE}
-# helpers
-plot_summary <- function(summary) {
-  df <- base::as.data.frame(cbind(coordinates(summary), summary@data@values))
-  colnames(df) <- c("Longitude","Latitude", "val")
-  plt <- ggplot(data = df, aes(x = Longitude, y = Latitude, fill = val)) +
-    geom_raster(interpolate = FALSE) +
-    scale_fill_gradient2(low = "red", high = "blue", midpoint = mean(df$val))
-  return(plt)
-}
-
-plot_trends <- function(data, trends) {
-  df <- base::as.data.frame(cbind(coordinates(data), trends))
-  colnames(df) <- c("Longitude","Latitude", "val")
-  plt <- ggplot(data = df, aes(x = Longitude, y = Latitude, fill = val)) +
-    geom_raster(interpolate = FALSE) +
-    scale_fill_gradient2(low = "red", high = "blue", midpoint = mean(df$val))
-  return(plt)
-}
-```
-
 
 Below the area of the Central Amazon Basin that is object of our study.
 
 ```{r, echo=FALSE, fig.cap="Localisation of the area under study. The central amazon basin (CAB) spanning across 0,-10 latitude and -70,-55 longitude"}
-ggplot(data = world) +
-  geom_sf() +
-  coord_sf(xlim = c(-100,-20), ylim = c(40,-40), expand = TRUE) +   geom_rect(xmin = -70, xmax = -55, ymin = -10, ymax = 0,
-                                                                              fill = NA, colour = "black", size = 1.5)
+(cab_square_plot <- readRDS("../results/eda/cab_square_plot.rds"))
 ```
 
-```{r}
-precip <- brick("../data/interim/drought/chirps_setreftime.nc")
-precip <- raster::aggregate(precip, fact = 10)
-```
 ## Precipitation values raw
 
 Firstly we inspect the precipitation values in general
 ```{r}
-precip_dens_plot <- readRDS("../results/precip_dens.rds")
-r <- range(precip_dens_plot$data$value)
-precip_dens_plot
+(precip_dens_plot <- readRDS("../results/eda/precip_dens_plot.rds"))
 ```
 Its form is a unimodal, right-skewed distribution.
 The values range from `r[1]` tom `r[2]`.
@@ -88,15 +52,11 @@ The values range from `r[1]` tom `r[2]`.
 
 ## Mean at each location
 ```{r, fig.cap="Precipitation mean at each location. The mean was computed over the whole time period"}
-r_mean <- calc(precip, mean)
-#plot(r_mean)
-(mean_locs_plot <- plot_summary(r_mean) + ggtitle("Mean of precipitation for each location"))
+(precip_means_loc_plot <- readRDS("../results/eda/precip_means_loc_plot.rds"))
 ```
 
 ```{r, fig.cap="Density of means, means were computed for each location over the whole time period"}
-df_mean <- data.frame(means = values(r_mean))
-(mean_dens_plot<- ggplot(df_mean, aes(x = means)) + geom_density() + ggtitle("Density of means computed on each location"))
-
+(precip_mean_dens_plot <- readRDS("../results/eda/precip_means_dens_plot.rds"))
 ```
 
 As we can see most locations have a mean precipitation of around 200 mm/month, over
@@ -110,14 +70,11 @@ For example in the upper right corner and on the bottom, right of the middle.
 
 ## SD at each location
 ```{r, fig.cap="Precipitation standard deviation at each location. The standard deviation was computed over the whole time period"}
-r_sd <- calc(precip, sd)
-#plot(r_sd)
-(sd_locs_plot <- plot_summary(r_sd) + ggtitle("SD of precipitation for each location"))
+(precip_sds_loc_plot <- readRDS("../results/eda/precip_sds_loc_plot.rds"))
 ```
 
 ```{r, fig.cap="Density of standard deviations, standard deviations were computed for each location over the whole time period"}
-df_sd <- data.frame(sd = values(r_sd))
-(sd_dens_plot <- ggplot(df_sd, aes(x = sd)) + geom_density())
+(precip_sds_dens_plot <- readRDS("../results/eda/precip_sds_dens_plot.rds"))
 ```
 
 For the standard deviation we also see regional patterns. These patterns overlap
@@ -135,99 +92,34 @@ that the values of different months come a different distribution)
 ## Mean and SD at each location
 
 ```{r}
-mean_locs_plot + sd_locs_plot
+precip_means_loc_plot + precip_sds_loc_plot
 ```
 ```{r}
-(mean_dens_plot + ggtitle("Density of means")) + (sd_dens_plot + ggtitle("Density of sd"))
+(precip_mean_dens_plot + ggtitle("Density of means")) + (precip_sds_dens_plot + ggtitle("Density of sd"))
 ```
 
 
 ## Trend at each location
+
 ```{r, include=FALSE}
-get_trend <- function(vec) {
-  b <- seq(length(vec))
-  trend <- lm(vec ~ b)$coefficients[2]
-  return(trend)
-}
+a <- readRDS("../results/eda/precip_trends_loc_lm_plot.rds")
+b <- readRDS("../results/eda/precip_trends_loc_stl_plot.rds")
+a + b
 ```
-
-
 ```{r}
-trends <- apply(getValues(precip), 1, get_trend)
-plot_trends(precip, trends)
-df_trends <- data.frame(tr = trends)
-ggplot(df_trends, aes(x = tr)) + geom_density()
+(precip_trends_loc_stl_plot <- readRDS("../results/eda/precip_trends_loc_stl_plot.rds"))
 ```
+
 
 Many regions dont have a trend and trends in general seem to be quite small.
 We can identify some regions with similar up or downward trends.
 We also computed plots for the deseasonalised data but it looked almost the same
 
 Plot means and sd for each month respectively
-```{r,include=FALSE}
-create_ind_mat <- function(precip_data) {
-  ind_mat <- matrix(NA, nrow = 12, ncol = nlayers(precip_data)/12)
-  for(i in 1:12) {
-    ind_mat[i,] <- seq(i, nlayers(precip_data), 12)
-  }
-  return(ind_mat)
-}
-
-mon_plots <- function(precip_data) {
-  ind_mat <- create_ind_mat(precip_data)
-  plot_list_m <- list()
-  plot_list_sd <- list()
-  plot_list_trend <- list()
-  pvals <- getValues(precip_data)
-  for(i in 1:nrow(ind_mat)) {
-    mon <- subset(precip_data, ind_mat[i,])
-    mon_means <- calc(mon, mean)
-    mon_sd <- calc(mon, sd)
-    mon_trend <- calc(mon, get_trend)
-    m_plot <- plot_summary(mon_means) + #ggtitle(paste("Means for month", i)) +
-      theme(#axis.text.x=element_blank(), #remove x axis labels
-        #axis.ticks.x=element_blank(), #remove x axis ticks
-        #axis.text.y=element_blank(),  #remove y axis labels
-        #axis.ticks.y=element_blank(), #remove y axis ticks
-        axis.title.x = element_blank(),
-        axis.title.y = element_blank()
-        )
-    sd_plot <- plot_summary(mon_sd)  + ggtitle(paste("SD for month", i)) +
-      #ggtitle(paste("Means for month", i)) +
-      theme(#axis.text.x=element_blank(), #remove x axis labels
-        #axis.ticks.x=element_blank(), #remove x axis ticks
-        #axis.text.y=element_blank(),  #remove y axis labels
-        #axis.ticks.y=element_blank(), #remove y axis ticks
-        axis.title.x = element_blank(),
-        axis.title.y = element_blank(),
-        plot.title = element_text(size=5)
-        )
-    trend_plot <- plot_summary(mon_trend) + #ggtitle(paste("trend for month", i)) +
-      #ggtitle(paste("Means for month", i)) +
-      theme(#axis.text.x=element_blank(), #remove x axis labels
-        #axis.ticks.x=element_blank(), #remove x axis ticks
-        #axis.text.y=element_blank(),  #remove y axis labels
-        #axis.ticks.y=element_blank(), #remove y axis ticks
-        axis.title.x = element_blank(),
-        axis.title.y = element_blank(),
-        plot.title = element_text(size=5)
-        )
-    plot_list_m[[i]] <- m_plot
-    plot_list_sd[[i]] <- sd_plot
-    plot_list_trend[[i]] <- trend_plot
-  }
-  return(list(plot_list_m,plot_list_sd, plot_list_trend))
-}
-```
-
 
 ```{r}
-plt_list <- mon_plots(precip)
-mon_mean <- plt_list[[1]]
-mon_sd <- plt_list[[2]]
-mon_trend <- plt_list[[3]]
-```
 
+```
 
 <!-- ## Means per month -->
 <!-- ### January -->
@@ -315,8 +207,7 @@ mon_trend <- plt_list[[3]]
 ## Means per month TEST
 
 ```{r}
-mean_arrange <- ggarrange(plotlist = mon_mean, ncol = 3, nrow = 4, common.legend = TRUE, legend = "bottom")
-mean_arrange 
+(precip_mean_arrange <- readRDS("../results/eda/precip_mean_arrange.rds"))
 ```
 We see spatial patterns of the mean evolving over time.
 For example: From May until August there is a spatial separation in
@@ -407,16 +298,12 @@ As expected there is a large seasonal component regarding the means.
 #Do we get stationary time series when we only take each january or february?
 #Check for stationarity of the different time series?
 #### Open: summarise CAB for each month (mean Jan, Feb, etc.)
-
 ```
-
-
 
 ## SD per month TEST
 
 ```{r}
-sd_arrange <- ggarrange(plotlist = mon_sd, ncol = 3, nrow = 4, common.legend = TRUE, legend = "bottom")
-sd_arrange
+(precip_sd_arrange <- readRDS("../results/eda/precip_sd_arrange.rds"))
 ```
 
 For the standard deviation we see as well large differences in values 
@@ -425,8 +312,7 @@ during different months of the year.
 ## Trend per month TEST
 
 ```{r}
-trend_arrange <- ggarrange(plotlist = mon_trend, ncol = 3, nrow = 4, common.legend = TRUE, legend = "bottom")
-trend_arrange 
+(precip_trend_arrange <- readRDS("../results/eda/precip_trend_arrange.rds"))
 ```
 
 

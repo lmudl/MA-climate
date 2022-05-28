@@ -27,7 +27,7 @@ all_precip_ts <- ggplot() +
   geom_line(data = precip, aes(x=layer, y = precip_mean), color="blue") 
 plt
 
-precip_dens <-  ggplot(precip, aes(x = value)) +
+precip_dens <-  ggplot(precip, aes(x = precip)) +
   geom_histogram(aes(y = ..density..),
                  colour = 1, fill = "white",
                  bins=50) +

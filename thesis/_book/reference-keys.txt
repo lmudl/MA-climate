@@ -94,3 +94,6 @@ trend-per-month-test
 fig:unnamed-chunk-13
 precipitation-values-raw
 eda-sst
+fig:unnamed-chunk-4
+fig:unnamed-chunk-6
+fig:unnamed-chunk-8
