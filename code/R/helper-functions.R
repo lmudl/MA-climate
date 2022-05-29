@@ -673,8 +673,10 @@ plot_and_save_cv_results <- function(error_matrix, number_of_folds,
 
 plot_all_err <- function(error_matrix, save_to) {
   dir.create(paste0(save_to,"/err-mat-plots/"))
+  error_matrix <- as.data.frame(error_matrix)
   for(i in 1:ncol(error_matrix)) {
-    p <- plot(error_matrix[,i])
+    p <- ggplot(error_matrix, aes(x = 1:100, y = error_matrix[,i])) +
+      geom_point()
     saveRDS(p, paste0(save_to,"/err-mat-plots/","err-plot-fold-",i,".rds"))
   }
 }
@@ -696,7 +698,7 @@ plot_nonzero_from_fold <- function(error_matrix, fold, cv_ids, lambdas,
                                    feature_data, target_data) {
   id_min <- which.min(error_matrix[,fold])
   ids <- cv_ids$train[[fold]]
-  min_lambda <- lambdas[id_min]
+  min_lambda <- rev(lambdas)[id_min]
   # watch out for target dimensions and that feature_data
   # is prepared f.e via prepare_sst
   mod <- glmnet(feature_data[ids,], target_data[ids],
