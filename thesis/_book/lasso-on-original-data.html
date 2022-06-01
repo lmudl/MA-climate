@@ -4,11 +4,11 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Page not found | Predicting Droughts in the Amazon Basin based on Global Sea Surface Temperatures</title>
-  <meta name="description" content="Page not found | Predicting Droughts in the Amazon Basin based on Global Sea Surface Temperatures" />
+  <title>11 Lasso on original data | Predicting Droughts in the Amazon Basin based on Global Sea Surface Temperatures</title>
+  <meta name="description" content="11 Lasso on original data | Predicting Droughts in the Amazon Basin based on Global Sea Surface Temperatures" />
   <meta name="generator" content="bookdown 0.24 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="Page not found | Predicting Droughts in the Amazon Basin based on Global Sea Surface Temperatures" />
+  <meta property="og:title" content="11 Lasso on original data | Predicting Droughts in the Amazon Basin based on Global Sea Surface Temperatures" />
   <meta property="og:type" content="book" />
   
   
@@ -16,7 +16,7 @@
   
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Page not found | Predicting Droughts in the Amazon Basin based on Global Sea Surface Temperatures" />
+  <meta name="twitter:title" content="11 Lasso on original data | Predicting Droughts in the Amazon Basin based on Global Sea Surface Temperatures" />
   
   
   
@@ -30,8 +30,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-
-
+<link rel="prev" href="analyse-clustering-results.html"/>
+<link rel="next" href="lasso-on-deseasonalised-data-with-correlation-preselection.html"/>
 <script src="libs/header-attrs-2.12/header-attrs.js"></script>
 <script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
@@ -178,19 +178,99 @@
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="page-not-found" class="section level1">
-<h1>Page not found</h1>
-<p>The page you requested cannot be found (perhaps it was moved or renamed).</p>
-<p>You may want to try searching to find the page's new location, or use
-the table of contents to find the page you are looking for.</p>
+<div id="lasso-on-original-data" class="section level1 hasAnchor" number="11">
+<h1><span class="header-section-number">11</span> Lasso on original data<a href="lasso-on-original-data.html#lasso-on-original-data" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<div id="lasso-model" class="section level2 hasAnchor" number="11.1">
+<h2><span class="header-section-number">11.1</span> LASSO model<a href="lasso-on-original-data.html#lasso-model" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>We fit a LASSO model on the precipitation and SST data.
+The precipitation target is the monthly mean precipitation
+in the Central Amazon Basin, the SST data are monthly temperatures
+over the globe.
+We use a 5-fold CV approach to find an optimal lambda.
+Each fold consists of 5 consecutive years of training data
+followed by 2 years of test data.
+In each fold we fit a LASSO model on a set of predetermined lambda
+values and choose the lambda that minimizes the MSE on the test set
+in that fold.
+After determining the best lambda in each fold we choose the
+lambda that minimizes the MSE over all folds and refit the model
+to the complete training data. Afterwards we evaluate the fitted model on a separate validation set with 5 years length which was not included
+in the training phase.</p>
+</div>
+<div id="error-plots" class="section level2 hasAnchor" number="11.2">
+<h2><span class="header-section-number">11.2</span> Error plots<a href="lasso-on-original-data.html#error-plots" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p><img src="_main_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<p>The plot shows the results from the 5 fold-CV plotted for each lambda.
+Lambda values start with high regularization and then decrease.
+Initially reducing regularization reduces the error
+until the 43th lambda value.
+As the errors get very large after the 60th lambda value and strictly
+increase we only showed the first 60 values for better visibility
+The highest regularization is chosen so that all coefficients are zero.</p>
+<p><img src="_main_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+<p>In the above plot we can see the error curves for each fold.
+Folds 1,2 and 3 in the top row, left to right and folds 4 and 5 in the bottom row.
+We can see that initially that with decreasing regularization the MSE decreases as well.
+Up to a certain point after which the error rises again.
+Fold 4 seems to be the exception where a decrease in regularization
+does not increase the error dramatically as seen for example in folds 2 and 5 respectively.</p>
+<p>Below we can see the minimum MSE for each fold.</p>
+<pre><code>## [1]  590.0167 1883.5540  775.5926  598.5691  350.5754</code></pre>
+<p>And which lambda in the lambda vector resulted in the lowest prediction error on the folds´ test set.</p>
+<pre><code>## [1] 33 45 59 47 38</code></pre>
+</div>
+<div id="coefficient-plots" class="section level2 hasAnchor" number="11.3">
+<h2><span class="header-section-number">11.3</span> Coefficient plots<a href="lasso-on-original-data.html#coefficient-plots" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p><img src="_main_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+<p>The plots displays the nonzero coefficients in each fold computed
+for the lambda that minimizes the MSE on the test set in the respective fold.
+For all folds we see large negative coefficients in the arctic.
+The LASSO chooses among correlated variables only one and discards the others,
+which can be seen here since the variables chosen are scattered across the map and can but don’t have to be close to each other.</p>
+</div>
+<div id="inspect-predictions-from-each-fold" class="section level2 hasAnchor" number="11.4">
+<h2><span class="header-section-number">11.4</span> Inspect predictions from each fold<a href="lasso-on-original-data.html#inspect-predictions-from-each-fold" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Following we inspect the folds precipitation time series and
+the predictions made by the model.</p>
+<p><img src="_main_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
+<p><img src="_main_files/figure-html/unnamed-chunk-16-1.png" width="672" />
+<img src="_main_files/figure-html/unnamed-chunk-17-1.png" width="672" />
+<img src="_main_files/figure-html/unnamed-chunk-18-1.png" width="672" /></p>
+<p><img src="_main_files/figure-html/unnamed-chunk-19-1.png" width="672" /></p>
+<p>In general the model fits the data sufficiently to predict the general
+form of the time series but misses some modes and is off in the larger
+values in fold 2.</p>
+</div>
+<div id="inspect-predictions-from-best-cv-lambda" class="section level2 hasAnchor" number="11.5">
+<h2><span class="header-section-number">11.5</span> Inspect predictions from best CV-lambda<a href="lasso-on-original-data.html#inspect-predictions-from-best-cv-lambda" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>We choose now the best lambda with the 1SE rule and fit
+the model anew to predict the time series we held out
+as validation data</p>
+<p><img src="_main_files/figure-html/unnamed-chunk-21-1.png" width="672" /></p>
+<p>Over the more than 5 years of validation data the model predicts the
+seasonal pattern of the precipitation time series quite well,
+but constantly fails to predict the higher values of precipitation.
+The MSE is 1215.74 and the RSME 34.87.</p>
+</div>
+<div id="summary-2" class="section level2 hasAnchor" number="11.6">
+<h2><span class="header-section-number">11.6</span> Summary<a href="lasso-on-original-data.html#summary-2" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>We fitted a LASSO model for predicting the mean precipitation
+in the Central Amazon Basin and used a 5-fold blocked Cross Validation
+approach to find the optimal level of regularization.
+After training the model we evaluated its performance on a separate validation set that was not used in the training process.
+The model shows predicting capabilities but misses out on higher values of the precipitation target.
+Also although predicting seems to bring useful results, the choice of the LASSO coefficients seems somewhat arbitrary or at least not
+interpret able in a straightforward way.</p>
+
+</div>
 </div>
             </section>
 
           </div>
         </div>
       </div>
-
-
+<a href="analyse-clustering-results.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="lasso-on-deseasonalised-data-with-correlation-preselection.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>

@@ -1,95 +1,28 @@
----
-title: "Analyze lasso results"
-author: "Dario Lepke"
-date: '2022-05-29'
-output: html_document
----
+# Lasso deseasonalised
+```{r}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE, echo = FALSE)
+```
+
 
 ```{r}
 library(patchwork)
 library(ggpubr)
 library(raster)
+library(glmnet)
+library(Hmisc)
 source("../code/R/helper-functions.R")
 ```
 
-# Analysis of lasso on original data
-
 ```{r}
-# inspect error plots
-# inspect coef plots
-# inspect prediction plots
-```
-
-## Error plots
-```{r}
-p1 <- readRDS("../results/CV-lasso/cv-lasso-og-data-12-05-22/err-mat-plots/err-plot-fold-1.rds")
-err_mat <- readRDS("../results/CV-lasso/cv-lasso-og-data-12-05-22/err-mat.rds")
-plot(sqrt(err_mat[,5]))
-
-plot(err_mat)
-library(glmnet)
-library(Hmisc)
-a <- 1:100
-err_mat <- sqrt(err_mat)
-b <- apply(err_mat, 1, mean)
-bplus <- apply(err_mat, 1, max)
-bmin <- apply(err_mat, 1, min)
-errbar(a, b, b+bplus, b-bmin)
-which.min(b)
-(b[40:100] > (b+bplus)[40:100]) | (b[40:100] < b-bmin[40:100])
-
-tv <- (b+bplus)[40]
-tz <- b+bplus
-tz <- tz[41:100]
-tv < tz
-
+err_mat <- readRDS("../results/CV-lasso/cv-lasso-des-data-08-11-21/err-mat.rds")
 
 ```
 
-```{r}
-plot_all_err <- function(error_matrix, save_to) {
-  dir.create(paste0(save_to,"/err-mat-plots/"))
-  for(i in 1:ncol(error_matrix)) {
-    p <- plot(error_matrix[,i])
-    saveRDS(p, paste0(save_to,"/err-mat-plots/","err-plot-fold-",i,".rds"))
-  }
-}
-# plot_all_err(error_matrix = err_mat, save_to = "../results/CV-lasso/cv-lasso-og-data-12-05-22/")
-```
 
-```{r}
-ggplot(err_mat, aes(x = err_mat[1:100,1], y=err_mat[,1])) + geom_point()
-
-err_mat <- as.data.frame(err_mat)
-head(df)
-ggplot(err_mat, aes(x = 1:100, y=err_mat[,1])) + geom_point()
-```
-```{r}
-p1 <- readRDS("../results/CV-lasso/cv-lasso-og-data-12-05-22/err-mat-plots/err-plot-fold-1.rds")
-p2 <- readRDS("../results/CV-lasso/cv-lasso-og-data-12-05-22/err-mat-plots/err-plot-fold-2.rds")
-p3 <- readRDS("../results/CV-lasso/cv-lasso-og-data-12-05-22/err-mat-plots/err-plot-fold-3.rds")
-p4 <- readRDS("../results/CV-lasso/cv-lasso-og-data-12-05-22/err-mat-plots/err-plot-fold-4.rds")
-p5 <- readRDS("../results/CV-lasso/cv-lasso-og-data-12-05-22/err-mat-plots/err-plot-fold-5.rds")
-p1 + p2 + p3 + p4 + p5
-```
-## Coefficient plots
-
-```{r}
-pc1 <- readRDS("../results/CV-lasso/cv-lasso-og-data-12-05-22/coef-plots/coef-plot-fold-1.rds")
-pc2 <- readRDS("../results/CV-lasso/cv-lasso-og-data-12-05-22/coef-plots/coef-plot-fold-2.rds")
-pc3 <- readRDS("../results/CV-lasso/cv-lasso-og-data-12-05-22/coef-plots/coef-plot-fold-3.rds")
-pc4 <- readRDS("../results/CV-lasso/cv-lasso-og-data-12-05-22/coef-plots/coef-plot-fold-4.rds")
-pc5 <- readRDS("../results/CV-lasso/cv-lasso-og-data-12-05-22/coef-plots/coef-plot-fold-5.rds")
-
-l <- list(pc1,pc2,pc3,pc4,pc5)
-ggarrange(plotlist = l, ncol = 3, nrow = 2,
-         common.legend = TRUE)
-```
-## Inspect predictions from each fold
 ```{r}
 # load data
-target_path <- "../data/interim/drought/chirps_setreftime_aggregated.rds"
-features_path <- "../data/interim/sst/ersst_setreftime.nc"
+target_path <- "../data/processed/deasonalised_precip_aggregated.rds"
+features_path <- "../data/processed/deseasonalised_sst.rds"
 target <- load_data(target_path)
 target <- apply(getValues(target), 2, mean)
 features <- load_data(features_path, "sst")
@@ -101,8 +34,8 @@ dim(features)
 
 ```{r}
 # get indices
-lambdas <- readRDS("../results/CV-lasso/cv-lasso-og-data-12-05-22/lambda-vec.rds")
-ids <- readRDS("../results/CV-lasso/cv-lasso-og-data-12-05-22/index-list.rds")
+lambdas <- readRDS("../results/CV-lasso/cv-lasso-des-data-08-11-21/lambda-vec.rds")
+ids <- readRDS("../results/CV-lasso/cv-lasso-des-data-08-11-21/index-list.rds")
 ```
 
 
@@ -185,13 +118,13 @@ ggplot() + geom_line(data = df, mapping = aes(x=1:14, y=s0, colour = "blue")) +
 
 ```{r}
 # fit model with best lambda
-which.min(b)
-lambdas <- readRDS("../results/CV-lasso/cv-lasso-og-data-12-05-22/lambda-vec.rds")
+#which.min(b)
+lambdas <- readRDS("../results/CV-lasso/cv-lasso-des-data-08-11-21/lambda-vec.rds")
 ```
 
 ```{r}
 minmin <- which.min(apply(err_mat, 1, mean))
-minmin <- 45
+#minmin <- 45
 best_lambda <- rev(lambdas)[minmin]
 dim(features)
 m_full <- glmnet(features[1:370,], target[1:370], lambda = best_lambda)
@@ -204,9 +137,12 @@ ggplot() + geom_line(data = df, mapping = aes(x=1:62, y=s0, colour = "blue")) +
 
 ```
 
-
-
-
+```{r}
+sqrt(mean((df$s0 - df$target)^2))
+```
+```{r}
+mean((df$s0 - df$target)^2)
+```
 
 
 

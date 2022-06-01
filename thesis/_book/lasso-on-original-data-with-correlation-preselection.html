@@ -4,11 +4,11 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>1 Related work | Predicting Droughts in the Amazon Basin based on Global Sea Surface Temperatures</title>
-  <meta name="description" content="1 Related work | Predicting Droughts in the Amazon Basin based on Global Sea Surface Temperatures" />
+  <title>12 Lasso on original data with correlation preselection | Predicting Droughts in the Amazon Basin based on Global Sea Surface Temperatures</title>
+  <meta name="description" content="12 Lasso on original data with correlation preselection | Predicting Droughts in the Amazon Basin based on Global Sea Surface Temperatures" />
   <meta name="generator" content="bookdown 0.24 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="1 Related work | Predicting Droughts in the Amazon Basin based on Global Sea Surface Temperatures" />
+  <meta property="og:title" content="12 Lasso on original data with correlation preselection | Predicting Droughts in the Amazon Basin based on Global Sea Surface Temperatures" />
   <meta property="og:type" content="book" />
   
   
@@ -16,7 +16,7 @@
   
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="1 Related work | Predicting Droughts in the Amazon Basin based on Global Sea Surface Temperatures" />
+  <meta name="twitter:title" content="12 Lasso on original data with correlation preselection | Predicting Droughts in the Amazon Basin based on Global Sea Surface Temperatures" />
   
   
   
@@ -30,8 +30,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-<link rel="prev" href="index.html"/>
-<link rel="next" href="eda-precipitation.html"/>
+<link rel="prev" href="lasso-on-deseasonalised-data-with-correlation-preselection.html"/>
+<link rel="next" href="references.html"/>
 <script src="libs/header-attrs-2.12/header-attrs.js"></script>
 <script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
@@ -187,77 +187,39 @@ div.csl-indent {
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="related-work" class="section level1 hasAnchor" number="1">
-<h1><span class="header-section-number">1</span> Related work<a href="related-work.html#related-work" class="anchor-section" aria-label="Anchor link to header"></a></h1>
-<p>As already mentioned the paper by <span class="citation">Ciemer et al. (<a href="references.html#ref-ciemer2020early" role="doc-biblioref">2020</a>)</span>, created an early warning
-indicator for Amazon droughts. They did so using a complex network approach.
-They used two datasets, one for the Sea Surface Temperatures (<span class="citation">Smith et al. (<a href="references.html#ref-smith2008improvements" role="doc-biblioref">2008</a>)</span>) and one for
-the precipitation (<span class="citation">Funk et al. (<a href="references.html#ref-funk2015climate" role="doc-biblioref">2015</a>)</span>) with monthly data for the time period of 1981 until 2016. The data can be downloaded for example in netcdf format and manipulated conveniently with Climate Data Operators (CDO, <span class="citation">Schulzweida (<a href="references.html#ref-schulzweida2019cdo" role="doc-biblioref">2019</a>)</span>). CDO in turn can be used with wrappers for R and Python. The data is organized on a longitude/latitude grid.<br />
-They identify 4 oceanic regions that correlate the most with rain in the amazon basin, using a coupled network approach.
-Figure <a href="related-work.html#fig:cross">1.1</a> shows the cross degree towards rainfall in the central Amazon basin (CAB, blue box), for positive and negative correlations. Darker shades indicate a larger cross degree, hence a larger number of links and correlations with rainfall at more grid points in the CBA.<br />
-The correlations are measured using a spearman rank-order correlation coefficient<br />
-<span class="math display" id="eq:spearman-rank">\[\begin{equation}
-\rho = 1 - \frac{6\sum\Delta_{R_i}^2}{n(n^2-1)}  .
-\tag{1.1}
-\end{equation}\]</span></p>
-<p>Where <span class="math inline">\(\Delta_{R_i}\)</span> denotes the difference between the ranks of observations of both variables at the same time <span class="math inline">\(i\)</span> and <span class="math inline">\(n\)</span> is the number of observations.
-An Adjacency Matrix describes the resulting network, where the threshold <span class="math inline">\(p_{th}\)</span> was chosen so that only 10% of the strongest correlations are represented as links in the network<br />
-<span class="math display" id="eq:adj-mat">\[\begin{equation}
-A_{ij} = \begin{cases}0 \textrm{ } p_{ij} &lt; p_{th}\\ 1 \textrm{ } p_{ij}\geq p_{th}\\\end{cases}  .
-\tag{1.2}
-\end{equation}\]</span>
-The cross degree then gives the strength of correlation between a specific grid point <span class="math inline">\(i\)</span> of network <span class="math inline">\(V_l\)</span> (oceanic grid point) and another (sub)network <span class="math inline">\(V_m\)</span> (all grid points <span class="math inline">\(j\)</span> in central amazon basin)<br />
-<span class="math display" id="eq:cross-deg">\[\begin{equation}
-k_{i}^{lm} = \sum\limits_{j \in V_m} A_{ij}, i \in V_l\  .
-\tag{1.3}
-\end{equation}\]</span></p>
-<div class="figure" style="text-align: center"><span style="display:block;" id="fig:cross"></span>
-<img src="../figures/cross-degree.jpg" alt="&quot;Cross degree between sea surface temperature and continental rainfall anomalies. For each sea surface temperature grid cell of the Atlantic and Pacific Ocean, the cross degree towards rainfall in the Central Amazon Basin (blue box) is shown, for a positive correlations and b negative correlations. Darker shading indicates a larger cross degree, implying a larger number of links, and thus significant correlations with rainfall at more grid points in the Central Amazon Basin. Red areas outline coherent oceanic regions with a the 20% highest cross degrees for positive correlations, found in the Southern Pacific Ocean (SPO) and Southern Tropical Atlantic Ocean (STAO), and b the 20% highest cross degrees for negative correlations, found in the Central Pacific Ocean (CPO) and Northern Tropical Atlantic Ocean (NTAO)&quot; [@ciemer2020early]" width="50%" />
-<p class="caption">
-Figure 1.1: “Cross degree between sea surface temperature and continental rainfall anomalies. For each sea surface temperature grid cell of the Atlantic and Pacific Ocean, the cross degree towards rainfall in the Central Amazon Basin (blue box) is shown, for a positive correlations and b negative correlations. Darker shading indicates a larger cross degree, implying a larger number of links, and thus significant correlations with rainfall at more grid points in the Central Amazon Basin. Red areas outline coherent oceanic regions with a the 20% highest cross degrees for positive correlations, found in the Southern Pacific Ocean (SPO) and Southern Tropical Atlantic Ocean (STAO), and b the 20% highest cross degrees for negative correlations, found in the Central Pacific Ocean (CPO) and Northern Tropical Atlantic Ocean (NTAO)” <span class="citation">(<a href="references.html#ref-ciemer2020early" role="doc-biblioref">Ciemer et al. 2020</a>)</span>
-</p>
+<div id="lasso-on-original-data-with-correlation-preselection" class="section level1 hasAnchor" number="12">
+<h1><span class="header-section-number">12</span> Lasso on original data with correlation preselection<a href="lasso-on-original-data-with-correlation-preselection.html#lasso-on-original-data-with-correlation-preselection" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<div id="error-plots-2" class="section level2 hasAnchor" number="12.1">
+<h2><span class="header-section-number">12.1</span> Error plots<a href="lasso-on-original-data-with-correlation-preselection.html#error-plots-2" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p><img src="_main_files/figure-html/unnamed-chunk-325-1.png" width="672" /></p>
+<p><img src="_main_files/figure-html/unnamed-chunk-327-1.png" width="672" />
+## Coefficient plots</p>
+<p><img src="_main_files/figure-html/unnamed-chunk-328-1.png" width="672" />
+## Inspect predictions from each fold</p>
+<pre><code>## [1]   432 10988</code></pre>
+<p><img src="_main_files/figure-html/unnamed-chunk-331-1.png" width="672" /></p>
+<p><img src="_main_files/figure-html/unnamed-chunk-332-1.png" width="672" />
+<img src="_main_files/figure-html/unnamed-chunk-333-1.png" width="672" />
+<img src="_main_files/figure-html/unnamed-chunk-334-1.png" width="672" /></p>
+<p><img src="_main_files/figure-html/unnamed-chunk-335-1.png" width="672" /></p>
 </div>
-<p>They further explore the relationship by constructing (weighted) networks for sliding windows of 24 months between the Central Amazon Basin and each of the ocean regions. For each month except for the first two years, an individual network is computed based on the data of the previous 24 months.
-Then they take the average of the cross correlations for each of the networks which gives a new time series of average cross correlation (ACC) values.
-Each ACC summarizes the connectivity of one region with the CAB for the last 24 months.<br />
-They find that NTAO and STAO give the strongest signal, hence they apply the same sliding window coupled network approach between the ocean regions NTAO and STAO.
-Before they computed networks between ocean and continental regions, now it is computed between these two Atlantic regions, NTAO and STAO.<br />
-The resulting time series and its comparison to the drought index time series is shown in figure <a href="related-work.html#fig:early">1.2</a> below.
-They find that using a ACC threshold for a drought (SPI below -1.5), lets them
-forecast 6 of the 7 droughts in the observation period, missing the 2005 drought, while also giving one false alarm in 2002.</p>
-<div class="figure" style="text-align: center"><span style="display:block;" id="fig:early"></span>
-<img src="../figures/early-warning-signals.jpg" alt="&quot;Early-warning signal for droughts in the central Amazon basin. We compare the time evolution of the average cross correlation of the Northern Tropical Atlantic Ocean (NTAO) and Southern Tropical Atlantic Ocean (STAO), given by the blue curve, with the standardized precipitation index (SPI, orange) of the central Amazon basin. Orange dips indicate a negative SPI with a threshold for severely dry periods (SPI -1, dotted red line). We expect a drought event within the following one and a half years whenever the average cross correlation between NTAO and STAO SST anomalies falls below an empirically found threshold of -0.06. Green circles indicate a matching forecast based on the Atlantic SST correlation structure, with one false alarm in 2002 indicated by a grey circle, where the threshold is crossed but no drought took place in the direct aftermath (see Discussion). The temporal evolution of the average cross correlation shown here is smoothed using a Chebyshev type-I low-pass filter with a cutoff at 24 months&quot; [@ciemer2020early]." width="75%" />
-<p class="caption">
-Figure 1.2: “Early-warning signal for droughts in the central Amazon basin. We compare the time evolution of the average cross correlation of the Northern Tropical Atlantic Ocean (NTAO) and Southern Tropical Atlantic Ocean (STAO), given by the blue curve, with the standardized precipitation index (SPI, orange) of the central Amazon basin. Orange dips indicate a negative SPI with a threshold for severely dry periods (SPI -1, dotted red line). We expect a drought event within the following one and a half years whenever the average cross correlation between NTAO and STAO SST anomalies falls below an empirically found threshold of -0.06. Green circles indicate a matching forecast based on the Atlantic SST correlation structure, with one false alarm in 2002 indicated by a grey circle, where the threshold is crossed but no drought took place in the direct aftermath (see Discussion). The temporal evolution of the average cross correlation shown here is smoothed using a Chebyshev type-I low-pass filter with a cutoff at 24 months” <span class="citation">(<a href="references.html#ref-ciemer2020early" role="doc-biblioref">Ciemer et al. 2020</a>)</span>.
-</p>
-</div>
-<p>The work by <span class="citation">Ciemer et al. (<a href="references.html#ref-ciemer2020early" role="doc-biblioref">2020</a>)</span> shows potential forecasting capabilities and limitations.
-While they are able to predict 5 out of 6 drought events, they also give one false negative and one false positive result. Their work uses a complex network approach that is applied stepwise (first two unweighted networks, then two weighted networks
-and in the end a dichotomous threshold decision rule). For the thesis we would like
-to create a more general predictive model that can learn the relationship between the
-SSTs and rainfall in the CAB. As already mentioned a first step can be a LASSO model. First findings show that, the classic LASSO only chooses single points in the ocean as predictors, though. But our motivation is to discover predictive regions and not only single separated points.
-Therefore in a next step we want to make use of a generalized form of the LASSO that also takes into account that chosen predictors should be close to each other. This model is the so called Fused LASSO.<br />
-For the models we also need a form of evaluation. Classic Cross Validation assumes independence of the observations. In our setting this is clearly violated due to the time dependency of the data.
-We will explore different possibilities to use an adjusted form of Cross Validation that takes this characteristic into account.<br />
-Depending on how well the relationship between SST and rain can be established, we can take this a step further and use it as a so called “Emergent Constraint” (EC).
-Since different climate models give different answers about future climate
-there is a need to narrow this “spread”, which can be done by ECs.
-To do so, we need a plausible relationship between a Variable X and Y (here: SST and drought).<br />
-According to how well the relationship is represented in a climate model we
-assign “credibility” to a climate model’s future projections
-(here: projections of future droughts in the Amazon rain forest).
-In summary this can be used to reduce uncertainty in the ensemble of
-climate models’ future projections, f.e by using ML techniques as done by
-<span class="citation">Schlund et al. (<a href="references.html#ref-schlund2020constraining" role="doc-biblioref">2020</a>)</span>.</p>
+<div id="inspect-predictions-from-best-cv-lambda-2" class="section level2 hasAnchor" number="12.2">
+<h2><span class="header-section-number">12.2</span> Inspect predictions from best CV-lambda<a href="lasso-on-original-data-with-correlation-preselection.html#inspect-predictions-from-best-cv-lambda-2" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<pre><code>## [1]   432 10988</code></pre>
+<pre><code>## [1] 62  1</code></pre>
+<p><img src="_main_files/figure-html/unnamed-chunk-337-1.png" width="672" /></p>
+<pre><code>## [1] 36.0622</code></pre>
+<pre><code>## [1] 1300.483</code></pre>
 
+</div>
 </div>
             </section>
 
           </div>
         </div>
       </div>
-<a href="index.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="eda-precipitation.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="lasso-on-deseasonalised-data-with-correlation-preselection.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="references.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>

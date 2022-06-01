@@ -638,7 +638,7 @@ cv_for_ts <- function(sst, precip, nfold, size_train, size_test, save_folder) {
   #print(paste("finished lambda", i))
   #}
   print("finished fitting")
-  dir.create(paste("results/CV-lasso/",save_folder))
+  dir.create(paste0("results/CV-lasso/",save_folder))
   index_list_path <- paste0("results/CV-lasso/", save_folder, "/index-list.rds")
   lambda_vec_path <- paste0("results/CV-lasso/", save_folder, "/lambda-vec.rds")
   err_mat_path <- paste0("results/CV-lasso/", save_folder, "/err-mat.rds")
