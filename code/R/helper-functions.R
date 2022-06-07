@@ -778,5 +778,6 @@ igraph_from_raster <- function(raster_object) {
   land <- which(is.na(vals))
   g <- delete_vertices(g, land)
   return(g)
+}
   
   
