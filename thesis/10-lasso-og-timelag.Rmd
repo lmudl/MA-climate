@@ -1,0 +1,313 @@
+# Lasso og timelag
+
+```{r, echo = FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE, echo = FALSE)
+```
+
+
+```{r}
+library(patchwork)
+library(ggpubr)
+library(raster)
+library(glmnet)
+library(Hmisc)
+source("../code/R/helper-functions.R")
+```
+
+```{r}
+# inspect error plots
+# inspect coef plots
+# inspect prediction plots
+# length(ids$train$Training060)
+# length(ids$test$Testing060)
+```
+
+## LASSO model
+
+We fit a LASSO model on the precipitation and SST data.
+The precipitation target is the monthly mean precipitation
+in the Central Amazon Basin, the SST data are monthly temperatures
+over the globe.
+We use a 5-fold CV approach to find an optimal lambda.
+Each fold consists of 5 consecutive years of training data
+followed by 2 years of test data.
+In each fold we fit a LASSO model on a set of predetermined lambda 
+values and choose the lambda that minimizes the MSE on the test set 
+in that fold.
+After determining the best lambda in each fold we choose the
+lambda that minimizes the MSE over all folds and refit the model
+to the complete training data. Afterwards we evaluate the fitted model on a separate validation set with 5 years length which was not included
+in the training phase.
+
+## Error plots
+
+```{r}
+err_mat <- readRDS("../results/CV-lasso/cv-lasso-og-timelag-03-06-22/err-mat.rds")
+#err_mat <- sqrt(err_mat)
+err_mat <- err_mat[1:60,]
+```
+
+```{r}
+lambda_id <- c(1:60)
+mse <- apply(err_mat, 1, mean)
+b <- mse
+bplus <- apply(err_mat, 1, max)
+bmin <- apply(err_mat, 1, min)
+errbar(lambda_id, mse, b+bplus, b-bmin)
+```
+
+The plot shows the results from the 5 fold-CV plotted for each lambda.
+Lambda values start with high regularization and then decrease.
+Initially reducing regularization reduces the error
+until the 43th lambda value.
+As the errors get very large after the 60th lambda value and strictly
+increase we only showed the first 60 values for better visibility
+The highest regularization is chosen so that all coefficients are zero.
+
+
+
+```{r}
+# which.min(b)
+# bs <- b[40:100]
+# bbpluss <- (b+bplus)[40:100]
+# bbmins <- (b-bmin)[40:100]
+# (bs > bbpluss) | (bs < bbmins)
+bmin <- which.min(b)
+tv <- (b+bplus)[bmin]
+tz <- b+bplus
+tz <- tz[(bmin+1):100]
+w <- tv < tz
+#bmin is 40
+#w ist bei 45 true
+l1se <- 45
+
+```
+
+
+
+```{r}
+p1 <- readRDS("../results/CV-lasso/cv-lasso-og-timelag-03-06-22/err-mat-plots/err-plot-fold-1.rds")
+p2 <- readRDS("../results/CV-lasso/cv-lasso-og-timelag-03-06-22/err-mat-plots/err-plot-fold-2.rds")
+p3 <- readRDS("../results/CV-lasso/cv-lasso-og-timelag-03-06-22/err-mat-plots/err-plot-fold-3.rds")
+p4 <- readRDS("../results/CV-lasso/cv-lasso-og-timelag-03-06-22/err-mat-plots/err-plot-fold-4.rds")
+p5 <- readRDS("../results/CV-lasso/cv-lasso-og-timelag-03-06-22/err-mat-plots/err-plot-fold-5.rds")
+p1 + p2 + p3 + p4 + p5
+```
+
+In the above plot we can see the error curves for each fold.
+Folds 1,2 and 3 in the top row, left to right and folds 4 and 5 in the bottom row.
+We can see that initially that with decreasing regularization the MSE decreases as well.
+Up to a certain point after which the error rises again.
+Fold 4 seems to be the exception where a decrease in regularization
+does not increase the error dramatically as seen for example in folds 2 and 5 respectively.
+
+Below we can see the minimum MSE for each fold.
+```{r}
+apply(err_mat, 2, min)
+```
+And which lambda in the lambda vector resulted in the lowest prediction error on the folds´ test set.
+
+```{r}
+apply(err_mat, 2, function(x) which.min(x))
+```
+
+
+
+## Coefficient plots
+
+```{r}
+# pc1 <- readRDS("../results/CV-lasso/cv-lasso-og-timelag-03-06-22/coef-plots/coef-plot-fold-1.rds")
+# pc2 <- readRDS("../results/CV-lasso/cv-lasso-og-timelag-03-06-22/coef-plots/coef-plot-fold-2.rds")
+# pc3 <- readRDS("../results/CV-lasso/cv-lasso-og-timelag-03-06-22/coef-plots/coef-plot-fold-3.rds")
+# pc4 <- readRDS("../results/CV-lasso/cv-lasso-og-timelag-03-06-22/coef-plots/coef-plot-fold-4.rds")
+# pc5 <- readRDS("../results/CV-lasso/cv-lasso-og-timelag-03-06-22/coef-plots/coef-plot-fold-5.rds")
+# 
+# l <- list(pc1,pc2,pc3,pc4,pc5)
+# ggarrange(plotlist = l, ncol = 3, nrow = 2,
+#          common.legend = TRUE)
+```
+
+The plots displays the nonzero coefficients in each fold computed
+for the lambda that minimizes the MSE on the test set in the respective fold.
+For all folds we see large negative coefficients in the arctic. 
+The LASSO chooses among correlated variables only one and discards the others,
+which can be seen here since the variables chosen are scattered across the map and can but don't have to be close to each other.
+
+
+```{r}
+# q <- ggplot_build(pc1)
+# q$data[[1]]$linetype <- 21
+# pc1$layers[[2]]$aes_params$shape <- 21
+# pc1$data
+# pc1$layers[[2]]
+# q <- ggplot_gtable(q)
+# plot(q)
+# 
+# q <- ggplot_build(pc1)
+```
+
+
+
+## Inspect predictions from each fold
+
+Following we inspect the folds precipitation time series and
+the predictions made by the model.
+
+```{r}
+# load data
+target_path <- "../data/interim/drought/chirps_setreftime_aggregated.rds"
+features_path <- "../data/interim/sst/ersst_setreftime.nc"
+target <- load_data(target_path)
+target <- apply(getValues(target), 2, mean)
+# features_og <- load_data(features_path, "sst")
+# dim(features_og)
+# features_og <- t(features_og)
+# dim(features_og)
+# features_og <- prepare_sst(features_og)
+# dim(features_og)
+features <- readRDS("../results/CV-lasso/cv-lasso-og-timelag-03-06-22/timelag_feautures.rds")
+dim(features)
+any(is.na(features))
+```
+
+```{r}
+#dim(features_og)
+dim(features)
+#plot(ts(target))
+```
+
+
+```{r}
+# get indices
+lambdas <- readRDS("../results/CV-lasso/cv-lasso-og-timelag-03-06-22/lambda-vec.rds")
+ids <- readRDS("../results/CV-lasso/cv-lasso-og-timelag-03-06-22/index-list.rds")
+```
+
+
+```{r}
+f1_train <- ids$train$Training060
+f1_test <- ids$test$Testing060
+x1_train <- features[f1_train,]
+y1_train <- target[f1_train]
+x1_test <- features[f1_test,]
+y1_test <- target[f1_test]
+min1 <- which.min(err_mat[,1])
+m1 <- glmnet(x1_train, y1_train, lambda=rev(lambdas)[min1])
+preds1 <- predict(object = m1, newx = x1_test)
+df <- data.frame(preds = preds1, target = y1_test, check.names=TRUE)
+ggplot() + geom_line(data = df, mapping = aes(x=1:14, y=s0, colour = "blue")) +
+  geom_line(data = df, mapping= aes(x=1:14, y=target))
+```
+
+```{r}
+f2_train <- ids$train$Training134
+f2_test <- ids$test$Testing134
+x2_train <- features[f2_train,]
+y2_train <- target[f2_train]
+x2_test <- features[f2_test,]
+y2_test <- target[f2_test]
+min2 <- which.min(err_mat[,2])
+m2 <- glmnet(x2_train, y2_train, lambda=rev(lambdas)[min2])
+preds2 <- predict(m2, newx = x2_test)
+df <- data.frame(preds = preds2, target = y2_test)
+ggplot() + geom_line(data = df, mapping = aes(x=1:14, y=s0, colour = "blue")) +
+  geom_line(data = df, mapping= aes(x=1:14, y=target))
+```
+```{r}
+f3_train <- ids$train$Training208
+f3_test <- ids$test$Testing208
+x3_train <- features[f3_train,]
+y3_train <- target[f3_train]
+x3_test <- features[f3_test,]
+y3_test <- target[f3_test]
+min3 <- which.min(err_mat[,3])
+m3 <- glmnet(x3_train, y3_train, lambda=rev(lambdas)[min3])
+preds3 <- predict(m3, newx = x3_test)
+df <- data.frame(preds = preds3, target = y3_test)
+ggplot() + geom_line(data = df, mapping = aes(x=1:14, y=s0, colour = "blue")) +
+  geom_line(data = df, mapping= aes(x=1:14, y=target))
+```
+```{r}
+f4_train <- ids$train$Training282
+f4_test <- ids$test$Testing282
+x4_train <- features[f4_train,]
+y4_train <- target[f4_train]
+x4_test <- features[f4_test,]
+y4_test <- target[f4_test]
+min4 <- which.min(err_mat[,4])
+m4 <- glmnet(x4_train, y4_train, lambda=rev(lambdas)[min4])
+preds4 <- predict(m4, newx = x4_test)
+df <- data.frame(preds = preds4, target = y4_test)
+ggplot() + geom_line(data = df, mapping = aes(x=1:14, y=s0, colour = "blue")) +
+  geom_line(data = df, mapping= aes(x=1:14, y=target))
+```
+
+```{r}
+f5_train <- ids$train$Training356
+f5_test <- ids$test$Testing356
+x5_train <- features[f5_train,]
+y5_train <- target[f5_train]
+x5_test <- features[f5_test,]
+y5_test <- target[f5_test]
+min5 <- which.min(err_mat[,5])
+m5 <- glmnet(x5_train, y5_train, lambda=rev(lambdas)[min5])
+preds5 <- predict(m5, newx = x5_test)
+df <- data.frame(preds = preds5, target = y5_test)
+ggplot() + geom_line(data = df, mapping = aes(x=1:14, y=s0, colour = "blue")) +
+  geom_line(data = df, mapping= aes(x=1:14, y=target))
+```
+
+In general the model fits the data sufficiently to predict the general
+form of the time series but misses some modes and is off in the larger
+values in fold 2.
+
+## Inspect predictions from best CV-lambda
+
+We choose now the best lambda with the 1SE rule and fit 
+the model anew to predict the time series we held out
+as validation data
+
+```{r}
+# fit model with best lambda
+#which.min(b)
+lambdas <- readRDS("../results/CV-lasso/cv-lasso-og-timelag-03-06-22/lambda-vec.rds")
+```
+
+```{r}
+minmin <- which.min(apply(err_mat, 1, mean))
+#minmin <- l1se
+best_lambda <- rev(lambdas)[minmin]
+#dim(features)
+
+
+m_full <- glmnet(features[1:370,], target[4:373], lambda = best_lambda)
+dim(features)
+preds_full <- predict(m_full, newx = features[370:429,],
+                      lambda = best_lambda)
+df <- data.frame(preds = preds_full, target = target[373:432])
+#dim(preds_full)
+ggplot() + geom_line(data = df, mapping = aes(x=1:60, y=s0, colour = "blue")) +
+  geom_line(data = df, mapping= aes(x=1:60, y=target))
+dim(features_og)
+
+```
+```{r}
+sqrt(mean((df$s0 - df$target)^2))
+```
+```{r}
+mean((df$s0 - df$target)^2)
+```
+Over the more than 5 years of validation data the model predicts the
+seasonal pattern of the precipitation time series quite well,
+but constantly fails to predict the higher values of precipitation.
+The MSE is 1215.74 and the RSME 34.87.
+
+## Summary
+We fitted a LASSO model for predicting the mean precipitation
+in the Central Amazon Basin and used a 5-fold blocked Cross Validation
+approach to find the optimal level of regularization.
+After training the model we evaluated its performance on a separate validation set that was not used in the training process.
+The model shows predicting capabilities but misses out on higher values of the precipitation target.
+Also although predicting seems to bring useful results, the choice of the LASSO coefficients seems somewhat arbitrary or at least not
+interpret able in a straightforward way.
+

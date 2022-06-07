@@ -1,7 +1,8 @@
 # check vignettes of genlasso
+setwd("Repos/MA-climate/")
 library(genlasso)
-vignette("genlasso")
-browseVignettes()
+# vignette("genlasso")
+# browseVignettes()
 source("code/R/helper-functions.R")
 #### igraph plot of raster info ####
 # I would like to create a network with a missing part
@@ -38,7 +39,6 @@ create_coords <- function(vec) {
   return(df)
 }
 
-
 # plot(e, vertex.size = 0.001, edge.width=0.00001,
 #      vertex.label = labels)
 # begins top left
@@ -56,7 +56,7 @@ igraph_from_raster <- function(raster_object) {
   return(g)
 }
 
-#debug(igraph_from_raster)
+
 g <- igraph_from_raster(sst)
 plot(g, vertex.size = 0.001, edge.width=0.00001,
      vertex.label = NA)
@@ -65,7 +65,7 @@ plot(g, vertex.size = 0.001, edge.width=0.00001,
 # first remove sst NAs and then fit?
 # exciting!!!
 
-# genlasso tries ####
+# genlasso tries deseasonalised ####
 s <- readRDS("data/processed/deseasonalised_sst.rds")
 #s <- raster(s)
 precip <- readRDS("data/processed/deseasonalised_precip.rds")
@@ -81,29 +81,33 @@ testmod <- fusedlasso(y=precip,X=s, graph=g)
 length(precip)
 nrow(s)
 
-# genlasso try with unseasonalised data ###
+# genlasso try with raw data ####
 # prepare sst data with colnames
-pr <- readRDS("data/interim/drought/chirps_setreftime_aggregated.rds")
-pr <- values(pr)
-pr <- apply(pr, 2, mean)
-pr <- pr[1:24]
+precip <- readRDS("data/interim/drought/chirps_setreftime_aggregated.rds")
+precip <- values(pr)
+precip <- apply(pr, 2, mean)
+#precip <- pr[1:24]
 
 features_path <- "data/interim/sst/ersst_setreftime.nc"
 sst <- brick("data/interim/sst/ersst_setreftime.nc", var = "sst")
 ext <- extent(-180,0,-50,40)
 sst <- crop(sst,ext)
+g <- igraph_from_raster(sst)
 coord <- coordinates(sst)
 cnames <- paste(coord[,1], coord[,2])
-s <- as.matrix(sst)
-s <- t(s)
-colnames(s) <- cnames
-s <- prepare_sst(s)
-s <- s[1:24,]
+sst <- as.matrix(sst)
+sst <- t(s)
+colnames(sst) <- cnames
+sst <- prepare_sst(sst)
+#sst <- sst[1:24,]
 
-g <- igraph_from_raster(sst)
+# make example model from first fold
 
-length(V(g))
-dim(s)
+
+
+
+
+
 
 # ex_mod <- fusedlasso(y=pr, X=s, graph=g)
 # saveRDS(ex_mod, "results/first_fused_lasso.rds")

@@ -732,3 +732,28 @@ plot_nonzero_coefficients <- function(nonzero_coef) {
 }
 
 
+############ Fused Lasso helpers ###########
+create_coords <- function(vec) {
+  x_vec <- rep(c(1:vec[1]), vec[2])
+  y_vec <- c()
+  for(i in 1:vec[2]) {
+    y_vec <- append(y_vec,(rep(i, vec[1])))
+  }
+  df <- as.data.frame(cbind(x_vec, y_vec))
+  return(df)
+}
+
+igraph_from_raster <- function(raster_object) {
+  dims <- dim(raster_object)[1:2]
+  dims <- rev(dims)
+  g <- make_lattice(dims)
+  ec <- create_coords(dims)
+  V(g)$x <- ec$x_vec
+  V(g)$y <- rev(ec$y_vec)
+  vals <- values(raster_object[[1]])
+  land <- which(is.na(vals))
+  g <- delete_vertices(g, land)
+  return(g)
+}
+
+
