@@ -13,7 +13,7 @@ source("code/R/helper-functions.R")
 library(raster)
 library(igraph)
 library(genlasso)
-library(caret)
+#library(caret)
 
 # load data sst
 sst <- brick("data/interim/sst/ersst_setreftime.nc", var = "sst")

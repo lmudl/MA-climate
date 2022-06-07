@@ -534,6 +534,30 @@ drop_obs <- function(data, obs_to_drop) {
   return(data)
 }
 
+# Create TimeSlices function directly taken from the caret package
+# on the server it was quite difficult to install caret, so I
+# take the function directly for the scripts there
+createTimeSlices <- function (y, initialWindow, horizon = 1, fixedWindow = TRUE, 
+                              skip = 0) 
+{
+  stops <- seq(initialWindow, (length(y) - horizon), by = skip + 
+                 1)
+  if (fixedWindow) {
+    starts <- stops - initialWindow + 1
+  }
+  else {
+    starts <- rep(1, length(stops))
+  }
+  train <- mapply(seq, starts, stops, SIMPLIFY = FALSE)
+  test <- mapply(seq, stops + 1, stops + horizon, SIMPLIFY = FALSE)
+  nums <- gsub(" ", "0", format(stops))
+  names(train) <- paste("Training", nums, sep = "")
+  names(test) <- paste("Testing", nums, sep = "")
+  out <- list(train = train, test = test)
+  out
+}
+
+
 # In this function we want to get the lambda values,
 # that glmnet uses
 # according to 
@@ -601,7 +625,7 @@ cv_for_ts <- function(sst, precip, nfold, size_train, size_test, save_folder) {
   # now we made sure that nrow(data) %% nfold == 0
   assertthat::are_equal(size_train+size_test, nrow(sst)/nfold)
   index_list <- caret::createTimeSlices(1:nrow(sst), initialWindow=size_train, horizon=size_test,
-                                 skip=size_train+size_test-1)
+                                        skip=size_train+size_test-1)
   #TODO create list with glmnet objects so we can plot
   #their paths and coefficients on map
   #TODO safe index_list as well
@@ -754,6 +778,5 @@ igraph_from_raster <- function(raster_object) {
   land <- which(is.na(vals))
   g <- delete_vertices(g, land)
   return(g)
-}
-
-
+  
+  
