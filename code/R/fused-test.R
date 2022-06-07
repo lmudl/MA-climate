@@ -12,7 +12,7 @@ source("code/R/helper-functions.R")
 # }
 library(raster)
 library(igraph)
-library(glmnet)
+library(genlasso)
 library(caret)
 
 # load data sst
