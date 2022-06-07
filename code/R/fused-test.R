@@ -5,11 +5,15 @@ source("code/R/helper-functions.R")
 
 # load packages
 
-requiredPackages = c('raster','igraph','glmnet')
-for(p in requiredPackages){
-  if(!require(p,character.only = TRUE)) install.packages(p)
-  library(p,character.only = TRUE)
-}
+# requiredPackages = c('raster','igraph','glmnet', 'caret')
+# for(p in requiredPackages){
+#   if(!require(p,character.only = TRUE)) install.packages(p)
+#   library(p,character.only = TRUE)
+# }
+library(raster)
+library(igraph)
+library(glmnet)
+library(caret)
 
 # load data sst
 sst <- brick("data/interim/sst/ersst_setreftime.nc", var = "sst")
