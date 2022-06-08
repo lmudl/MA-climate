@@ -10,6 +10,7 @@ source("code/R/helper-functions.R")
 #   if(!require(p,character.only = TRUE)) install.packages(p)
 #   library(p,character.only = TRUE)
 # }
+library(sp)
 library(raster)
 library(igraph)
 library(genlasso)
@@ -37,7 +38,7 @@ precip <- values(precip)
 precip <- apply(precip, 2, mean)
 
 # create timeslices
-index_list <- caret::createTimeSlices(1:nrow(sst), initialWindow=60, horizon=14,
+index_list <- createTimeSlices(1:nrow(sst), initialWindow=60, horizon=14,
                                       skip=60+14-1)
 train_id <- index_list$train$Training060
 test_id <- index_list$test$Testing060
@@ -49,8 +50,39 @@ fused_mod_f1 <- fusedlasso(y=precip[train_id], X=sst[train_id,], graph=g)
 print("model was fitted")
 save(mod_f1, "results/CV-lasso/fused_mod_f1.rds")
 # predict on test data
-preds <- predict.genlasso(mod_1, Xnew=sst[test_id])
+preds <- predict.genlasso(fused_mod_f1, Xnew=sst[test_id,])
 errs <- apply(preds$fit, 2, function(x) mean((x-precip[test_id])^2))
 print(min(errs))
+Sys.time()
+
+
+# co2 <- coef.genlasso(fused_mod_f1)
+# length(co2$beta)
+# dim(co2$beta)
+# a <- co2$beta[,2000]
+# plot(density(a))
+# names(a)
+# length(cnames)
+# num_coef_names <- coef_names_to_numeric(colnames(sst))
+# dim(num_coef_names)
+# coef_mat <- cbind(num_coef_names, a)
+# plot <- plot_nonzero_coefficients(coef_mat)
+# 
+# 
+# #replot without large values
+# a[a< -1] <- 0
+# coef_mat <- cbind(num_coef_names, a)
+# plot <- plot_nonzero_coefficients(coef_mat)
+# 
+# 
+# # plot predictions
+# wm <- which.min(errs)
+# p <- preds$fit[,wm]
+# df <- data.frame(preds = p, target = precip[test_id])
+# ggplot() + geom_line(data = df, mapping = aes(x=1:14, y=preds, colour = "blue")) +
+#   geom_line(data = df, mapping= aes(x=1:14, y=target))
+# 
+
+
 
 
