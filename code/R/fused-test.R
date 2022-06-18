@@ -45,10 +45,10 @@ test_id <- index_list$test$Testing060
 
 print("data prepared now fit model")
 # get 1fold/ prepare data # fit igraph model
-fused_mod_f1 <- fusedlasso(y=precip[train_id], X=sst[train_id,], graph=g)
+fused_mod_f1 <- fusedlasso(y=precip[train_id], X=sst[train_id,], graph=g, verbose = TRUE)
 # save model
 print("model was fitted")
-save(mod_f1, "results/CV-lasso/fused_mod_f1.rds")
+saveRDS(fused_mod_f1, "results/CV-lasso/fused_mod_f1.rds")
 # predict on test data
 preds <- predict.genlasso(fused_mod_f1, Xnew=sst[test_id,])
 errs <- apply(preds$fit, 2, function(x) mean((x-precip[test_id])^2))

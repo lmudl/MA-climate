@@ -528,7 +528,10 @@ get_obs_to_drop <- function(nrow, nfold) {
 # and then actually dropping the rows
 drop_obs <- function(data, obs_to_drop) {
   if(!is.null(obs_to_drop)) {
-    data <- data[-c(1:obs_to_drop),]
+    if(length(dim(data))==2)
+      data <- data[-c(1:obs_to_drop),]
+    if(is.null(dim(data)))
+      data <- data[-c(1:obs_to_drop)]
     return(data)
   }
   return(data)
@@ -590,7 +593,7 @@ get_lambda_values <- function(sst, precip){
   # TODO create vector with lambda values
   # create vector of lambdas
   # evenly spaced points on log scale between mx and mn
-  lambda_vec <- exp(seq(log(min_lambda),log(max_lambda), length.out = 100))
+  lambda_vec <- rev(exp(seq(log(min_lambda),log(max_lambda), length.out = 100)))
   return(lambda_vec)
 }
 
@@ -613,7 +616,141 @@ get_lambda_values <- function(sst, precip){
 # like lasso or fused lasso etc.
 # TODO when testing this also remember to leave some
 # observations for validation set.
-cv_for_ts <- function(sst, precip, nfold, size_train, size_test, save_folder) {
+# cv_for_ts <- function(sst, precip, nfold, size_train, size_test, save_folder) {
+#   set.seed(1234)
+#   # TODO answer question:compute precip mean here or before?
+#   sst <- prepare_sst(sst)
+#   assertthat::are_equal(nrow(sst), length(precip))
+#   n_row <- nrow(sst)
+#   obs_to_drop <- get_obs_to_drop(n_row, nfold)
+#   sst <- drop_obs(sst, obs_to_drop)
+#   precip <- drop_obs(precip, obs_to_drop)
+#   # now we made sure that nrow(data) %% nfold == 0
+#   assertthat::are_equal(size_train+size_test, nrow(sst)/nfold)
+#   index_list <- createTimeSlices(1:nrow(sst), initialWindow=size_train, horizon=size_test,
+#                                         skip=size_train+size_test-1)
+#   #TODO create list with glmnet objects so we can plot
+#   #their paths and coefficients on map
+#   #TODO safe index_list as well
+#   #TODO for each lambda
+#   #         for each fold
+#   #             fit model and predict on test, save err
+#   # now we have for each lambda 5 MSE
+#   # find best lambda
+#   # refit on all train+test data with lambda
+#   # predict on validation set and report error final
+#   # error final can then be compared among diff models
+#   lambda_vec <- get_lambda_values(sst, precip)
+#   err_mat <- matrix(NA, ncol = nfold, nrow = length(lambda_vec))
+#   #for(i in 1:length(lambda_vec)) {
+#   for(j in 1:length(index_list$train)) {
+#     id_train <- unlist(index_list$train[j], use.names = FALSE)
+#     id_test <- unlist(index_list$test[j], use.names = FALSE)
+#     x_train <- sst[id_train,]
+#     y_train <- precip[id_train]
+#     x_test <- sst[id_test,]
+#     y_test <- precip[id_test]
+#     # die cross validaion is done here classically
+#     # does not work!!!
+#     # trained_model <- glmnet(x_train, y_train)
+#     trained_model <- glmnet(x_train, y_train, lambda=lambda_vec, standardize=FALSE)
+#     #TODO change value her for s
+#     predicted <- predict(trained_model, newx = data.matrix(x_test), s = lambda_vec)
+#     err_col <- apply(predicted, 2, function(x) mean((x-y_test)^2))
+#     err_mat[,j] <- err_col
+#     #save(trained_model, file=paste0("results/CV-lasso/model-","lambda-",i,"fold-",j,".RData"))
+#     #print(paste("lambda", i, "fold", j))
+#     print(paste("finished fold", j))
+#   }
+#   #print(paste("finished lambda", i))
+#   #}
+#   print("finished fitting")
+#   dir.create(paste0("results/CV-lasso/",save_folder))
+#   index_list_path <- paste0("results/CV-lasso/", save_folder, "/index-list.rds")
+#   lambda_vec_path <- paste0("results/CV-lasso/", save_folder, "/lambda-vec.rds")
+#   err_mat_path <- paste0("results/CV-lasso/", save_folder, "/err-mat.rds")
+#   saveRDS(index_list, file = index_list_path)
+#   saveRDS(lambda_vec, file = lambda_vec_path) 
+#   saveRDS(err_mat, file = err_mat_path)
+#   return(err_mat)
+#   # until here we keep the error for each fold
+#   # but with fixed regularisation
+#   #TODO add loop for different regularisation values
+#   #TODO add parameters for glmnet
+#   #TODO create function that computes number of observations
+#   #for each fold so that all windows have same number
+#   #of observations
+#   #make sure that nrow(data) %% nfold == 0
+#   #AND initialwindow+horizon == nrow(data)/nfold
+#   #TODO read about standardisation ?glmnet()
+#   
+# }
+
+cv_lasso <- function(sst, precip, index_list, save_folder) {
+  # dir.create(paste0("results/CV-lasso/", save_folder))
+  # dir.create(paste0("results/CV-lasso/", save_folder, "/fold-models"))
+  lambda_vec <- get_lambda_values(sst, precip)
+  nfold <- length(index_list$train)
+  err_mat <- matrix(NA, ncol = nfold, nrow = length(lambda_vec),
+                    dimnames = list(lambda_vec))
+  for(j in 1:length(index_list$train)) {
+    id_train <- unlist(index_list$train[j], use.names = FALSE)
+    id_test <- unlist(index_list$test[j], use.names = FALSE)
+    x_train <- sst[id_train,]
+    y_train <- precip[id_train]
+    x_test <- sst[id_test,]
+    y_test <- precip[id_test]
+    trained_model <- glmnet(x_train, y_train, lambda = lambda_vec,
+                            standardize=FALSE)
+    #TODO change value her for s
+    predicted <- predict(trained_model, newx = data.matrix(x_test), s = lambda_vec)
+    err_col <- apply(predicted, 2, function(x) mean((x-y_test)^2))
+    err_mat[,j] <- err_col
+    fold_model_path <- paste0("results/CV-lasso/", save_folder, "/fold-models/",
+                              "model-fold-",j,".rds")
+    saveRDS(trained_model, file = fold_model_path)
+    print(paste("finished fold", j))
+  }
+  lambda_vec_path <- paste0("results/CV-lasso/", save_folder, "/lambda-vec.rds")
+  saveRDS(lambda_vec, file = lambda_vec_path) 
+  return(err_mat)
+}
+
+cv_fused_lasso <- function(sst, precip, index_list, save_folder, graph,
+                           maxsteps) {
+  # dir.create(paste0("results/CV-lasso/", save_folder))
+  # dir.create(paste0("results/CV-lasso/", save_folder, "/fold-models"))
+  # maxsteps <- maxsteps
+  nfold <- length(index_list$train)
+  err_mat <- matrix(NA, ncol = nfold, nrow = maxsteps)
+  for(j in 1:length(index_list$train)) {
+    id_train <- unlist(index_list$train[j], use.names = FALSE)
+    id_test <- unlist(index_list$test[j], use.names = FALSE)
+    x_train <- sst[id_train,]
+    y_train <- precip[id_train]
+    x_test <- sst[id_test,]
+    y_test <- precip[id_test]
+    trained_model <- fusedlasso(y=y_train, X=x_train, graph=graph,
+                                verbose=TRUE, maxsteps = maxsteps)
+    predicted <- predict.genlasso(trained_model, Xnew=x_test)
+    err_col <- apply(predicted$fit, 2, function(x) mean((x-y_test)^2))
+    err_mat[,j] <- err_col
+    fold_model_path <- paste0("results/CV-lasso/", save_folder, "/fold-models/",
+                              "model-fold-",j,".rds")
+    saveRDS(trained_model, file = fold_model_path )
+    print(paste("finished fold", j))
+  }
+  return(err_mat)
+}
+
+cv_for_ts <- function(sst, precip, nfold, size_train, size_test, save_folder,
+                      model = "lasso", graph = NULL, maxsteps=100) {
+  if(model == "fused" & is.null(graph)){
+    stop("for the fused LASSO a graph object is needed")
+  }
+  if(model == "lasso" & !is.null(graph)) {
+    warning("graph object will be ignored for the lasso")
+  }
   set.seed(1234)
   # TODO answer question:compute precip mean here or before?
   sst <- prepare_sst(sst)
@@ -624,8 +761,8 @@ cv_for_ts <- function(sst, precip, nfold, size_train, size_test, save_folder) {
   precip <- drop_obs(precip, obs_to_drop)
   # now we made sure that nrow(data) %% nfold == 0
   assertthat::are_equal(size_train+size_test, nrow(sst)/nfold)
-  index_list <- caret::createTimeSlices(1:nrow(sst), initialWindow=size_train, horizon=size_test,
-                                        skip=size_train+size_test-1)
+  index_list <- createTimeSlices(1:nrow(sst), initialWindow=size_train, horizon=size_test,
+                                 skip=size_train+size_test-1)
   #TODO create list with glmnet objects so we can plot
   #their paths and coefficients on map
   #TODO safe index_list as well
@@ -637,39 +774,37 @@ cv_for_ts <- function(sst, precip, nfold, size_train, size_test, save_folder) {
   # refit on all train+test data with lambda
   # predict on validation set and report error final
   # error final can then be compared among diff models
-  lambda_vec <- get_lambda_values(sst, precip)
-  err_mat <- matrix(NA, ncol = nfold, nrow = length(lambda_vec))
   #for(i in 1:length(lambda_vec)) {
-  for(j in 1:length(index_list$train)) {
-    id_train <- unlist(index_list$train[j], use.names = FALSE)
-    id_test <- unlist(index_list$test[j], use.names = FALSE)
-    x_train <- sst[id_train,]
-    y_train <- precip[id_train]
-    x_test <- sst[id_test,]
-    y_test <- precip[id_test]
-    # die cross validaion is done here classically
-    # does not work!!!
-    # trained_model <- glmnet(x_train, y_train)
-    trained_model <- glmnet(x_train, y_train, lambda=rev(lambda_vec))
-    #TODO change value her for s
-    predicted <- predict(trained_model, newx = data.matrix(x_test), s = rev(lambda_vec))
-    err_col <- apply(predicted, 2, function(x) mean((x-y_test)^2))
-    err_mat[,j] <- err_col
-    #save(trained_model, file=paste0("results/CV-lasso/model-","lambda-",i,"fold-",j,".RData"))
-    #print(paste("lambda", i, "fold", j))
-    print(paste("finished fold", j))
+  dir.create(paste0("results/CV-lasso/", save_folder))
+  dir.create(paste0("results/CV-lasso/", save_folder, "/fold-models"))
+  if(model == "lasso") {
+    err_mat <- cv_lasso(sst, precip, index_list, save_folder)
+    print("finished fitting")
+    index_list_path <- paste0("results/CV-lasso/", save_folder, "/index-list.rds")
+    # lambda_vec_path <- paste0("results/CV-lasso/", save_folder, "/lambda-vec.rds")
+    err_mat_path <- paste0("results/CV-lasso/", save_folder, "/err-mat.rds")
+    saveRDS(index_list, file = index_list_path)
+    # saveRDS(lambda_vec, file = lambda_vec_path) 
+    saveRDS(err_mat, file = err_mat_path)
+    return(err_mat)
   }
+  if(model == "fused") {
+    err_mat <- cv_fused_lasso(sst, precip, index_list, 
+                              save_folder,  graph, maxsteps)
+    print("finished fitting")
+    index_list_path <- paste0("results/CV-lasso/", save_folder, "/index-list.rds")
+    #lambda_vec_path <- paste0("results/CV-lasso/", save_folder, "/lambda-vec.rds")
+    err_mat_path <- paste0("results/CV-lasso/", save_folder, "/err-mat.rds")
+    saveRDS(index_list, file = index_list_path)
+    #saveRDS(lambda_vec, file = lambda_vec_path) 
+    saveRDS(err_mat, file = err_mat_path)
+    return(err_mat)
+  }
+  #save(trained_model, file=paste0("results/CV-lasso/model-","lambda-",i,"fold-",j,".RData"))
+  #print(paste("lambda", i, "fold", j))
   #print(paste("finished lambda", i))
   #}
-  print("finished fitting")
-  dir.create(paste0("results/CV-lasso/",save_folder))
-  index_list_path <- paste0("results/CV-lasso/", save_folder, "/index-list.rds")
-  lambda_vec_path <- paste0("results/CV-lasso/", save_folder, "/lambda-vec.rds")
-  err_mat_path <- paste0("results/CV-lasso/", save_folder, "/err-mat.rds")
-  saveRDS(index_list, file = index_list_path)
-  saveRDS(lambda_vec, file = lambda_vec_path) 
-  saveRDS(err_mat, file = err_mat_path)
-  return(err_mat)
+  
   # until here we keep the error for each fold
   # but with fixed regularisation
   #TODO add loop for different regularisation values
@@ -684,6 +819,8 @@ cv_for_ts <- function(sst, precip, nfold, size_train, size_test, save_folder) {
 }
 
 ############ Plotting the CV-results ###########
+
+
 plot_and_save_cv_results <- function(error_matrix, number_of_folds,
                                      cv_ids, lambdas, feature_data,
                                      target_data, save_to) {
@@ -695,6 +832,7 @@ plot_and_save_cv_results <- function(error_matrix, number_of_folds,
                      target_data, save_to)
 }
 
+# old error plot function ******************************************************
 plot_all_err <- function(error_matrix, save_to) {
   dir.create(paste0(save_to,"/err-mat-plots/"))
   error_matrix <- as.data.frame(error_matrix)
@@ -704,6 +842,7 @@ plot_all_err <- function(error_matrix, save_to) {
     saveRDS(p, paste0(save_to,"/err-mat-plots/","err-plot-fold-",i,".rds"))
   }
 }
+# ******************************************************************************
 
 plot_all_coef_maps <- function(error_matrix, number_of_folds,
                                cv_ids, lambdas, feature_data,
@@ -722,7 +861,7 @@ plot_nonzero_from_fold <- function(error_matrix, fold, cv_ids, lambdas,
                                    feature_data, target_data) {
   id_min <- which.min(error_matrix[,fold])
   ids <- cv_ids$train[[fold]]
-  min_lambda <- rev(lambdas)[id_min]
+  min_lambda <- lambdas[id_min]
   # watch out for target dimensions and that feature_data
   # is prepared f.e via prepare_sst
   mod <- glmnet(feature_data[ids,], target_data[ids],
@@ -755,8 +894,95 @@ plot_nonzero_coefficients <- function(nonzero_coef) {
   mp
 }
 
+# NEW erorr plot functions *****************************************************
+# plot the error bars with ggplot 
+plot_errbar_gg <- function(err_mat, loglambdas, save_to) {
+  mean_mse <- apply(err_mat, 1, mean)
+  sd_mse <- apply(err_mat, 1, sd)
+  #median_mse <- apply(err_mat, 1, median)
+  err_mat <- cbind(err_mat, loglambdas = loglambdas,
+                   mean_mse=mean_mse, sd_mse=sd_mse)#, median=median_mse)
+  p <- ggplot(err_mat, aes(x=loglambdas, y=mean_mse)) +
+    geom_point() + geom_errorbar(aes(ymin=mean_mse-sd_mse, 
+                                     ymax=mean_mse+sd_mse))
+  saveRDS(p, paste0(save_to,"/err-mat-plots/","err-bars-plot.rds"))
+}
 
-############ Fused Lasso helpers ###########
+# plot the error for the loglambdas in each fold
+plot_all_fold_errors <- function(err_mat, loglambdas, save_to) {
+  err_mat <- cbind(err_mat, loglambdas = loglambdas)
+  for(i in 1:(ncol(err_mat)-1)) {
+    p <- ggplot(err_mat, aes(x=loglambdas, y=err_mat[,i])) +
+      geom_point()
+    saveRDS(p, paste0(save_to,"/err-mat-plots/","err-plot-fold-",i,".rds"))
+  }
+}
+
+# plot the errorbars and errors inside the fold in one step
+plot_save_errors <- function(err_mat, lambdas, save_to) {
+  dir.create(paste0(save_to,"/err-mat-plots/"))
+  err_mat <- as.data.frame(err_mat)
+  loglambdas <- log(lambdas)
+  plot_errbar_gg(err_mat, loglambdas, save_to)
+  plot_all_fold_errors(err_mat, loglambdas, save_to)
+  print(paste("plotted all error plots and saved to", save_to))
+}
+# ******************************************************************************
+# NEW Coef plot functions ******************************************************
+plot_nonzero_coef_from_fold <- function(model, fold_nr, err_mat) {
+  l_min <- which.min(err_mat[,fold_nr])
+  coefs <- model$beta[,l_min]
+  all_coefs <- coefs[-1]
+  nonzero_coefs <- all_coefs != 0
+  nonzero_coef_names <- names(all_coefs[nonzero_coefs])
+  num_coef_names <- coef_names_to_numeric(nonzero_coef_names)
+  coef_mat <- cbind(num_coef_names, all_coefs[nonzero_coefs])
+  plt <- plot_nonzero_coefficients(coef_mat)
+  return(plt)
+}
+
+plot_coef_maps <- function(model_list, err_mat, save_to) {
+  dir.create(paste0(save_to,"/coef-plots/"))
+  for(i in 1:length(model_list)) {
+    p <- plot_nonzero_from_fold(model_list[[i]], i, err_mat)
+    saveRDS(p, paste0(save_to, "/coef-plots/", "coef-plot-fold-", i,".rds"))
+  }
+}
+
+# Plot predictions ************************************************************
+
+plot_predictions_best_l <- function(err_mat, model_list, ids, features, target,
+                                    save_to, standardize=FALSE) {
+  dir.create(paste0(save_to,"/pred-plots/"))
+  for(i in seq(length(model_list))) {
+    ids_i <- ids$test[[i]]
+    model_i <- model_list[[i]]
+    l_min <- which.min(err_mat[,i])
+    preds <- predict(model_i, newx = features[ids_i,], s=lambdas[l_min],
+                     standardize=standardize)
+    df <- data.frame(targets = target[ids_i], predictions = preds)
+    plt <- ggplot() + geom_line(data=df, mapping= aes(x=seq(length(preds)), y=preds, col = "red")) +
+      geom_line(data=df, mapping=aes(x=seq(lengths(preds)), y=targets))
+    saveRDS(plt, paste0(save_to, "/pred-plots/", "pred-plot-fold-", i,".rds"))
+  }
+}
+
+
+
+# ******************************************************************************
+load_models <- function(path_to_models) {
+  l <- list()
+  n_models <- length(list.files(path_to_models))
+  for(i in seq(n_models)) {
+    l[[i]] <- readRDS(paste0(path_to_models,"/model-fold-",
+                             i, ".rds"))
+  }
+  return(l)
+}
+
+
+
+############ Fused Lasso helpers ###############################################
 create_coords <- function(vec) {
   x_vec <- rep(c(1:vec[1]), vec[2])
   y_vec <- c()
@@ -779,5 +1005,4 @@ igraph_from_raster <- function(raster_object) {
   g <- delete_vertices(g, land)
   return(g)
 }
-  
-  
+

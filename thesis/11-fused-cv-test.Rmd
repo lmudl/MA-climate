@@ -1,0 +1,320 @@
+# Fused Lasso CV
+
+```{r, echo = FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE, echo = FALSE)
+```
+
+
+```{r}
+library(patchwork)
+library(ggpubr)
+library(raster)
+library(glmnet)
+library(Hmisc)
+library(genlasso)
+source("../code/R/helper-functions.R")
+```
+
+```{r}
+# inspect error plots
+# inspect coef plots
+# inspect prediction plots
+# length(ids$train$Training060)
+# length(ids$test$Testing060)
+```
+
+```{r}
+f1 <- readRDS("../results/CV-lasso/fused-cv-test-100-steps/fold-models/model-fold-1.rds")
+f2 <- readRDS("../results/CV-lasso/fused-cv-test-100-steps/fold-models/model-fold-2.rds")
+f3 <- readRDS("../results/CV-lasso/fused-cv-test-100-steps/fold-models/model-fold-3.rds")
+f4 <- readRDS("../results/CV-lasso/fused-cv-test-100-steps/fold-models/model-fold-4.rds")
+f5 <- readRDS("../results/CV-lasso/fused-cv-test-100-steps/fold-models/model-fold-5.rds")
+```
+
+
+
+## Error plots
+
+```{r}
+err_mat <- readRDS("../results/CV-lasso/fused-cv-test-100-steps/err-mat.rds")
+#err_mat <- sqrt(err_mat)
+#err_mat <- err_mat[1:60,]
+```
+
+```{r}
+lambda_id <- c(1:100)
+mse <- apply(err_mat, 1, mean)
+b <- mse
+bplus <- apply(err_mat, 1, max)
+bmin <- apply(err_mat, 1, min)
+errbar(lambda_id, mse, b+bplus, b-bmin)
+```
+
+The plot shows the results from the 5 fold-CV plotted for each lambda.
+Lambda values start with high regularization and then decrease.
+Initially reducing regularization reduces the error
+until the 43th lambda value.
+As the errors get very large after the 60th lambda value and strictly
+increase we only showed the first 60 values for better visibility
+The highest regularization is chosen so that all coefficients are zero.
+
+
+
+```{r}
+# which.min(b)
+# bs <- b[40:100]
+# bbpluss <- (b+bplus)[40:100]
+# bbmins <- (b-bmin)[40:100]
+# (bs > bbpluss) | (bs < bbmins)
+bmin <- which.min(b)
+tv <- (b+bplus)[bmin]
+tz <- b+bplus
+tz <- tz[(bmin+1):100]
+w <- tv < tz
+#bmin is 40
+#w ist bei 45 true
+l1se <- 45
+
+```
+
+
+
+```{r}
+# p1 <- readRDS("../results/CV-lasso/fused-cv-test-100-steps/err-mat-plots/err-plot-fold-1.rds")
+# p2 <- readRDS("../results/CV-lasso/fused-cv-test-100-steps/err-mat-plots/err-plot-fold-2.rds")
+# p3 <- readRDS("../results/CV-lasso/fused-cv-test-100-steps/err-mat-plots/err-plot-fold-3.rds")
+# p4 <- readRDS("../results/CV-lasso/fused-cv-test-100-steps/err-mat-plots/err-plot-fold-4.rds")
+# p5 <- readRDS("../results/CV-lasso/fused-cv-test-100-steps/err-mat-plots/err-plot-fold-5.rds")
+# p1 + p2 + p3 + p4 + p5
+plot(err_mat[,1])
+```
+
+
+Below we can see the minimum MSE for each fold.
+```{r}
+apply(err_mat, 2, min)
+```
+And which lambda in the lambda vector resulted in the lowest prediction error on the folds´ test set.
+
+```{r}
+apply(err_mat, 2, function(x) which.min(x))
+```
+
+
+
+## Coefficient plots
+
+```{r}
+# pc1 <- readRDS("../results/CV-lasso/fused-cv-test-100-steps/coef-plots/coef-plot-fold-1.rds")
+# pc2 <- readRDS("../results/CV-lasso/fused-cv-test-100-steps/coef-plots/coef-plot-fold-2.rds")
+# pc3 <- readRDS("../results/CV-lasso/fused-cv-test-100-steps/coef-plots/coef-plot-fold-3.rds")
+# pc4 <- readRDS("../results/CV-lasso/fused-cv-test-100-steps/coef-plots/coef-plot-fold-4.rds")
+# pc5 <- readRDS("../results/CV-lasso/fused-cv-test-100-steps/coef-plots/coef-plot-fold-5.rds")
+# 
+# l <- list(pc1,pc2,pc3,pc4,pc5)
+# ggarrange(plotlist = l, ncol = 3, nrow = 2,
+#          common.legend = TRUE)
+
+sst <- brick("../data/interim/sst/ersst_setreftime.nc", var = "sst")
+ext <- extent(-180,0,-50,40)
+sst <- crop(sst,ext)
+coord <- coordinates(sst)
+cnames <- paste(coord[,1], coord[,2])
+sst <- t(as.matrix(sst))
+colnames(sst) <- cnames
+sst <- prepare_sst(sst)
+num_coef_names <- coef_names_to_numeric(colnames(sst))
+```
+
+
+```{r}
+co1 <- coef.genlasso(f1)$beta
+#l1 <- coef.genlasso(f1)$lambda[which.min(err_mat[,1])]
+l1 <- which.min(err_mat[,1])
+co1 <- co1[,l1]
+coef_mat <- cbind(num_coef_names, co1)
+plot1 <- plot_nonzero_coefficients(coef_mat)
+plot1
+# range(co1)
+# table(round(co1,3))
+
+# preapare coefficients from fold
+# get coordiante names from sst
+# cbind to get coef_matrix
+# plot with plot_nonzero
+# 
+# plot_fused_fold <- function(fold_model) {
+#   
+# }
+
+
+p1s <- softthresh(f1, lambda=4069.727,gamma=0.0001)
+plot(p1s)
+```
+
+```{r}
+co2 <- coef.genlasso(f2)$beta
+#l1 <- coef.genlasso(f1)$lambda[which.min(err_mat[,1])]
+l2 <- which.min(err_mat[,2])
+co2 <- co2[,l2]
+coef_mat <- cbind(num_coef_names, co2)
+plot2 <- plot_nonzero_coefficients(coef_mat)
+plot2
+range(co1)
+table(round(co1,3))
+```
+
+```{r}
+co3 <- coef.genlasso(f3)$beta
+#l1 <- coef.genlasso(f1)$lambda[which.min(err_mat[,1])]
+l3 <- which.min(err_mat[,3])
+co3 <- co3[,l3]
+coef_mat <- cbind(num_coef_names, co3)
+plot3 <- plot_nonzero_coefficients(coef_mat)
+plot3
+range(co1)
+table(round(co1,3))
+```
+
+```{r}
+co4 <- coef.genlasso(f4)$beta
+#l1 <- coef.genlasso(f1)$lambda[which.min(err_mat[,1])]
+l4 <- which.min(err_mat[,4])
+co4 <- co4[,l4]
+coef_mat <- cbind(num_coef_names, co4)
+plot4 <- plot_nonzero_coefficients(coef_mat)
+plot4
+range(co1)
+table(round(co1,3))
+```
+
+```{r}
+co5 <- coef.genlasso(f5)$beta
+#l1 <- coef.genlasso(f1)$lambda[which.min(err_mat[,1])]
+l5 <- which.min(err_mat[,5])
+co5 <- co5[,l5]
+coef_mat <- cbind(num_coef_names, co5)
+plot5 <- plot_nonzero_coefficients(coef_mat)
+plot5
+range(co1)
+table(round(co1,3))
+```
+
+
+```{r}
+# q <- ggplot_build(pc1)
+# q$data[[1]]$linetype <- 21
+# pc1$layers[[2]]$aes_params$shape <- 21
+# pc1$data
+# pc1$layers[[2]]
+# q <- ggplot_gtable(q)
+# plot(q)
+# 
+# q <- ggplot_build(pc1)
+```
+
+
+
+## Inspect predictions from each fold
+
+```{r}
+# load model
+# evaluate predictions on the test data
+target_path <- "../data/interim/drought/chirps_setreftime_aggregated.rds"
+features_path <- "../data/interim/sst/ersst_setreftime.nc"
+target <- load_data(target_path)
+target <- apply(getValues(target), 2, mean)
+sst <- brick("../data/interim/sst/ersst_setreftime.nc", var = "sst")
+ext <- extent(-180,0,-50,40)
+sst <- crop(sst,ext)
+features <- as.matrix(sst)
+features <- t(features)
+features <- prepare_sst(features)
+dim(features)
+ids <- readRDS("../results/CV-lasso/cv-lasso-og-data-31-05-22/index-list.rds")
+```
+
+```{r}
+f1 <- readRDS("../results/CV-lasso/fused-cv-test-100-steps/fold-models/model-fold-1.rds")
+preds1 <- predict.genlasso(f1, Xnew=features[ids$test$Testing060,])
+dim(preds1$fit)
+min1 <- which.min(err_mat[,1])
+p1 <- preds1$fit[,1]
+df <- data.frame(preds = p1, target = target[ids$test$Testing060])
+ggplot() + geom_line(data = df, mapping = aes(x=1:14, y=preds, colour = "blue")) +
+  geom_line(data = df, mapping= aes(x=1:14, y=target))
+```
+```{r}
+f2 <- readRDS("../results/CV-lasso/fused-cv-test-100-steps/fold-models/model-fold-2.rds")
+preds2 <- predict.genlasso(f2, Xnew=features[ids$test$Testing134,])
+dim(preds2$fit)
+min2 <- which.min(err_mat[,2])
+p2 <- preds2$fit[,2]
+df <- data.frame(preds = p2, target = target[ids$test$Testing134])
+ggplot() + geom_line(data = df, mapping = aes(x=1:14, y=preds, colour = "blue")) +
+  geom_line(data = df, mapping= aes(x=1:14, y=target))
+```
+
+```{r}
+f3 <- readRDS("../results/CV-lasso/fused-cv-test-100-steps/fold-models/model-fold-3.rds")
+preds3 <- predict.genlasso(f3, Xnew=features[ids$test$Testing208,])
+dim(preds3$fit)
+min3 <- which.min(err_mat[,3])
+p3 <- preds3$fit[,3]
+df <- data.frame(preds = p3, target = target[ids$test$Testing208])
+ggplot() + geom_line(data = df, mapping = aes(x=1:14, y=preds, colour = "blue")) +
+  geom_line(data = df, mapping= aes(x=1:14, y=target))
+
+```
+```{r}
+f4 <- readRDS("../results/CV-lasso/fused-cv-test-100-steps/fold-models/model-fold-4.rds")
+preds4 <- predict.genlasso(f4, Xnew=features[ids$test$Testing282,])
+min4 <- which.min(err_mat[,4])
+p4 <- preds4$fit[,4]
+df <- data.frame(preds = p4, target = target[ids$test$Testing282])
+ggplot() + geom_line(data = df, mapping = aes(x=1:14, y=preds, colour = "blue")) +
+  geom_line(data = df, mapping= aes(x=1:14, y=target))
+
+```
+
+```{r}
+f5 <- readRDS("../results/CV-lasso/fused-cv-test-100-steps/fold-models/model-fold-5.rds")
+preds5 <- predict.genlasso(f5, Xnew=features[ids$test$Testing356,])
+min5 <- which.min(err_mat[,5])
+p5 <- preds5$fit[,5]
+df <- data.frame(preds = p5, target = target[ids$test$Testing356])
+ggplot() + geom_line(data = df, mapping = aes(x=1:14, y=preds, colour = "blue")) +
+  geom_line(data = df, mapping= aes(x=1:14, y=target))
+```
+
+
+```{r}
+# fit model with best lambda
+#which.min(b)
+#lambdas <- readRDS("../results/CV-lasso/fused-cv-test-100-steps/lambda-vec.rds")
+```
+
+```{r}
+# full model prediction for fused lasso cv in other script
+```
+```{r}
+#sqrt(mean((df$s0 - df$target)^2))
+```
+```{r}
+#mean((df$s0 - df$target)^2)
+```
+Over the more than 5 years of validation data the model predicts the
+seasonal pattern of the precipitation time series quite well,
+but constantly fails to predict the higher values of precipitation.
+The MSE is 1215.74 and the RSME 34.87.
+
+## Summary
+We fitted a LASSO model for predicting the mean precipitation
+in the Central Amazon Basin and used a 5-fold blocked Cross Validation
+approach to find the optimal level of regularization.
+After training the model we evaluated its performance on a separate validation set that was not used in the training process.
+The model shows predicting capabilities but misses out on higher values of the precipitation target.
+Also although predicting seems to bring useful results, the choice of the LASSO coefficients seems somewhat arbitrary or at least not
+interpret able in a straightforward way.
+
+

@@ -44,11 +44,11 @@ in the training phase.
 ```{r}
 err_mat <- readRDS("../results/CV-lasso/cv-lasso-og-timelag-03-06-22/err-mat.rds")
 #err_mat <- sqrt(err_mat)
-err_mat <- err_mat[1:60,]
+#err_mat <- err_mat[1:60,]
 ```
 
 ```{r}
-lambda_id <- c(1:60)
+lambda_id <- c(1:100)
 mse <- apply(err_mat, 1, mean)
 b <- mse
 bplus <- apply(err_mat, 1, max)
@@ -80,18 +80,18 @@ w <- tv < tz
 #bmin is 40
 #w ist bei 45 true
 l1se <- 45
-
+plot(err_mat[,4])
 ```
 
 
 
 ```{r}
-p1 <- readRDS("../results/CV-lasso/cv-lasso-og-timelag-03-06-22/err-mat-plots/err-plot-fold-1.rds")
-p2 <- readRDS("../results/CV-lasso/cv-lasso-og-timelag-03-06-22/err-mat-plots/err-plot-fold-2.rds")
-p3 <- readRDS("../results/CV-lasso/cv-lasso-og-timelag-03-06-22/err-mat-plots/err-plot-fold-3.rds")
-p4 <- readRDS("../results/CV-lasso/cv-lasso-og-timelag-03-06-22/err-mat-plots/err-plot-fold-4.rds")
-p5 <- readRDS("../results/CV-lasso/cv-lasso-og-timelag-03-06-22/err-mat-plots/err-plot-fold-5.rds")
-p1 + p2 + p3 + p4 + p5
+# p1 <- readRDS("../results/CV-lasso/cv-lasso-og-timelag-03-06-22/err-mat-plots/err-plot-fold-1.rds")
+# p2 <- readRDS("../results/CV-lasso/cv-lasso-og-timelag-03-06-22/err-mat-plots/err-plot-fold-2.rds")
+# p3 <- readRDS("../results/CV-lasso/cv-lasso-og-timelag-03-06-22/err-mat-plots/err-plot-fold-3.rds")
+# p4 <- readRDS("../results/CV-lasso/cv-lasso-og-timelag-03-06-22/err-mat-plots/err-plot-fold-4.rds")
+# p5 <- readRDS("../results/CV-lasso/cv-lasso-og-timelag-03-06-22/err-mat-plots/err-plot-fold-5.rds")
+# p1 + p2 + p3 + p4 + p5
 ```
 
 In the above plot we can see the error curves for each fold.
@@ -165,7 +165,7 @@ target <- apply(getValues(target), 2, mean)
 # dim(features_og)
 # features_og <- prepare_sst(features_og)
 # dim(features_og)
-features <- readRDS("../results/CV-lasso/cv-lasso-og-timelag-03-06-22/timelag_feautures.rds")
+features <- readRDS("../results/CV-lasso/cv-lasso-og-timelag-03-06-22/timelag_features.rds")
 dim(features)
 any(is.na(features))
 ```
@@ -192,7 +192,7 @@ y1_train <- target[f1_train]
 x1_test <- features[f1_test,]
 y1_test <- target[f1_test]
 min1 <- which.min(err_mat[,1])
-m1 <- glmnet(x1_train, y1_train, lambda=rev(lambdas)[min1])
+m1 <- glmnet(x1_train, y1_train, lambda=rev(lambdas)[min1], standardize = FALSE)
 preds1 <- predict(object = m1, newx = x1_test)
 df <- data.frame(preds = preds1, target = y1_test, check.names=TRUE)
 ggplot() + geom_line(data = df, mapping = aes(x=1:14, y=s0, colour = "blue")) +
@@ -207,7 +207,7 @@ y2_train <- target[f2_train]
 x2_test <- features[f2_test,]
 y2_test <- target[f2_test]
 min2 <- which.min(err_mat[,2])
-m2 <- glmnet(x2_train, y2_train, lambda=rev(lambdas)[min2])
+m2 <- glmnet(x2_train, y2_train, lambda=rev(lambdas)[min2], standardize = FALSE)
 preds2 <- predict(m2, newx = x2_test)
 df <- data.frame(preds = preds2, target = y2_test)
 ggplot() + geom_line(data = df, mapping = aes(x=1:14, y=s0, colour = "blue")) +
@@ -221,7 +221,7 @@ y3_train <- target[f3_train]
 x3_test <- features[f3_test,]
 y3_test <- target[f3_test]
 min3 <- which.min(err_mat[,3])
-m3 <- glmnet(x3_train, y3_train, lambda=rev(lambdas)[min3])
+m3 <- glmnet(x3_train, y3_train, lambda=rev(lambdas)[min3], standardize = FALSE)
 preds3 <- predict(m3, newx = x3_test)
 df <- data.frame(preds = preds3, target = y3_test)
 ggplot() + geom_line(data = df, mapping = aes(x=1:14, y=s0, colour = "blue")) +
@@ -235,7 +235,7 @@ y4_train <- target[f4_train]
 x4_test <- features[f4_test,]
 y4_test <- target[f4_test]
 min4 <- which.min(err_mat[,4])
-m4 <- glmnet(x4_train, y4_train, lambda=rev(lambdas)[min4])
+m4 <- glmnet(x4_train, y4_train, lambda=rev(lambdas)[min4], standardize = FALSE)
 preds4 <- predict(m4, newx = x4_test)
 df <- data.frame(preds = preds4, target = y4_test)
 ggplot() + geom_line(data = df, mapping = aes(x=1:14, y=s0, colour = "blue")) +
@@ -250,7 +250,7 @@ y5_train <- target[f5_train]
 x5_test <- features[f5_test,]
 y5_test <- target[f5_test]
 min5 <- which.min(err_mat[,5])
-m5 <- glmnet(x5_train, y5_train, lambda=rev(lambdas)[min5])
+m5 <- glmnet(x5_train, y5_train, lambda=rev(lambdas)[min5], standardize = FALSE)
 preds5 <- predict(m5, newx = x5_test)
 df <- data.frame(preds = preds5, target = y5_test)
 ggplot() + geom_line(data = df, mapping = aes(x=1:14, y=s0, colour = "blue")) +
@@ -278,9 +278,7 @@ minmin <- which.min(apply(err_mat, 1, mean))
 #minmin <- l1se
 best_lambda <- rev(lambdas)[minmin]
 #dim(features)
-
-
-m_full <- glmnet(features[1:370,], target[4:373], lambda = best_lambda)
+m_full <- glmnet(features[1:370,], target[4:373], lambda = best_lambda, standardize = FALSE)
 dim(features)
 preds_full <- predict(m_full, newx = features[370:429,],
                       lambda = best_lambda)
@@ -288,7 +286,6 @@ df <- data.frame(preds = preds_full, target = target[373:432])
 #dim(preds_full)
 ggplot() + geom_line(data = df, mapping = aes(x=1:60, y=s0, colour = "blue")) +
   geom_line(data = df, mapping= aes(x=1:60, y=target))
-dim(features_og)
 
 ```
 ```{r}
@@ -310,4 +307,9 @@ After training the model we evaluated its performance on a separate validation s
 The model shows predicting capabilities but misses out on higher values of the precipitation target.
 Also although predicting seems to bring useful results, the choice of the LASSO coefficients seems somewhat arbitrary or at least not
 interpret able in a straightforward way.
+
+
+```{r}
+
+```
 

@@ -16,7 +16,7 @@ target_path <- "data/interim/drought/chirps_setreftime_aggregated.rds"
 features_path <- "data/interim/sst/ersst_setreftime.nc"
 target <- load_data(target_path)
 target <- values(target)
-#target <- apply(target, 2, mean)
+#target <- as.data.frame(apply(target, 2, mean))
 features <- load_data(features_path, "sst")
 features <- add_colnames(features_path, features)
 #features <- prepare_sst(features)
@@ -24,7 +24,7 @@ dim(target)
 dim(features)
 # get correlations and the significant ones only, create mask to set rest NA
 cvec <- compute_corr(t(features), target, timelag = 0, cor_method = "pearson")
-#cvec2 <- compute_corr(features, target, timelag = 0, cor_method = "spearman")
+#cvec <- compute_corr(t(features), target, timelag = 0, cor_method = "spearman")
 plot(hist(cvec))
 #plot(hist(cvec2))
 old_sst <- brick("data/interim/sst/ersst_setreftime.nc", varname = "sst")
@@ -53,14 +53,14 @@ target_cv4 <- as.data.frame(target)[,1:370]
 target_cv4 <- unname(apply(target_cv4, 2, mean))
 
 lasso_og_corr_pre <- cv_for_ts(features_cv4, target_cv4, nfold = 5, size_train = 60, size_test = 14,
-                               save_folder = "cv-lasso-original-corr-pre")
+                               save_folder = "cv-lasso-original-corr-pre-pearson")
 # plot results
 ids <- createTimeSlices(1:370, initialWindow=60, horizon=14,
                         skip=60+14-1)
-lambdas <- readRDS("results/CV-lasso/cv-lasso-original-corr-pre/lambda-vec.rds")
-err_mat <- readRDS("results/CV-lasso/cv-lasso-original-corr-pre/err-mat.rds")
+lambdas <- readRDS("results/CV-lasso/cv-lasso-original-corr-pre-pearson/lambda-vec.rds")
+err_mat <- readRDS("results/CV-lasso/cv-lasso-original-corr-pre-pearson/err-mat.rds")
 plot_and_save_cv_results(err_mat, 5, ids, lambdas, features_cv4, target_cv4,
-                         save_to = "results/CV-lasso/cv-lasso-original-corr-pre")
+                         save_to = "results/CV-lasso/cv-lasso-original-corr-pre-pearson")
 
 
 

@@ -34,19 +34,19 @@ lag <- 3
 lag_mat <- readRDS("results/CV-lasso/cv-lasso-og-timelag-03-06-22/lag_mat.rds")
 # test(head(lag_mat[,1:10]))
 # drop_na_from_lag_mat <- function(lag_mat) {
-  keep_col <- apply(lag_mat, 2, function(x) !all(is.na(x)))
-  lag_mat <- lag_mat[,keep_col]
-  keep_row <- apply(lag_mat, 1, function(x) !any(is.na(x)))
-  lag_mat <- lag_mat[keep_row,]
-  return(lag_mat)
-}
+#   keep_col <- apply(lag_mat, 2, function(x) !all(is.na(x)))
+#   lag_mat <- lag_mat[,keep_col]
+#   keep_row <- apply(lag_mat, 1, function(x) !any(is.na(x)))
+#   lag_mat <- lag_mat[keep_row,]
+#   return(lag_mat)
+# }
 # drop_na_from_lag_mat(test)
 lag_mat <- lag_mat[-c(1:lag),-1]
 dim(lag_mat)[2] == dim(features)[2]*3
 features <- features[-c(1:lag),]
 dim(lag_mat)[1] == dim(features)[1]
-features <- cbind(features, l2)
-saveRDS(features, "results/CV-lasso/cv-lasso-og-timelag-03-06-22/timelag_feautures.rds")
+features <- cbind(features, lag_mat)
+saveRDS(features, "results/CV-lasso/cv-lasso-og-timelag-03-06-22/timelag_features.rds")
 
 features_cv6 <- features[1:370,]
 target_cv6 <- target[-c(1:3)]

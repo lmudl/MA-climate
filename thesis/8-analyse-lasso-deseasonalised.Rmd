@@ -15,7 +15,6 @@ source("../code/R/helper-functions.R")
 
 ```{r}
 err_mat <- readRDS("../results/CV-lasso/cv-lasso-des-data-08-11-21/err-mat.rds")
-
 ```
 
 
