@@ -21,6 +21,10 @@ source("../code/R/helper-functions.R")
 # length(ids$train$Training060)
 # length(ids$test$Testing060)
 ```
+```{r}
+path_to_model_folder <- "../results/CV-lasso/cv-lasso-og-data-16-06-22"
+```
+
 
 ## LASSO model
 
@@ -41,19 +45,26 @@ in the training phase.
 
 ## Error plots
 
-```{r}
-err_mat <- readRDS("../results/CV-lasso/cv-lasso-og-data-11-06-22/err-mat.rds")
-#err_mat <- sqrt(err_mat)
-err_mat <- err_mat[1:60,]
-```
+<!-- ```{r} -->
+<!-- err_mat <- readRDS("../results/CV-lasso/cv-lasso-og-data-16-06-22/err-mat.rds") -->
+<!-- #err_mat <- sqrt(err_mat) -->
+<!-- err_mat <- err_mat[1:60,] -->
+<!-- ``` -->
+
+<!-- ```{r} -->
+<!-- lambda_id <- c(1:60) -->
+<!-- mse <- apply(err_mat, 1, mean) -->
+<!-- b <- mse -->
+<!-- bplus <- apply(err_mat, 1, max) -->
+<!-- bmin <- apply(err_mat, 1, min) -->
+<!-- errbar(lambda_id, mse, b+bplus, b-bmin) -->
+<!-- ``` -->
+
+
 
 ```{r}
-lambda_id <- c(1:60)
-mse <- apply(err_mat, 1, mean)
-b <- mse
-bplus <- apply(err_mat, 1, max)
-bmin <- apply(err_mat, 1, min)
-errbar(lambda_id, mse, b+bplus, b-bmin)
+err_bars_plot <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-bars-plot.rds"))
+err_bars_plot
 ```
 
 The plot shows the results from the 5 fold-CV plotted for each lambda.
@@ -65,32 +76,31 @@ increase we only showed the first 60 values for better visibility
 The highest regularization is chosen so that all coefficients are zero.
 
 
+<!-- ```{r} -->
+<!-- # which.min(b) -->
+<!-- # bs <- b[40:100] -->
+<!-- # bbpluss <- (b+bplus)[40:100] -->
+<!-- # bbmins <- (b-bmin)[40:100] -->
+<!-- # (bs > bbpluss) | (bs < bbmins) -->
+<!-- bmin <- which.min(b) -->
+<!-- tv <- (b+bplus)[bmin] -->
+<!-- tz <- b+bplus -->
+<!-- tz <- tz[(bmin+1):100] -->
+<!-- w <- tv < tz -->
+<!-- #bmin is 40 -->
+<!-- #w ist bei 45 true -->
+<!-- l1se <- 45 -->
+
+<!-- ``` -->
+
+
 
 ```{r}
-# which.min(b)
-# bs <- b[40:100]
-# bbpluss <- (b+bplus)[40:100]
-# bbmins <- (b-bmin)[40:100]
-# (bs > bbpluss) | (bs < bbmins)
-bmin <- which.min(b)
-tv <- (b+bplus)[bmin]
-tz <- b+bplus
-tz <- tz[(bmin+1):100]
-w <- tv < tz
-#bmin is 40
-#w ist bei 45 true
-l1se <- 45
-
-```
-
-
-
-```{r}
-p1 <- readRDS("../results/CV-lasso/cv-lasso-og-data-11-06-22/err-mat-plots/err-plot-fold-1.rds")
-p2 <- readRDS("../results/CV-lasso/cv-lasso-og-data-11-06-22/err-mat-plots/err-plot-fold-2.rds")
-p3 <- readRDS("../results/CV-lasso/cv-lasso-og-data-11-06-22/err-mat-plots/err-plot-fold-3.rds")
-p4 <- readRDS("../results/CV-lasso/cv-lasso-og-data-11-06-22/err-mat-plots/err-plot-fold-4.rds")
-p5 <- readRDS("../results/CV-lasso/cv-lasso-og-data-11-06-22/err-mat-plots/err-plot-fold-5.rds")
+p1 <- readRDS("../results/CV-lasso/cv-lasso-og-data-16-06-22/err-mat-plots/err-plot-fold-1.rds")
+p2 <- readRDS("../results/CV-lasso/cv-lasso-og-data-16-06-22/err-mat-plots/err-plot-fold-2.rds")
+p3 <- readRDS("../results/CV-lasso/cv-lasso-og-data-16-06-22/err-mat-plots/err-plot-fold-3.rds")
+p4 <- readRDS("../results/CV-lasso/cv-lasso-og-data-16-06-22/err-mat-plots/err-plot-fold-4.rds")
+p5 <- readRDS("../results/CV-lasso/cv-lasso-og-data-16-06-22/err-mat-plots/err-plot-fold-5.rds")
 p1 + p2 + p3 + p4 + p5
 ```
 
@@ -116,11 +126,11 @@ apply(err_mat, 2, function(x) which.min(x))
 ## Coefficient plots
 
 ```{r}
-pc1 <- readRDS("../results/CV-lasso/cv-lasso-og-data-11-06-22/coef-plots/coef-plot-fold-1.rds")
-pc2 <- readRDS("../results/CV-lasso/cv-lasso-og-data-11-06-22/coef-plots/coef-plot-fold-2.rds")
-pc3 <- readRDS("../results/CV-lasso/cv-lasso-og-data-11-06-22/coef-plots/coef-plot-fold-3.rds")
-pc4 <- readRDS("../results/CV-lasso/cv-lasso-og-data-11-06-22/coef-plots/coef-plot-fold-4.rds")
-pc5 <- readRDS("../results/CV-lasso/cv-lasso-og-data-11-06-22/coef-plots/coef-plot-fold-5.rds")
+pc1 <- readRDS("../results/CV-lasso/cv-lasso-og-data-16-06-22/coef-plots/coef-plot-fold-1.rds")
+pc2 <- readRDS("../results/CV-lasso/cv-lasso-og-data-16-06-22/coef-plots/coef-plot-fold-2.rds")
+pc3 <- readRDS("../results/CV-lasso/cv-lasso-og-data-16-06-22/coef-plots/coef-plot-fold-3.rds")
+pc4 <- readRDS("../results/CV-lasso/cv-lasso-og-data-16-06-22/coef-plots/coef-plot-fold-4.rds")
+pc5 <- readRDS("../results/CV-lasso/cv-lasso-og-data-16-06-22/coef-plots/coef-plot-fold-5.rds")
 
 l <- list(pc1,pc2,pc3,pc4,pc5)
 ggarrange(plotlist = l, ncol = 3, nrow = 2,
@@ -153,102 +163,124 @@ which can be seen here since the variables chosen are scattered across the map a
 Following we inspect the folds precipitation time series and
 the predictions made by the model.
 
-```{r}
-# load data
-target_path <- "../data/interim/drought/chirps_setreftime_aggregated.rds"
-features_path <- "../data/interim/sst/ersst_setreftime.nc"
-target <- load_data(target_path)
-target <- apply(getValues(target), 2, mean)
-features <- load_data(features_path, "sst")
-features <- t(features)
-features <- prepare_sst(features)
-```
+<!-- ```{r} -->
+<!-- # load data -->
+<!-- target_path <- "../data/interim/drought/chirps_setreftime_aggregated.rds" -->
+<!-- features_path <- "../data/interim/sst/ersst_setreftime.nc" -->
+<!-- target <- load_data(target_path) -->
+<!-- target <- apply(getValues(target), 2, mean) -->
+<!-- features <- load_data(features_path, "sst") -->
+<!-- features <- t(features) -->
+<!-- features <- prepare_sst(features) -->
+<!-- ``` -->
 
-```{r}
-#plot(ts(target))
-```
-
-
-```{r}
-# get indices
-lambdas <- readRDS("../results/CV-lasso/cv-lasso-og-data-11-06-22/lambda-vec.rds")
-ids <- readRDS("../results/CV-lasso/cv-lasso-og-data-11-06-22/index-list.rds")
-```
+<!-- ```{r} -->
+<!-- #plot(ts(target)) -->
+<!-- ``` -->
 
 
-```{r}
-f1_train <- ids$train$Training060
-f1_test <- ids$test$Testing060
-x1_train <- features[f1_train,]
-y1_train <- target[f1_train]
-x1_test <- features[f1_test,]
-y1_test <- target[f1_test]
-min1 <- which.min(err_mat[,1])
-m1 <- glmnet(x1_train, y1_train, lambda=rev(lambdas)[min1], standardize = FALSE)
-preds1 <- predict(object = m1, newx = x1_test)
-df <- data.frame(preds = preds1, target = y1_test, check.names=TRUE)
-ggplot() + geom_line(data = df, mapping = aes(x=1:14, y=s0, colour = "blue")) +
-  geom_line(data = df, mapping= aes(x=1:14, y=target))
-```
+<!-- ```{r} -->
+<!-- # get indices -->
+<!-- lambdas <- readRDS("../results/CV-lasso/cv-lasso-og-data-16-06-22/lambda-vec.rds") -->
+<!-- ids <- readRDS("../results/CV-lasso/cv-lasso-og-data-16-06-22/index-list.rds") -->
+<!-- ``` -->
+
+
+<!-- ```{r} -->
+<!-- f1_train <- ids$train$Training060 -->
+<!-- f1_test <- ids$test$Testing060 -->
+<!-- x1_train <- features[f1_train,] -->
+<!-- y1_train <- target[f1_train] -->
+<!-- x1_test <- features[f1_test,] -->
+<!-- y1_test <- target[f1_test] -->
+<!-- min1 <- which.min(err_mat[,1]) -->
+<!-- m1 <- glmnet(x1_train, y1_train, lambda=rev(lambdas)[min1], standardize = FALSE) -->
+<!-- preds1 <- predict(object = m1, newx = x1_test) -->
+<!-- df <- data.frame(preds = preds1, target = y1_test, check.names=TRUE) -->
+<!-- ggplot() + geom_line(data = df, mapping = aes(x=1:14, y=s0, colour = "blue")) + -->
+<!--   geom_line(data = df, mapping= aes(x=1:14, y=target)) -->
+<!-- ``` -->
+
+<!-- ```{r} -->
+<!-- f2_train <- ids$train$Training134 -->
+<!-- f2_test <- ids$test$Testing134 -->
+<!-- x2_train <- features[f2_train,] -->
+<!-- y2_train <- target[f2_train] -->
+<!-- x2_test <- features[f2_test,] -->
+<!-- y2_test <- target[f2_test] -->
+<!-- min2 <- which.min(err_mat[,2]) -->
+<!-- m2 <- glmnet(x2_train, y2_train, lambda=rev(lambdas)[min2], standardize = FALSE) -->
+<!-- preds2 <- predict(m2, newx = x2_test) -->
+<!-- df <- data.frame(preds = preds2, target = y2_test) -->
+<!-- ggplot() + geom_line(data = df, mapping = aes(x=1:14, y=s0, colour = "blue")) + -->
+<!--   geom_line(data = df, mapping= aes(x=1:14, y=target)) -->
+<!-- ``` -->
+<!-- ```{r} -->
+<!-- f3_train <- ids$train$Training208 -->
+<!-- f3_test <- ids$test$Testing208 -->
+<!-- x3_train <- features[f3_train,] -->
+<!-- y3_train <- target[f3_train] -->
+<!-- x3_test <- features[f3_test,] -->
+<!-- y3_test <- target[f3_test] -->
+<!-- min3 <- which.min(err_mat[,3]) -->
+<!-- m3 <- glmnet(x3_train, y3_train, lambda=rev(lambdas)[min3], standardize = FALSE) -->
+<!-- preds3 <- predict(m3, newx = x3_test) -->
+<!-- df <- data.frame(preds = preds3, target = y3_test) -->
+<!-- ggplot() + geom_line(data = df, mapping = aes(x=1:14, y=s0, colour = "blue")) + -->
+<!--   geom_line(data = df, mapping= aes(x=1:14, y=target)) -->
+<!-- ``` -->
+<!-- ```{r} -->
+<!-- f4_train <- ids$train$Training282 -->
+<!-- f4_test <- ids$test$Testing282 -->
+<!-- x4_train <- features[f4_train,] -->
+<!-- y4_train <- target[f4_train] -->
+<!-- x4_test <- features[f4_test,] -->
+<!-- y4_test <- target[f4_test] -->
+<!-- min4 <- which.min(err_mat[,4]) -->
+<!-- m4 <- glmnet(x4_train, y4_train, lambda=rev(lambdas)[min4], standardize = FALSE) -->
+<!-- preds4 <- predict(m4, newx = x4_test) -->
+<!-- df <- data.frame(preds = preds4, target = y4_test) -->
+<!-- ggplot() + geom_line(data = df, mapping = aes(x=1:14, y=s0, colour = "blue")) + -->
+<!--   geom_line(data = df, mapping= aes(x=1:14, y=target)) -->
+<!-- ``` -->
+
+<!-- ```{r} -->
+<!-- f5_train <- ids$train$Training356 -->
+<!-- f5_test <- ids$test$Testing356 -->
+<!-- x5_train <- features[f5_train,] -->
+<!-- y5_train <- target[f5_train] -->
+<!-- x5_test <- features[f5_test,] -->
+<!-- y5_test <- target[f5_test] -->
+<!-- min5 <- which.min(err_mat[,5]) -->
+<!-- m5 <- glmnet(x5_train, y5_train, lambda=rev(lambdas)[min5], standardize = FALSE) -->
+<!-- preds5 <- predict(m5, newx = x5_test) -->
+<!-- df <- data.frame(preds = preds5, target = y5_test) -->
+<!-- ggplot() + geom_line(data = df, mapping = aes(x=1:14, y=s0, colour = "blue")) + -->
+<!--   geom_line(data = df, mapping= aes(x=1:14, y=target)) -->
+<!-- ``` -->
+
+
 
 ```{r}
-f2_train <- ids$train$Training134
-f2_test <- ids$test$Testing134
-x2_train <- features[f2_train,]
-y2_train <- target[f2_train]
-x2_test <- features[f2_test,]
-y2_test <- target[f2_test]
-min2 <- which.min(err_mat[,2])
-m2 <- glmnet(x2_train, y2_train, lambda=rev(lambdas)[min2], standardize = FALSE)
-preds2 <- predict(m2, newx = x2_test)
-df <- data.frame(preds = preds2, target = y2_test)
-ggplot() + geom_line(data = df, mapping = aes(x=1:14, y=s0, colour = "blue")) +
-  geom_line(data = df, mapping= aes(x=1:14, y=target))
+pred_plot_1 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-1.rds"))
+pred_plot_1
 ```
 ```{r}
-f3_train <- ids$train$Training208
-f3_test <- ids$test$Testing208
-x3_train <- features[f3_train,]
-y3_train <- target[f3_train]
-x3_test <- features[f3_test,]
-y3_test <- target[f3_test]
-min3 <- which.min(err_mat[,3])
-m3 <- glmnet(x3_train, y3_train, lambda=rev(lambdas)[min3], standardize = FALSE)
-preds3 <- predict(m3, newx = x3_test)
-df <- data.frame(preds = preds3, target = y3_test)
-ggplot() + geom_line(data = df, mapping = aes(x=1:14, y=s0, colour = "blue")) +
-  geom_line(data = df, mapping= aes(x=1:14, y=target))
+pred_plot_2 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-2.rds"))
+pred_plot_2
 ```
 ```{r}
-f4_train <- ids$train$Training282
-f4_test <- ids$test$Testing282
-x4_train <- features[f4_train,]
-y4_train <- target[f4_train]
-x4_test <- features[f4_test,]
-y4_test <- target[f4_test]
-min4 <- which.min(err_mat[,4])
-m4 <- glmnet(x4_train, y4_train, lambda=rev(lambdas)[min4], standardize = FALSE)
-preds4 <- predict(m4, newx = x4_test)
-df <- data.frame(preds = preds4, target = y4_test)
-ggplot() + geom_line(data = df, mapping = aes(x=1:14, y=s0, colour = "blue")) +
-  geom_line(data = df, mapping= aes(x=1:14, y=target))
+pred_plot_3 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-3.rds"))
+pred_plot_3
 ```
-
 ```{r}
-f5_train <- ids$train$Training356
-f5_test <- ids$test$Testing356
-x5_train <- features[f5_train,]
-y5_train <- target[f5_train]
-x5_test <- features[f5_test,]
-y5_test <- target[f5_test]
-min5 <- which.min(err_mat[,5])
-m5 <- glmnet(x5_train, y5_train, lambda=rev(lambdas)[min5], standardize = FALSE)
-preds5 <- predict(m5, newx = x5_test)
-df <- data.frame(preds = preds5, target = y5_test)
-ggplot() + geom_line(data = df, mapping = aes(x=1:14, y=s0, colour = "blue")) +
-  geom_line(data = df, mapping= aes(x=1:14, y=target))
+pred_plot_4 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-4.rds"))
+pred_plot_4
 ```
-
+```{r}
+pred_plot_5 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-5.rds"))
+pred_plot_5
+```
 In general the model fits the data sufficiently to predict the general
 form of the time series but misses some modes and is off in the larger
 values in fold 2.
@@ -259,36 +291,45 @@ We choose now the best lambda with the 1SE rule and fit
 the model anew to predict the time series we held out
 as validation data
 
-```{r}
-# fit model with best lambda
-#which.min(b)
-lambdas <- readRDS("../results/CV-lasso/cv-lasso-og-data-11-06-22/lambda-vec.rds")
-```
+<!-- ```{r} -->
+<!-- # fit model with best lambda -->
+<!-- #which.min(b) -->
+<!-- lambdas <- readRDS("../results/CV-lasso/cv-lasso-og-data-16-06-22/lambda-vec.rds") -->
+<!-- ``` -->
+
+<!-- ```{r} -->
+<!-- minmin <- which.min(apply(err_mat, 1, mean)) -->
+<!-- #minmin <- l1se -->
+<!-- best_lambda <- rev(lambdas)[minmin] -->
+<!-- #dim(features) -->
+<!-- m_full <- glmnet(features[1:370,], target[1:370], lambda = best_lambda, standardize = FALSE) -->
+<!-- preds_full <- predict(m_full, newx = features[371:432,], -->
+<!--                       lambda = best_lambda) -->
+<!-- df <- data.frame(preds = preds_full, target = target[371:432]) -->
+<!-- #dim(preds_full) -->
+<!-- ggplot() + geom_line(data = df, mapping = aes(x=1:62, y=s0, colour = "blue")) + -->
+<!--   geom_line(data = df, mapping= aes(x=1:62, y=target)) -->
+
+<!-- ``` -->
+<!-- ```{r} -->
+<!-- sqrt(mean((df$s0 - df$target)^2)) -->
+<!-- ``` -->
+<!-- ```{r} -->
+<!-- mean((df$s0 - df$target)^2) -->
+<!-- ``` -->
+
+
+
 
 ```{r}
-minmin <- which.min(apply(err_mat, 1, mean))
-#minmin <- l1se
-best_lambda <- rev(lambdas)[minmin]
-#dim(features)
-m_full <- glmnet(features[1:370,], target[1:370], lambda = best_lambda, standardize = FALSE)
-preds_full <- predict(m_full, newx = features[371:432,],
-                      lambda = best_lambda)
-df <- data.frame(preds = preds_full, target = target[371:432])
-#dim(preds_full)
-ggplot() + geom_line(data = df, mapping = aes(x=1:62, y=s0, colour = "blue")) +
-  geom_line(data = df, mapping= aes(x=1:62, y=target))
+full_preds <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-full.rds"))
+full_preds
+```
 
-```
-```{r}
-sqrt(mean((df$s0 - df$target)^2))
-```
-```{r}
-mean((df$s0 - df$target)^2)
-```
 Over the more than 5 years of validation data the model predicts the
 seasonal pattern of the precipitation time series quite well,
 but constantly fails to predict the higher values of precipitation.
-The MSE is 1215.74 and the RSME 34.87.
+The MSE is 1326.809 and the RSME 36.42539.
 
 ## Summary
 We fitted a LASSO model for predicting the mean precipitation
@@ -300,18 +341,18 @@ Also although predicting seems to bring useful results, the choice of the LASSO 
 interpret able in a straightforward way.
 
 
-```{r}
-m_full2 <- glmnet(features[1:370,], target[1:370], lambda = rev(lambdas), standardize = FALSE)
-preds_full2 <- predict.glmnet(m_full2, newx = features[371:432,], s = rev(lambdas))
-v <- apply(preds_full2,2,function(x) mean((x-target[371:432])^2))
-v <- unname(v)
-best_l <- which.min(v)
-df2 <- data.frame(preds = preds_full2[,best_l], target = target[371:432])
-#dim(preds_full)
-ggplot() + geom_line(data = df2, mapping = aes(x=1:62, y=preds, colour = "blue")) +
-  geom_line(data = df, mapping= aes(x=1:62, y=target))
-```
-```{r}
-sqrt(mean((df2$preds - df$target)^2))
-```
+<!-- ```{r} -->
+<!-- m_full2 <- glmnet(features[1:370,], target[1:370], lambda = rev(lambdas), standardize = FALSE) -->
+<!-- preds_full2 <- predict.glmnet(m_full2, newx = features[371:432,], s = rev(lambdas)) -->
+<!-- v <- apply(preds_full2,2,function(x) mean((x-target[371:432])^2)) -->
+<!-- v <- unname(v) -->
+<!-- best_l <- which.min(v) -->
+<!-- df2 <- data.frame(preds = preds_full2[,best_l], target = target[371:432]) -->
+<!-- #dim(preds_full) -->
+<!-- ggplot() + geom_line(data = df2, mapping = aes(x=1:62, y=preds, colour = "blue")) + -->
+<!--   geom_line(data = df, mapping= aes(x=1:62, y=target)) -->
+<!-- ``` -->
+<!-- ```{r} -->
+<!-- sqrt(mean((df2$preds - df$target)^2)) -->
+<!-- ``` -->
 
