@@ -818,52 +818,6 @@ cv_for_ts <- function(sst, precip, nfold, size_train, size_test, save_folder,
   
 }
 
-########### CV over cluster ###################################################
-create_cluster_id_list <- function(precip_raster, clustering_result) {
-  cluster_id_list <- list()
-  precip <- getValues(precip_raster)
-  for(i in 1:max(clustering_result$cluster)) {
-    cluster_id_list[[i]] <- precip[clustering_result$cluster==i,]
-  }
-  return(cluster_id_list)
-}
-
-compute_cluster_means <- function(cluster_id_list) {
-  for(i in 1:length(cluster_id_list)) {
-    cluster_id_list[[i]] <- apply(cluster_id_list[[i]], 2, mean)
-  }
-  return(cluster_id_list)
-}
-
-run_cv_over_clusters <- function(sst,cluster_means_list, nfold, size_train,
-                                 size_test, save_folder_cluster_result) {
-  # we can create ids for test and train already here
-  dir.create(paste0("results/CV-lasso/", save_folder_cluster_result))
-  ncluster <- length(cluster_means_list)
-  for (i in 1:ncluster) {
-    # create save_folder sub directory for each cluster
-    save_folder <- paste0(save_folder_cluster_result,"/cluster-",i)
-    err_mat <- cv_for_ts(sst, cluster_means_list[[i]],
-                         nfold, size_train, size_test, save_folder)
-    # cluster_model is err_mat each fold is column
-    print(paste("cluster", i, "finished"))
-    # lambdas <- readRDS(paste0("results/CV-lasso/",save_folder,"/lambda-vec.rds"))
-    # ids <- readRDS(paste0("results/CV-lasso/",save_folder,"/index-list.rds"))
-    # # plot_and_save_cv_results(err_mat, nfold, ids, lambdas, sst, cluster_means_list[[i]],
-    # #                          save_to = paste0("results/CV-lasso/",save_folder))
-    # model_list <- load_models(paste0("results/CV-lasso/", save_folder, "/fold-models"))
-    # plot_save_errors(err_mat, lambdas, save_to=save_folder)
-    # plot_all_coef_maps(model_list, err_mat = err_mat, save_to=save_folder)
-    # plot_predictions_best_l(err_mat, model_list, ids, features=sst, target=cluster_means_list[[i]],
-    #                         save_to = save_folder)
-    
-  }
-}
-
-
-# evaluate_cv_cluster <- 
-
-
 ############ Plotting the CV-results ###########
 
 
@@ -879,47 +833,47 @@ plot_and_save_cv_results <- function(error_matrix, number_of_folds,
 }
 
 # old error plot function ******************************************************
-# plot_all_err <- function(error_matrix, save_to) {
-#   dir.create(paste0(save_to,"/err-mat-plots/"))
-#   error_matrix <- as.data.frame(error_matrix)
-#   for(i in 1:ncol(error_matrix)) {
-#     p <- ggplot(error_matrix, aes(x = 1:100, y = error_matrix[,i])) +
-#       geom_point()
-#     saveRDS(p, paste0(save_to,"/err-mat-plots/","err-plot-fold-",i,".rds"))
-#   }
-# }
+plot_all_err <- function(error_matrix, save_to) {
+  dir.create(paste0(save_to,"/err-mat-plots/"))
+  error_matrix <- as.data.frame(error_matrix)
+  for(i in 1:ncol(error_matrix)) {
+    p <- ggplot(error_matrix, aes(x = 1:100, y = error_matrix[,i])) +
+      geom_point()
+    saveRDS(p, paste0(save_to,"/err-mat-plots/","err-plot-fold-",i,".rds"))
+  }
+}
 # ******************************************************************************
 
-# plot_all_coef_maps <- function(error_matrix, number_of_folds,
-#                                cv_ids, lambdas, feature_data,
-#                                target_data, save_to) {
-#   dir.create(paste0(save_to,"/coef-plots/"))
-#   for(i in 1:number_of_folds) {
-#     p <- plot_nonzero_from_fold(error_matrix = error_matrix, fold = i,
-#                                 cv_ids = cv_ids, lambdas = lambdas, 
-#                                 feature_data = feature_data,
-#                                 target_data = target_data)
-#     saveRDS(p, paste0(save_to, "/coef-plots/", "coef-plot-fold-", i,".rds"))
-#   }
-# }
-# 
-# plot_nonzero_from_fold <- function(error_matrix, fold, cv_ids, lambdas,
-#                                    feature_data, target_data) {
-#   id_min <- which.min(error_matrix[,fold])
-#   ids <- cv_ids$train[[fold]]
-#   min_lambda <- lambdas[id_min]
-#   # watch out for target dimensions and that feature_data
-#   # is prepared f.e via prepare_sst
-#   mod <- glmnet(feature_data[ids,], target_data[ids],
-#                 lambda = min_lambda)
-#   all_coef <- coef(mod)[-1,1]
-#   nonzero_coef <- all_coef != 0
-#   nonzero_coef_names <- names(all_coef[nonzero_coef])
-#   num_coef_names <- coef_names_to_numeric(nonzero_coef_names)
-#   coef_mat <- cbind(num_coef_names, all_coef[nonzero_coef])
-#   plt <- plot_nonzero_coefficients(coef_mat)
-#   return(plt)
-# }
+plot_all_coef_maps <- function(error_matrix, number_of_folds,
+                               cv_ids, lambdas, feature_data,
+                               target_data, save_to) {
+  dir.create(paste0(save_to,"/coef-plots/"))
+  for(i in 1:number_of_folds) {
+    p <- plot_nonzero_from_fold(error_matrix = error_matrix, fold = i,
+                                cv_ids = cv_ids, lambdas = lambdas, 
+                                feature_data = feature_data,
+                                target_data = target_data)
+    saveRDS(p, paste0(save_to, "/coef-plots/", "coef-plot-fold-", i,".rds"))
+  }
+}
+
+plot_nonzero_from_fold <- function(error_matrix, fold, cv_ids, lambdas,
+                                   feature_data, target_data) {
+  id_min <- which.min(error_matrix[,fold])
+  ids <- cv_ids$train[[fold]]
+  min_lambda <- lambdas[id_min]
+  # watch out for target dimensions and that feature_data
+  # is prepared f.e via prepare_sst
+  mod <- glmnet(feature_data[ids,], target_data[ids],
+                lambda = min_lambda)
+  all_coef <- coef(mod)[-1,1]
+  nonzero_coef <- all_coef != 0
+  nonzero_coef_names <- names(all_coef[nonzero_coef])
+  num_coef_names <- coef_names_to_numeric(nonzero_coef_names)
+  coef_mat <- cbind(num_coef_names, all_coef[nonzero_coef])
+  plt <- plot_nonzero_coefficients(coef_mat)
+  return(plt)
+}
 
 coef_names_to_numeric <- function(coefficient_names) {
   a <- unlist(strsplit(coefficient_names, " "))
@@ -999,7 +953,7 @@ plot_coef_maps <- function(model_list, err_mat, save_to) {
 # Plot predictions ************************************************************
 
 plot_predictions_best_l <- function(err_mat, model_list, ids, features, target,
-                                    save_to, standardize=FALSE) {
+                                    lambdas, save_to, standardize=FALSE) {
   dir.create(paste0(save_to,"/pred-plots/"))
   for(i in seq(length(model_list))) {
     ids_i <- ids$test[[i]]
