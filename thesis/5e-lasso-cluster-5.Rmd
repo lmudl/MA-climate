@@ -1,4 +1,4 @@
-# Lasso on original data
+# Lasso on cluster 5
 
 ```{r, echo = FALSE}
 knitr::opts_chunk$set(warning = FALSE, message = FALSE, echo = FALSE)
@@ -15,7 +15,7 @@ source("../code/R/helper-functions.R")
 ```
 
 ```{r}
-path_to_model_folder <- "../results/CV-lasso/cluster-cv-lasso-og/cluster-3/"
+path_to_model_folder <- "../results/CV-lasso/cluster-cv-lasso-og2/cluster-5/"
 ```
 
 
@@ -39,13 +39,13 @@ in the training phase.
 ## Error plots
 
 
-```{r}
+```{r err-bar-plot-lasso-og-cl5, fig.cap="Mean squared error of the 5-fold blocked cross validation for cluster 5. On the x-axis the lambda values on the log scale. The points in the middle represent the average MSE for the respective lambda, the errorbars give the MSE +/- one standard deviation. The dotted line shows the lambda for which minimum MSE was obtained."}
 err_bars_plot <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-bars-plot.rds"))
 err_bars_plot
 ```
 
 
-```{r}
+```{r err-fold-lasso-og-cl5, fig.cap="MSE of the CV for the different lambda values on the a log scale. The red dotted line shows the lambda for which minimum MSE was obtained."}
 p1 <- readRDS(paste0(path_to_model_folder, "err-mat-plots/err-plot-fold-1.rds"))
 p2 <- readRDS(paste0(path_to_model_folder, "err-mat-plots/err-plot-fold-2.rds"))
 p3 <- readRDS(paste0(path_to_model_folder, "err-mat-plots/err-plot-fold-3.rds"))
@@ -55,7 +55,14 @@ p5 <- readRDS(paste0(path_to_model_folder, "err-mat-plots/err-plot-fold-5.rds"))
 p1 + p2 + p3 + p4 + p5
 ```
 
+```{r}
+err_mat_list <- list(p1,p2,p3,p4,p5)
+err_mat_resc_list <- replot_err_mat(err_mat_list)
+```
 
+```{r err-fold-lasso-og-replot-cl5, fig.cap="MSE of the CV for the different lambda values on the a log scale computed for cluster 5. The red dotted line shows the lambda for which minimum MSE was obtained. See @\ref(fig:err-folg-lasso-og), but this time the y-axis has the same range for all plots."}
+err_mat_resc_list[[1]] + err_mat_resc_list[[2]] + err_mat_resc_list[[3]] + err_mat_resc_list[[4]] + err_mat_resc_list[[5]]
+```
 
 Below we can see the minimum MSE for each fold.
 ```{r}
@@ -71,7 +78,7 @@ And which lambda in the lambda vector resulted in the lowest prediction error on
 
 ## Coefficient plots
 
-```{r}
+```{r coef-plot-lasso-og-cl5, fig.cap="Coefficient map plot for the different folds. Longitude and Latitude on the x and y-axis respectively. Positive values are coloured in blue, negative values in red."}
 pc1 <- readRDS(paste0(path_to_model_folder, "coef-plots/coef-plot-fold-1.rds"))
 pc2 <- readRDS(paste0(path_to_model_folder, "coef-plots/coef-plot-fold-2.rds"))
 pc3 <- readRDS(paste0(path_to_model_folder, "coef-plots/coef-plot-fold-3.rds"))
@@ -125,6 +132,20 @@ as validation data
 ```{r}
 full_preds <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-full.rds"))
 full_preds
+mse_full <- get_mse_from_pred_plot(full_preds)
+mse_full
+```
+```{r}
+# [1] 1616.594
+# [1] "Done fitting and evaluating the full model with l_min for cluster 1"
+# [1] 1250.799
+# [1] "Done fitting and evaluating the full model with l_min for cluster 2"
+# [1] 3091.448
+# [1] "Done fitting and evaluating the full model with l_min for cluster 3"
+# [1] 3505.33
+# [1] "Done fitting and evaluating the full model with l_min for cluster 4"
+# [1] 2599.921
+# [1] "Done fitting and evaluating the full model with l_min for cluster 5"
 ```
 
 

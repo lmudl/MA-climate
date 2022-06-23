@@ -35,7 +35,7 @@ their location on the map and also the 5% strongest positive and negative correl
 ```{r, echo = FALSE, out.width="40%", out.height="20%",fig.show='hold',fig.align='center'}
 knitr::include_graphics(c("../code/Rmarkdown/plots-markdown/og-data/dens-0.jpg"))
 ```
-```{r, echo = FALSE, out.width="65%", out.height="65%",fig.show='hold',fig.align='center'}
+```{r corr-0, echo = FALSE, out.width="65%", out.height="65%",fig.show='hold',fig.align='center'}
 knitr::include_graphics("../code/Rmarkdown/plots-markdown/og-data/corr-0.jpg")
 ```
 ```{r, echo = FALSE, out.width="65%", out.height="65%",fig.show='hold',fig.align='center'}

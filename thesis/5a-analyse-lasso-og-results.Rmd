@@ -59,20 +59,24 @@ in the training phase.
 <!-- bmin <- apply(err_mat, 1, min) -->
 <!-- errbar(lambda_id, mse, b+bplus, b-bmin) -->
 <!-- ``` -->
-
-
 ```{r}
-err_bars_plot <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-bars-plot.rds"))
-err_bars_plot
+err_mat <- readRDS(paste0(path_to_model_folder, "/err-mat.rds"))
+lambdas <- readRDS(paste0(path_to_model_folder, "/lambda-vec.rds"))
 ```
 
-The plot shows the results from the 5 fold-CV plotted for each lambda.
-Lambda values start with high regularization and then decrease.
-Initially reducing regularization reduces the error
-until the 43th lambda value.
-As the errors get very large after the 60th lambda value and strictly
-increase we only showed the first 60 values for better visibility
-The highest regularization is chosen so that all coefficients are zero.
+
+```{r err-bar-plot-lasso-og, fig.cap="Mean squared error of the 5-fold blocked cross validation for a range of lambda values on the log scale. The points in the middle represent the average MSE for the respective lambda, the errorbars give the MSE +/- one standard deviation. The dotted line shows the lambda for which minimum MSE was obtained."}
+err_bars_plot <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-bars-plot.rds"))
+err_bars_plot
+a <- ggplot_build(err_bars_plot)
+```
+\@ref(fig:err-bar-plot-lasso-og) shows the results from the 5 fold-CV plotted for each lambda.
+The lambdas are given on the log scale.
+The upper and lower bars indicate mean MSE +/- one standard deviation from the
+mean MSE. 
+We note that the upper and lower bars are quite wide indicating big differences
+in MSE for the different folds.
+We therefore also inspect the MSE for each individual fold.
 
 
 <!-- ```{r} -->
@@ -93,43 +97,58 @@ The highest regularization is chosen so that all coefficients are zero.
 
 
 
-```{r}
-p1 <- readRDS(paste0(path_to_model_folder, "err-mat-plots/err-plot-fold-1.rds"))
-p2 <- readRDS(paste0(path_to_model_folder, "err-mat-plots/err-plot-fold-2.rds"))
-p3 <- readRDS(paste0(path_to_model_folder, "err-mat-plots/err-plot-fold-3.rds"))
-p4 <- readRDS(paste0(path_to_model_folder, "err-mat-plots/err-plot-fold-4.rds"))
-p5 <- readRDS(paste0(path_to_model_folder, "err-mat-plots/err-plot-fold-5.rds"))
+```{r err-fold-lasso-og, fig.cap="MSE of the CV for the different lambda values on the a log scale. The red dotted line shows the lambda for which minimum MSE was obtained."}
+p1 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-plot-fold-1.rds"))
+p2 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-plot-fold-2.rds"))
+p3 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-plot-fold-3.rds"))
+p4 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-plot-fold-4.rds"))
+p5 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-plot-fold-5.rds"))
 
 p1 + p2 + p3 + p4 + p5
+
+```
+At first glance \@ref(fig:err-fold-lasso-og) shows that the MSE for fold 1 and 2 have similar trajectories, the same for 3 and 4,
+while fold 5 is the only one that only has a local maximum somewhat in the middle of the 
+log lambda range. But fold 5 also has its minimum MSE at a larger regularization
+value than the other folds which is also reflected in the number of
+coefficients it includes in the model, as we will see in the coefficient plots.
+Also obviously the MSE differ greatly in their values as can be seen on the differences
+of their respective y-axis.
+While this plot works well for getting an overview of the trajectories we can
+replot them with a common y-axis to compare their values more easily.
+
+
+```{r}
+err_mat_p_list <- list(p1,p2,p3,p4,p5)
+err_mat_resc_list <- replot_err_mat(err_mat_p_list)
 ```
 
-In the above plot we can see the error curves for each fold.
-Folds 1,2 and 3 in the top row, left to right and folds 4 and 5 in the bottom row.
-We can see that initially that with decreasing regularization the MSE decreases as well.
-Up to a certain point after which the error rises again.
-Fold 4 seems to be the exception where a decrease in regularization
-does not increase the error dramatically as seen for example in folds 2 and 5 respectively.
+```{r err-fold-lasso-og-replot, fig.cap="MSE of the CV for the different lambda values on the a log scale. The red dotted line shows the lambda for which minimum MSE was obtained. See @\ref(fig:err-folg-lasso-og), but this time the y-axis has the same range for all plots."}
+err_mat_resc_list[[1]] + err_mat_resc_list[[2]] + err_mat_resc_list[[3]] + err_mat_resc_list[[4]] + err_mat_resc_list[[5]]
+```
+
+We can see now that fold 2 settles for far larger errors than fold 5 for example. Fold 5 chooses the highest lambda but also has the lowest minimal MSE.
+
+
 
 Below we can see the minimum MSE for each fold.
 ```{r}
-#apply(err_mat, 2, min)
+apply(err_mat, 2, min)
 ```
 And which lambda in the lambda vector resulted in the lowest prediction error on the folds´ test set.
 
 ```{r}
-#apply(err_mat, 2, function(x) which.min(x))
+apply(err_mat, 2, function(x) lambdas[which.min(x)])
 ```
 
 ## Coefficient plots
 
-```{r}
-pc1 <- readRDS(paste0(path_to_model_folder, "coef-plots/coef-plot-fold-1.rds"))
-pc2 <- readRDS(paste0(path_to_model_folder, "coef-plots/coef-plot-fold-2.rds"))
-pc3 <- readRDS(paste0(path_to_model_folder, "coef-plots/coef-plot-fold-3.rds"))
-pc4 <- readRDS(paste0(path_to_model_folder, "coef-plots/coef-plot-fold-4.rds"))
-pc5 <- readRDS(paste0(path_to_model_folder, "coef-plots/coef-plot-fold-5.rds"))
-
-
+```{r coef-plot-lasso-og, fig.cap="Coefficient map plot for the different folds. Longitude and Latitude on the x and y-axis respectively. Positive values are coloured in blue, negative values in red."}
+pc1 <- readRDS(paste0(path_to_model_folder, "/coef-plots/coef-plot-fold-1.rds"))
+pc2 <- readRDS(paste0(path_to_model_folder, "/coef-plots/coef-plot-fold-2.rds"))
+pc3 <- readRDS(paste0(path_to_model_folder, "/coef-plots/coef-plot-fold-3.rds"))
+pc4 <- readRDS(paste0(path_to_model_folder, "/coef-plots/coef-plot-fold-4.rds"))
+pc5 <- readRDS(paste0(path_to_model_folder, "/coef-plots/coef-plot-fold-5.rds"))
 
 l <- list(pc1,pc2,pc3,pc4,pc5)
 ggarrange(plotlist = l, ncol = 3, nrow = 2,
@@ -138,9 +157,14 @@ ggarrange(plotlist = l, ncol = 3, nrow = 2,
 
 The plots displays the nonzero coefficients in each fold computed
 for the lambda that minimizes the MSE on the test set in the respective fold.
-For all folds we see large negative coefficients in the arctic. 
 The LASSO chooses among correlated variables only one and discards the others,
 which can be seen here since the variables chosen are scattered across the map and can but don't have to be close to each other.
+<!-- If we recall the standard deviations of the SST (\@ref(fig:mean-and-sd-sst-og)) we can see that when the model is strongly regularized (as in fold 5), it chooses locations that have higher variation in values. Also some of the higher variable locations are not Sea but Great Lake data. -->
+<!-- We therefore might consider standardizing the data. -->
+<!-- The locations that are included in the models are also not geographically close to the CAB. So we have to ask ourselves if this makes sense from  -->
+<!-- a meteorological viewpoint. Can SST far away predict the precipitation in the same month in the CAB? -->
+If we take a look again at \@ref(fig:corr-0) we can see that the model includes
+locations that have high correlations.
 
 
 ## Inspect predictions from each fold
@@ -150,27 +174,46 @@ the predictions made by the model.
 
 ```{r}
 pred_plot_1 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-1.rds"))
-pred_plot_1
+#pred_plot_1
+mse_1 <- get_mse_from_pred_plot(pred_plot_1)
 ```
 ```{r}
 pred_plot_2 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-2.rds"))
-pred_plot_2
+#pred_plot_2
+mse_2 <- get_mse_from_pred_plot(pred_plot_2)
+
 ```
 ```{r}
 pred_plot_3 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-3.rds"))
-pred_plot_3
+#pred_plot_3
+mse_3 <- get_mse_from_pred_plot(pred_plot_3)
+
 ```
 ```{r}
 pred_plot_4 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-4.rds"))
-pred_plot_4
+#pred_plot_4
+mse_4 <- get_mse_from_pred_plot(pred_plot_4)
+
 ```
 ```{r}
 pred_plot_5 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-5.rds"))
-pred_plot_5
+#pred_plot_5
+mse_5 <- get_mse_from_pred_plot(pred_plot_5)
+
 ```
+```{r}
+pred_plot_list <- list(pred_plot_1,pred_plot_2,pred_plot_3,pred_plot_4,pred_plot_5)
+#lapply(pred_plot_list, get_mse_from_pred_plot)
+```
+```{r pred-plot-fold-lasso-og, fig.cap="Precipitation prediction and target values in the test set in each fold. Predictions in red and target values in black."}
+pred_plot_1 + pred_plot_2 + pred_plot_3 + pred_plot_4 +
+  pred_plot_5
+```
+
 In general the model fits the data sufficiently to predict the general
 form of the time series but misses some modes and is off in the larger
-values in fold 2.
+values in fold 2. Also it does not fit well rapid changes as in fold 3.
+Therefore it seems that the model generally underfits the data.
 
 ## Inspect predictions from best CV-lambda
 
@@ -208,9 +251,11 @@ as validation data
 
 
 
-```{r}
+```{r pred-plot-full-lasso-og, fi.cap="Precipitation prediction and target values in the validation set. Predictions in red and target values in black. The model was fitted on the full CV data with the lambda value that minimised the average MSE"}
 full_preds <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-full.rds"))
 full_preds
+mse_full <- get_mse_from_pred_plot(full_preds)
+mse_full
 ```
 
 Over the more than 5 years of validation data the model predicts the
@@ -223,9 +268,12 @@ We fitted a LASSO model for predicting the mean precipitation
 in the Central Amazon Basin and used a 5-fold blocked Cross Validation
 approach to find the optimal level of regularization.
 After training the model we evaluated its performance on a separate validation set that was not used in the training process.
-The model shows predicting capabilities but misses out on higher values of the precipitation target.
-Also although predicting seems to bring useful results, the choice of the LASSO coefficients seems somewhat arbitrary or at least not
-interpret able in a straightforward way.
+The model shows predicting capabilities but misses out on higher values of the precipitation target. It also misses on rapid changes and in general underfits the data. 
+This may be due to the choice of blocked cross validation.
+<!-- Also although predicting seems to bring useful results, the choice of the LASSO coefficients seems somewhat arbitrary or at least not -->
+<!-- interpret able in a straightforward way. -->
+Locations with higher variability get included in the model more easily
+and are not necessarily geographically close.
 
 
 <!-- ```{r} -->

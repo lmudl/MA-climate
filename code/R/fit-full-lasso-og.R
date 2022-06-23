@@ -48,11 +48,11 @@ full_model <- glmnet(sst_train, precip_train, lambda=l_min,
 preds <- c(predict(full_model, newx = sst_eval))
 
 # plot predictions against true data
-df <- data.frame(predictions = preds, targets = precip_eval)
-plt <- ggplot() + geom_line(data=df, mapping= aes(x=seq(length(predictions)), 
-                                                  y=predictions, col = "red")) +
-  geom_line(data=df, mapping=aes(x=seq(lengths(predictions)), y=targets))
-plt
+df <- data.frame(predictions = preds, targets = precip_eval, ids=c(start_eval:end_eval))
+# plt <- ggplot() + geom_line(data=df, mapping= aes(x=seq(length(predictions)), 
+#                                                   y=predictions, col = "red")) +
+#   geom_line(data=df, mapping=aes(x=seq(lengths(predictions)), y=targets)) 
+plt <- plot_predictions(df)
 saveRDS(plt, paste0(full_save_to,"pred-plots/pred-plot-full.rds"))
 
 # get mse on evaluation data set

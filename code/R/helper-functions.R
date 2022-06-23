@@ -45,7 +45,7 @@ plot_cell <- function(cell) {
   mp <- ggplot() + mapWorld
   
   #vNow Layer the cities on top
-  mp <- mp + geom_point(aes(x=cell[,1], y=cell[,2]), ,color="blue", size=3)
+  mp <- mp + geom_point(aes(x=cell[,1], y=cell[,2]),color="blue", size=3)
   mp
 }
 
@@ -844,36 +844,36 @@ plot_all_err <- function(error_matrix, save_to) {
 }
 # ******************************************************************************
 
-plot_all_coef_maps <- function(error_matrix, number_of_folds,
-                               cv_ids, lambdas, feature_data,
-                               target_data, save_to) {
-  dir.create(paste0(save_to,"/coef-plots/"))
-  for(i in 1:number_of_folds) {
-    p <- plot_nonzero_from_fold(error_matrix = error_matrix, fold = i,
-                                cv_ids = cv_ids, lambdas = lambdas, 
-                                feature_data = feature_data,
-                                target_data = target_data)
-    saveRDS(p, paste0(save_to, "/coef-plots/", "coef-plot-fold-", i,".rds"))
-  }
-}
-
-plot_nonzero_from_fold <- function(error_matrix, fold, cv_ids, lambdas,
-                                   feature_data, target_data) {
-  id_min <- which.min(error_matrix[,fold])
-  ids <- cv_ids$train[[fold]]
-  min_lambda <- lambdas[id_min]
-  # watch out for target dimensions and that feature_data
-  # is prepared f.e via prepare_sst
-  mod <- glmnet(feature_data[ids,], target_data[ids],
-                lambda = min_lambda)
-  all_coef <- coef(mod)[-1,1]
-  nonzero_coef <- all_coef != 0
-  nonzero_coef_names <- names(all_coef[nonzero_coef])
-  num_coef_names <- coef_names_to_numeric(nonzero_coef_names)
-  coef_mat <- cbind(num_coef_names, all_coef[nonzero_coef])
-  plt <- plot_nonzero_coefficients(coef_mat)
-  return(plt)
-}
+# plot_all_coef_maps <- function(error_matrix, number_of_folds,
+#                                cv_ids, lambdas, feature_data,
+#                                target_data, save_to) {
+#   dir.create(paste0(save_to,"/coef-plots/"))
+#   for(i in 1:number_of_folds) {
+#     p <- plot_nonzero_from_fold(error_matrix = error_matrix, fold = i,
+#                                 cv_ids = cv_ids, lambdas = lambdas, 
+#                                 feature_data = feature_data,
+#                                 target_data = target_data)
+#     saveRDS(p, paste0(save_to, "/coef-plots/", "coef-plot-fold-", i,".rds"))
+#   }
+# }
+# 
+# plot_nonzero_from_fold <- function(error_matrix, fold, cv_ids, lambdas,
+#                                    feature_data, target_data) {
+#   id_min <- which.min(error_matrix[,fold])
+#   ids <- cv_ids$train[[fold]]
+#   min_lambda <- lambdas[id_min]
+#   # watch out for target dimensions and that feature_data
+#   # is prepared f.e via prepare_sst
+#   mod <- glmnet(feature_data[ids,], target_data[ids],
+#                 lambda = min_lambda)
+#   all_coef <- coef(mod)[-1,1]
+#   nonzero_coef <- all_coef != 0
+#   nonzero_coef_names <- names(all_coef[nonzero_coef])
+#   num_coef_names <- coef_names_to_numeric(nonzero_coef_names)
+#   coef_mat <- cbind(num_coef_names, all_coef[nonzero_coef])
+#   plt <- plot_nonzero_coefficients(coef_mat)
+#   return(plt)
+# }
 
 coef_names_to_numeric <- function(coefficient_names) {
   a <- unlist(strsplit(coefficient_names, " "))
@@ -890,7 +890,8 @@ plot_nonzero_coefficients <- function(nonzero_coef) {
   
   #vNow Layer the cities on top
   mp <- mp + geom_point(aes(x=nonzero_coef[,1], y=nonzero_coef[,2], 
-                            colour = nonzero_coef[,3]), size=3) + scale_colour_gradient2()
+                            colour = nonzero_coef[,3]), size=3) + 
+    scale_colour_gradient2(name="Coefficient values")
   mp
 }
 
@@ -900,20 +901,29 @@ plot_errbar_gg <- function(err_mat, loglambdas, save_to) {
   mean_mse <- apply(err_mat, 1, mean)
   sd_mse <- apply(err_mat, 1, sd)
   #median_mse <- apply(err_mat, 1, median)
-  err_mat <- cbind(err_mat, loglambdas = loglambdas,
+  err_mat_e <- cbind(err_mat, loglambdas = loglambdas,
                    mean_mse=mean_mse, sd_mse=sd_mse)#, median=median_mse)
-  p <- ggplot(err_mat, aes(x=loglambdas, y=mean_mse)) +
+  me <- which.min(err_mat_e$mean_mse)
+  l_min <- err_mat_e$loglambdas[me]
+  p <- ggplot(err_mat_e, aes(x=loglambdas, y=mean_mse)) +
     geom_point() + geom_errorbar(aes(ymin=mean_mse-sd_mse, 
-                                     ymax=mean_mse+sd_mse))
+                                     ymax=mean_mse+sd_mse)) +
+    ylab("MSE") + xlab(expression("log" ~ lambda)) +
+    geom_vline(xintercept = l_min, linetype = "dashed", colour = "red")
   saveRDS(p, paste0(save_to,"/err-mat-plots/","err-bars-plot.rds"))
 }
 
 # plot the error for the loglambdas in each fold
 plot_all_fold_errors <- function(err_mat, loglambdas, save_to) {
-  err_mat <- cbind(err_mat, loglambdas = loglambdas)
-  for(i in 1:(ncol(err_mat)-1)) {
-    p <- ggplot(err_mat, aes(x=loglambdas, y=err_mat[,i])) +
-      geom_point()
+  err_mat_f <- cbind(err_mat, loglambdas = loglambdas)
+  for(i in 1:(ncol(err_mat_f)-1)) {
+    me <- which.min(err_mat_f[,i])
+    l_min <- err_mat_f$loglambdas[me]
+    p <- ggplot(err_mat_f, aes(x=loglambdas, y=err_mat_f[,i])) +
+      ylab(paste("MSE Fold", i)) + 
+      xlab(expression("log" ~ lambda)) +
+      geom_point() +
+      geom_vline(xintercept = l_min, linetype = "dashed", colour = "red")
     saveRDS(p, paste0(save_to,"/err-mat-plots/","err-plot-fold-",i,".rds"))
   }
 }
@@ -950,7 +960,7 @@ plot_coef_maps <- function(model_list, err_mat, save_to) {
 }
 
 
-# Plot predictions ************************************************************
+# Plot predictions *************************************************************
 
 plot_predictions_best_l <- function(err_mat, model_list, ids, features, target,
                                     lambdas, save_to, standardize=FALSE) {
@@ -959,13 +969,19 @@ plot_predictions_best_l <- function(err_mat, model_list, ids, features, target,
     ids_i <- ids$test[[i]]
     model_i <- model_list[[i]]
     l_min <- which.min(err_mat[,i])
-    preds <- predict(model_i, newx = features[ids_i,], s=lambdas[l_min],
-                     standardize=standardize)
-    df <- data.frame(targets = target[ids_i], predictions = preds)
-    plt <- ggplot() + geom_line(data=df, mapping= aes(x=seq(length(preds)), y=preds, col = "red")) +
-      geom_line(data=df, mapping=aes(x=seq(lengths(preds)), y=targets))
+    preds <- c(predict(model_i, newx = features[ids_i,], s=lambdas[l_min],
+                     standardize=standardize))
+    plot_df <- data.frame(targets = target[ids_i], predictions = preds, ids = ids_i)
+    plt <- plot_predictions(plot_df)
     saveRDS(plt, paste0(save_to, "/pred-plots/", "pred-plot-fold-", i,".rds"))
   }
+}
+
+plot_predictions <- function(plot_df) {
+  p <- ggplot() + geom_line(data=plot_df, mapping= aes(x=ids, y=predictions, col = "red")) +
+    geom_line(data=plot_df, mapping=aes(x=ids, y=targets)) +
+    ylab("Precipitation") + xlab("Month") + theme(legend.position = "none")
+  return(p)
 }
 
 
@@ -985,6 +1001,110 @@ comp_mse <- function(predictions, target) {
   return(mean((predictions-target)^2))
 }
 
+get_mse_from_pred_plot <- function(pred_plot) {
+  a <- ggplot_build(pred_plot)$data[[1]]$y
+  b <- ggplot_build(pred_plot)$data[[2]]$y
+  mse <- comp_mse(a,b)
+  return(mse)
+}
+
+replot_err_mat <- function(err_mat_list) {
+  l <- length(err_mat_list)
+  r_vec <- matrix(nrow=l,ncol=2)
+  for(i in seq(l)) {
+    plot_i <- err_mat_list[[i]]
+    r_vec[i,] <- range(ggplot_build(plot_i)$data[[1]]$y)
+  }
+  new_range <- range(r_vec)
+  new_list <- list()
+  for(i in seq(l)) {
+    new_list[[i]] <- err_mat_list[[i]] + ylim(new_range)
+  }
+  return(new_list)
+}
+
+
+############ Run/Evaluate cluster CV ###########################################
+
+fit_full_model_for_cluster <- function(sst, full_save_to, ncluster) {
+  cluster_means_list <- readRDS(paste0(full_save_to, "cluster-means-list.rds"))
+  for(i in seq(ncluster)) {
+    cluster_path <- paste0(full_save_to, "/cluster-", i, "/")
+    err_mat <- readRDS(paste0(cluster_path, "err-mat.rds"))
+    lambdas <- readRDS(paste0(cluster_path, "lambda-vec.rds"))
+    l_min_id <- which.min(apply(err_mat, 1, mean))
+    l_min <- lambdas[l_min_id]
+    precip <- cluster_means_list[[i]]
+    ids <- readRDS(paste0(cluster_path,"index-list.rds"))
+    start_eval <- max(ids$test[[length(ids$test)]])+1
+    end_eval <- nrow(sst)
+    sst_train <- sst[1:(start_eval-1),]
+    precip_train <- precip[1:(start_eval)-1]
+    sst_eval <- sst[start_eval:end_eval,]
+    precip_eval <- precip[start_eval:end_eval]
+    full_model <- glmnet(sst_train, precip_train, lambda=l_min,
+                         standardize=FALSE)
+    # predict on evaluation data
+    preds <- c(predict(full_model, newx = sst_eval))
+    
+    # plot predictions against true data
+    df <- data.frame(predictions = preds, targets = precip_eval, ids=c(start_eval:end_eval))
+    plt <- plot_predictions(df)
+    plt
+    saveRDS(plt, paste0(cluster_path,"pred-plots/pred-plot-full.rds"))
+    print(comp_mse(preds, precip_eval))
+    print(paste("Done fitting and evaluating the full model with l_min for cluster", i))
+  }
+}
+
+run_cv_over_clusters <- function(features, cluster_means_list, nfold=5, size_train=60, 
+                                 size_test=14, 
+                                 save_folder_cluster_result) {
+  save_folder_long <- paste0("results/CV-lasso/", save_folder_cluster_result)
+  dir.create(paste0(save_folder_long))
+  l <- length(cluster_means_list)
+  for(i in seq(l)) {
+    save_folder_cluster_i <- paste0(save_folder_cluster_result,"/cluster-", i)
+    dir.create(save_folder_cluster_i)
+    precip_i <- cluster_means_list[[i]]
+    err_mat_i <- cv_for_ts(sst = features, precip = precip_i, nfold = nfold,
+                           size_train = size_train, size_test=size_test,
+                           save_folder = save_folder_cluster_i)
+  }
+}
+
+create_cluster_precip_list <- function(precip, clustering_result) {
+  precip <- getValues(precip)
+  cluster_precip_list <- list()
+  cluster_vec <- clustering_result$cluster
+  ncluster <- length(unique(cluster_vec))
+  for(i in seq(ncluster)) {
+    ids <- which(cluster_vec == i)
+    cluster_precip_list[[i]] <- precip[ids,]
+  }
+  return(cluster_precip_list)
+}
+
+compute_cluster_means <- function(cluster_precip_list) {
+  lapply(cluster_precip_list, function(x) apply(x, 2, mean))
+}
+
+evaluate_cluster_cv <- function(path_to_model_folder, cluster_means_list,
+                                sst, ncluster) {
+  for(i in seq(ncluster)) {
+    load_path <- paste0(path_to_model_folder, "/cluster-", i, "/")
+    dir.create(load_path)
+    err_mat <- readRDS(paste0(load_path, "err-mat.rds"))
+    lambdas <- readRDS(paste0(load_path, "lambda-vec.rds"))
+    ids <- readRDS(paste0(load_path, "index-list.rds"))
+    model_list <- load_models(paste0(load_path,"fold-models"))
+    plot_save_errors(err_mat, lambdas, save_to = load_path)
+    plot_coef_maps(model_list, err_mat = err_mat, save_to=load_path)
+    precip <- cluster_means_list[[i]]
+    plot_predictions_best_l(err_mat, model_list, ids, features=sst, target=precip,
+                            lambdas, save_to = load_path)
+  }
+}
 
 ############ Fused Lasso helpers ###############################################
 create_coords <- function(vec) {

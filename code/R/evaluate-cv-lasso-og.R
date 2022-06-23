@@ -1,6 +1,7 @@
 # analyse CV
 setwd("Repos/MA-climate/")
 library(raster)
+library(ggplot2)
 source("code/R/helper-functions.R")
 # load the error-matrix, lambda and define filepath for saving the plots ####
 err_mat <- readRDS("results/CV-lasso/cv-lasso-og-data-16-06-22/err-mat.rds")

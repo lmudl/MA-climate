@@ -51,8 +51,8 @@ source("../code/R/helper-functions.R")
 
 ## Mean and SD at each location
 
-```{r}
-sst_means_loc_plot + sst_sds_loc_plot
+```{r mean-and-sd-sst-og, fig.cap="Mean and SD on the spatial map."}
+sst_means_loc_plot + (sst_sds_loc_plot + ggtitle("SD of sst at each location"))
 ```
 
 ```{r}

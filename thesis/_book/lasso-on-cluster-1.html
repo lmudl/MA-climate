@@ -4,18 +4,18 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>6 Main Idea Clustering | Predicting Droughts in the Amazon Basin based on Global Sea Surface Temperatures</title>
-  <meta name="description" content="6 Main Idea Clustering | Predicting Droughts in the Amazon Basin based on Global Sea Surface Temperatures" />
+  <title>11 Lasso on cluster 1 | Predicting Droughts in the Amazon Basin based on Global Sea Surface Temperatures</title>
+  <meta name="description" content="11 Lasso on cluster 1 | Predicting Droughts in the Amazon Basin based on Global Sea Surface Temperatures" />
   <meta name="generator" content="bookdown 0.26 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="6 Main Idea Clustering | Predicting Droughts in the Amazon Basin based on Global Sea Surface Temperatures" />
+  <meta property="og:title" content="11 Lasso on cluster 1 | Predicting Droughts in the Amazon Basin based on Global Sea Surface Temperatures" />
   <meta property="og:type" content="book" />
   
   
   
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="6 Main Idea Clustering | Predicting Droughts in the Amazon Basin based on Global Sea Surface Temperatures" />
+  <meta name="twitter:title" content="11 Lasso on cluster 1 | Predicting Droughts in the Amazon Basin based on Global Sea Surface Temperatures" />
   
   
   
@@ -29,8 +29,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-<link rel="prev" href="correlation-analysis.html"/>
-<link rel="next" href="clustering-methods.html"/>
+<link rel="prev" href="lasso-on-original-data.html"/>
+<link rel="next" href="lasso-on-cluster-2.html"/>
 <script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -224,35 +224,99 @@ div.csl-indent {
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="main-idea-clustering" class="section level1 hasAnchor" number="6">
-<h1><span class="header-section-number">6</span> Main Idea Clustering<a href="main-idea-clustering.html#main-idea-clustering" class="anchor-section" aria-label="Anchor link to header"></a></h1>
-<p>We can describe an object by a set of measurements or its similarity to other objects.
-Using this similarity we can put a collection of objects into subgroups or clusters.
-The objects in the subgroups should then be more
-similar to one another than to objects of different subgroups.
-This means inside the clusters we aim for homogeneity
-and for observations of different clusters for heterogeneity.
-With the clustering analysis applied to the precipitation data we want to study if there are distinct groups (regions)
-apparent in the CAB. So that if we later apply the regression models we predict the precipitation for each group and not for the whole region.</p>
-<p>To explore the grouping in the data we need a measure
-of (dis)similarity. This measure is central and depends
-on subject matter considerations.
-We construct the dissimilarities based on the measurements taken for each month.
-We interpret this as a multivariate analysis where,
-each month is one variable.
-So given the area in the CAB (resolution 5°x5°),
-we have 612 cells and 432 months, resulting in
-a <span class="math inline">\(612 \times 432\)</span> data matrix.
-we want to cluster cells into homogen groups.</p>
+<div id="lasso-on-cluster-1" class="section level1 hasAnchor" number="11">
+<h1><span class="header-section-number">11</span> Lasso on cluster 1<a href="lasso-on-cluster-1.html#lasso-on-cluster-1" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<div id="lasso-model-1" class="section level2 hasAnchor" number="11.1">
+<h2><span class="header-section-number">11.1</span> LASSO model<a href="lasso-on-cluster-1.html#lasso-model-1" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>We fit a LASSO model on the precipitation and SST data.
+The precipitation target is the monthly mean precipitation
+in the Central Amazon Basin, the SST data are monthly temperatures
+over the globe.
+We use a 5-fold CV approach to find an optimal lambda.
+Each fold consists of 5 consecutive years of training data
+followed by 2 years of test data.
+In each fold we fit a LASSO model on a set of predetermined lambda
+values and choose the lambda that minimizes the MSE on the test set
+in that fold.
+After determining the best lambda in each fold we choose the
+lambda that minimizes the MSE over all folds and refit the model
+to the complete training data. Afterwards we evaluate the fitted model on a separate validation set with 5 years length which was not included
+in the training phase.</p>
+</div>
+<div id="error-plots-1" class="section level2 hasAnchor" number="11.2">
+<h2><span class="header-section-number">11.2</span> Error plots<a href="lasso-on-cluster-1.html#error-plots-1" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div class="figure"><span style="display:block;" id="fig:err-bar-plot-lasso-og-cl1"></span>
+<img src="_main_files/figure-html/err-bar-plot-lasso-og-cl1-1.png" alt="Mean squared error of the 5-fold blocked cross validation for cluster 1. On the x-axis the lambda values on the log scale. The points in the middle represent the average MSE for the respective lambda, the errorbars give the MSE +/- one standard deviation. The dotted line shows the lambda for which minimum MSE was obtained." width="672" />
+<p class="caption">
+Figure 11.1: Mean squared error of the 5-fold blocked cross validation for cluster 1. On the x-axis the lambda values on the log scale. The points in the middle represent the average MSE for the respective lambda, the errorbars give the MSE +/- one standard deviation. The dotted line shows the lambda for which minimum MSE was obtained.
+</p>
+</div>
+<p><a href="lasso-on-cluster-1.html#fig:err-bar-plot-lasso-og-cl1">11.1</a> shows the results from the 5 fold-CV plotted for each lambda. The lambdas are given on the log scale.
+The upper and lower bars indicate mean MSE +/- one standard deviation from the
+mean MSE.
+We note that the upper and lower bars are quite wide indicating big differences
+in MSE for the different folds, just as in the unclustered case,
+the minimum average MSE is obtained at a higher lambda value.
+Again we also inspect the MSE for each individual fold.</p>
+<div class="figure"><span style="display:block;" id="fig:err-fold-lasso-og-cl1"></span>
+<img src="_main_files/figure-html/err-fold-lasso-og-cl1-1.png" alt="MSE of the CV for the different lambda values on the a log scale. The red dotted line shows the lambda for which minimum MSE was obtained." width="672" />
+<p class="caption">
+Figure 11.2: MSE of the CV for the different lambda values on the a log scale. The red dotted line shows the lambda for which minimum MSE was obtained.
+</p>
+</div>
+<p>The trajectories in <a href="lasso-on-cluster-1.html#fig:err-fold-lasso-og-cl1">11.2</a> are quite similar in fold 1
+4 and 5, but quite different from fold 2 and 3.
+The chosen values of regularisation differ between the folds.</p>
+<div class="figure"><span style="display:block;" id="fig:err-fold-lasso-og-replot-cl1"></span>
+<img src="_main_files/figure-html/err-fold-lasso-og-replot-cl1-1.png" alt="MSE of the CV for the different lambda values on the a log scale computed for cluster 1. The red dotted line shows the lambda for which minimum MSE was obtained. See @
+ef(fig:err-folg-lasso-og), but this time the y-axis has the same range for all plots." width="672" />
+<p class="caption">
+Figure 11.3: MSE of the CV for the different lambda values on the a log scale computed for cluster 1. The red dotted line shows the lambda for which minimum MSE was obtained. See @
+ef(fig:err-folg-lasso-og), but this time the y-axis has the same range for all plots.
+</p>
+</div>
+<p>Below we can see the minimum MSE for each fold.</p>
+<p>And which lambda in the lambda vector resulted in the lowest prediction error on the folds´ test set.</p>
+</div>
+<div id="coefficient-plots-1" class="section level2 hasAnchor" number="11.3">
+<h2><span class="header-section-number">11.3</span> Coefficient plots<a href="lasso-on-cluster-1.html#coefficient-plots-1" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div class="figure"><span style="display:block;" id="fig:coef-plot-lasso-og-cl1"></span>
+<img src="_main_files/figure-html/coef-plot-lasso-og-cl1-1.png" alt="Coefficient map plot for the different folds. Longitude and Latitude on the x and y-axis respectively. Positive values are coloured in blue, negative values in red." width="672" />
+<p class="caption">
+Figure 11.4: Coefficient map plot for the different folds. Longitude and Latitude on the x and y-axis respectively. Positive values are coloured in blue, negative values in red.
+</p>
+</div>
+</div>
+<div id="inspect-predictions-from-each-fold-1" class="section level2 hasAnchor" number="11.4">
+<h2><span class="header-section-number">11.4</span> Inspect predictions from each fold<a href="lasso-on-cluster-1.html#inspect-predictions-from-each-fold-1" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Following we inspect the folds precipitation time series and
+the predictions made by the model.</p>
+<p><img src="_main_files/figure-html/unnamed-chunk-98-1.png" width="672" />
+<img src="_main_files/figure-html/unnamed-chunk-99-1.png" width="672" />
+<img src="_main_files/figure-html/unnamed-chunk-100-1.png" width="672" />
+<img src="_main_files/figure-html/unnamed-chunk-101-1.png" width="672" />
+<img src="_main_files/figure-html/unnamed-chunk-102-1.png" width="672" /></p>
+</div>
+<div id="inspect-predictions-from-best-cv-lambda-1" class="section level2 hasAnchor" number="11.5">
+<h2><span class="header-section-number">11.5</span> Inspect predictions from best CV-lambda<a href="lasso-on-cluster-1.html#inspect-predictions-from-best-cv-lambda-1" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>We choose now the best lambda with the 1SE rule and fit
+the model anew to predict the time series we held out
+as validation data</p>
+<p><img src="_main_files/figure-html/unnamed-chunk-103-1.png" width="672" /></p>
+<pre><code>## [1] 1616.594</code></pre>
+</div>
+<div id="summary-3" class="section level2 hasAnchor" number="11.6">
+<h2><span class="header-section-number">11.6</span> Summary<a href="lasso-on-cluster-1.html#summary-3" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 
+</div>
 </div>
             </section>
 
           </div>
         </div>
       </div>
-<a href="correlation-analysis.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="clustering-methods.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="lasso-on-original-data.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="lasso-on-cluster-2.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
