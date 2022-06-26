@@ -597,6 +597,45 @@ get_lambda_values <- function(sst, precip){
   return(lambda_vec)
 }
 
+add_ts_vars <- function(data_matrix) {
+  df <- as.data.frame(data_matrix)
+  rm(data_matrix)
+  df %>% pivot_longer(cols = colnames(df),
+                      names_to = "location",
+                      values_to = "temperature") %>%
+    group_by(location) %>% 
+    # mutate(
+    #   rollm_2 = zoo::rollmean(x = temperature, k=2,
+    #                           fill = NA, align = "right"),
+    #   rollm_3 = zoo::rollmean(x = temperature, k=3,
+    #                           fill = NA, align = "right"),
+    #   rollm_4 = zoo::rollmean(x = temperature, k=4,
+    #                           fill = NA, align = "right")) %>%
+    mutate(
+      lag1 = dplyr::lag(x=temperature, n=1),
+      lag2 = dplyr::lag(x=temperature, n=2),
+      lag3 = dplyr::lag(x=temperature, n=3),
+      rollm_4 = zoo::rollmean(x = temperature, k=4,
+                              fill = NA, align = "right")
+    ) %>%
+    mutate(rn = row_number()) %>%
+    # pivot_wider(names_from = location, 
+    #             values_from = c(temperature, rollm_2,
+    #                             rollm_3, rollm_4)) %>%
+    pivot_wider(names_from = location, values_from = c(temperature, lag1,
+                                                       lag2, lag3, rollm_4)) %>%
+    select(-rn) -> df
+  cnames <- colnames(df)
+  df %>% mutate(run_month = row_number(), .before=cnames[1]) -> df
+  cyc_month_vec <- factor(as.character(month(ymd(010101) + 
+                                               months(df$run_month-1),
+                                             label=TRUE,abbr=TRUE)))
+  df <- df %>% mutate(cyc_month = cyc_month_vec) %>%
+    relocate(cyc_month, .after = run_month)
+  return(df)
+} 
+
+
 # For testing, smaller set
 # sst <- sst[1:60,]
 # precip <- precip[1:60]
@@ -686,7 +725,8 @@ get_lambda_values <- function(sst, precip){
 #   
 # }
 
-cv_lasso <- function(sst, precip, index_list, save_folder) {
+cv_lasso <- function(sst, precip, index_list, save_folder, include_ts_vars, stand,
+                     diff_features, des_features) {
   # dir.create(paste0("results/CV-lasso/", save_folder))
   # dir.create(paste0("results/CV-lasso/", save_folder, "/fold-models"))
   lambda_vec <- get_lambda_values(sst, precip)
@@ -700,8 +740,55 @@ cv_lasso <- function(sst, precip, index_list, save_folder) {
     y_train <- precip[id_train]
     x_test <- sst[id_test,]
     y_test <- precip[id_test]
+    
+    if(include_ts_vars == TRUE) {
+      x_train <- add_ts_vars(x_train)
+      keep_vec <- complete.cases(x_train)
+      x_train <- x_train[keep_vec,]
+      y_train <- y_train[keep_vec]
+      
+      x_test <- add_ts_vars(x_test)
+      keep_vec <- complete.cases(x_test)
+      x_test <- x_test[keep_vec,]
+      y_test <- y_train[keep_vec]
+      
+      x_train <- data.matrix(x_train)
+      # x_train <- scale(x_train)
+      # x_t1 <- x_test[,-2]
+      # x_t2 <- scale(x_t1)
+      # x_test <- cbind(x_test[,2], x_t2)
+      # 
+      # lambda_vec <- get_lambda_values(x_train, y_train)
+      # lambda_fold_path <- paste0("results/CV-lasso/", save_folder, "/fold-models/",
+      #                            "lambda-vec-fold", j, ".rds")
+      # saveRDS(lambda_vec, file=lambda_fold_path)
+    }
+    if(diff_features == TRUE) {
+      ndiffs <- apply(x_train, 2, unitroot_ndiffs)
+      max_ndiffs <- max(ndiffs)
+      x_train <- apply(x_train, 2, function(x) diff(x, lag=1, difference=max_ndiffs))
+      y_train <- y_train[-c(seq(max_ndiffs))]
+      
+      x_test <- apply(x_test, 2, function(x) diff(x, lag=1, difference=max_ndiffs))
+      y_test <- y_test[-c(seq(max_ndiffs))]
+    }
+    if(des_features == TRUE) {
+      #stop("under construction deseasonalised")
+      # x_train <- apply(x_train, 2, function(x) c(stl(ts(x, frequency=12), s.window = "periodic",
+      #                                                  robust = TRUE)$time.series[,"remainder"]))
+      # x_together <- rbind(x_train,x_test)
+      # x_together <- apply(x_together, 2, function(x) c(stl(ts(x, frequency=12), s.window = "periodic",
+      #                                               robust = TRUE)$time.series[,"remainder"]))
+      x_train <- apply(x_train, 2, function(x) c(stl(ts(x, frequency=12), s.window = "periodic",
+                                                     robust = TRUE)$time.series[,"remainder"]))
+      x_together <- rbind(x_train, x_test)
+      x_together <- apply(x_together, 2, function(x) c(stl(ts(x, frequency=12), s.window = "periodic",
+                                                       robust = TRUE)$time.series[,"remainder"]))
+      x_test <- x_together[-c(seq(nrow(x_train))),]
+    }
+    
     trained_model <- glmnet(x_train, y_train, lambda = lambda_vec,
-                            standardize=FALSE)
+                            standardize=stand)
     #TODO change value her for s
     predicted <- predict(trained_model, newx = data.matrix(x_test), s = lambda_vec)
     err_col <- apply(predicted, 2, function(x) mean((x-y_test)^2))
@@ -744,7 +831,8 @@ cv_fused_lasso <- function(sst, precip, index_list, save_folder, graph,
 }
 
 cv_for_ts <- function(sst, precip, nfold, size_train, size_test, save_folder,
-                      model = "lasso", graph = NULL, maxsteps=100) {
+                      model = "lasso", graph = NULL, maxsteps=100, include_ts_vars=FALSE,
+                      stand=FALSE, diff_features=FALSE, des_features=FALSE) {
   if(model == "fused" & is.null(graph)){
     stop("for the fused LASSO a graph object is needed")
   }
@@ -778,7 +866,8 @@ cv_for_ts <- function(sst, precip, nfold, size_train, size_test, save_folder,
   dir.create(paste0("results/CV-lasso/", save_folder))
   dir.create(paste0("results/CV-lasso/", save_folder, "/fold-models"))
   if(model == "lasso") {
-    err_mat <- cv_lasso(sst, precip, index_list, save_folder)
+    err_mat <- cv_lasso(sst, precip, index_list, save_folder, include_ts_vars, stand,
+                        diff_features, des_features)
     print("finished fitting")
     index_list_path <- paste0("results/CV-lasso/", save_folder, "/index-list.rds")
     # lambda_vec_path <- paste0("results/CV-lasso/", save_folder, "/lambda-vec.rds")
@@ -902,7 +991,7 @@ plot_errbar_gg <- function(err_mat, loglambdas, save_to) {
   sd_mse <- apply(err_mat, 1, sd)
   #median_mse <- apply(err_mat, 1, median)
   err_mat_e <- cbind(err_mat, loglambdas = loglambdas,
-                   mean_mse=mean_mse, sd_mse=sd_mse)#, median=median_mse)
+                     mean_mse=mean_mse, sd_mse=sd_mse)#, median=median_mse)
   me <- which.min(err_mat_e$mean_mse)
   l_min <- err_mat_e$loglambdas[me]
   p <- ggplot(err_mat_e, aes(x=loglambdas, y=mean_mse)) +
@@ -941,8 +1030,9 @@ plot_save_errors <- function(err_mat, lambdas, save_to) {
 # NEW Coef plot functions ******************************************************
 plot_nonzero_coef_from_fold <- function(model, fold_nr, err_mat) {
   l_min <- which.min(err_mat[,fold_nr])
-  coefs <- model$beta[,l_min]
-  all_coefs <- coefs[-1]
+  all_coefs <- model$beta[,l_min]
+  # MAYBE WE CAN DROP -1 bc we get only betas now!
+  #all_coefs <- coefs[-1]
   nonzero_coefs <- all_coefs != 0
   nonzero_coef_names <- names(all_coefs[nonzero_coefs])
   num_coef_names <- coef_names_to_numeric(nonzero_coef_names)
@@ -963,15 +1053,54 @@ plot_coef_maps <- function(model_list, err_mat, save_to) {
 # Plot predictions *************************************************************
 
 plot_predictions_best_l <- function(err_mat, model_list, ids, features, target,
-                                    lambdas, save_to, standardize=FALSE) {
+                                    lambdas, save_to, standardize=FALSE,
+                                    include_ts_vars=FALSE, diff_features=FALSE,
+                                    des_features=FALSE) {
   dir.create(paste0(save_to,"/pred-plots/"))
   for(i in seq(length(model_list))) {
     ids_i <- ids$test[[i]]
     model_i <- model_list[[i]]
     l_min <- which.min(err_mat[,i])
-    preds <- c(predict(model_i, newx = features[ids_i,], s=lambdas[l_min],
-                     standardize=standardize))
-    plot_df <- data.frame(targets = target[ids_i], predictions = preds, ids = ids_i)
+    if(include_ts_vars==TRUE) {
+      features_i <- features[ids_i,]
+      target_i <- target[ids_i]
+      features_i <- add_ts_vars(features_i)
+      keep_vec <- complete.cases(features_i)
+      features_i <- features_i[keep_vec,]
+      target_i <- target_i[keep_vec]
+      ids_i <- ids_i[keep_vec]
+      preds <- c(predict(model_i, newx = data.matrix(features_i), s=lambdas[l_min],
+                         standardize = standardize))
+      #standardize=standardize))
+      plot_df <- data.frame(targets = target_i, predictions = preds, ids = ids_i)
+    }
+    if(diff_features==TRUE) {
+      features_i <- features[ids_i,]
+      target_i <- target[ids_i]
+      ndiffs <- apply(features_i, 2, unitroot_ndiffs)
+      max_ndiffs <- max(ndiffs)
+      features_i <- apply(features_i, 2, function(x) diff(x, lag=1, difference=max_ndiffs))
+      target_i <- target_i[-c(seq(max_ndiffs))]
+      preds <- c(predict(model_i, newx = data.matrix(features_i), s=lambdas[l_min],
+                         standardize = standardize))
+      ids_i <- ids_i[-c(seq(max_ndiffs))]
+      #standardize=standardize))
+      plot_df <- data.frame(targets = target_i, predictions = preds, ids = ids_i)
+    if(des_features==TRUE) {
+      features_i <- features[ids_i,]
+      target_i <- target[ids_i]
+      features_i <- apply(features_i, 2, function(x) c(stl(ts(x, frequency=12), s.window = "periodic",
+                                                     robust = TRUE)$time.series[,"remainder"]))
+      preds <- c(predict(model_i, newx = data.matrix(features_i), s=lambdas[l_min],
+                         standardize = standardize))
+      plot_df <- data.frame(targets = target_i, predictions = preds, ids = ids_i)
+      }
+    } else {
+      preds <- c(predict(model_i, newx = features[ids_i,], s=lambdas[l_min],
+                         standardize=standardize))
+      plot_df <- data.frame(targets = target[ids_i], predictions = preds, ids = ids_i)
+      
+    }
     plt <- plot_predictions(plot_df)
     saveRDS(plt, paste0(save_to, "/pred-plots/", "pred-plot-fold-", i,".rds"))
   }

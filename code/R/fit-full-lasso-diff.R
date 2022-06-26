@@ -11,7 +11,7 @@ source("code/R/helper-functions.R")
 # plot predictions etc
 
 # path to and save_to
-save_to <- "cv-lasso-og-data-16-06-22"
+save_to <- "cv-lasso-og-diff"
 full_save_to <- paste0("results/CV-lasso/",save_to,"/")
 
 # load err mat, lambdas and get lambda min
@@ -40,15 +40,24 @@ precip_train <- precip[1:(start_eval)-1]
 sst_eval <- sst[start_eval:end_eval,]
 precip_eval <- precip[start_eval:end_eval]
 
+ndiffs <- apply(sst_train, 2, unitroot_ndiffs)
+max_ndiffs <- max(ndiffs)
+sst_train <- apply(sst_train, 2, function(x) diff(x, lag=1, difference=max_ndiffs))
+precip_train <- precip_train[-c(seq(max_ndiffs))]
+
+sst_eval <- apply(sst_eval, 2, function(x) diff(x, lag=1, difference=max_ndiffs))
+precip_eval <- precip_eval[-c(seq(max_ndiffs))]
+
+
 # fit full model
-full_model <- glmnet(sst_train, precip_train, lambda=l_min,
+full_model <- glmnet(data.matrix(sst_train), precip_train, lambda=l_min,
                      standardize=FALSE)
 saveRDS(full_model, paste0(full_save_to, "full-model.rds"))
 # predict on evaluation data
-preds <- c(predict(full_model, newx = sst_eval))
+preds <- c(predict(full_model, newx = data.matrix(sst_eval)))
 
 # plot predictions against true data
-df <- data.frame(predictions = preds, targets = precip_eval, ids=c(start_eval:end_eval))
+df <- data.frame(predictions = preds, targets = precip_eval, ids=c((start_eval+max_ndiffs):end_eval))
 # plt <- ggplot() + geom_line(data=df, mapping= aes(x=seq(length(predictions)), 
 #                                                   y=predictions, col = "red")) +
 #   geom_line(data=df, mapping=aes(x=seq(lengths(predictions)), y=targets)) 

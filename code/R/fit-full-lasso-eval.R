@@ -11,7 +11,7 @@ source("code/R/helper-functions.R")
 # plot predictions etc
 
 # path to and save_to
-save_to <- "cv-lasso-og-data-16-06-22"
+save_to <- "cv-lasso-des"
 full_save_to <- paste0("results/CV-lasso/",save_to,"/")
 
 # load err mat, lambdas and get lambda min
@@ -40,12 +40,19 @@ precip_train <- precip[1:(start_eval)-1]
 sst_eval <- sst[start_eval:end_eval,]
 precip_eval <- precip[start_eval:end_eval]
 
+sst_train <- apply(sst_train, 2, function(x) c(stl(ts(x, frequency=12), s.window = "periodic",
+                                               robust = TRUE)$time.series[,"remainder"]))
+sst_together <- rbind(sst_train, sst_eval)
+sst_together <- apply(sst_together, 2, function(x) c(stl(ts(x, frequency=12), s.window = "periodic",
+                                                     robust = TRUE)$time.series[,"remainder"]))
+sst_test <- sst_together[-c(seq(nrow(sst_train))),]
+
 # fit full model
-full_model <- glmnet(sst_train, precip_train, lambda=l_min,
+full_model <- glmnet(data.matrix(sst_train), precip_train, lambda=l_min,
                      standardize=FALSE)
 saveRDS(full_model, paste0(full_save_to, "full-model.rds"))
 # predict on evaluation data
-preds <- c(predict(full_model, newx = sst_eval))
+preds <- c(predict(full_model, newx = data.matrix(sst_eval)))
 
 # plot predictions against true data
 df <- data.frame(predictions = preds, targets = precip_eval, ids=c(start_eval:end_eval))
@@ -56,8 +63,7 @@ plt <- plot_predictions(df)
 saveRDS(plt, paste0(full_save_to,"pred-plots/pred-plot-full.rds"))
 
 # get mse on evaluation data set
-comp_mse(preds, precip_eval) # 1326.809
-
+comp_mse(preds, precip_eval) # 7618.352
 
 # what if we fit full model on all lambdas?
 # full_model2 <- glmnet(sst_train, precip_train, lambda=lambdas,

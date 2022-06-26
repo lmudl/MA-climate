@@ -1,4 +1,4 @@
-# Lasso on original data
+# lasso with deseasonalised
 
 ```{r, echo = FALSE}
 knitr::opts_chunk$set(warning = FALSE, message = FALSE, echo = FALSE)
@@ -22,7 +22,7 @@ source("../code/R/helper-functions.R")
 # length(ids$test$Testing060)
 ```
 ```{r}
-path_to_model_folder <- "../results/CV-lasso/cv-lasso-og-data-16-06-22"
+path_to_model_folder <- "../results/CV-lasso/cv-lasso-des"
 ```
 
 
@@ -303,22 +303,6 @@ plot(a,res)
 qqnorm(res)
 qqline(res)
 plot(density(res))
-```
-
-```{r}
 acf(res)
-Box.test(res, lag=20, type="Ljung-Box")
 ```
-```{r}
-plot.ts(res)
-```
-```{r}
-pacf(res)
-```
-
-
-```{r}
-plot(hist(res))
-```
-
 
