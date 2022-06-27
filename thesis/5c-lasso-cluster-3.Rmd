@@ -19,22 +19,9 @@ path_to_model_folder <- "../results/CV-lasso/cluster-cv-lasso-og2/cluster-3/"
 ```
 
 
-## LASSO model
+## Cluster 3 
 
-We fit a LASSO model on the precipitation and SST data.
-The precipitation target is the monthly mean precipitation
-in the Central Amazon Basin, the SST data are monthly temperatures
-over the globe.
-We use a 5-fold CV approach to find an optimal lambda.
-Each fold consists of 5 consecutive years of training data
-followed by 2 years of test data.
-In each fold we fit a LASSO model on a set of predetermined lambda 
-values and choose the lambda that minimizes the MSE on the test set 
-in that fold.
-After determining the best lambda in each fold we choose the
-lambda that minimizes the MSE over all folds and refit the model
-to the complete training data. Afterwards we evaluate the fitted model on a separate validation set with 5 years length which was not included
-in the training phase.
+These are the LASSO results for cluster 3
 
 ## Error plots
 
@@ -126,10 +113,9 @@ pred_plot_5
 
 ## Inspect predictions from best CV-lambda
 
-We choose now the best lambda with the 1SE rule and fit 
+We choose now the best lambda and fit 
 the model anew to predict the time series we held out
 as validation data
-
 
 
 

@@ -11,20 +11,11 @@ library(dplyr)
 library(tidyverse)
 library(lubridate)
 
-precip <- readRDS("data/interim/drought/chirps_setreftime_aggregated.rds")
-sst <- brick("data/interim/sst/ersst_setreftime.nc", varname = "sst")
-sst <- as.matrix(sst)
-sst <- add_colnames("data/interim/sst/ersst_setreftime.nc",sst)
-sst <- prepare_sst(sst)
-dim(sst)
-anyNA(sst)
-precip <- as.matrix(precip)
-precip <- apply(precip, 2, mean)
+# Data loading
+sst_cv <- readRDS("data/processed/sst_cv.rds")
+precip_cv <- readRDS("data/processed/precip_cv.rds")
 
-features_cv <- sst[1:370,]
-target_cv <- precip[1:370]
-
-lasso_on_og_data_timelag <- cv_for_ts(features_cv, target_cv, nfold = 5, size_train = 60, size_test = 14,
+lasso_on_og_data_timelag <- cv_for_ts(sst_cv, precip_cv, nfold = 5, size_train = 60, size_test = 14,
                               save_folder = "cv-lasso-og-timelag-25-06-22-rm4",
                               include_ts_vars=TRUE, stand=FALSE)
 # debug(cv_for_ts)

@@ -830,7 +830,7 @@ cv_fused_lasso <- function(sst, precip, index_list, save_folder, graph,
   return(err_mat)
 }
 
-cv_for_ts <- function(sst, precip, nfold, size_train, size_test, save_folder,
+cv_for_ts <- function(sst, precip, nfold = 5, size_train = 60, size_test = 14, save_folder,
                       model = "lasso", graph = NULL, maxsteps=100, include_ts_vars=FALSE,
                       stand=FALSE, diff_features=FALSE, des_features=FALSE) {
   if(model == "fused" & is.null(graph)){

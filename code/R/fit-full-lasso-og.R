@@ -17,41 +17,32 @@ full_save_to <- paste0("results/CV-lasso/",save_to,"/")
 # load err mat, lambdas and get lambda min
 err_mat <- readRDS(paste0(full_save_to,"err-mat.rds"))
 lambdas <- readRDS(paste0(full_save_to,"lambda-vec.rds"))
+ids <- readRDS(paste0(full_save_to,"index-list.rds"))
+
 l_min_id <- which.min(apply(err_mat, 1, mean))
 l_min <- lambdas[l_min_id]
 
-# load data, pprepare data
-ids <- readRDS(paste0(full_save_to,"index-list.rds"))
-precip <- readRDS("data/interim/drought/chirps_setreftime_aggregated.rds")
-sst <- brick("data/interim/sst/ersst_setreftime.nc", varname = "sst")
-sst <- as.matrix(sst)
-sst <- add_colnames("data/interim/sst/ersst_setreftime.nc",sst)
-sst <- prepare_sst(sst)
-dim(sst)
-anyNA(sst)
-precip <- as.matrix(precip)
-precip <- apply(precip, 2, mean)
+# load data for fitting and evaluating full model
+sst_cv <- readRDS("data/processed/sst_cv.rds")
+precip_cv <- readRDS("data/processed/precip_cv.rds")
 
-# get evaluation data
-start_eval <- max(ids$test$Testing356)+1
-end_eval <- length(precip)
-sst_train <- sst[1:(start_eval-1),]
-precip_train <- precip[1:(start_eval)-1]
-sst_eval <- sst[start_eval:end_eval,]
-precip_eval <- precip[start_eval:end_eval]
+sst_eval <- readRDS("data/processed/sst_eval.rds")
+precip_eval <- readRDS("data/processed/precip_eval.rds")
+
 
 # fit full model
-full_model <- glmnet(sst_train, precip_train, lambda=l_min,
+full_model <- glmnet(sst_cv, precip_cv, lambda=l_min,
                      standardize=FALSE)
+# save full model
 saveRDS(full_model, paste0(full_save_to, "full-model.rds"))
+
 # predict on evaluation data
 preds <- c(predict(full_model, newx = sst_eval))
 
 # plot predictions against true data
-df <- data.frame(predictions = preds, targets = precip_eval, ids=c(start_eval:end_eval))
-# plt <- ggplot() + geom_line(data=df, mapping= aes(x=seq(length(predictions)), 
-#                                                   y=predictions, col = "red")) +
-#   geom_line(data=df, mapping=aes(x=seq(lengths(predictions)), y=targets)) 
+ms_start <- nrow(sst_cv)+1
+ms_end <- nrow(sst_cv)+nrow(sst_eval)
+df <- data.frame(predictions = preds, targets = precip_eval, ids=c(ms_start:ms_end))
 plt <- plot_predictions(df)
 saveRDS(plt, paste0(full_save_to,"pred-plots/pred-plot-full.rds"))
 

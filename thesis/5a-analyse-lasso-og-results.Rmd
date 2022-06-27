@@ -217,9 +217,11 @@ Therefore it seems that the model generally underfits the data.
 
 ## Inspect predictions from best CV-lambda
 
-We choose now the best lambda with the 1SE rule and fit 
-the model anew to predict the time series we held out
-as validation data
+A common practice is too choose the largest lambda so that
+it`s mean MSE is smaller than the MSE of the lambda that minimizes mean MSE
+plus one SE.
+But since in our case the largest lambda that satisfies these criteria 
+is the maximum lambda we choose the lambda with minimum mean MSE instead.
 
 <!-- ```{r} -->
 <!-- # fit model with best lambda -->
@@ -261,14 +263,14 @@ mse_full
 Over the more than 5 years of validation data the model predicts the
 seasonal pattern of the precipitation time series quite well,
 but constantly fails to predict the higher values of precipitation.
-The MSE is 1326.809 and the RSME 36.42539.
+The MSE is `mse_full` and the RSME `sqrt(mse_full)`.
 
 ## Summary
 We fitted a LASSO model for predicting the mean precipitation
 in the Central Amazon Basin and used a 5-fold blocked Cross Validation
 approach to find the optimal level of regularization.
 After training the model we evaluated its performance on a separate validation set that was not used in the training process.
-The model shows predicting capabilities but misses out on higher values of the precipitation target. It also misses on rapid changes and in general underfits the data. 
+The model shows predicting capabilities but misses out on higher values of the precipitation target. It also misses on rapid changes and in general underfits the data.
 This may be due to the choice of blocked cross validation.
 <!-- Also although predicting seems to bring useful results, the choice of the LASSO coefficients seems somewhat arbitrary or at least not -->
 <!-- interpret able in a straightforward way. -->
@@ -302,12 +304,13 @@ res <- a-b # residuals
 plot(a,res)
 qqnorm(res)
 qqline(res)
-plot(density(res))
+plot(hist(res))
 ```
 
 ```{r}
 acf(res)
 Box.test(res, lag=20, type="Ljung-Box")
+
 ```
 ```{r}
 plot.ts(res)
@@ -319,6 +322,34 @@ pacf(res)
 
 ```{r}
 plot(hist(res))
+```
+```{r}
+# fm <- readRDS(paste0(path_to_model_folder,"/full-model.rds"))
+# err_bars_plot
+# op_l <- a$data[[3]]$xintercept
+# xind <- which(a$data[[2]]==op_l)
+# maxim <- a$data[[2]]$ymax[xind]
+# maxim
+# mm_vec <- a$data[[1]]$y
+# mm_vec < maxim 
+# # lambda 71 von der negativen Seite
+# lnew <- lambdas[71]
+# # xintercept optimal lambda 1.28
+# p_eval <- readRDS("../data/processed/precip_eval.rds")
+# s_eval <- readRDS("../data/processed/sst_eval.rds")
+# # get ymax at optimal lambda
+# # get smallest lambda so that mse is smaller than ymax
+# preds_new <- c(predict(fm, newx = s_eval, s=lnew))
+# comp_mse(preds_new, p_eval)
+# plot(ts(p_eval))
+# plot(ts(preds_new))
+# df <- data.frame(predictions=preds_new,targets=p_eval, ids=1:62)
+# plot_predictions(df)
+
+```
+```{r}
+# err_bars_plot
+
 ```
 
 

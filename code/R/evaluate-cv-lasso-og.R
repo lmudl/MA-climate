@@ -3,29 +3,23 @@ setwd("Repos/MA-climate/")
 library(raster)
 library(ggplot2)
 source("code/R/helper-functions.R")
-# load the error-matrix, lambda and define filepath for saving the plots ####
-err_mat <- readRDS("results/CV-lasso/cv-lasso-og-data-16-06-22/err-mat.rds")
-lambdas <- readRDS("results/CV-lasso/cv-lasso-og-data-16-06-22/lambda-vec.rds")
-save_to <- "results/CV-lasso/cv-lasso-og-data-16-06-22"
-model_list <- load_models("results/CV-lasso/cv-lasso-og-data-16-06-22/fold-models")
 
-# Data preperation 
-ids <- readRDS("results/CV-lasso/cv-lasso-og-data-16-06-22/index-list.rds")
-precip <- readRDS("data/interim/drought/chirps_setreftime_aggregated.rds")
-sst <- brick("data/interim/sst/ersst_setreftime.nc", varname = "sst")
-sst <- as.matrix(sst)
-sst <- add_colnames("data/interim/sst/ersst_setreftime.nc",sst)
-sst <- prepare_sst(sst)
-dim(sst)
-anyNA(sst)
-precip <- as.matrix(precip)
-precip <- apply(precip, 2, mean)
+model_folder <- "cv-lasso-og-data-16-06-22"
+save_to <- paste0("results/CV-lasso/", model_folder, "/")
 
-plot_save_errors(err_mat, lambdas, save_to)
-plot_coef_maps(model_list, err_mat = err_mat, save_to=save_to)
-plot_predictions_best_l(err_mat, model_list, ids, features=sst, target=precip,
-                        lambdas, save_to = save_to)
+# load the error-matrix, lambda and the model_list ####
+err_mat <- readRDS(paste0(save_to,"err-mat.rds"))
+lambdas <- readRDS(paste0(save_to,"lambda-vec.rds"))
+ids <- readRDS(paste0(save_to, "index-list.rds"))
+model_list <- load_models(paste0(save_to,"fold-models"))
 
-# what could we automise?
-# load and prepare data etc but not now
+# Data loading
+sst_cv <- readRDS("data/processed/sst_cv.rds")
+precip_cv <- readRDS("data/processed/precip_cv.rds")
+
+plot_save_errors(err_mat = err_mat, lambdas = lambdas, save_to = save_to)
+plot_coef_maps(model_list = model_list, err_mat = err_mat, save_to=save_to)
+plot_predictions_best_l(err_mat = err_mat, model_list = model_list, ids = ids, 
+                        features=sst_cv, target=precip_cv,
+                        lambdas = lambdas, save_to = save_to)
 

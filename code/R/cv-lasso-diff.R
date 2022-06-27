@@ -15,18 +15,8 @@ library(tidyverse)
 library(lubridate)
 library(feasts)
 
-precip <- readRDS("data/interim/drought/chirps_setreftime_aggregated.rds")
-sst <- brick("data/interim/sst/ersst_setreftime.nc", varname = "sst")
-sst <- as.matrix(sst)
-sst <- add_colnames("data/interim/sst/ersst_setreftime.nc",sst)
-sst <- prepare_sst(sst)
-dim(sst)
-anyNA(sst)
-precip <- as.matrix(precip)
-precip <- apply(precip, 2, mean)
-
-features_cv <- sst[1:370,]
-target_cv <- precip[1:370]
+sst_cv <- readRDS("data/processed/sst_cv.rds")
+precip_cv <- readRDS("data/processed/precip_cv.rds")
 
 lasso_on_og_diff <- cv_for_ts(features_cv, target_cv, nfold = 5, size_train = 60, size_test = 14,
                                       save_folder = "cv-lasso-og-diff",

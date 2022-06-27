@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>17 lasso with lags | Predicting Droughts in the Amazon Basin based on Global Sea Surface Temperatures</title>
+  <meta name="description" content="17 lasso with lags | Predicting Droughts in the Amazon Basin based on Global Sea Surface Temperatures" />
+  <meta name="generator" content="bookdown 0.26 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="17 lasso with lags | Predicting Droughts in the Amazon Basin based on Global Sea Surface Temperatures" />
+  <meta property="og:type" content="book" />
+  
+  
+  
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="17 lasso with lags | Predicting Droughts in the Amazon Basin based on Global Sea Surface Temperatures" />
+  
+  
+  
+
+<meta name="author" content="Dario Lepke" />
+
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="lasso-on-cluster-5.html"/>
+<link rel="next" href="lasso-with-diff.html"/>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
+
+
+
+<style type="text/css">
+/* Used with Pandoc 2.11+ new --citeproc when CSL is used */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
+</style>
+
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Introduction</a></li>
+<li class="chapter" data-level="1" data-path="related-work.html"><a href="related-work.html"><i class="fa fa-check"></i><b>1</b> Related work</a></li>
+<li class="chapter" data-level="2" data-path="eda-precipitation.html"><a href="eda-precipitation.html"><i class="fa fa-check"></i><b>2</b> EDA precipitation</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="eda-precipitation.html"><a href="eda-precipitation.html#overview"><i class="fa fa-check"></i><b>2.1</b> Overview</a></li>
+<li class="chapter" data-level="2.2" data-path="eda-precipitation.html"><a href="eda-precipitation.html#precipitation-values-raw"><i class="fa fa-check"></i><b>2.2</b> Precipitation values raw</a></li>
+<li class="chapter" data-level="2.3" data-path="eda-precipitation.html"><a href="eda-precipitation.html#mean-at-each-location"><i class="fa fa-check"></i><b>2.3</b> Mean at each location</a></li>
+<li class="chapter" data-level="2.4" data-path="eda-precipitation.html"><a href="eda-precipitation.html#sd-at-each-location"><i class="fa fa-check"></i><b>2.4</b> SD at each location</a></li>
+<li class="chapter" data-level="2.5" data-path="eda-precipitation.html"><a href="eda-precipitation.html#mean-and-sd-at-each-location"><i class="fa fa-check"></i><b>2.5</b> Mean and SD at each location</a></li>
+<li class="chapter" data-level="2.6" data-path="eda-precipitation.html"><a href="eda-precipitation.html#trend-at-each-location"><i class="fa fa-check"></i><b>2.6</b> Trend at each location</a></li>
+<li class="chapter" data-level="2.7" data-path="eda-precipitation.html"><a href="eda-precipitation.html#means-per-month-test"><i class="fa fa-check"></i><b>2.7</b> Means per month TEST</a></li>
+<li class="chapter" data-level="2.8" data-path="eda-precipitation.html"><a href="eda-precipitation.html#sd-per-month-test"><i class="fa fa-check"></i><b>2.8</b> SD per month TEST</a></li>
+<li class="chapter" data-level="2.9" data-path="eda-precipitation.html"><a href="eda-precipitation.html#trend-per-month-test"><i class="fa fa-check"></i><b>2.9</b> Trend per month TEST</a></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="eda-sst.html"><a href="eda-sst.html"><i class="fa fa-check"></i><b>3</b> EDA SST</a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="eda-sst.html"><a href="eda-sst.html#sst-values-raw"><i class="fa fa-check"></i><b>3.1</b> SST values raw</a></li>
+<li class="chapter" data-level="3.2" data-path="eda-sst.html"><a href="eda-sst.html#mean-at-each-location-1"><i class="fa fa-check"></i><b>3.2</b> Mean at each location</a></li>
+<li class="chapter" data-level="3.3" data-path="eda-sst.html"><a href="eda-sst.html#sd-at-each-location-1"><i class="fa fa-check"></i><b>3.3</b> SD at each location</a></li>
+<li class="chapter" data-level="3.4" data-path="eda-sst.html"><a href="eda-sst.html#mean-and-sd-at-each-location-1"><i class="fa fa-check"></i><b>3.4</b> Mean and SD at each location</a></li>
+<li class="chapter" data-level="3.5" data-path="eda-sst.html"><a href="eda-sst.html#trend-at-each-location-1"><i class="fa fa-check"></i><b>3.5</b> Trend at each location</a></li>
+<li class="chapter" data-level="3.6" data-path="eda-sst.html"><a href="eda-sst.html#sd-per-month-test-1"><i class="fa fa-check"></i><b>3.6</b> SD per month TEST</a></li>
+<li class="chapter" data-level="3.7" data-path="eda-sst.html"><a href="eda-sst.html#trend-per-month-test-1"><i class="fa fa-check"></i><b>3.7</b> Trend per month TEST</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="glyph-plots.html"><a href="glyph-plots.html"><i class="fa fa-check"></i><b>4</b> Glyph plots</a></li>
+<li class="chapter" data-level="5" data-path="correlation-analysis.html"><a href="correlation-analysis.html"><i class="fa fa-check"></i><b>5</b> Correlation analysis</a>
+<ul>
+<li class="chapter" data-level="5.1" data-path="correlation-analysis.html"><a href="correlation-analysis.html#short-recap"><i class="fa fa-check"></i><b>5.1</b> Short Recap</a></li>
+<li class="chapter" data-level="5.2" data-path="correlation-analysis.html"><a href="correlation-analysis.html#correlation-of-sea-surface-temperature-and-precipitation"><i class="fa fa-check"></i><b>5.2</b> Correlation of Sea Surface Temperature and Precipitation</a>
+<ul>
+<li class="chapter" data-level="5.2.1" data-path="correlation-analysis.html"><a href="correlation-analysis.html#original-data"><i class="fa fa-check"></i><b>5.2.1</b> Original Data</a></li>
+<li class="chapter" data-level="5.2.2" data-path="correlation-analysis.html"><a href="correlation-analysis.html#deseasonalised-data"><i class="fa fa-check"></i><b>5.2.2</b> Deseasonalised Data</a></li>
+</ul></li>
+<li class="chapter" data-level="5.3" data-path="correlation-analysis.html"><a href="correlation-analysis.html#summary"><i class="fa fa-check"></i><b>5.3</b> Summary</a>
+<ul>
+<li class="chapter" data-level="5.3.1" data-path="correlation-analysis.html"><a href="correlation-analysis.html#original-data-1"><i class="fa fa-check"></i><b>5.3.1</b> Original Data</a></li>
+<li class="chapter" data-level="5.3.2" data-path="correlation-analysis.html"><a href="correlation-analysis.html#deseasonalised-data-1"><i class="fa fa-check"></i><b>5.3.2</b> Deseasonalised Data</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="main-idea-clustering.html"><a href="main-idea-clustering.html"><i class="fa fa-check"></i><b>6</b> Main Idea Clustering</a></li>
+<li class="chapter" data-level="7" data-path="clustering-methods.html"><a href="clustering-methods.html"><i class="fa fa-check"></i><b>7</b> Clustering Methods</a>
+<ul>
+<li class="chapter" data-level="7.1" data-path="clustering-methods.html"><a href="clustering-methods.html#k-means"><i class="fa fa-check"></i><b>7.1</b> K-means</a>
+<ul>
+<li class="chapter" data-level="7.1.1" data-path="clustering-methods.html"><a href="clustering-methods.html#kmeans-characteristics"><i class="fa fa-check"></i><b>7.1.1</b> Kmeans characteristics</a></li>
+</ul></li>
+<li class="chapter" data-level="7.2" data-path="clustering-methods.html"><a href="clustering-methods.html#k-medoids"><i class="fa fa-check"></i><b>7.2</b> K-medoids</a>
+<ul>
+<li class="chapter" data-level="7.2.1" data-path="clustering-methods.html"><a href="clustering-methods.html#k-medoids-characteristics"><i class="fa fa-check"></i><b>7.2.1</b> K-medoids characteristics</a></li>
+</ul></li>
+<li class="chapter" data-level="7.3" data-path="clustering-methods.html"><a href="clustering-methods.html#pca"><i class="fa fa-check"></i><b>7.3</b> PCA</a></li>
+<li class="chapter" data-level="7.4" data-path="clustering-methods.html"><a href="clustering-methods.html#gap-statistic"><i class="fa fa-check"></i><b>7.4</b> Gap statistic</a></li>
+</ul></li>
+<li class="chapter" data-level="8" data-path="clustering-results.html"><a href="clustering-results.html"><i class="fa fa-check"></i><b>8</b> Clustering results</a>
+<ul>
+<li class="chapter" data-level="8.1" data-path="clustering-results.html"><a href="clustering-results.html#k-means-and-pam-gap-statistics-without-pca"><i class="fa fa-check"></i><b>8.1</b> K-means and PAM gap statistics without PCA</a>
+<ul>
+<li class="chapter" data-level="8.1.1" data-path="clustering-results.html"><a href="clustering-results.html#scree-plot"><i class="fa fa-check"></i><b>8.1.1</b> Scree plot</a></li>
+</ul></li>
+<li class="chapter" data-level="8.2" data-path="clustering-results.html"><a href="clustering-results.html#k-means-and-pam-gap-statistics-after-applying-pca"><i class="fa fa-check"></i><b>8.2</b> K-means and PAM gap statistics after applying PCA</a></li>
+<li class="chapter" data-level="8.3" data-path="clustering-results.html"><a href="clustering-results.html#summary-1"><i class="fa fa-check"></i><b>8.3</b> Summary</a></li>
+</ul></li>
+<li class="chapter" data-level="9" data-path="analyse-clustering-results.html"><a href="analyse-clustering-results.html"><i class="fa fa-check"></i><b>9</b> Analyse clustering results</a></li>
+<li class="chapter" data-level="10" data-path="lasso-on-original-data.html"><a href="lasso-on-original-data.html"><i class="fa fa-check"></i><b>10</b> Lasso on original data</a>
+<ul>
+<li class="chapter" data-level="10.1" data-path="lasso-on-original-data.html"><a href="lasso-on-original-data.html#lasso-model"><i class="fa fa-check"></i><b>10.1</b> LASSO model</a></li>
+<li class="chapter" data-level="10.2" data-path="lasso-on-original-data.html"><a href="lasso-on-original-data.html#error-plots"><i class="fa fa-check"></i><b>10.2</b> Error plots</a></li>
+<li class="chapter" data-level="10.3" data-path="lasso-on-original-data.html"><a href="lasso-on-original-data.html#coefficient-plots"><i class="fa fa-check"></i><b>10.3</b> Coefficient plots</a></li>
+<li class="chapter" data-level="10.4" data-path="lasso-on-original-data.html"><a href="lasso-on-original-data.html#inspect-predictions-from-each-fold"><i class="fa fa-check"></i><b>10.4</b> Inspect predictions from each fold</a></li>
+<li class="chapter" data-level="10.5" data-path="lasso-on-original-data.html"><a href="lasso-on-original-data.html#inspect-predictions-from-best-cv-lambda"><i class="fa fa-check"></i><b>10.5</b> Inspect predictions from best CV-lambda</a></li>
+<li class="chapter" data-level="10.6" data-path="lasso-on-original-data.html"><a href="lasso-on-original-data.html#summary-2"><i class="fa fa-check"></i><b>10.6</b> Summary</a></li>
+</ul></li>
+<li class="chapter" data-level="11" data-path="lasso-on-cluster-1.html"><a href="lasso-on-cluster-1.html"><i class="fa fa-check"></i><b>11</b> Lasso on cluster 1</a>
+<ul>
+<li class="chapter" data-level="11.1" data-path="lasso-on-cluster-1.html"><a href="lasso-on-cluster-1.html#cluster-1"><i class="fa fa-check"></i><b>11.1</b> Cluster 1</a></li>
+<li class="chapter" data-level="11.2" data-path="lasso-on-cluster-1.html"><a href="lasso-on-cluster-1.html#error-plots-1"><i class="fa fa-check"></i><b>11.2</b> Error plots</a></li>
+<li class="chapter" data-level="11.3" data-path="lasso-on-cluster-1.html"><a href="lasso-on-cluster-1.html#coefficient-plots-1"><i class="fa fa-check"></i><b>11.3</b> Coefficient plots</a></li>
+<li class="chapter" data-level="11.4" data-path="lasso-on-cluster-1.html"><a href="lasso-on-cluster-1.html#inspect-predictions-from-each-fold-1"><i class="fa fa-check"></i><b>11.4</b> Inspect predictions from each fold</a></li>
+<li class="chapter" data-level="11.5" data-path="lasso-on-cluster-1.html"><a href="lasso-on-cluster-1.html#inspect-predictions-from-best-cv-lambda-1"><i class="fa fa-check"></i><b>11.5</b> Inspect predictions from best CV-lambda</a></li>
+<li class="chapter" data-level="11.6" data-path="lasso-on-cluster-1.html"><a href="lasso-on-cluster-1.html#summary-3"><i class="fa fa-check"></i><b>11.6</b> Summary</a></li>
+</ul></li>
+<li class="chapter" data-level="12" data-path="lasso-with-standardization.html"><a href="lasso-with-standardization.html"><i class="fa fa-check"></i><b>12</b> Lasso with standardization</a>
+<ul>
+<li class="chapter" data-level="12.1" data-path="lasso-with-standardization.html"><a href="lasso-with-standardization.html#model"><i class="fa fa-check"></i><b>12.1</b> Model</a></li>
+<li class="chapter" data-level="12.2" data-path="lasso-with-standardization.html"><a href="lasso-with-standardization.html#error-plots-2"><i class="fa fa-check"></i><b>12.2</b> Error plots</a></li>
+<li class="chapter" data-level="12.3" data-path="lasso-with-standardization.html"><a href="lasso-with-standardization.html#coefficient-plots-2"><i class="fa fa-check"></i><b>12.3</b> Coefficient plots</a></li>
+<li class="chapter" data-level="12.4" data-path="lasso-with-standardization.html"><a href="lasso-with-standardization.html#inspect-predictions-from-each-fold-2"><i class="fa fa-check"></i><b>12.4</b> Inspect predictions from each fold</a></li>
+<li class="chapter" data-level="12.5" data-path="lasso-with-standardization.html"><a href="lasso-with-standardization.html#inspect-predictions-from-best-cv-lambda-2"><i class="fa fa-check"></i><b>12.5</b> Inspect predictions from best CV-lambda</a></li>
+<li class="chapter" data-level="12.6" data-path="lasso-with-standardization.html"><a href="lasso-with-standardization.html#summary-4"><i class="fa fa-check"></i><b>12.6</b> Summary</a></li>
+</ul></li>
+<li class="chapter" data-level="13" data-path="lasso-on-cluster-2.html"><a href="lasso-on-cluster-2.html"><i class="fa fa-check"></i><b>13</b> Lasso on cluster 2</a>
+<ul>
+<li class="chapter" data-level="13.1" data-path="lasso-on-cluster-2.html"><a href="lasso-on-cluster-2.html#cluster-2"><i class="fa fa-check"></i><b>13.1</b> Cluster 2</a></li>
+<li class="chapter" data-level="13.2" data-path="lasso-on-cluster-2.html"><a href="lasso-on-cluster-2.html#error-plots-3"><i class="fa fa-check"></i><b>13.2</b> Error plots</a></li>
+<li class="chapter" data-level="13.3" data-path="lasso-on-cluster-2.html"><a href="lasso-on-cluster-2.html#coefficient-plots-3"><i class="fa fa-check"></i><b>13.3</b> Coefficient plots</a></li>
+<li class="chapter" data-level="13.4" data-path="lasso-on-cluster-2.html"><a href="lasso-on-cluster-2.html#inspect-predictions-from-each-fold-3"><i class="fa fa-check"></i><b>13.4</b> Inspect predictions from each fold</a></li>
+<li class="chapter" data-level="13.5" data-path="lasso-on-cluster-2.html"><a href="lasso-on-cluster-2.html#inspect-predictions-from-best-cv-lambda-3"><i class="fa fa-check"></i><b>13.5</b> Inspect predictions from best CV-lambda</a></li>
+<li class="chapter" data-level="13.6" data-path="lasso-on-cluster-2.html"><a href="lasso-on-cluster-2.html#summary-5"><i class="fa fa-check"></i><b>13.6</b> Summary</a></li>
+</ul></li>
+<li class="chapter" data-level="14" data-path="lasso-on-cluster-3.html"><a href="lasso-on-cluster-3.html"><i class="fa fa-check"></i><b>14</b> Lasso on cluster 3</a>
+<ul>
+<li class="chapter" data-level="14.1" data-path="lasso-on-cluster-3.html"><a href="lasso-on-cluster-3.html#cluster-3"><i class="fa fa-check"></i><b>14.1</b> Cluster 3</a></li>
+<li class="chapter" data-level="14.2" data-path="lasso-on-cluster-3.html"><a href="lasso-on-cluster-3.html#error-plots-4"><i class="fa fa-check"></i><b>14.2</b> Error plots</a></li>
+<li class="chapter" data-level="14.3" data-path="lasso-on-cluster-3.html"><a href="lasso-on-cluster-3.html#coefficient-plots-4"><i class="fa fa-check"></i><b>14.3</b> Coefficient plots</a></li>
+<li class="chapter" data-level="14.4" data-path="lasso-on-cluster-3.html"><a href="lasso-on-cluster-3.html#inspect-predictions-from-each-fold-4"><i class="fa fa-check"></i><b>14.4</b> Inspect predictions from each fold</a></li>
+<li class="chapter" data-level="14.5" data-path="lasso-on-cluster-3.html"><a href="lasso-on-cluster-3.html#inspect-predictions-from-best-cv-lambda-4"><i class="fa fa-check"></i><b>14.5</b> Inspect predictions from best CV-lambda</a></li>
+<li class="chapter" data-level="14.6" data-path="lasso-on-cluster-3.html"><a href="lasso-on-cluster-3.html#summary-6"><i class="fa fa-check"></i><b>14.6</b> Summary</a></li>
+</ul></li>
+<li class="chapter" data-level="15" data-path="lasso-on-cluster-4.html"><a href="lasso-on-cluster-4.html"><i class="fa fa-check"></i><b>15</b> Lasso on cluster 4</a>
+<ul>
+<li class="chapter" data-level="15.1" data-path="lasso-on-cluster-4.html"><a href="lasso-on-cluster-4.html#cluster-4"><i class="fa fa-check"></i><b>15.1</b> Cluster 4</a></li>
+<li class="chapter" data-level="15.2" data-path="lasso-on-cluster-4.html"><a href="lasso-on-cluster-4.html#error-plots-5"><i class="fa fa-check"></i><b>15.2</b> Error plots</a></li>
+<li class="chapter" data-level="15.3" data-path="lasso-on-cluster-4.html"><a href="lasso-on-cluster-4.html#coefficient-plots-5"><i class="fa fa-check"></i><b>15.3</b> Coefficient plots</a></li>
+<li class="chapter" data-level="15.4" data-path="lasso-on-cluster-4.html"><a href="lasso-on-cluster-4.html#inspect-predictions-from-each-fold-5"><i class="fa fa-check"></i><b>15.4</b> Inspect predictions from each fold</a></li>
+<li class="chapter" data-level="15.5" data-path="lasso-on-cluster-4.html"><a href="lasso-on-cluster-4.html#inspect-predictions-from-best-cv-lambda-5"><i class="fa fa-check"></i><b>15.5</b> Inspect predictions from best CV-lambda</a></li>
+<li class="chapter" data-level="15.6" data-path="lasso-on-cluster-4.html"><a href="lasso-on-cluster-4.html#summary-7"><i class="fa fa-check"></i><b>15.6</b> Summary</a></li>
+</ul></li>
+<li class="chapter" data-level="16" data-path="lasso-on-cluster-5.html"><a href="lasso-on-cluster-5.html"><i class="fa fa-check"></i><b>16</b> Lasso on cluster 5</a>
+<ul>
+<li class="chapter" data-level="16.1" data-path="lasso-on-cluster-5.html"><a href="lasso-on-cluster-5.html#cluster-5"><i class="fa fa-check"></i><b>16.1</b> Cluster 5</a></li>
+<li class="chapter" data-level="16.2" data-path="lasso-on-cluster-5.html"><a href="lasso-on-cluster-5.html#error-plots-6"><i class="fa fa-check"></i><b>16.2</b> Error plots</a></li>
+<li class="chapter" data-level="16.3" data-path="lasso-on-cluster-5.html"><a href="lasso-on-cluster-5.html#coefficient-plots-6"><i class="fa fa-check"></i><b>16.3</b> Coefficient plots</a></li>
+<li class="chapter" data-level="16.4" data-path="lasso-on-cluster-5.html"><a href="lasso-on-cluster-5.html#inspect-predictions-from-each-fold-6"><i class="fa fa-check"></i><b>16.4</b> Inspect predictions from each fold</a></li>
+<li class="chapter" data-level="16.5" data-path="lasso-on-cluster-5.html"><a href="lasso-on-cluster-5.html#inspect-predictions-from-best-cv-lambda-6"><i class="fa fa-check"></i><b>16.5</b> Inspect predictions from best CV-lambda</a></li>
+<li class="chapter" data-level="16.6" data-path="lasso-on-cluster-5.html"><a href="lasso-on-cluster-5.html#summary-8"><i class="fa fa-check"></i><b>16.6</b> Summary</a></li>
+</ul></li>
+<li class="chapter" data-level="17" data-path="lasso-with-lags.html"><a href="lasso-with-lags.html"><i class="fa fa-check"></i><b>17</b> lasso with lags</a>
+<ul>
+<li class="chapter" data-level="17.1" data-path="lasso-with-lags.html"><a href="lasso-with-lags.html#lasso-model-with-lags"><i class="fa fa-check"></i><b>17.1</b> LASSO model with lags</a></li>
+<li class="chapter" data-level="17.2" data-path="lasso-with-lags.html"><a href="lasso-with-lags.html#error-plots-7"><i class="fa fa-check"></i><b>17.2</b> Error plots</a></li>
+<li class="chapter" data-level="17.3" data-path="lasso-with-lags.html"><a href="lasso-with-lags.html#coefficient-plots-7"><i class="fa fa-check"></i><b>17.3</b> Coefficient plots</a></li>
+<li class="chapter" data-level="17.4" data-path="lasso-with-lags.html"><a href="lasso-with-lags.html#inspect-predictions-from-each-fold-7"><i class="fa fa-check"></i><b>17.4</b> Inspect predictions from each fold</a></li>
+<li class="chapter" data-level="17.5" data-path="lasso-with-lags.html"><a href="lasso-with-lags.html#inspect-predictions-from-best-cv-lambda-7"><i class="fa fa-check"></i><b>17.5</b> Inspect predictions from best CV-lambda</a></li>
+<li class="chapter" data-level="17.6" data-path="lasso-with-lags.html"><a href="lasso-with-lags.html#summary-9"><i class="fa fa-check"></i><b>17.6</b> Summary</a></li>
+</ul></li>
+<li class="chapter" data-level="18" data-path="lasso-with-diff.html"><a href="lasso-with-diff.html"><i class="fa fa-check"></i><b>18</b> lasso with diff</a>
+<ul>
+<li class="chapter" data-level="18.1" data-path="lasso-with-diff.html"><a href="lasso-with-diff.html#lasso-model-with-diff"><i class="fa fa-check"></i><b>18.1</b> LASSO model with diff</a></li>
+<li class="chapter" data-level="18.2" data-path="lasso-with-diff.html"><a href="lasso-with-diff.html#error-plots-8"><i class="fa fa-check"></i><b>18.2</b> Error plots</a></li>
+<li class="chapter" data-level="18.3" data-path="lasso-with-diff.html"><a href="lasso-with-diff.html#coefficient-plots-8"><i class="fa fa-check"></i><b>18.3</b> Coefficient plots</a></li>
+<li class="chapter" data-level="18.4" data-path="lasso-with-diff.html"><a href="lasso-with-diff.html#inspect-predictions-from-each-fold-8"><i class="fa fa-check"></i><b>18.4</b> Inspect predictions from each fold</a></li>
+<li class="chapter" data-level="18.5" data-path="lasso-with-diff.html"><a href="lasso-with-diff.html#inspect-predictions-from-best-cv-lambda-8"><i class="fa fa-check"></i><b>18.5</b> Inspect predictions from best CV-lambda</a></li>
+<li class="chapter" data-level="18.6" data-path="lasso-with-diff.html"><a href="lasso-with-diff.html#summary-10"><i class="fa fa-check"></i><b>18.6</b> Summary</a></li>
+</ul></li>
+<li class="chapter" data-level="19" data-path="lasso-with-deseasonalised.html"><a href="lasso-with-deseasonalised.html"><i class="fa fa-check"></i><b>19</b> lasso with deseasonalised</a>
+<ul>
+<li class="chapter" data-level="19.1" data-path="lasso-with-deseasonalised.html"><a href="lasso-with-deseasonalised.html#lasso-model-stl-on-sst"><i class="fa fa-check"></i><b>19.1</b> LASSO model, stl() on SST</a></li>
+<li class="chapter" data-level="19.2" data-path="lasso-with-deseasonalised.html"><a href="lasso-with-deseasonalised.html#error-plots-9"><i class="fa fa-check"></i><b>19.2</b> Error plots</a></li>
+<li class="chapter" data-level="19.3" data-path="lasso-with-deseasonalised.html"><a href="lasso-with-deseasonalised.html#coefficient-plots-9"><i class="fa fa-check"></i><b>19.3</b> Coefficient plots</a></li>
+<li class="chapter" data-level="19.4" data-path="lasso-with-deseasonalised.html"><a href="lasso-with-deseasonalised.html#inspect-predictions-from-each-fold-9"><i class="fa fa-check"></i><b>19.4</b> Inspect predictions from each fold</a></li>
+<li class="chapter" data-level="19.5" data-path="lasso-with-deseasonalised.html"><a href="lasso-with-deseasonalised.html#inspect-predictions-from-best-cv-lambda-9"><i class="fa fa-check"></i><b>19.5</b> Inspect predictions from best CV-lambda</a></li>
+<li class="chapter" data-level="19.6" data-path="lasso-with-deseasonalised.html"><a href="lasso-with-deseasonalised.html#summary-11"><i class="fa fa-check"></i><b>19.6</b> Summary</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i>References</a></li>
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Predicting Droughts in the Amazon Basin based on Global Sea Surface Temperatures</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="lasso-with-lags" class="section level1 hasAnchor" number="17">
+<h1><span class="header-section-number">17</span> lasso with lags<a href="lasso-with-lags.html#lasso-with-lags" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<div id="lasso-model-with-lags" class="section level2 hasAnchor" number="17.1">
+<h2><span class="header-section-number">17.1</span> LASSO model with lags<a href="lasso-with-lags.html#lasso-model-with-lags" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>We fit a LASSO model on the precipitation and SST data.
+This time we include lags from 1 to 3 and a rolling mean of 3</p>
+</div>
+<div id="error-plots-7" class="section level2 hasAnchor" number="17.2">
+<h2><span class="header-section-number">17.2</span> Error plots<a href="lasso-with-lags.html#error-plots-7" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<!-- ```{r} -->
+<!-- err_mat <- readRDS("../results/CV-lasso/cv-lasso-og-data-16-06-22/err-mat.rds") -->
+<!-- #err_mat <- sqrt(err_mat) -->
+<!-- err_mat <- err_mat[1:60,] -->
+<!-- ``` -->
+<!-- ```{r} -->
+<!-- lambda_id <- c(1:60) -->
+<!-- mse <- apply(err_mat, 1, mean) -->
+<!-- b <- mse -->
+<!-- bplus <- apply(err_mat, 1, max) -->
+<!-- bmin <- apply(err_mat, 1, min) -->
+<!-- errbar(lambda_id, mse, b+bplus, b-bmin) -->
+<!-- ``` -->
+<div class="figure"><span style="display:block;" id="fig:err-bar-plot-lasso-lags"></span>
+<img src="_main_files/figure-html/err-bar-plot-lasso-lags-1.png" alt="Mean squared error of the 5-fold blocked cross validation for a range of lambda values on the log scale. The points in the middle represent the average MSE for the respective lambda, the errorbars give the MSE +/- one standard deviation. The dotted line shows the lambda for which minimum MSE was obtained." width="672" />
+<p class="caption">
+Figure 17.1: Mean squared error of the 5-fold blocked cross validation for a range of lambda values on the log scale. The points in the middle represent the average MSE for the respective lambda, the errorbars give the MSE +/- one standard deviation. The dotted line shows the lambda for which minimum MSE was obtained.
+</p>
+</div>
+<!-- ```{r} -->
+<!-- # which.min(b) -->
+<!-- # bs <- b[40:100] -->
+<!-- # bbpluss <- (b+bplus)[40:100] -->
+<!-- # bbmins <- (b-bmin)[40:100] -->
+<!-- # (bs > bbpluss) | (bs < bbmins) -->
+<!-- bmin <- which.min(b) -->
+<!-- tv <- (b+bplus)[bmin] -->
+<!-- tz <- b+bplus -->
+<!-- tz <- tz[(bmin+1):100] -->
+<!-- w <- tv < tz -->
+<!-- #bmin is 40 -->
+<!-- #w ist bei 45 true -->
+<!-- l1se <- 45 -->
+<!-- ``` -->
+<div class="figure"><span style="display:block;" id="fig:err-fold-lasso-lags"></span>
+<img src="_main_files/figure-html/err-fold-lasso-lags-1.png" alt="MSE of the CV for the different lambda values on the a log scale. The red dotted line shows the lambda for which minimum MSE was obtained." width="672" />
+<p class="caption">
+Figure 17.2: MSE of the CV for the different lambda values on the a log scale. The red dotted line shows the lambda for which minimum MSE was obtained.
+</p>
+</div>
+<div class="figure"><span style="display:block;" id="fig:err-fold-lasso-lags-replot"></span>
+<img src="_main_files/figure-html/err-fold-lasso-lags-replot-1.png" alt="MSE of the CV for the different lambda values on the a log scale. The red dotted line shows the lambda for which minimum MSE was obtained. See @
+ef(fig:err-folg-lasso-og), but this time the y-axis has the same range for all plots." width="672" />
+<p class="caption">
+Figure 17.3: MSE of the CV for the different lambda values on the a log scale. The red dotted line shows the lambda for which minimum MSE was obtained. See @
+ef(fig:err-folg-lasso-og), but this time the y-axis has the same range for all plots.
+</p>
+</div>
+<p>Below we can see the minimum MSE for each fold.</p>
+<pre><code>## [1] 13894.94 14232.87 13067.59 11659.02 18720.08</code></pre>
+<p>And which lambda in the lambda vector resulted in the lowest prediction error on the folds´ test set.</p>
+<pre><code>## [1] 72.2998982 72.2998982  0.0722999 72.2998982 72.2998982</code></pre>
+</div>
+<div id="coefficient-plots-7" class="section level2 hasAnchor" number="17.3">
+<h2><span class="header-section-number">17.3</span> Coefficient plots<a href="lasso-with-lags.html#coefficient-plots-7" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>coefficient plot function TODO</p>
+</div>
+<div id="inspect-predictions-from-each-fold-7" class="section level2 hasAnchor" number="17.4">
+<h2><span class="header-section-number">17.4</span> Inspect predictions from each fold<a href="lasso-with-lags.html#inspect-predictions-from-each-fold-7" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Following we inspect the folds precipitation time series and
+the predictions made by the model.</p>
+<div class="figure"><span style="display:block;" id="fig:pred-plot-fold-lasso-lags"></span>
+<img src="_main_files/figure-html/pred-plot-fold-lasso-lags-1.png" alt="Precipitation prediction and target values in the test set in each fold. Predictions in red and target values in black." width="672" />
+<p class="caption">
+Figure 17.4: Precipitation prediction and target values in the test set in each fold. Predictions in red and target values in black.
+</p>
+</div>
+</div>
+<div id="inspect-predictions-from-best-cv-lambda-7" class="section level2 hasAnchor" number="17.5">
+<h2><span class="header-section-number">17.5</span> Inspect predictions from best CV-lambda<a href="lasso-with-lags.html#inspect-predictions-from-best-cv-lambda-7" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<!-- ```{r} -->
+<!-- # fit model with best lambda -->
+<!-- #which.min(b) -->
+<!-- lambdas <- readRDS("../results/CV-lasso/cv-lasso-og-data-16-06-22/lambda-vec.rds") -->
+<!-- ``` -->
+<!-- ```{r} -->
+<!-- minmin <- which.min(apply(err_mat, 1, mean)) -->
+<!-- #minmin <- l1se -->
+<!-- best_lambda <- rev(lambdas)[minmin] -->
+<!-- #dim(features) -->
+<!-- m_full <- glmnet(features[1:370,], target[1:370], lambda = best_lambda, standardize = FALSE) -->
+<!-- preds_full <- predict(m_full, newx = features[371:432,], -->
+<!--                       lambda = best_lambda) -->
+<!-- df <- data.frame(preds = preds_full, target = target[371:432]) -->
+<!-- #dim(preds_full) -->
+<!-- ggplot() + geom_line(data = df, mapping = aes(x=1:62, y=s0, colour = "blue")) + -->
+<!--   geom_line(data = df, mapping= aes(x=1:62, y=target)) -->
+<!-- ``` -->
+<!-- ```{r} -->
+<!-- sqrt(mean((df$s0 - df$target)^2)) -->
+<!-- ``` -->
+<!-- ```{r} -->
+<!-- mean((df$s0 - df$target)^2) -->
+<!-- ``` -->
+<p><img src="_main_files/figure-html/pred-plot-full-lasso-lags-1.png" width="672" /></p>
+<pre><code>## [1] 1910.708</code></pre>
+<p>MSE is <code>mse_full</code> RMSE <code>sqrt(mse_full)</code></p>
+</div>
+<div id="summary-9" class="section level2 hasAnchor" number="17.6">
+<h2><span class="header-section-number">17.6</span> Summary<a href="lasso-with-lags.html#summary-9" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p><img src="_main_files/figure-html/unnamed-chunk-194-1.png" width="672" /><img src="_main_files/figure-html/unnamed-chunk-194-2.png" width="672" /><img src="_main_files/figure-html/unnamed-chunk-194-3.png" width="672" /><img src="_main_files/figure-html/unnamed-chunk-194-4.png" width="672" /></p>
+
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="lasso-on-cluster-5.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="lasso-with-diff.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"whatsapp": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": null,
+"text": null
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": null,
+"text": null
+},
+"download": null,
+"search": {
+"engine": "fuse",
+"options": null
+},
+"toc": {
+"collapse": "subsection"
+}
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>

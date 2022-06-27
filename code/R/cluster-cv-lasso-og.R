@@ -28,17 +28,10 @@ for(i in seq(length(cluster_means_list))) {
   cluster_means_list[[i]] <- cluster_means_list[[i]][1:370]
 }
 
-
-sst <- brick("data/interim/sst/ersst_setreftime.nc", varname = "sst")
-sst <- as.matrix(sst)
-sst <- add_colnames("data/interim/sst/ersst_setreftime.nc",sst)
-sst <- prepare_sst(sst)
-dim(sst)
-anyNA(sst)
-features <- sst[1:370,]
+sst_cv <- readRDS("data/processed/sst_cv.rds")
 
 debug(run_cv_over_clusters)
-run_cv_over_clusters(features, cluster_means_list, nfold=5, size_train=60, 
+run_cv_over_clusters(sst_cv, cluster_means_list, nfold=5, size_train=60, 
                      size_test=14, 
                      save_folder_cluster_result = "cluster-cv-lasso-og2")
 
