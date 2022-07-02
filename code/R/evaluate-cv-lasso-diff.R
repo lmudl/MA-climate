@@ -6,7 +6,7 @@ library(raster)
 library(ggplot2)
 source("code/R/helper-functions.R")
 
-model_folder <- "cv-lasso-og-diff"
+model_folder <- "cv-lasso-og-diff-with-ts-maxdiff-2"
 save_to <- paste0("results/CV-lasso/", model_folder, "/")
 
 # load the error-matrix, lambda and the model_list ####

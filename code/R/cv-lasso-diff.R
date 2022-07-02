@@ -18,8 +18,8 @@ library(feasts)
 sst_cv <- readRDS("data/processed/sst_cv.rds")
 precip_cv <- readRDS("data/processed/precip_cv.rds")
 
-lasso_on_og_diff <- cv_for_ts(features_cv, target_cv, nfold = 5, size_train = 60, size_test = 14,
-                                      save_folder = "cv-lasso-og-diff",
+lasso_on_og_diff <- cv_for_ts(sst_cv, precip_cv, nfold = 5, size_train = 60, size_test = 14,
+                                      save_folder = "cv-lasso-og-diff-with-ts-maxdiff-2",
                                       include_ts_vars=FALSE, stand=FALSE, diff_features=TRUE)
 # debug(cv_for_ts)
 # lasso_on_og_data_timelag

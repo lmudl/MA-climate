@@ -22,7 +22,7 @@ source("../code/R/helper-functions.R")
 # length(ids$test$Testing060)
 ```
 ```{r}
-path_to_model_folder <- "../results/CV-lasso/cv-lasso-og-timelag-25-06-22-rm4"
+path_to_model_folder <- "../results/CV-lasso/cv-lasso-og-timelag-28-06-22-lag-1-3"
 ```
 
 

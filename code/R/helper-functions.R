@@ -614,16 +614,16 @@ add_ts_vars <- function(data_matrix) {
     mutate(
       lag1 = dplyr::lag(x=temperature, n=1),
       lag2 = dplyr::lag(x=temperature, n=2),
-      lag3 = dplyr::lag(x=temperature, n=3),
-      rollm_4 = zoo::rollmean(x = temperature, k=4,
-                              fill = NA, align = "right")
+      lag3 = dplyr::lag(x=temperature, n=3)#,
+      #rollm_4 = zoo::rollmean(x = temperature, k=4,
+      #                        fill = NA, align = "right")
     ) %>%
     mutate(rn = row_number()) %>%
     # pivot_wider(names_from = location, 
     #             values_from = c(temperature, rollm_2,
     #                             rollm_3, rollm_4)) %>%
     pivot_wider(names_from = location, values_from = c(temperature, lag1,
-                                                       lag2, lag3, rollm_4)) %>%
+                                                       lag2, lag3)) %>% #, rollm_4)) %>%
     select(-rn) -> df
   cnames <- colnames(df)
   df %>% mutate(run_month = row_number(), .before=cnames[1]) -> df
@@ -634,6 +634,16 @@ add_ts_vars <- function(data_matrix) {
     relocate(cyc_month, .after = run_month)
   return(df)
 } 
+
+# helper function for diff data
+diff_data <- function(df, ndiff) {
+  df <- apply(df, 2, function(x) diff(x, lag = 1, ndiff))
+  return(df)
+}
+
+cut_data <- function(df, ndiff) {
+  df <- df[-c(seq(ndiff))]
+}
 
 
 # For testing, smaller set
@@ -764,13 +774,65 @@ cv_lasso <- function(sst, precip, index_list, save_folder, include_ts_vars, stan
       # saveRDS(lambda_vec, file=lambda_fold_path)
     }
     if(diff_features == TRUE) {
-      ndiffs <- apply(x_train, 2, unitroot_ndiffs)
-      max_ndiffs <- max(ndiffs)
+      # lasso og diff does not have fac_month and time_ind code
+      # between ## are new
+      # ndiffs <- apply(x_train, 2, unitroot_ndiffs)
+      # max_ndiffs <- max(ndiffs)
+      max_ndiffs <- 1
+      ##
+      nr <- nrow(x_train)
+      time_ind <- seq(nr)
+      fac_month <- time_ind %% 12
+      fac_month[fac_month == 0] <- 12
+      fac_month <- as.factor(fac_month)
+      ##
       x_train <- apply(x_train, 2, function(x) diff(x, lag=1, difference=max_ndiffs))
-      y_train <- y_train[-c(seq(max_ndiffs))]
+      
+      ##
+      time_ind <- time_ind[-c(seq(max_ndiffs))]
+      fac_month <- fac_month[-c(seq(max_ndiffs))]
+      x_train <- cbind(x_train, time_ind, fac_month)
+      x_train <- data.matrix(x_train)
+      ##
+      # y_train <- y_train[-c(seq(max_ndiffs))]
+      y_train <- diff(y_train, max_ndiffs)
+      
+      ##
+      time_ind2 <- seq(nr+1,nr+nrow(x_test))
+      fac_month2 <- time_ind2 %% 12
+      fac_month2[fac_month2 == 0] <- 12
+      fac_month2 <- as.factor(fac_month2)
+      ##
       
       x_test <- apply(x_test, 2, function(x) diff(x, lag=1, difference=max_ndiffs))
-      y_test <- y_test[-c(seq(max_ndiffs))]
+      ##
+      time_ind2 <- time_ind2[-c(seq(max_ndiffs))]
+      fac_month2 <- fac_month2[-c(seq(max_ndiffs))]
+      x_test <- cbind(x_test, time_ind2, fac_month2)
+      ##
+      
+      # y_test <- y_test[-c(seq(max_ndiffs))]
+      y_test <- diff(y_test, max_ndiffs)
+      
+      # add_time <- function(df) {
+      #   rn <- rownames(df)
+      #   s <- strsplit(rn, "X", "")
+      #   time_vec <- sapply(s, FUN = function(x) as.integer(x[[2]]))
+      #   df <- cbind(time_vec, df)
+      #   return(df)
+      # }
+      # 
+      # add_month_fac <- function(df) {
+      #   t_vec <- df[, "time_vec"]
+      #   fac_month <- t_vec %% 12
+      #   fac_month[fac_month == 0] <- 12
+      #   fac_month <- as.factor(fac_month)
+      #   df <- cbind(fac_month, df)
+      #   return(df)
+      # }
+      # 
+      
+      
     }
     if(des_features == TRUE) {
       #stop("under construction deseasonalised")
@@ -783,7 +845,7 @@ cv_lasso <- function(sst, precip, index_list, save_folder, include_ts_vars, stan
                                                      robust = TRUE)$time.series[,"remainder"]))
       x_together <- rbind(x_train, x_test)
       x_together <- apply(x_together, 2, function(x) c(stl(ts(x, frequency=12), s.window = "periodic",
-                                                       robust = TRUE)$time.series[,"remainder"]))
+                                                           robust = TRUE)$time.series[,"remainder"]))
       x_test <- x_together[-c(seq(nrow(x_train))),]
     }
     
@@ -803,8 +865,18 @@ cv_lasso <- function(sst, precip, index_list, save_folder, include_ts_vars, stan
   return(err_mat)
 }
 
+sdN=function(x){
+  sigma=sqrt( (1/length(x)) * sum((x-mean(x))^2))
+  return(sigma)
+}
+
+custom_stand <- function(x) {
+  stand_x <- (x-mean(x))/sdN(x)
+  return(stand_x)
+}
+
 cv_fused_lasso <- function(sst, precip, index_list, save_folder, graph,
-                           maxsteps) {
+                           maxsteps, stand) {
   # dir.create(paste0("results/CV-lasso/", save_folder))
   # dir.create(paste0("results/CV-lasso/", save_folder, "/fold-models"))
   # maxsteps <- maxsteps
@@ -817,6 +889,17 @@ cv_fused_lasso <- function(sst, precip, index_list, save_folder, graph,
     y_train <- precip[id_train]
     x_test <- sst[id_test,]
     y_test <- precip[id_test]
+    if(stand==TRUE){
+      # x_train <- scale(x_train)
+      # x_test <- scale(x_test)
+      # https://stackoverflow.com/questions/59846325/confusion-about-standardize-option-of-glmnet-package-in-r
+      x_train <- apply(x_train, 2, custom_stand)
+      # or maybe scale x_test with mean and standard deviation from x_train
+      x_test <- apply(x_test, 2, custom_stand)
+      # y_train <- apply(y_train, 2, custom_stand)
+      # y_test <- apply(y_train, 2, custom_stand)
+      print("standardized features")
+    }
     trained_model <- fusedlasso(y=y_train, X=x_train, graph=graph,
                                 verbose=TRUE, maxsteps = maxsteps)
     predicted <- predict.genlasso(trained_model, Xnew=x_test)
@@ -824,7 +907,8 @@ cv_fused_lasso <- function(sst, precip, index_list, save_folder, graph,
     err_mat[,j] <- err_col
     fold_model_path <- paste0("results/CV-lasso/", save_folder, "/fold-models/",
                               "model-fold-",j,".rds")
-    saveRDS(trained_model, file = fold_model_path )
+    saveRDS(trained_model, file = fold_model_path)
+    rm(trained_model)
     print(paste("finished fold", j))
   }
   return(err_mat)
@@ -878,8 +962,9 @@ cv_for_ts <- function(sst, precip, nfold = 5, size_train = 60, size_test = 14, s
     return(err_mat)
   }
   if(model == "fused") {
-    err_mat <- cv_fused_lasso(sst, precip, index_list, 
-                              save_folder,  graph, maxsteps)
+    err_mat <- cv_fused_lasso(sst = sst, precip = precip, index_list = index_list, 
+                              save_folder = save_folder,  graph = graph, 
+                              maxsteps = maxsteps, stand=stand)
     print("finished fitting")
     index_list_path <- paste0("results/CV-lasso/", save_folder, "/index-list.rds")
     #lambda_vec_path <- paste0("results/CV-lasso/", save_folder, "/lambda-vec.rds")
@@ -1077,25 +1162,47 @@ plot_predictions_best_l <- function(err_mat, model_list, ids, features, target,
     if(diff_features==TRUE) {
       features_i <- features[ids_i,]
       target_i <- target[ids_i]
-      ndiffs <- apply(features_i, 2, unitroot_ndiffs)
-      max_ndiffs <- max(ndiffs)
+      # ndiffs <- apply(features_i, 2, unitroot_ndiffs)
+      # max_ndiffs <- max(ndiffs)
+      max_ndiffs <- 1
+      
+      nr <- nrow(features_i)
+      time_ind <- seq(nr)
+      fac_month <- time_ind %% 12
+      fac_month[fac_month == 0] <- 12
+      fac_month <- as.factor(fac_month)
+      
       features_i <- apply(features_i, 2, function(x) diff(x, lag=1, difference=max_ndiffs))
-      target_i <- target_i[-c(seq(max_ndiffs))]
+      
+      time_ind <- time_ind[-c(seq(max_ndiffs))]
+      fac_month <- fac_month[-c(seq(max_ndiffs))]
+      features_i <- cbind(features_i, time_ind, fac_month)
+      features_i <- data.matrix(features_i)
+      
+      # target_i <- target_i[-c(seq(max_ndiffs))]
+      target_i <- diff(target_i, max_ndiffs)
+      
       preds <- c(predict(model_i, newx = data.matrix(features_i), s=lambdas[l_min],
                          standardize = standardize))
       ids_i <- ids_i[-c(seq(max_ndiffs))]
       #standardize=standardize))
       plot_df <- data.frame(targets = target_i, predictions = preds, ids = ids_i)
+      
+      # add here possibility to add 
+      # seasonal and time information
+      
+      
+    }
     if(des_features==TRUE) {
       features_i <- features[ids_i,]
       target_i <- target[ids_i]
       features_i <- apply(features_i, 2, function(x) c(stl(ts(x, frequency=12), s.window = "periodic",
-                                                     robust = TRUE)$time.series[,"remainder"]))
+                                                           robust = TRUE)$time.series[,"remainder"]))
       preds <- c(predict(model_i, newx = data.matrix(features_i), s=lambdas[l_min],
                          standardize = standardize))
       plot_df <- data.frame(targets = target_i, predictions = preds, ids = ids_i)
-      }
-    } else {
+    }
+    if(sum(include_ts_vars,diff_features, des_features)==0) {
       preds <- c(predict(model_i, newx = features[ids_i,], s=lambdas[l_min],
                          standardize=standardize))
       plot_df <- data.frame(targets = target[ids_i], predictions = preds, ids = ids_i)

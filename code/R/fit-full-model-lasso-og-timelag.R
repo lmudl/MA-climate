@@ -11,7 +11,7 @@ source("code/R/helper-functions.R")
 # plot predictions etc
 
 # path to and save_to
-save_to <- "cv-lasso-og-timelag-25-06-22-rm4"
+save_to <- "cv-lasso-og-timelag-28-06-22-lag-1-3"
 full_save_to <- paste0("results/CV-lasso/",save_to,"/")
 
 # load err mat, lambdas and get lambda min

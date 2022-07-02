@@ -22,7 +22,7 @@ source("../code/R/helper-functions.R")
 # length(ids$test$Testing060)
 ```
 ```{r}
-path_to_model_folder <- "../results/CV-lasso/cv-lasso-des"
+path_to_model_folder <- "../results/CV-lasso/cv-lasso-des-sst"
 ```
 
 

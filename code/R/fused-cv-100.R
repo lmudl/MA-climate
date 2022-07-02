@@ -46,7 +46,7 @@ precip <- precip[train_max]
 # sst <- sst[1:25,]
 # precip <- precip[1:25]
 
-err <- cv_for_ts_up(sst, precip, nfold=5, size_train=60, size_test=14, 
+err <- cv_for_ts(sst, precip, nfold=5, size_train=60, size_test=14, 
                     save_folder="fused-cv-test-100-steps",
                          model = "fused", graph = g, maxsteps = maxsteps)
 

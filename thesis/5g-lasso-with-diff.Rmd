@@ -22,7 +22,7 @@ source("../code/R/helper-functions.R")
 # length(ids$test$Testing060)
 ```
 ```{r}
-path_to_model_folder <- "../results/CV-lasso/cv-lasso-og-diff"
+path_to_model_folder <- "../results/CV-lasso/cv-lasso-og-diff-with-ts-and-stand-maxdiff-2"
 ```
 
 
@@ -57,6 +57,9 @@ lambdas <- readRDS(paste0(path_to_model_folder, "/lambda-vec.rds"))
 err_bars_plot <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-bars-plot.rds"))
 err_bars_plot
 a <- ggplot_build(err_bars_plot)
+```
+```{r}
+err_bars_plot + ylim(-10000,10000)
 ```
 
 
@@ -258,6 +261,7 @@ b <- d[[2]]$y #
 res <- a-b # residuals
 
 plot(a,res)
+plot(ts(abs(res)))
 qqnorm(res)
 qqline(res)
 plot(density(res))

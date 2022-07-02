@@ -5,7 +5,7 @@ library(raster)
 library(ggplot2)
 source("code/R/helper-functions.R")
 
-model_folder <- "cv-lasso-og-timelag-25-06-22-rm4"
+model_folder <- "cv-lasso-og-timelag-28-06-22-lag-1-3"
 save_to <- paste0("results/CV-lasso/", model_folder, "/")
 
 # load the error-matrix, lambda and the model_list ####

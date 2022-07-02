@@ -2,7 +2,7 @@
 # fused lasso test with new cv method
 getwd() # is MA-climate on the shell 
 # but we could add a check here
-#setwd("Repos/MA-climate/")
+# setwd("Repos/MA-climate/")
 source("code/R/helper-functions.R")
 
 # load packages
@@ -25,30 +25,16 @@ sst <- brick("data/interim/sst/ersst_setreftime.nc", var = "sst")
 # sst <- crop(sst,ext)
 # create igraph object
 g <- igraph_from_raster(sst)
-# prepare sst for fitting
-coord <- coordinates(sst)
-cnames <- paste(coord[,1], coord[,2])
-sst <- as.matrix(sst)
-sst <- t(sst)
-colnames(sst) <- cnames
-#sst <- prepare_sst(sst)
-sst <- sst[train_max,]
+rm(sst)
 
-
-# load data precip
-precip <- readRDS("data/interim/drought/chirps_setreftime_aggregated.rds")
-
-# prepare precip for fitting
-precip <- values(precip)
-precip <- apply(precip, 2, mean)
-precip <- precip[train_max]
-
-# do cv on fused lasso small
-# sst <- sst[1:25,]
-# precip <- precip[1:25]
-
-err <- cv_for_ts_up(sst, precip, nfold=5, size_train=60, size_test=14, 
+sst_cv <- readRDS("data/processed/sst_cv.rds")
+precip_cv <- readRDS("data/processed/precip_cv.rds")
+# drop intercept
+precip_cv <- scale(precip_cv, center = TRUE, scale = FALSE)
+ 
+err <- cv_for_ts(sst_cv, precip_cv, nfold=5, size_train=60, size_test=14, 
                     save_folder="fused-cv-20k-steps-fullwindow",
                     model = "fused", graph = g, maxsteps = maxsteps)
 
-
+# started 30.06.22 at 14:10
+# ended?
