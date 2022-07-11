@@ -17,7 +17,7 @@ library(igraph)
 library(genlasso)
 #library(caret)
 train_max <- 1:370
-maxsteps <- 10
+maxsteps <- 1000
 
 # load data sst
 sst <- brick("data/interim/sst/ersst_setreftime.nc", var = "sst")
@@ -28,15 +28,10 @@ g <- igraph_from_raster(sst)
 rm(sst)
 
 small_sst_cv <- readRDS("data/processed/small_sst_cv.rds")
-#small_sst_cv <- scale(small_sst_cv)
 precip_cv <- readRDS("data/processed/precip_cv.rds")
 # drop intercept
-# and scale target, converges a lot faster seems like
 precip_cv <- scale(precip_cv, center = TRUE, scale = FALSE)
-
+ 
 err <- cv_for_ts(small_sst_cv, precip_cv, nfold=5, size_train=60, size_test=14, 
-                 save_folder="small-fused-cv-test",
-                 model = "fused", graph = g, maxsteps = maxsteps)
-
-# evaluate
-plot(ts(err[,5]))
+                    save_folder="small-fused-cv-1k",
+                    model = "fused", graph = g, maxsteps = maxsteps)

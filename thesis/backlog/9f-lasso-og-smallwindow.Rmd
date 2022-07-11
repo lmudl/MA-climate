@@ -11,7 +11,7 @@ library(ggpubr)
 library(raster)
 library(glmnet)
 library(Hmisc)
-source("../code/R/helper-functions.R")
+source("../../code/R/helper-functions.R")
 ```
 
 ```{r}
@@ -42,7 +42,7 @@ in the training phase.
 ## Error plots
 
 ```{r}
-err_mat <- readRDS("../results/CV-lasso/cv-lasso-og-smallwindow/err-mat.rds")
+err_mat <- readRDS("../../results/CV-lasso/cv-lasso-og-smallwindow/err-mat.rds")
 #err_mat <- sqrt(err_mat)
 err_mat <- err_mat[1:60,]
 ```
@@ -86,11 +86,11 @@ l1se <- 45
 
 
 ```{r}
-p1 <- readRDS("../results/CV-lasso/cv-lasso-og-smallwindow/err-mat-plots/err-plot-fold-1.rds")
-p2 <- readRDS("../results/CV-lasso/cv-lasso-og-smallwindow/err-mat-plots/err-plot-fold-2.rds")
-p3 <- readRDS("../results/CV-lasso/cv-lasso-og-smallwindow/err-mat-plots/err-plot-fold-3.rds")
-p4 <- readRDS("../results/CV-lasso/cv-lasso-og-smallwindow/err-mat-plots/err-plot-fold-4.rds")
-p5 <- readRDS("../results/CV-lasso/cv-lasso-og-smallwindow/err-mat-plots/err-plot-fold-5.rds")
+p1 <- readRDS("../../results/CV-lasso/cv-lasso-og-smallwindow/err-mat-plots/err-plot-fold-1.rds")
+p2 <- readRDS("../../results/CV-lasso/cv-lasso-og-smallwindow/err-mat-plots/err-plot-fold-2.rds")
+p3 <- readRDS("../../results/CV-lasso/cv-lasso-og-smallwindow/err-mat-plots/err-plot-fold-3.rds")
+p4 <- readRDS("../../results/CV-lasso/cv-lasso-og-smallwindow/err-mat-plots/err-plot-fold-4.rds")
+p5 <- readRDS("../../results/CV-lasso/cv-lasso-og-smallwindow/err-mat-plots/err-plot-fold-5.rds")
 p1 + p2 + p3 + p4 + p5
 ```
 
@@ -116,11 +116,11 @@ apply(err_mat, 2, function(x) which.min(x))
 ## Coefficient plots
 
 ```{r}
-pc1 <- readRDS("../results/CV-lasso/cv-lasso-og-smallwindow/coef-plots/coef-plot-fold-1.rds")
-pc2 <- readRDS("../results/CV-lasso/cv-lasso-og-smallwindow/coef-plots/coef-plot-fold-2.rds")
-pc3 <- readRDS("../results/CV-lasso/cv-lasso-og-smallwindow/coef-plots/coef-plot-fold-3.rds")
-pc4 <- readRDS("../results/CV-lasso/cv-lasso-og-smallwindow/coef-plots/coef-plot-fold-4.rds")
-pc5 <- readRDS("../results/CV-lasso/cv-lasso-og-smallwindow/coef-plots/coef-plot-fold-5.rds")
+pc1 <- readRDS("../../results/CV-lasso/cv-lasso-og-smallwindow/coef-plots/coef-plot-fold-1.rds")
+pc2 <- readRDS("../../results/CV-lasso/cv-lasso-og-smallwindow/coef-plots/coef-plot-fold-2.rds")
+pc3 <- readRDS("../../results/CV-lasso/cv-lasso-og-smallwindow/coef-plots/coef-plot-fold-3.rds")
+pc4 <- readRDS("../../results/CV-lasso/cv-lasso-og-smallwindow/coef-plots/coef-plot-fold-4.rds")
+pc5 <- readRDS("../../results/CV-lasso/cv-lasso-og-smallwindow/coef-plots/coef-plot-fold-5.rds")
 
 l <- list(pc1,pc2,pc3,pc4,pc5)
 ggarrange(plotlist = l, ncol = 3, nrow = 2,
@@ -155,8 +155,8 @@ the predictions made by the model.
 
 ```{r}
 # load data
-target_path <- "../data/interim/drought/chirps_setreftime_aggregated.rds"
-features_path <- "../data/interim/sst/ersst_setreftime.nc"
+target_path <- "../../data/interim/drought/chirps_setreftime_aggregated.rds"
+features_path <- "../../data/interim/sst/ersst_setreftime.nc"
 target <- load_data(target_path)
 target <- apply(getValues(target), 2, mean)
 features <- load_data(features_path, "sst")
@@ -171,8 +171,8 @@ features <- prepare_sst(features)
 
 ```{r}
 # get indices
-lambdas <- readRDS("../results/CV-lasso/cv-lasso-og-smallwindow/lambda-vec.rds")
-ids <- readRDS("../results/CV-lasso/cv-lasso-og-smallwindow/index-list.rds")
+lambdas <- readRDS("../../results/CV-lasso/cv-lasso-og-smallwindow/lambda-vec.rds")
+ids <- readRDS("../../results/CV-lasso/cv-lasso-og-smallwindow/index-list.rds")
 ```
 
 
@@ -262,7 +262,7 @@ as validation data
 ```{r}
 # fit model with best lambda
 #which.min(b)
-lambdas <- readRDS("../results/CV-lasso/cv-lasso-og-smallwindow/lambda-vec.rds")
+lambdas <- readRDS("../../results/CV-lasso/cv-lasso-og-smallwindow/lambda-vec.rds")
 ```
 
 ```{r}

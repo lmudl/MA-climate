@@ -33,7 +33,9 @@ saveRDS(target_eval, paste0(save_to, "precip_eval.rds"))
 # small sst window ####
 sst <- brick("data/interim/sst/ersst_setreftime.nc", var = "sst")
 ext <- extent(-180,0,-50,40)
+# ext <- extent(-180,-10,-50,40)
 small_sst <- crop(sst,ext)
+# plot(small_sst[[1]])
 rm(sst)
 coord <- coordinates(small_sst)
 cnames <- paste(coord[,1], coord[,2])
@@ -91,4 +93,14 @@ des_sst_eval <- des_sst[ids_eval,]
 saveRDS(des_sst_eval, paste0(save_to, "des_sst_eval.rds"))
 des_precip_eval <- des_precip[ids_eval]
 saveRDS(des_precip_eval, paste0(save_to, "des_precip_eval.rds"))
+
+# graph objects ####
+sst <- brick("data/interim/sst/ersst_setreftime.nc", varname = "sst")
+graph_sst <- igraph_from_raster(sst)
+saveRDS(graph_sst, paste0(save_to, "graph_sst.rds"))
+
+ext <- extent(-180,0,-50,40)
+small_sst <- crop(sst,ext)
+small_graph_sst <- igraph_from_raster(small_sst)
+saveRDS(small_graph_sst, paste0(save_to, "small_graph_sst.rds"))
 

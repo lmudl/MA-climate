@@ -17,7 +17,7 @@ library(igraph)
 library(genlasso)
 #library(caret)
 train_max <- 1:370
-maxsteps <- 2000
+maxsteps <- 1000
 
 # load data sst
 sst <- brick("data/interim/sst/ersst_setreftime.nc", var = "sst")
@@ -33,7 +33,8 @@ precip_cv <- readRDS("data/processed/precip_cv.rds")
 precip_cv <- scale(precip_cv, center = TRUE, scale = FALSE)
 
 err <- cv_for_ts(small_sst_cv, precip_cv, nfold=5, size_train=60, size_test=14, 
-                 save_folder="small-fused-cv-1k",
-                 model = "fused", graph = g, maxsteps = maxsteps)
+                 save_folder="small-fused-cv-1k-gamma-01",
+                 model = "fused", graph = g, maxsteps = maxsteps,
+                 gamma=0.1, standardize_response = TRUE)
 
 

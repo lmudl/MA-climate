@@ -13,6 +13,9 @@ index_list <- ids
 sst_cv <- readRDS("data/processed/sst_cv.rds")
 precip_cv <- readRDS("data/processed/precip_cv.rds")
 
+# Data loading
+sst_cv <- readRDS("data/processed/small_sst_cv.rds")
+precip_cv <- readRDS("data/processed/precip_cv.rds")
 
 ####
 lambdas
@@ -119,4 +122,8 @@ unitroot_ndiffs(b)
 #
 zoo::rollmean(1:10, k=3
               )
+
+
+
+# plot it?
 
