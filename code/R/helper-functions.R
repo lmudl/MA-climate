@@ -902,126 +902,47 @@ custom_stand <- function(x) {
   return(stand_x)
 }
 
-cv_run <- function() {
-  id_train <- unlist(index_list$train[j], use.names = FALSE)
-  id_test <- unlist(index_list$test[j], use.names = FALSE)
-  x_train <- sst[id_train,]
-  y_train <- precip[id_train]
-  x_test <- sst[id_test,]
-  y_test <- precip[id_test]
-  
-  # if(stand==TRUE){
-  #   # x_train <- scale(x_train)
-  #   # x_test <- scale(x_test)
-  #   # https://stackoverflow.com/questions/59846325/confusion-about-standardize-option-of-glmnet-package-in-r
-  #   x_train <- apply(x_train, 2, custom_stand)
-  #   # or maybe scale x_test with mean and standard deviation from x_train
-  #   x_test <- apply(x_test, 2, custom_stand)
-  #   # y_train <- apply(y_train, 2, custom_stand)
-  #   # y_test <- apply(y_train, 2, custom_stand)
-  #   print("standardized features")
-  # }
-  if(standardize_features == TRUE) {
-    mean_x_train <- apply(x_train,2, mean)
-    sdn_x_train <- apply(x_train,2,sdN)
-    x_train <- scale(x_train, center=mean_x_train,
-                     scale=sdn_x_train)
-    x_test <- scale(x_test, center=mean_x_train,
-                    scale=sdn_x_train)
-    print("standardized features")
-  }
-  if(standardize_response == TRUE) {
-    mean_y_train <- mean(y_train)
-    sdn_y_train <- sdN(y_train)
-    y_train <- scale(y_train, center=mean_y_train, 
-                     scale=sdn_y_train)
-    # y_test <- scale(y_test, center=mean_y_train, 
-    #                 scale=sdn_y_train)
-  }
-  trained_model <- fusedlasso(y=y_train, X=x_train, graph=graph,
-                              verbose=TRUE, maxsteps = maxsteps,
-                              gamma=gamma)
-  predicted <- predict.genlasso(trained_model, Xnew=x_test)
-  if(standardize_response == TRUE) {
-    predicted$fit <- apply(predicted$fit, 2, function(x)  x*sdn_y_train + mean_y_train)
-  }
-  err_col <- apply(predicted$fit, 2, function(x) mean((x-y_test)^2))
-  err_mat[,j] <- err_col
-  fold_model_path <- paste0("results/CV-lasso/", save_folder, "/fold-models/",
-                            "model-fold-",j,".rds")
-  saveRDS(trained_model, file = fold_model_path)
-  rm(trained_model)
-  print(paste("finished fold", j))
-}
-
 
 cv_fused_lasso <- function(sst, precip, index_list, save_folder, graph,
                            maxsteps, stand, standardize_features, standardize_response,
-                           gamma) {
+                           gamma, parallelize) {
   # dir.create(paste0("results/CV-lasso/", save_folder))
   # dir.create(paste0("results/CV-lasso/", save_folder, "/fold-models"))
   # maxsteps <- maxsteps
   nfold <- length(index_list$train)
   err_mat <- matrix(NA, ncol = nfold, nrow = maxsteps)
-  for(j in 1:length(index_list$train)) {
-    id_train <- unlist(index_list$train[j], use.names = FALSE)
-    id_test <- unlist(index_list$test[j], use.names = FALSE)
-    x_train <- sst[id_train,]
-    y_train <- precip[id_train]
-    x_test <- sst[id_test,]
-    y_test <- precip[id_test]
-    
-    # if(stand==TRUE){
-    #   # x_train <- scale(x_train)
-    #   # x_test <- scale(x_test)
-    #   # https://stackoverflow.com/questions/59846325/confusion-about-standardize-option-of-glmnet-package-in-r
-    #   x_train <- apply(x_train, 2, custom_stand)
-    #   # or maybe scale x_test with mean and standard deviation from x_train
-    #   x_test <- apply(x_test, 2, custom_stand)
-    #   # y_train <- apply(y_train, 2, custom_stand)
-    #   # y_test <- apply(y_train, 2, custom_stand)
-    #   print("standardized features")
-    # }
-    if(standardize_features == TRUE) {
-      mean_x_train <- apply(x_train,2, mean)
-      sdn_x_train <- apply(x_train,2,sdN)
-      x_train <- scale(x_train, center=mean_x_train,
-                       scale=sdn_x_train)
-      x_test <- scale(x_test, center=mean_x_train,
-                      scale=sdn_x_train)
-      print("standardized features")
+  if(parallelize == FALSE) {
+    source("code/R/helper-functions-parallel-cv.R")
+    for(j in 1:length(index_list$train)) {
+      err_mat[,j] <- cv_run_fused(j, err_mat, nfold, sst, precip, index_list, save_folder, graph,
+                                  maxsteps, stand, standardize_features, standardize_response,
+                                  gamma)
     }
-    if(standardize_response == TRUE) {
-      mean_y_train <- mean(y_train)
-      sdn_y_train <- sdN(y_train)
-      y_train <- scale(y_train, center=mean_y_train, 
-                       scale=sdn_y_train)
-      # y_test <- scale(y_test, center=mean_y_train, 
-      #                 scale=sdn_y_train)
-    }
-    trained_model <- fusedlasso(y=y_train, X=x_train, graph=graph,
-                                verbose=TRUE, maxsteps = maxsteps,
-                                gamma=gamma)
-    predicted <- predict.genlasso(trained_model, Xnew=x_test)
-    if(standardize_response == TRUE) {
-      predicted$fit <- apply(predicted$fit, 2, function(x)  x*sdn_y_train + mean_y_train)
-    }
-    err_col <- apply(predicted$fit, 2, function(x) mean((x-y_test)^2))
-    err_mat[,j] <- err_col
-    fold_model_path <- paste0("results/CV-fused/", save_folder, "/fold-models/",
-                              "model-fold-",j,".rds")
-    saveRDS(trained_model, file = fold_model_path)
-    rm(trained_model)
-    print(paste("finished fold", j))
+    return(err_mat)
   }
-  return(err_mat)
+  if(parallelize == TRUE) {
+    num_cores <- parallel::detectCores()
+    doParallel::registerDoParallel(num_cores)
+    library(foreach)
+    err_mat <- foreach(j = 1:length(index_list$train),
+                       .packages="genlasso", .combine = "cbind") %dopar% {
+                         source("code/R/helper-functions-parallel-cv.R")
+                         print(paste("start job", j))
+                         cv_run_fused(j = j, err_mat, nfold, sst, precip, index_list, save_folder, graph,
+                                      maxsteps, stand, standardize_features, standardize_response,
+                                      gamma)
+                       }
+    doParallel::stopImplicitCluster()
+    return(err_mat)
+  }
 }
 
 cv_for_ts <- function(sst, precip, nfold = 5, size_train = 60, size_test = 14, save_folder,
                       model = "lasso", graph = NULL, maxsteps=100, include_ts_vars=FALSE,
                       stand=FALSE, diff_features=FALSE, des_features=FALSE,
                       standardize_features=FALSE, standardize_response=FALSE,
-                      gamma=0) {
+                      gamma=0, parallelize = FALSE) {
+  a <- Sys.time()
   if(model == "fused" & is.null(graph)){
     stop("for the fused LASSO a graph object is needed")
   }
@@ -1066,6 +987,8 @@ cv_for_ts <- function(sst, precip, nfold = 5, size_train = 60, size_test = 14, s
     saveRDS(index_list, file = index_list_path)
     # saveRDS(lambda_vec, file = lambda_vec_path) 
     saveRDS(err_mat, file = err_mat_path)
+    b <- Sys.time()
+    print(a-b)
     return(err_mat)
   }
   if(model == "fused") {
@@ -1074,7 +997,8 @@ cv_for_ts <- function(sst, precip, nfold = 5, size_train = 60, size_test = 14, s
                               maxsteps = maxsteps, stand=stand,
                               standardize_features = standardize_features,
                               standardize_response = standardize_response,
-                              gamma=gamma)
+                              gamma=gamma,
+                              parallelize = parallelize)
     print("finished fitting")
     index_list_path <- paste0("results/CV-fused/", save_folder, "/index-list.rds")
     #lambda_vec_path <- paste0("results/CV-lasso/", save_folder, "/lambda-vec.rds")
@@ -1082,6 +1006,8 @@ cv_for_ts <- function(sst, precip, nfold = 5, size_train = 60, size_test = 14, s
     saveRDS(index_list, file = index_list_path)
     #saveRDS(lambda_vec, file = lambda_vec_path) 
     saveRDS(err_mat, file = err_mat_path)
+    b <- Sys.time()
+    print(a-b)
     return(err_mat)
   }
   #save(trained_model, file=paste0("results/CV-lasso/model-","lambda-",i,"fold-",j,".RData"))
@@ -1099,6 +1025,38 @@ cv_for_ts <- function(sst, precip, nfold = 5, size_train = 60, size_test = 14, s
   #make sure that nrow(data) %% nfold == 0
   #AND initialwindow+horizon == nrow(data)/nfold
   #TODO read about standardisation ?glmnet()
+  
+}
+
+############ Fit full models ###################################################
+fit_full_fused <- function(model_name) {
+  model_path <- paste0("results/CV-fused/", model_name, "/")
+  path_config <- paste0("code/R/fused-lasso/", model_name, "/config-", model_name, ".yml")
+  conf <- config::get(file = path_config)
+  sst_path <- conf$features_cv_path
+  precip_path <- conf$target_cv_path
+  
+  standardize_response <- conf$standardize_response
+  standardize_features <- conf$standardize_features
+  
+  sst_cv <- readRDS(sst_path)
+  precip_cv <- readRDS(precip_path)
+  
+  if(standardize_response == TRUE) {
+    precip_cv <- custom_stand(precip_cv)
+  }
+  
+  if(conf$small) {
+    g <- readRDS("data/processed/small_graph_sst.rds")
+  } 
+  if(!conf$small) {
+    g <- readRDS("data/processed/graph_sst.rds")
+  }
+  
+  full_mod <- fusedlasso(y = precip_cv, X = sst_cv, graph = g,
+                         verbose = TRUE, maxsteps = conf$maxsteps)
+  
+  saveRDS(full_mod, paste0(model_path, "full-model.rds"))
   
 }
 
@@ -1516,7 +1474,13 @@ plot_coef_maps_fused <- function(model_list, err_mat, save_to,
                                            standardize_features,
                                            ids,
                                            drop_out)
-    saveRDS(p, paste0(save_to, "/coef-plots/", "coef-plot-fold-", i,".rds"))
+    if(drop_out == FALSE) {
+      saveRDS(p, paste0(save_to, "/coef-plots/", "coef-plot-fold-", i,".rds"))
+    }
+    if(drop_out == TRUE) {
+      saveRDS(p, paste0(save_to, "/coef-plots/", "coef-plot-drop-out-fold-", i,".rds"))
+      
+    }
   }
 }
 
@@ -1524,11 +1488,11 @@ plot_cv_fused <- function(model_name) {
   
   model_path <- paste0("results/CV-fused/", model_name, "/")
   path_config <- paste0("code/R/fused-lasso/", model_name, "/config-", model_name, ".yml")
-  cons <- config::get(file = path_config)
+  conf <- config::get(file = path_config)
   
-  sst_path <- cons$features_cv_path
-  precip_path <- cons$target_cv_path
-  standardize_features <- cons$standardize_features
+  sst_path <- conf$features_cv_path
+  precip_path <- conf$target_cv_path
+  standardize_features <- conf$standardize_features
   
   sst_cv <- readRDS(sst_path)
   precip_cv <- readRDS(precip_path)
@@ -1540,25 +1504,25 @@ plot_cv_fused <- function(model_name) {
   model_list <- load_models(paste0(model_path, "fold-models"))
   
   plot_all_fold_error_fused(model_list, err_mat, save_to = model_path)
-  
+  print("finished error plots")
   plot_predictions_best_l_fused(err_mat = err_mat, model_list = model_list,
                                 ids = ids, features = sst_cv,
                                 target = precip_cv, save_to = model_path,
                                 standardize_features = standardize_features)
-  
+  print("finished prediction plots")
   plot_coef_maps_fused(model_list, err_mat, save_to = model_path,
                        features = sst_cv,
                        target = precip_cv,
                        standardize_features = standardize_features,
                        ids = ids,
                        drop_out  = FALSE)
-  
   plot_coef_maps_fused(model_list, err_mat, save_to = model_path,
                        features = sst_cv,
                        target = precip_cv,
                        standardize_features = standardize_features,
                        ids = ids,
                        drop_out  = TRUE)
+  print("finished coefficient plots")
 }
 
 # MISC ********************************************************************#####

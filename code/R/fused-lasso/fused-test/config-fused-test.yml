@@ -9,6 +9,7 @@ default:
   size_test:  14
   small:  TRUE
   model:  "fused"
+  parallelize: TRUE
   maxsteps:  10
   gamma:  0
   standardize_response:  TRUE
