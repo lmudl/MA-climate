@@ -7,6 +7,6 @@ library(genlasso)
 #library(dplyr)
 source("code/R/helper-functions.R")
 
-model_name <- "small-fused-1k"
+model_name <- "small-fused-1k-gamma-01"
 
 full_mod <- fit_full_fused(model_name)

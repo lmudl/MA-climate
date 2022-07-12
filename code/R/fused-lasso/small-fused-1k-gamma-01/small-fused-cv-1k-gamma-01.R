@@ -1,40 +1,39 @@
-# fused cv-full
-# fused lasso test with new cv method
-getwd() # is MA-climate on the shell 
-# but we could add a check here
+path_config <- "code/R/fused-lasso/small-fused-1k-gamma-01/config-small-fused-1k-gamma-01.yml"
+conf <- config::get(file = path_config)
 # setwd("Repos/MA-climate/")
 source("code/R/helper-functions.R")
 
 # load packages
-# requiredPackages = c('raster','igraph','glmnet', 'caret')
-# for(p in requiredPackages){
-#   if(!require(p,character.only = TRUE)) install.packages(p)
-#   library(p,character.only = TRUE)
-# }
 library(sp)
 library(raster)
 library(igraph)
 library(genlasso)
-#library(caret)
-train_max <- 1:370
-maxsteps <- 1000
 
-# load data sst
-sst <- brick("data/interim/sst/ersst_setreftime.nc", var = "sst")
-ext <- extent(-180,0,-50,40)
-sst <- crop(sst,ext)
-# create igraph object
-g <- igraph_from_raster(sst)
-rm(sst)
+# load data
+features <- readRDS(conf$features_cv_path)
+targets <- readRDS(conf$target_cv_path)
 
-small_sst_cv <- readRDS("data/processed/small_sst_cv.rds")
-precip_cv <- readRDS("data/processed/precip_cv.rds")
-# drop intercept
-precip_cv <- scale(precip_cv, center = TRUE, scale = FALSE)
+# load graph
+if(conf$small) {
+  g <- readRDS("data/processed/small_graph_sst.rds")
+} 
+if(!conf$small) {
+  g <- readRDS("data/processed/graph_sst.rds")
+}
 
-err <- cv_for_ts(small_sst_cv, precip_cv, nfold=5, size_train=60, size_test=14, 
-                 save_folder="small-fused-cv-1k-gamma-01",
-                 model = "fused", graph = g, maxsteps = maxsteps,
-                 gamma=0.1, standardize_response = TRUE)
-
-
+cv_for_ts(sst = features, 
+          precip = targets, 
+          nfold = conf$nfold, 
+          size_train = conf$size_train,
+          size_test = conf$size_test,
+          save_folder = conf$save_folder,
+          model = conf$model,
+          parallelize = conf$parallelize,
+          graph = g,
+          maxsteps = conf$maxsteps,
+          include_ts_vars = conf$include_ts_vars,
+          diff_features = conf$diff_features,
+          des_features = conf$des_features,
+          standardize_features = conf$standardize_features, 
+          standardize_response = conf$standardize_response,
+          gamma = conf$gamma)

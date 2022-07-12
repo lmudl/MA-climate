@@ -156,5 +156,17 @@ pred_plot_list <- list(pred_plot_1,pred_plot_2,pred_plot_3,pred_plot_4,pred_plot
 pred_plot_1 + pred_plot_2 + pred_plot_3 + pred_plot_4 +
   pred_plot_5
 ```
+```{r}
+pred_plot_full <- readRDS(paste0(path_to_model_folder, "pred-plots/pred-plot-full.rds"))
+```
 
+```{r}
+coef_full <- readRDS(paste0(path_to_model_folder, "coef-plots/coef-plot-full.rds"))
+coef_full
+```
+```{r}
+coef_full_drop <- readRDS(paste0(path_to_model_folder, "coef-plots/coef-plot-drop-out-full.rds"))
+coef_full_drop
+
+```
 

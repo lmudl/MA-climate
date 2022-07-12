@@ -1027,25 +1027,54 @@ cv_for_ts <- function(sst, precip, nfold = 5, size_train = 60, size_test = 14, s
   #TODO read about standardisation ?glmnet()
   
 }
+################# get best lambda fused ########################################
+get_pr <- function(x,y, pred_seq) {
+  ll <- loess(y~x)
+  pr <- predict(ll, newdata = pred_seq, span = 0.05)
+  pr
+  return(pr)
+}
 
-############ Fit full models ###################################################
+get_best_lambda_fused <- function(model_name) {
+  err_line_plot <- readRDS(paste0("results/CV-fused/", model_name,"/err-mat-plots/err-line-plot.rds"))
+  c <- ggplot_build(err_line_plot)
+  dat <- c$data
+  df <- dat[[1]]
+  df %>% group_by(group) %>% summarise(xmin = min(x), xmax = max(x)) -> dx 
+  common_range <- c(max(dx$xmin), min(dx$xmax))
+  pred_seq <- seq(common_range[1], common_range[2], length.out = 1000)
+  newdf <- df %>% group_by(group) %>% mutate(k = get_pr(x,y, pred_seq=pred_seq), lambdas = pred_seq)
+  v_df <- newdf  %>% group_by(lambdas) %>% mutate(mm = mean(k))
+  log_lambda_min <- v_df$lambdas[which.min(v_df$mm)]
+  plt <- ggplot() +
+    geom_line(data = newdf, aes(x, y, color = factor(group))) +
+    geom_line(data = v_df, aes(lambdas, mm)) +
+    ylab("MSE") + 
+    xlab(expression("log" ~ lambda))
+  res_list <- list(lambda_min = exp(log_lambda_min), err_plot = plt)
+  saveRDS(res_list, paste0("results/CV-fused/", model_name, "/best-lambda-res.rds"))
+  return(res_list)
+}
+
+
+
+############ Fit/ Plot full models ###################################################
 fit_full_fused <- function(model_name) {
   model_path <- paste0("results/CV-fused/", model_name, "/")
   path_config <- paste0("code/R/fused-lasso/", model_name, "/config-", model_name, ".yml")
   conf <- config::get(file = path_config)
-  sst_path <- conf$features_cv_path
-  precip_path <- conf$target_cv_path
+  sst_cv_path <- conf$features_cv_path
+  precip_cv_path <- conf$target_cv_path
   
   standardize_response <- conf$standardize_response
   standardize_features <- conf$standardize_features
   
-  sst_cv <- readRDS(sst_path)
-  precip_cv <- readRDS(precip_path)
+  sst_cv <- readRDS(sst_cv_path)
+  precip_cv <- readRDS(precip_cv_path)
   
   if(standardize_response == TRUE) {
     precip_cv <- custom_stand(precip_cv)
   }
-  
   if(conf$small) {
     g <- readRDS("data/processed/small_graph_sst.rds")
   } 
@@ -1058,9 +1087,111 @@ fit_full_fused <- function(model_name) {
   
   saveRDS(full_mod, paste0(model_path, "full-model.rds"))
   
+  return(full_mod)
+  
 }
 
-############ Plotting the CV-results ###########
+check_and_iterate_fused <- function(model_name){
+  model_path <- paste0("results/CV-fused/", model_name, "/")
+  path_config <- paste0("code/R/fused-lasso/", model_name, "/config-", model_name, ".yml")
+  conf <- config::get(file = path_config)
+  
+  full_model <- readRDS(paste0(model_path, "full-model.rds"))
+  best_l <- readRDS(paste0(model_path, "best-lambda-res.rds"))
+  best_l <- best_l$lambda_min
+  
+  if(best_l < min(full_model$lambda) & !(best_l > max(full_model$lambda))) {
+    print(paste("iterate full model", conf$maxsteps, " more"))
+    full_model <- iterate(full_model, moresteps = conf$maxsteps,
+                          minlam = best_l, verbose = TRUE)
+    attr(full_model, "iterated") <- TRUE
+    saveRDS(full_model, paste0(model_path, "full-model.rds"))
+  }
+  else {
+    print("no iteration needed")
+  }
+}
+
+plot_fused_full <- function(model_name) {
+  model_path <- paste0("results/CV-fused/", model_name, "/")
+  full_model <- readRDS(paste0(model_path, "full-model.rds"))
+  path_config <- paste0("code/R/fused-lasso/", model_name, "/config-", model_name, ".yml")
+  conf <- config::get(file = path_config)
+  
+  sst_eval_path <- conf$features_eval_path
+  precip_eval_path <- conf$target_eval_path
+  
+  sst_eval <- readRDS(sst_eval_path)
+  precip_eval <- readRDS(precip_eval_path)
+  
+  standardize_response <- conf$standardize_response
+  preds <- predict.genlasso(full_model, Xnew = sst_eval) 
+  dim(preds$fit)
+  
+  if(standardize_response == TRUE) {
+    precip_cv_path <- conf$target_cv_path
+    precip_cv <- readRDS(precip_cv_path)
+    sdn_y_train <- sdN(precip_cv)
+    mean_y_train <- mean(precip_cv)
+    preds$fit <- apply(preds$fit, 2, function(x)  x*sdn_y_train + mean_y_train)
+  }
+  # TODO
+  # Standardize_features
+  # diff
+  # des
+  # time vars
+  errors <- apply(preds$fit, 2, function(x) comp_mse(x, precip_eval))
+  df <- data.frame(errors = errors, lambdas = log(preds$lambda))
+  err_line_plot_full <- ggplot(df, aes(x=lambdas, y=errors)) + 
+    ylab(paste("MSE full model")) +
+    xlab(expression("log" ~ lambda)) +
+    geom_point()
+  saveRDS(err_line_plot_full, paste0(model_path,"err-mat-plots/error-line-plot-full.rds"))
+  
+  # plot predictions best l
+  best_l <- readRDS(paste0(model_path, "best-lambda-res.rds"))
+  best_l <- best_l$lambda_min
+  
+  preds_bl <- predict.genlasso(full_model, Xnew = sst_eval, lambda=best_l)
+  if(standardize_response == TRUE) {
+    preds_bl$fit <- preds_bl$fit*sdn_y_train + mean_y_train
+  }
+  pnames <- names(precip_eval)
+  ids <- as.integer(sub("X", "", pnames))
+  plot_df <- data.frame(targets = precip_eval, ids = ids, predictions = c(preds_bl$fit))
+  pred_plt <- plot_predictions(plot_df)
+  attr(pred_plt, "mse") <- comp_mse(precip_eval, preds_bl$fit)
+  saveRDS(pred_plt, paste0(model_path, "pred-plots/pred-plot-full.rds"))
+  
+  h <- which(full_model$lambda <  best_l)
+  plot_coef_map_full_fused(full_model, h, sst_cv, drop_out==TRUE, model_path)
+  plot_coef_map_full_fused(full_model, h, sst_cv, drop_out==FALSE, model_path)
+  
+}
+
+plot_coef_map_full_fused <- function(full_model, h, sst_cv, drop_out, save_to) {
+  all_coefs <- full_model$beta[,h]
+  nonzero_coefs <- all_coefs != 0
+  cnames <- colnames(sst_cv)
+  nonzero_coef_names <- cnames[nonzero_coefs]
+  num_coef_names <- coef_names_to_numeric(nonzero_coef_names)
+  coef_mat <- cbind(num_coef_names, all_coefs[nonzero_coefs])
+  if(drop_out == TRUE) {
+    nz <- round(all_coefs[nonzero_coefs],6)
+    b <- boxplot(nz)
+    out_val <- unique(b$out)
+    out_id <- nz %in% out_val
+    coef_mat <- coef_mat[!out_id,]
+  }
+  plt <- plot_nonzero_coefficients(coef_mat)
+  if(drop_out == FALSE) saveRDS(plt, paste0(save_to, "/coef-plots/", "coef-plot-full.rds"))
+  if(drop_out == TRUE) saveRDS(plt, paste0(save_to, "/coef-plots/", "coef-plot-drop-out-full.rds"))
+  
+}
+
+
+
+############ Plotting the CV-results ###########################################
 
 
 plot_and_save_cv_results <- function(error_matrix, number_of_folds,
@@ -1504,6 +1635,7 @@ plot_cv_fused <- function(model_name) {
   model_list <- load_models(paste0(model_path, "fold-models"))
   
   plot_all_fold_error_fused(model_list, err_mat, save_to = model_path)
+  plot_errline_gg_fused(model_list, err_mat, save_to = model_path)
   print("finished error plots")
   plot_predictions_best_l_fused(err_mat = err_mat, model_list = model_list,
                                 ids = ids, features = sst_cv,
