@@ -973,9 +973,11 @@ cv_for_ts <- function(sst, precip, nfold = 5, size_train = 60, size_test = 14, s
   # predict on validation set and report error final
   # error final can then be compared among diff models
   #for(i in 1:length(lambda_vec)) {
-  dir.create(paste0("results/CV-lasso/", save_folder))
-  dir.create(paste0("results/CV-lasso/", save_folder, "/fold-models"))
+  # dir.create(paste0("results/CV-lasso/", save_folder))
+  # dir.create(paste0("results/CV-lasso/", save_folder, "/fold-models"))
   if(model == "lasso") {
+    dir.create(paste0("results/CV-lasso/", save_folder))
+    dir.create(paste0("results/CV-lasso/", save_folder, "/fold-models"))
     err_mat <- cv_lasso(sst, precip, index_list, save_folder, include_ts_vars, stand,
                         diff_features, des_features,
                         standardize_features = standardize_features,
@@ -992,6 +994,8 @@ cv_for_ts <- function(sst, precip, nfold = 5, size_train = 60, size_test = 14, s
     return(err_mat)
   }
   if(model == "fused") {
+    dir.create(paste0("results/CV-fused/", save_folder))
+    dir.create(paste0("results/CV-fused/", save_folder, "/fold-models"))
     err_mat <- cv_fused_lasso(sst = sst, precip = precip, index_list = index_list, 
                               save_folder = save_folder,  graph = graph, 
                               maxsteps = maxsteps, stand=stand,
