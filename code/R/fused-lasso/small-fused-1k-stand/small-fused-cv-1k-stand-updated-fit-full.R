@@ -12,7 +12,7 @@ library(genlasso)
 
 # path to model and modelname
 model_name <- "small-fused-cv-1k-stand-updated"
-save_to <- paste0("results/CV-lasso/", model_name, "/")
+save_to <- paste0("results/CV-fused/", model_name, "/")
 
 # settings
 standardize_features <- TRUE

@@ -1087,7 +1087,8 @@ fit_full_fused <- function(model_name) {
   }
   
   full_mod <- fusedlasso(y = precip_cv, X = sst_cv, graph = g,
-                         verbose = TRUE, maxsteps = conf$maxsteps)
+                         verbose = TRUE, maxsteps = conf$maxsteps,
+                         gamma = conf$gamma)
   
   saveRDS(full_mod, paste0(model_path, "full-model.rds"))
   
@@ -1156,6 +1157,11 @@ plot_fused_full <- function(model_name) {
   best_l <- readRDS(paste0(model_path, "best-lambda-res.rds"))
   best_l <- best_l$lambda_min
   
+  if(best_l < min(full_model$lambda)) {
+    print("current min lambda is larger than CV min lambda, choose current min lambda")
+    best_l <- min(full_model$lambda)
+  }
+  
   preds_bl <- predict.genlasso(full_model, Xnew = sst_eval, lambda=best_l)
   if(standardize_response == TRUE) {
     preds_bl$fit <- preds_bl$fit*sdn_y_train + mean_y_train
@@ -1168,8 +1174,8 @@ plot_fused_full <- function(model_name) {
   saveRDS(pred_plt, paste0(model_path, "pred-plots/pred-plot-full.rds"))
   
   h <- which(full_model$lambda <  best_l)
-  plot_coef_map_full_fused(full_model, h, sst_cv, drop_out==TRUE, model_path)
-  plot_coef_map_full_fused(full_model, h, sst_cv, drop_out==FALSE, model_path)
+  plot_coef_map_full_fused(full_model, h, sst_cv, drop_out=TRUE, model_path)
+  plot_coef_map_full_fused(full_model, h, sst_cv, drop_out=FALSE, model_path)
   
 }
 
@@ -1180,12 +1186,11 @@ plot_coef_map_full_fused <- function(full_model, h, sst_cv, drop_out, save_to) {
   nonzero_coef_names <- cnames[nonzero_coefs]
   num_coef_names <- coef_names_to_numeric(nonzero_coef_names)
   coef_mat <- cbind(num_coef_names, all_coefs[nonzero_coefs])
-  if(drop_out == TRUE) {
+  if((drop_out == TRUE) & (sum(nonzero_coefs)!=0) ) {
     nz <- round(all_coefs[nonzero_coefs],6)
     b <- boxplot(nz)
     out_val <- unique(b$out)
     out_id <- nz %in% out_val
-    coef_mat <- coef_mat[!out_id,]
   }
   plt <- plot_nonzero_coefficients(coef_mat)
   if(drop_out == FALSE) saveRDS(plt, paste0(save_to, "/coef-plots/", "coef-plot-full.rds"))
@@ -1557,7 +1562,6 @@ plot_errline_gg_fused <- function(model_list, err_mat, save_to) {
     geom_point(aes(color=factor(fold))) +
     ylab("MSE") + 
     xlab(expression("log" ~ lambda))
-  dev.off()
   saveRDS(p, paste0(save_to, "err-mat-plots/err-line-plot.rds"))
   
   #return(p)
@@ -1583,7 +1587,7 @@ plot_nonzero_coef_from_fold_fused <- function(model, fold_nr, err_mat, features,
   nonzero_coef_names <- cnames[nonzero_coefs]
   num_coef_names <- coef_names_to_numeric(nonzero_coef_names)
   coef_mat <- cbind(num_coef_names, all_coefs[nonzero_coefs])
-  if(drop_out == TRUE) {
+  if((drop_out == TRUE) & (sum(nonzero_coefs)!=0) ) {
     nz <- round(all_coefs[nonzero_coefs],6)
     b <- boxplot(nz)
     out_val <- unique(b$out)

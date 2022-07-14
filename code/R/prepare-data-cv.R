@@ -100,6 +100,7 @@ graph_sst <- igraph_from_raster(sst)
 saveRDS(graph_sst, paste0(save_to, "graph_sst.rds"))
 
 ext <- extent(-180,0,-50,40)
+# possibility ext <- extent(-180,-6,-50, 40)
 small_sst <- crop(sst,ext)
 small_graph_sst <- igraph_from_raster(small_sst)
 saveRDS(small_graph_sst, paste0(save_to, "small_graph_sst.rds"))

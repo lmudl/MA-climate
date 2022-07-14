@@ -9,3 +9,4 @@ source("code/R/helper-functions.R")
 model_name <- "small-fused-1k-gamma-01"
 
 plot_cv_fused(model_name)
+get_best_lambda_fused(model_name)
