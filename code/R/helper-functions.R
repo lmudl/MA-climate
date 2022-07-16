@@ -737,7 +737,7 @@ cut_data <- function(df, ndiff) {
 
 cv_lasso <- function(sst, precip, index_list, save_folder, include_ts_vars, stand,
                      diff_features, des_features, standardize_features,
-                     standardize_response, diff_n) {
+                     standardize_response, diff_n, stand_then_diff) {
   # dir.create(paste0("results/CV-lasso/", save_folder))
   # dir.create(paste0("results/CV-lasso/", save_folder, "/fold-models"))
   lambda_vec <- get_lambda_values(sst, precip)
@@ -751,6 +751,19 @@ cv_lasso <- function(sst, precip, index_list, save_folder, include_ts_vars, stan
     y_train <- precip[id_train]
     x_test <- sst[id_test,]
     y_test <- precip[id_test]
+    
+    if(stand_then_diff == TRUE) {
+      x_train <- standardize_train(x_train)
+      x_test <- standardize_test(x_train, x_test)
+      
+      max_ndiffs <- diff_n[2]
+      x_train <- apply(x_train, 2, function(x) diff(x, lag=1, difference=max_ndiffs))
+      y_train <- y_train[-c(seq(max_ndiffs))]
+      
+      x_test <- apply(x_test, 2, function(x) diff(x, lag=1, difference=max_ndiffs))
+      y_test <- y_test[-c(seq(max_ndiffs))]
+      print("differentiated features")
+    }
     
     if(include_ts_vars == TRUE) {
       x_train <- add_ts_vars(x_train)
@@ -953,7 +966,8 @@ cv_for_ts <- function(sst, precip, nfold = 5, size_train = 60, size_test = 14, s
                       model = "lasso", graph = NULL, maxsteps=100, include_ts_vars=FALSE,
                       stand=FALSE, diff_features=FALSE, des_features=FALSE,
                       standardize_features=FALSE, standardize_response=FALSE,
-                      gamma=0, parallelize = FALSE, diff_n=FALSE) {
+                      gamma=0, parallelize = FALSE, diff_n=FALSE,
+                      stand_then_diff = FALSE) {
   a <- Sys.time()
   if(model == "fused" & is.null(graph)){
     stop("for the fused LASSO a graph object is needed")
@@ -993,7 +1007,8 @@ cv_for_ts <- function(sst, precip, nfold = 5, size_train = 60, size_test = 14, s
     err_mat <- cv_lasso(sst, precip, index_list, save_folder, include_ts_vars, stand,
                         diff_features, des_features,
                         standardize_features = standardize_features,
-                        standardize_response = standardize_response, diff_n = diff_n)
+                        standardize_response = standardize_response, diff_n = diff_n,
+                        stand_then_diff = stand_then_diff)
     print("finished fitting")
     index_list_path <- paste0("results/CV-lasso/", save_folder, "/index-list.rds")
     # lambda_vec_path <- paste0("results/CV-lasso/", save_folder, "/lambda-vec.rds")
@@ -1395,7 +1410,8 @@ plot_predictions_best_l <- function(err_mat, model_list, ids, features, target,
                                     des_features=FALSE,
                                     standardize_features = FALSE,
                                     standardize_response = FALSE,
-                                    diff_n = FALSE) {
+                                    diff_n = FALSE,
+                                    stand_then_diff = FALSE) {
   dir.create(paste0(save_to,"/pred-plots/"))
   for(i in seq(length(model_list))) {
     ids_i_tr <- ids$train[[i]]
@@ -1404,6 +1420,20 @@ plot_predictions_best_l <- function(err_mat, model_list, ids, features, target,
     l_min <- which.min(err_mat[,i])
     features_i <- features[ids_i,]
     target_i <- target[ids_i]
+    
+    if(stand_then_diff == TRUE) {
+      features_i_tr <- features[ids_i_tr,]
+      features_i_tr <- standardize_train(features_i_tr)
+      features_i <- standardize_test(features_i_tr, features_i)
+      max_ndiffs <- diff_n[2]
+      features_i <- apply(features_i, 2, function(x) diff(x, lag=1, difference=max_ndiffs))
+      #target_i <- diff(target_i, max_ndiffs)
+      target_i <- target_i[-c(seq(max_ndiffs))]
+      ids_i <- ids_i[-c(seq(max_ndiffs))]
+      preds <- c(predict(model_i, newx = data.matrix(features_i), s=lambdas[l_min],
+                         standardize = standardize))
+      plot_df <- data.frame(targets = target_i, predictions = preds, ids = ids_i)
+    }
     if(include_ts_vars==TRUE) {
       features_i <- add_ts_vars(features_i)
       keep_vec <- complete.cases(features_i)
@@ -1453,11 +1483,15 @@ plot_predictions_best_l <- function(err_mat, model_list, ids, features, target,
       features_i <- apply(features_i, 2, function(x) diff(x, lag=1, difference=max_ndiffs))
       #target_i <- diff(target_i, max_ndiffs)
       target_i <- target_i[-c(seq(max_ndiffs))]
-      preds <- c(predict(model_i, newx = data.matrix(features_i), s=lambdas[l_min],
-                         standardize = standardize))
       ids_i <- ids_i[-c(seq(max_ndiffs))]
-      #standardize=standardize))
-      plot_df <- data.frame(targets = target_i, predictions = preds, ids = ids_i)
+      
+      if(!standardize_features){
+        preds <- c(predict(model_i, newx = data.matrix(features_i), s=lambdas[l_min],
+                           standardize = standardize))
+        ids_i <- ids_i[-c(seq(max_ndiffs))]
+        #standardize=standardize))
+        plot_df <- data.frame(targets = target_i, predictions = preds, ids = ids_i)
+      }
     }
     
     
@@ -1470,7 +1504,6 @@ plot_predictions_best_l <- function(err_mat, model_list, ids, features, target,
       plot_df <- data.frame(targets = target_i, predictions = preds, ids = ids_i)
     }
     if(standardize_response == TRUE) {
-      target_i <- target[ids_i]
       mean_target_i <- mean(target_i)
       sdn_target_i <- sdN(target_i)
       y_train <- scale(target_i, center=mean_target_i,
@@ -1480,14 +1513,20 @@ plot_predictions_best_l <- function(err_mat, model_list, ids, features, target,
     }
     if(standardize_features == TRUE) {
       features_i_tr <- features[ids_i_tr,]
-
-      mean_features_i_tr <- apply(features_i_tr,2, mean)
-      sdn_features_i_tr <- apply(features_i_tr,2,sdN)
-      features_i <- scale(features_i, center=mean_features_i_tr,
-                          scale=sdn_features_i_tr)
-      nonzero_sd_cols <- complete.cases(t(features_i))
-      features_i <- features_i[,nonzero_sd_cols]
-      # drop variables with 0 variance
+      
+      if(diff_n[1] == TRUE) {
+        features_i_tr <- apply(features_i_tr, 2, function(x) diff(x, lag=1, difference=max_ndiffs))
+      }
+      features_i_tr <- standardize_train(features_i_tr)
+      features_i <- standardize_test(features_i_tr, features_i)
+      
+      # mean_features_i_tr <- apply(features_i_tr,2, mean)
+      # sdn_features_i_tr <- apply(features_i_tr,2,sdN)
+      # features_i <- scale(features_i, center=mean_features_i_tr,
+      #                     scale=sdn_features_i_tr)
+      # nonzero_sd_cols <- complete.cases(t(features_i))
+      # features_i <- features_i[,nonzero_sd_cols]
+      # # drop variables with 0 variance
       print("standardized features")
       preds <- c(predict(model_i, newx = data.matrix(features_i), s=lambdas[l_min],
                          standardize = standardize))
@@ -1498,7 +1537,8 @@ plot_predictions_best_l <- function(err_mat, model_list, ids, features, target,
     }
     
     
-    if(sum(include_ts_vars,diff_features,diff_n[1], des_features, standardize_features)==0) {
+    if(sum(include_ts_vars,diff_features,diff_n[1], des_features, standardize_features,
+           stand_then_diff)==0) {
       preds <- c(predict(model_i, newx = features[ids_i,], s=lambdas[l_min],
                          standardize=standardize))
       if(standardize_response == TRUE) {

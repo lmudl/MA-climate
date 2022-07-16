@@ -11,7 +11,7 @@ source("code/R/helper-functions.R")
 # plot predictions etc
 
 # path to and save_to
-save_to <- "cv-lasso-diff-1"
+save_to <- "cv-lasso-stand-then-diff-1"
 full_save_to <- paste0("results/CV-lasso/",save_to,"/")
 
 # load err mat, lambdas and get lambda min
@@ -28,6 +28,9 @@ precip_cv <- readRDS("data/processed/precip_cv.rds")
 
 sst_eval <- readRDS("data/processed/sst_eval.rds")
 precip_eval <- readRDS("data/processed/precip_eval.rds")
+
+sst_cv <- standardize_train(sst_cv)
+sst_eval <- standardize_test(sst_cv, sst_eval)
 
 # prepare with ndiffs
 # ndiffs <- apply(sst_cv, 2, unitroot_ndiffs)
@@ -63,6 +66,8 @@ sst_eval <- apply(sst_eval, 2, function(x) diff(x, lag=1, difference=max_ndiffs)
 precip_eval <- precip_eval[-c(seq(max_ndiffs))]
 
 
+
+
 # fit full model
 # l_min = exp(0)
 # take smallest lambda that is in 1se of lambda min
@@ -83,16 +88,4 @@ saveRDS(plt, paste0(full_save_to,"pred-plots/pred-plot-full.rds"))
 
 # get mse on evaluation data set
 comp_mse(preds, precip_eval) # 
-
-# TESTING
-fm <- glmnet(sst_cv, precip_cv, standardize = FALSE, lambda = lambdas)
-preds <- predict(fm, newx = sst_eval)
-err <- apply(preds, 2, function(x) comp_mse(x, precip_eval))
-length(err)
-plot(err)
-df <- data.frame(predictions = preds[,40], targets = precip_eval, ids=ids_cheat)
-plot_predictions(df)
-which.min(err)
-err[40]
-l_min_id
 
