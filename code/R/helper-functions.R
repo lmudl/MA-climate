@@ -737,7 +737,7 @@ cut_data <- function(df, ndiff) {
 
 cv_lasso <- function(sst, precip, index_list, save_folder, include_ts_vars, stand,
                      diff_features, des_features, standardize_features,
-                     standardize_response) {
+                     standardize_response, diff_n) {
   # dir.create(paste0("results/CV-lasso/", save_folder))
   # dir.create(paste0("results/CV-lasso/", save_folder, "/fold-models"))
   lambda_vec <- get_lambda_values(sst, precip)
@@ -832,9 +832,21 @@ cv_lasso <- function(sst, precip, index_list, save_folder, include_ts_vars, stan
       #   return(df)
       # }
       # 
-      
-      
     }
+    if(diff_n[1] == TRUE) {
+      # ndiffs <- apply(features_i, 2, unitroot_ndiffs)
+      # max_ndiffs <- max(ndiffs)
+      max_ndiffs <- diff_n[2]
+      x_train <- apply(x_train, 2, function(x) diff(x, lag=1, difference=max_ndiffs))
+      y_train <- y_train[-c(seq(max_ndiffs))]
+      
+      x_test <- apply(x_test, 2, function(x) diff(x, lag=1, difference=max_ndiffs))
+      y_test <- y_test[-c(seq(max_ndiffs))]
+      print("differentiated features")
+    }
+    
+    
+    
     if(des_features == TRUE) {
       #stop("under construction deseasonalised")
       # x_train <- apply(x_train, 2, function(x) c(stl(ts(x, frequency=12), s.window = "periodic",
@@ -941,7 +953,7 @@ cv_for_ts <- function(sst, precip, nfold = 5, size_train = 60, size_test = 14, s
                       model = "lasso", graph = NULL, maxsteps=100, include_ts_vars=FALSE,
                       stand=FALSE, diff_features=FALSE, des_features=FALSE,
                       standardize_features=FALSE, standardize_response=FALSE,
-                      gamma=0, parallelize = FALSE) {
+                      gamma=0, parallelize = FALSE, diff_n=FALSE) {
   a <- Sys.time()
   if(model == "fused" & is.null(graph)){
     stop("for the fused LASSO a graph object is needed")
@@ -981,7 +993,7 @@ cv_for_ts <- function(sst, precip, nfold = 5, size_train = 60, size_test = 14, s
     err_mat <- cv_lasso(sst, precip, index_list, save_folder, include_ts_vars, stand,
                         diff_features, des_features,
                         standardize_features = standardize_features,
-                        standardize_response = standardize_response)
+                        standardize_response = standardize_response, diff_n = diff_n)
     print("finished fitting")
     index_list_path <- paste0("results/CV-lasso/", save_folder, "/index-list.rds")
     # lambda_vec_path <- paste0("results/CV-lasso/", save_folder, "/lambda-vec.rds")
@@ -1117,6 +1129,31 @@ check_and_iterate_fused <- function(model_name){
   }
 }
 
+### misc rndm ##################################################################
+standardize_train <- function(df_train) {
+  mean_vec <- apply(df_train, 2, mean)
+  sdn_vec <- apply(df_train, 2, sdN)
+  df_train <- scale(df_train, center = mean_vec,
+                    scale = sdn_vec)
+  nonzero_sd_cols <- complete.cases(t(df_train))
+  df_train <- df_train[, nonzero_sd_cols]
+  attr(df_train, "center") <- mean_vec
+  attr(df_train, "scale") <- sdn_vec
+  attr(df_train, "nonzero_sd_cols") <- nonzero_sd_cols
+  return(df_train)
+}
+
+standardize_test <- function(df_train_stand, df_test) {
+  mean_vec <- attr(df_train_stand, "center")
+  sdn_vec <- attr(df_train_stand, "scale")
+  df_test <- scale(df_test, center = mean_vec,
+                   scale = sdn_vec)
+  nonzero_sd_cols <- attr(df_train_stand, "nonzero_sd_cols")
+  df_test <- df_test[, nonzero_sd_cols]
+  return(df_test)
+}
+################################################################################
+
 plot_fused_full <- function(model_name) {
   model_path <- paste0("results/CV-fused/", model_name, "/")
   full_model <- readRDS(paste0(model_path, "full-model.rds"))
@@ -1129,10 +1166,21 @@ plot_fused_full <- function(model_name) {
   sst_eval <- readRDS(sst_eval_path)
   precip_eval <- readRDS(precip_eval_path)
   
-  standardize_response <- conf$standardize_response
+  # TODO
+  # Standardize_features
+  standardize_features <- conf$standardize_features
+  if(standardize_features == TRUE) {
+    sst_cv <- readRDS(conf$features_cv_path)
+    sst_cv <- standardize_train(sst_cv)
+    sst_eval <- standardize_test(sst_cv, sst_eval)
+  }
+  # diff
+  # des
+  # time vars
   preds <- predict.genlasso(full_model, Xnew = sst_eval) 
-  dim(preds$fit)
+  #dim(preds$fit)
   
+  standardize_response <- conf$standardize_response
   if(standardize_response == TRUE) {
     precip_cv_path <- conf$target_cv_path
     precip_cv <- readRDS(precip_cv_path)
@@ -1140,11 +1188,7 @@ plot_fused_full <- function(model_name) {
     mean_y_train <- mean(precip_cv)
     preds$fit <- apply(preds$fit, 2, function(x)  x*sdn_y_train + mean_y_train)
   }
-  # TODO
-  # Standardize_features
-  # diff
-  # des
-  # time vars
+  
   errors <- apply(preds$fit, 2, function(x) comp_mse(x, precip_eval))
   df <- data.frame(errors = errors, lambdas = log(preds$lambda))
   err_line_plot_full <- ggplot(df, aes(x=lambdas, y=errors)) + 
@@ -1350,16 +1394,17 @@ plot_predictions_best_l <- function(err_mat, model_list, ids, features, target,
                                     include_ts_vars=FALSE, diff_features=FALSE,
                                     des_features=FALSE,
                                     standardize_features = FALSE,
-                                    standardize_response = FALSE) {
+                                    standardize_response = FALSE,
+                                    diff_n = FALSE) {
   dir.create(paste0(save_to,"/pred-plots/"))
   for(i in seq(length(model_list))) {
     ids_i_tr <- ids$train[[i]]
     ids_i <- ids$test[[i]]
     model_i <- model_list[[i]]
     l_min <- which.min(err_mat[,i])
+    features_i <- features[ids_i,]
+    target_i <- target[ids_i]
     if(include_ts_vars==TRUE) {
-      features_i <- features[ids_i,]
-      target_i <- target[ids_i]
       features_i <- add_ts_vars(features_i)
       keep_vec <- complete.cases(features_i)
       features_i <- features_i[keep_vec,]
@@ -1371,8 +1416,6 @@ plot_predictions_best_l <- function(err_mat, model_list, ids, features, target,
       plot_df <- data.frame(targets = target_i, predictions = preds, ids = ids_i)
     }
     if(diff_features==TRUE) {
-      features_i <- features[ids_i,]
-      target_i <- target[ids_i]
       # ndiffs <- apply(features_i, 2, unitroot_ndiffs)
       # max_ndiffs <- max(ndiffs)
       max_ndiffs <- 1
@@ -1401,12 +1444,25 @@ plot_predictions_best_l <- function(err_mat, model_list, ids, features, target,
       
       # add here possibility to add 
       # seasonal and time information
-      
-      
     }
+    
+    if(diff_n[1] == TRUE) {
+      # ndiffs <- apply(features_i, 2, unitroot_ndiffs)
+      # max_ndiffs <- max(ndiffs)
+      max_ndiffs <- diff_n[2]
+      features_i <- apply(features_i, 2, function(x) diff(x, lag=1, difference=max_ndiffs))
+      #target_i <- diff(target_i, max_ndiffs)
+      target_i <- target_i[-c(seq(max_ndiffs))]
+      preds <- c(predict(model_i, newx = data.matrix(features_i), s=lambdas[l_min],
+                         standardize = standardize))
+      ids_i <- ids_i[-c(seq(max_ndiffs))]
+      #standardize=standardize))
+      plot_df <- data.frame(targets = target_i, predictions = preds, ids = ids_i)
+    }
+    
+    
+    
     if(des_features==TRUE) {
-      features_i <- features[ids_i,]
-      target_i <- target[ids_i]
       features_i <- apply(features_i, 2, function(x) c(stl(ts(x, frequency=12), s.window = "periodic",
                                                            robust = TRUE)$time.series[,"remainder"]))
       preds <- c(predict(model_i, newx = data.matrix(features_i), s=lambdas[l_min],
@@ -1424,8 +1480,7 @@ plot_predictions_best_l <- function(err_mat, model_list, ids, features, target,
     }
     if(standardize_features == TRUE) {
       features_i_tr <- features[ids_i_tr,]
-      features_i <- features[ids_i,]
-      
+
       mean_features_i_tr <- apply(features_i_tr,2, mean)
       sdn_features_i_tr <- apply(features_i_tr,2,sdN)
       features_i <- scale(features_i, center=mean_features_i_tr,
@@ -1443,7 +1498,7 @@ plot_predictions_best_l <- function(err_mat, model_list, ids, features, target,
     }
     
     
-    if(sum(include_ts_vars,diff_features, des_features, standardize_features)==0) {
+    if(sum(include_ts_vars,diff_features,diff_n[1], des_features, standardize_features)==0) {
       preds <- c(predict(model_i, newx = features[ids_i,], s=lambdas[l_min],
                          standardize=standardize))
       if(standardize_response == TRUE) {
@@ -1456,6 +1511,7 @@ plot_predictions_best_l <- function(err_mat, model_list, ids, features, target,
     saveRDS(plt, paste0(save_to, "/pred-plots/", "pred-plot-fold-", i,".rds"))
   }
 }
+
 
 plot_predictions <- function(plot_df) {
   p <- ggplot() + geom_line(data=plot_df, mapping= aes(x=ids, y=predictions, col = "red")) +
