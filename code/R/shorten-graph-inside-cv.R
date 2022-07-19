@@ -28,14 +28,17 @@ sst <- readRDS("data/processed/sst_cv.rds")
 f1_sst <- sst[ids$train$Training060,]
 mean_vec <- apply(f1_sst, 2, mean)
 sdn_vec <- apply(f1_sst, 2, sdN)
-stand_f1_sst <- scale(f1_sst, center = mean_vec,
-                      scale = sdn_vec)
-# stand_f1_sst <- standardize_train(f1_sst)
+# a_stand_f1_sst <- scale(f1_sst, center = mean_vec,
+#                       scale = sdn_vec)
+stand_f1_sst <- standardize_train(f1_sst)
+abs(dim(stand_f1_sst)[2] - dim(f1_sst)[2]) == sum((attr(stand_f1_sst, "scale")==0))
 
+zerostd <- which(attr(stand_f1_sst, "scale") == 0)
+g <- readRDS("data/processed/graph_sst.rds")
+g2 <- delete_vertices(g, zerostd)
 
-dim(f1_sst)
-dim(stand_f1_sst)
-
+vcount(g2) == ncol(stand_f1_sst)
+?ncol
 # we drop around 800 variables
 igraph_from_raster(f1_sst)
 debug(igraph_from_raster)
@@ -68,5 +71,9 @@ x_test <- standardize_test(x_train, x_test)
 is.na(attr(alt, "scale"))
 
 
+# 
+vcount(g)
+dim(sst)
 
+dim(stand_f1_sst)
      

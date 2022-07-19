@@ -40,10 +40,11 @@ cv_run_fused <- function(j, err_mat, nfold, sst, precip, index_list, save_folder
 
     x_train <- standardize_train(x_train)
     x_test <- standardize_test(x_train, x_test)
-    zerostd <- which(is.na(attr(x_train, "scale")))
-    g <- delete_vertices(g, zerostd)
-    
-    print("standardized features, cutted graph accordingly")
+    zerostd <- which(attr(x_train, "scale") == 0)
+    graph <- delete_vertices(graph, zerostd)
+    print(vcount(graph) == ncol(x_train))
+    print(ncol(x_train) == ncol(x_test))
+    print("standardized features, cutted graph nodes with zero variance")
   }
   if(standardize_response == TRUE) {
     mean_y_train <- mean(y_train)
