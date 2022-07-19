@@ -22,7 +22,7 @@ source("../code/R/helper-functions.R")
 # length(ids$test$Testing060)
 ```
 ```{r}
-path_to_model_folder <- "../results/CV-lasso/small-fused-cv-1k-gamma-01"
+path_to_model_folder <- "../results/CV-fused/small-fused-1k-gamma-05"
 ```
 
 ## Error plots
@@ -58,11 +58,11 @@ err_bars_plot <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-line-p
 
 
 ```{r err-fold-lasso-og, fig.cap="MSE of the CV for the different lambda values on the a log scale. The red dotted line shows the lambda for which minimum MSE was obtained."}
-p1 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-plot-fold-1.rds"))
-p2 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-plot-fold-2.rds"))
-p3 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-plot-fold-3.rds"))
-p4 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-plot-fold-4.rds"))
-p5 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-plot-fold-5.rds"))
+p1 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-plot-fold1.rds"))
+p2 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-plot-fold2.rds"))
+p3 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-plot-fold3.rds"))
+p4 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-plot-fold4.rds"))
+p5 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-plot-fold5.rds"))
 
 p1 + p2 + p3 + p4 + p5
 

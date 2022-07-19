@@ -31,19 +31,26 @@ cv_run_fused <- function(j, err_mat, nfold, sst, precip, index_list, save_folder
   #   print("standardized features")
   # }
   if(standardize_features == TRUE) {
-    mean_x_train <- apply(x_train,2, mean)
-    sdn_x_train <- apply(x_train,2,sdN)
-    x_train <- scale(x_train, center=mean_x_train,
-                     scale=sdn_x_train)
-    x_test <- scale(x_test, center=mean_x_train,
-                    scale=sdn_x_train)
-    print("standardized features")
+    # mean_x_train <- apply(x_train,2, mean)
+    # sdn_x_train <- apply(x_train,2,sdN)
+    # x_train <- scale(x_train, center=mean_x_train,
+    #                  scale=sdn_x_train)
+    # x_test <- scale(x_test, center=mean_x_train,
+    #                 scale=sdn_x_train)
+
+    x_train <- standardize_train(x_train)
+    x_test <- standardize_test(x_train, x_test)
+    zerostd <- which(is.na(attr(x_train, "scale")))
+    g <- delete_vertices(g, zerostd)
+    
+    print("standardized features, cutted graph accordingly")
   }
   if(standardize_response == TRUE) {
     mean_y_train <- mean(y_train)
     sdn_y_train <- sdN(y_train)
     y_train <- scale(y_train, center=mean_y_train, 
                      scale=sdn_y_train)
+    
     # y_test <- scale(y_test, center=mean_y_train, 
     #                 scale=sdn_y_train)
   }

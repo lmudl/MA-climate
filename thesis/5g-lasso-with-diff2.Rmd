@@ -1,4 +1,4 @@
-# Lasso with standardization updated
+# lasso with diff 2
 
 ```{r, echo = FALSE}
 knitr::opts_chunk$set(warning = FALSE, message = FALSE, echo = FALSE)
@@ -22,14 +22,16 @@ source("../code/R/helper-functions.R")
 # length(ids$test$Testing060)
 ```
 ```{r}
-path_to_model_folder <- "../results/CV-lasso/cv-lasso-standardize"
+#path_to_model_folder <- "../results/CV-lasso/cv-lasso-og-diff-with-ts-and-stand-maxdiff-2"
+path_to_model_folder <- "../results/CV-lasso/cv-lasso-diff-2"
+
 ```
 
 
-## Model
+## LASSO model with diff
 
-We fit a LASSO model on the precipitation and SST data.
-But in this case we standardize in the glmnet function.
+LASSO model,
+SST data gets differentiated twice to obtain stationary features.
 
 ## Error plots
 
@@ -53,19 +55,13 @@ lambdas <- readRDS(paste0(path_to_model_folder, "/lambda-vec.rds"))
 ```
 
 
-```{r , fig.cap="Mean squared error of the 5-fold blocked cross validation for a range of lambda values on the log scale. The points in the middle represent the average MSE for the respective lambda, the errorbars give the MSE +/- one standard deviation. The dotted line shows the lambda for which minimum MSE was obtained."}
+```{r err-bar-plot-lasso-diff, fig.cap="Mean squared error of the 5-fold blocked cross validation for a range of lambda values on the log scale. The points in the middle represent the average MSE for the respective lambda, the errorbars give the MSE +/- one standard deviation. The dotted line shows the lambda for which minimum MSE was obtained."}
 err_bars_plot <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-bars-plot.rds"))
 err_bars_plot
 a <- ggplot_build(err_bars_plot)
 ```
-\@ref(fig:err-bar-plot-lasso-stand) shows the results from the 5 fold-CV plotted for each lambda.
-The lambdas are given on the log scale.
-The upper and lower bars indicate mean MSE +/- one standard deviation from the
-mean MSE. 
-For values of log $\lambda$ smaller than 0 the differences in MSE become huge.
-
 ```{r}
-#err_bars_plot + xlim(0,3) + ylim(-3000,3000)
+err_bars_plot + ylim(-10000,10000)
 ```
 
 
@@ -87,7 +83,7 @@ For values of log $\lambda$ smaller than 0 the differences in MSE become huge.
 
 
 
-```{r err-fold-lasso-stand, fig.cap="MSE of the CV for the different lambda values on the a log scale. The red dotted line shows the lambda for which minimum MSE was obtained."}
+```{r err-fold-lasso-diff, fig.cap="MSE of the CV for the different lambda values on the a log scale. The red dotted line shows the lambda for which minimum MSE was obtained."}
 p1 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-plot-fold-1.rds"))
 p2 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-plot-fold-2.rds"))
 p3 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-plot-fold-3.rds"))
@@ -97,7 +93,7 @@ p5 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-plot-fold-5.rds")
 p1 + p2 + p3 + p4 + p5
 
 ```
-The errors in fold 5 are the ones that explode after lambda 0.
+
 
 
 ```{r}
@@ -105,10 +101,11 @@ err_mat_p_list <- list(p1,p2,p3,p4,p5)
 err_mat_resc_list <- replot_err_mat(err_mat_p_list)
 ```
 
-```{r err-fold-lasso-stand-replot, fig.cap="MSE of the CV for the different lambda values on the a log scale. The red dotted line shows the lambda for which minimum MSE was obtained. See @\ref(fig:err-folg-lasso-og), but this time the y-axis has the same range for all plots."}
+```{r err-fold-lasso-diff-replot, fig.cap="MSE of the CV for the different lambda values on the a log scale. The red dotted line shows the lambda for which minimum MSE was obtained. See @\ref(fig:err-folg-lasso-og), but this time the y-axis has the same range for all plots."}
 err_mat_resc_list[[1]] + err_mat_resc_list[[2]] + err_mat_resc_list[[3]] + err_mat_resc_list[[4]] + err_mat_resc_list[[5]]
 ```
-This plot emphasizes the findings from the plot above
+
+
 
 
 Below we can see the minimum MSE for each fold.
@@ -123,7 +120,7 @@ apply(err_mat, 2, function(x) lambdas[which.min(x)])
 
 ## Coefficient plots
 
-```{r coef-plot-lasso-stand, fig.cap="Coefficient map plot for the different folds. Longitude and Latitude on the x and y-axis respectively. Positive values are coloured in blue, negative values in red."}
+```{r coef-plot-lasso-diff, fig.cap="Coefficient map plot for the different folds. Longitude and Latitude on the x and y-axis respectively. Positive values are coloured in blue, negative values in red."}
 pc1 <- readRDS(paste0(path_to_model_folder, "/coef-plots/coef-plot-fold-1.rds"))
 pc2 <- readRDS(paste0(path_to_model_folder, "/coef-plots/coef-plot-fold-2.rds"))
 pc3 <- readRDS(paste0(path_to_model_folder, "/coef-plots/coef-plot-fold-3.rds"))
@@ -136,6 +133,7 @@ ggarrange(plotlist = l, ncol = 3, nrow = 2,
 ```
 
 
+
 ## Inspect predictions from each fold
 
 Following we inspect the folds precipitation time series and
@@ -145,47 +143,36 @@ the predictions made by the model.
 pred_plot_1 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-1.rds"))
 #pred_plot_1
 mse_1 <- get_mse_from_pred_plot(pred_plot_1)
-```
-```{r}
 pred_plot_2 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-2.rds"))
 #pred_plot_2
 mse_2 <- get_mse_from_pred_plot(pred_plot_2)
-
-```
-```{r}
 pred_plot_3 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-3.rds"))
 #pred_plot_3
 mse_3 <- get_mse_from_pred_plot(pred_plot_3)
-
-```
-```{r}
 pred_plot_4 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-4.rds"))
 #pred_plot_4
 mse_4 <- get_mse_from_pred_plot(pred_plot_4)
-
-```
-```{r}
 pred_plot_5 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-5.rds"))
 #pred_plot_5
 mse_5 <- get_mse_from_pred_plot(pred_plot_5)
-
-```
-```{r}
 pred_plot_list <- list(pred_plot_1,pred_plot_2,pred_plot_3,pred_plot_4,pred_plot_5)
 #lapply(pred_plot_list, get_mse_from_pred_plot)
 ```
-```{r pred-plot-fold-lasso-stand, fig.cap="Precipitation prediction and target values in the test set in each fold. Predictions in red and target values in black."}
+```{r pred-plot-fold-lasso-diff, fig.cap="Precipitation prediction and target values in the test set in each fold. Predictions in red and target values in black."}
 pred_plot_1 + pred_plot_2 + pred_plot_3 + pred_plot_4 +
   pred_plot_5
 ```
-The predictions look similar to those without standardization,
-with differences for example in fold 2. With standardization the predictions 
-are lower than the target in the later months. But the peak in fold 4 is better fit
-by this model than by the original lasso.
+
+In general the model fits the data sufficiently to predict the general
+form of the time series but misses some modes and is off in the larger
+values in fold 2. Also it does not fit well rapid changes as in fold 3.
+Therefore it seems that the model generally underfits the data.
 
 ## Inspect predictions from best CV-lambda
 
-For consistency we also choose the minimizing lambda here.
+We choose now the best lambda with the 1SE rule and fit 
+the model anew to predict the time series we held out
+as validation data
 
 <!-- ```{r} -->
 <!-- # fit model with best lambda -->
@@ -217,25 +204,25 @@ For consistency we also choose the minimizing lambda here.
 
 
 
-```{r pred-plot-full-lasso-stand, fi.cap="Precipitation prediction and target values in the validation set. Predictions in red and target values in black. The model was fitted on the full CV data with the lambda value that minimised the average MSE"}
+```{r pred-plot-full-lasso-dif, fi.cap="Precipitation prediction and target values in the validation set. Predictions in red and target values in black. The model was fitted on the full CV data with the lambda value that minimised the average MSE"}
 full_preds <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-full.rds"))
 full_preds
 mse_full <- get_mse_from_pred_plot(full_preds)
 mse_full
 ```
-
-Over the more than 5 years of validation data the model predicts the
-seasonal pattern of the precipitation time series quite well,
-but constantly fails to predict the higher values of precipitation.
-The MSE is `mse_full` and the RSME `sqrt(mse_full)``.
+MSE `mse_full` RMSE `sqrt(mse_full)`
 
 ## Summary
-
-By standardizing we improve the MSE of the final model slightly but
-still under estimate the larger precipitation values in the evaluation set.
-
+We fitted a LASSO model for predicting the mean precipitation
+in the Central Amazon Basin and used a 5-fold blocked Cross Validation
+approach to find the optimal level of regularization.
+After training the model we evaluated its performance on a separate validation set that was not used in the training process.
+The model shows predicting capabilities but misses out on higher values of the precipitation target. It also misses on rapid changes and in general underfits the data. 
+This may be due to the choice of blocked cross validation.
 <!-- Also although predicting seems to bring useful results, the choice of the LASSO coefficients seems somewhat arbitrary or at least not -->
 <!-- interpret able in a straightforward way. -->
+Locations with higher variability get included in the model more easily
+and are not necessarily geographically close.
 
 
 <!-- ```{r} -->
@@ -262,25 +249,10 @@ b <- d[[2]]$y #
 res <- a-b # residuals
 
 plot(a,res)
+plot(ts(abs(res)))
 qqnorm(res)
 qqline(res)
 plot(density(res))
-```
-
-```{r}
 acf(res)
-Box.test(res, lag=20, type="Ljung-Box")
 ```
-```{r}
-plot.ts(res)
-```
-```{r}
-pacf(res)
-```
-
-
-```{r}
-plot(hist(res))
-```
-
 

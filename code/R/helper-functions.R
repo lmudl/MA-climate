@@ -875,15 +875,19 @@ cv_lasso <- function(sst, precip, index_list, save_folder, include_ts_vars, stan
       x_test <- x_together[-c(seq(nrow(x_train))),]
     }
     if(standardize_features == TRUE) {
-      mean_x_train <- apply(x_train,2, mean)
-      sdn_x_train <- apply(x_train,2,sdN)
-      x_train <- scale(x_train, center=mean_x_train,
-                       scale=sdn_x_train)
-      x_test <- scale(x_test, center=mean_x_train,
-                      scale=sdn_x_train)
-      nonzero_sd_cols <- complete.cases(t(x_train))
-      x_train <- x_train[,nonzero_sd_cols]
-      x_test <- x_test[,nonzero_sd_cols]
+      # mean_x_train <- apply(x_train,2, mean)
+      # sdn_x_train <- apply(x_train,2,sdN)
+      # x_train <- scale(x_train, center=mean_x_train,
+      #                  scale=sdn_x_train)
+      # x_test <- scale(x_test, center=mean_x_train,
+      #                 scale=sdn_x_train)
+      # nonzero_sd_cols <- complete.cases(t(x_train))
+      # x_train <- x_train[,nonzero_sd_cols]
+      # x_test <- x_test[,nonzero_sd_cols]
+      
+      
+      x_train <- standardize_train(x_train)
+      x_test <- standardize_test(x_train, x_test)
       # drop variables with 0 variance
       
       print("standardized features")
@@ -1157,6 +1161,7 @@ standardize_train <- function(df_train) {
   attr(df_train, "nonzero_sd_cols") <- nonzero_sd_cols
   return(df_train)
 }
+
 
 standardize_test <- function(df_train_stand, df_test) {
   mean_vec <- attr(df_train_stand, "center")
@@ -1798,6 +1803,10 @@ replot_err_mat <- function(err_mat_list) {
   return(new_list)
 }
 
+estimate_runtime <- function(hours,min,sec,steps) {
+  rt <- ((hours*3600)+(min*60+sec)) / steps * 20000 / 60 / 60
+  return(rt)
+}
 
 ############ Run/Evaluate cluster CV ###########################################
 

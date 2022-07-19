@@ -22,7 +22,7 @@ source("../code/R/helper-functions.R")
 # length(ids$test$Testing060)
 ```
 ```{r}
-path_to_model_folder <- "../results/CV-fuseds/small-fused-cv-1k-stand-updated/"
+path_to_model_folder <- "../results/CV-fused/small-fused-1k-stand/"
 ```
 
 ## Error plots
@@ -157,4 +157,10 @@ pred_plot_1 + pred_plot_2 + pred_plot_3 + pred_plot_4 +
   pred_plot_5
 ```
 
+
+```{r}
+pred_full <- readRDS(paste0(path_to_model_folder, "pred-plots/pred-plot-full.rds"))
+get_mse_from_pred_plot(pred_full)
+pred_full
+```
 
