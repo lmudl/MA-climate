@@ -951,7 +951,9 @@ cv_fused_lasso <- function(sst, precip, index_list, save_folder, graph,
   }
   if(parallelize == TRUE) {
     num_cores <- parallel::detectCores()
+    #num_cores <- 5
     doParallel::registerDoParallel(num_cores)
+    print(paste("detected and registered", num_cores, "cores"))
     library(foreach)
     err_mat <- foreach(j = 1:length(index_list$train),
                        .packages="genlasso", .combine = "cbind") %dopar% {
