@@ -3,7 +3,7 @@ title: "Predicting Droughts in the Amazon Basin based on Global Sea Surface Temp
 author: "Dario Lepke"
 site: bookdown::bookdown_site
 output:
-  bookdown::gitbook:
+  bookdown::gitbook: default
     split_bib: FALSE
 #  bookdown::pdf_book:
 bibliography: ref-lib.bib

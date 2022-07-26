@@ -1,4 +1,4 @@
-# Fused on OG standardized
+# Fused 5k
 
 ```{r, echo = FALSE}
 knitr::opts_chunk$set(warning = FALSE, message = FALSE, echo = FALSE)
@@ -22,7 +22,7 @@ source("../code/R/helper-functions.R")
 # length(ids$test$Testing060)
 ```
 ```{r}
-path_to_model_folder <- "../results/CV-fused/small-fused-1k-stand/"
+path_to_model_folder <- "../results/CV-fused/large-fused-5k/"
 ```
 
 ## Error plots
@@ -74,8 +74,6 @@ err_mat_resc_list <- replot_err_mat(err_mat_p_list)
 err_mat_resc_list[[1]] + err_mat_resc_list[[2]] + err_mat_resc_list[[3]] + err_mat_resc_list[[4]] + err_mat_resc_list[[5]]
 ```
 
-
-
 Below we can see the minimum MSE for each fold.
 ```{r}
 apply(err_mat, 2, min)
@@ -90,11 +88,58 @@ And which lambda in the lambda vector resulted in the lowest prediction error on
 
 ```{r , fig.cap="Coefficient map plot for the different folds. Longitude and Latitude on the x and y-axis respectively. Positive values are coloured in blue, negative values in red."}
 pc1 <- readRDS(paste0(path_to_model_folder, "/coef-plots/coef-plot-fold-1.rds"))
-pc2 <- readRDS(paste0(path_to_model_folder, "/coef-plots/coef-plot-fold-2.rds"))
-pc3 <- readRDS(paste0(path_to_model_folder, "/coef-plots/coef-plot-fold-3.rds"))
-pc4 <- readRDS(paste0(path_to_model_folder, "/coef-plots/coef-plot-fold-4.rds"))
-pc5 <- readRDS(paste0(path_to_model_folder, "/coef-plots/coef-plot-fold-5.rds"))
+pc1
+```
+```{r}
+rm(pc1)
+```
 
+
+```{r , fig.cap="Coefficient map plot for the different folds. Longitude and Latitude on the x and y-axis respectively. Positive values are coloured in blue, negative values in red."}
+pc2 <- readRDS(paste0(path_to_model_folder, "/coef-plots/coef-plot-fold-2.rds"))
+pc2
+```
+```{r}
+rm(pc2)
+```
+
+
+```{r , fig.cap="Coefficient map plot for the different folds. Longitude and Latitude on the x and y-axis respectively. Positive values are coloured in blue, negative values in red."}
+pc3 <- readRDS(paste0(path_to_model_folder, "/coef-plots/coef-plot-fold-3.rds"))
+pc3
+```
+
+```{r}
+rm(pc3)
+```
+
+```{r , fig.cap="Coefficient map plot for the different folds. Longitude and Latitude on the x and y-axis respectively. Positive values are coloured in blue, negative values in red."}
+pc4 <- readRDS(paste0(path_to_model_folder, "/coef-plots/coef-plot-fold-4.rds"))
+pc4
+```
+```{r}
+rm(pc4)
+```
+
+
+```{r , fig.cap="Coefficient map plot for the different folds. Longitude and Latitude on the x and y-axis respectively. Positive values are coloured in blue, negative values in red."}
+pc5 <- readRDS(paste0(path_to_model_folder, "/coef-plots/coef-plot-fold-5.rds"))
+pc5
+```
+```{r}
+object.size(pc5)
+dim(pc5$data)
+pc5$data
+?object.size
+```
+
+
+```{r , fig.cap="Coefficient map plot for the different folds. Longitude and Latitude on the x and y-axis respectively. Positive values are coloured in blue, negative values in red."}
+rm(pc5)
+```
+
+
+```{r , fig.cap="Coefficient map plot for the different folds. Longitude and Latitude on the x and y-axis respectively. Positive values are coloured in blue, negative values in red."}
 l <- list(pc1,pc2,pc3,pc4,pc5)
 a1 <- ggarrange(plotlist = l, ncol = 3, nrow = 2,
          common.legend = TRUE)
@@ -123,32 +168,18 @@ the predictions made by the model.
 pred_plot_1 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-1.rds"))
 #pred_plot_1
 mse_1 <- get_mse_from_pred_plot(pred_plot_1)
-```
-```{r}
 pred_plot_2 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-2.rds"))
 #pred_plot_2
 mse_2 <- get_mse_from_pred_plot(pred_plot_2)
-
-```
-```{r}
 pred_plot_3 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-3.rds"))
 #pred_plot_3
 mse_3 <- get_mse_from_pred_plot(pred_plot_3)
-
-```
-```{r}
 pred_plot_4 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-4.rds"))
 #pred_plot_4
 mse_4 <- get_mse_from_pred_plot(pred_plot_4)
-
-```
-```{r}
 pred_plot_5 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-5.rds"))
 #pred_plot_5
 mse_5 <- get_mse_from_pred_plot(pred_plot_5)
-
-```
-```{r}
 pred_plot_list <- list(pred_plot_1,pred_plot_2,pred_plot_3,pred_plot_4,pred_plot_5)
 #lapply(pred_plot_list, get_mse_from_pred_plot)
 ```
@@ -157,14 +188,44 @@ pred_plot_1 + pred_plot_2 + pred_plot_3 + pred_plot_4 +
   pred_plot_5
 ```
 
+
 ```{r}
 best_l_res <- readRDS(paste0(path_to_model_folder, "best-lambda-res.rds"))
 best_l_res
 ```
 
 ```{r}
-pred_full <- readRDS(paste0(path_to_model_folder, "pred-plots/pred-plot-full.rds"))
-get_mse_from_pred_plot(pred_full)
-pred_full
+err_line_full <- readRDS(paste0(path_to_model_folder, "err-mat-plots/error-line-plot-full.rds"))
+err_line_full
 ```
+
+
+```{r}
+pred_plot_full <- readRDS(paste0(path_to_model_folder, "pred-plots/pred-plot-full.rds"))
+attr(pred_plot_full, "mse")
+pred_plot_full
+```
+
+```{r}
+coef_full <- readRDS(paste0(path_to_model_folder, "coef-plots/coef-plot-full.rds"))
+coef_full
+```
+```{r}
+coef_full_drop <- readRDS(paste0(path_to_model_folder, "coef-plots/coef-plot-drop-out-full.rds"))
+coef_full_drop
+
+```
+
+```{r}
+# TESTING
+# 
+rnd <- readRDS("../results/CV-fused/large-fused-5k/all_preds_full_model.rds")
+pp <- readRDS("../data/processed/precip_eval.rds")
+
+err <- apply(rnd$fit, 2, function(x) comp_mse(x, pp))
+which.min(err)
+plot(ts(rnd$fit[,5000]))
+plot(ts(pp))
+```
+
 

@@ -1,4 +1,4 @@
-# Lasso on original data
+# test lasso new plots
 
 ```{r, echo=FALSE}
 knitr::opts_chunk$set(warning = FALSE, message = FALSE, echo = FALSE)
@@ -21,7 +21,7 @@ source("../code/R/helper-functions.R")
 # length(ids$test$Testing060)
 ```
 ```{r}
-path_to_model_folder <- "../results/CV-lasso/cv-lasso-og-data-16-06-22"
+path_to_model_folder <- "../results/CV-lasso/testing-lasso-og/"
 ```
 
 
@@ -97,15 +97,19 @@ We therefore also inspect the MSE for each individual fold.
 
 
 ```{r err-fold-lasso-og, fig.cap="MSE of the CV for the different lambda values on the a log scale. The red dotted line shows the lambda for which minimum MSE was obtained."}
-p1 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-plot-fold-1.rds"))
-p2 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-plot-fold-2.rds"))
-p3 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-plot-fold-3.rds"))
-p4 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-plot-fold-4.rds"))
-p5 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-plot-fold-5.rds"))
+p1 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/new-err-plot-fold-1.rds"))
+p2 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/new-err-plot-fold-2.rds"))
+p3 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/new-err-plot-fold-3.rds"))
+p4 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/new-err-plot-fold-4.rds"))
+p5 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/new-err-plot-fold-5.rds"))
 
 p1 + p2 + p3 + p4 + p5
 
 ```
+
+
+
+
 At first glance \@ref(fig:err-fold-lasso-og) shows that the MSE for fold 1 and 2 have similar trajectories, the same for 3 and 4,
 while fold 5 is the only one that only has a local maximum somewhat in the middle of the 
 log lambda range. But fold 5 also has its minimum MSE at a larger regularization
@@ -208,6 +212,37 @@ pred_plot_list <- list(pred_plot_1,pred_plot_2,pred_plot_3,pred_plot_4,pred_plot
 pred_plot_1 + pred_plot_2 + pred_plot_3 + pred_plot_4 +
   pred_plot_5
 ```
+
+```{r}
+pred_plot_1 <- readRDS(paste0(path_to_model_folder, "/pred-plots/fit-plot-fold-1.rds"))
+#pred_plot_1
+mse_1 <- get_mse_from_pred_plot(pred_plot_1)
+
+pred_plot_2 <- readRDS(paste0(path_to_model_folder, "/pred-plots/fit-plot-fold-2.rds"))
+#pred_plot_2
+mse_2 <- get_mse_from_pred_plot(pred_plot_2)
+
+
+pred_plot_3 <- readRDS(paste0(path_to_model_folder, "/pred-plots/fit-plot-fold-3.rds"))
+#pred_plot_3
+mse_3 <- get_mse_from_pred_plot(pred_plot_3)
+
+pred_plot_4 <- readRDS(paste0(path_to_model_folder, "/pred-plots/fit-plot-fold-4.rds"))
+#pred_plot_4
+mse_4 <- get_mse_from_pred_plot(pred_plot_4)
+
+pred_plot_5 <- readRDS(paste0(path_to_model_folder, "/pred-plots/fit-plot-fold-5.rds"))
+#pred_plot_5
+mse_5 <- get_mse_from_pred_plot(pred_plot_5)
+pred_plot_list <- list(pred_plot_1,pred_plot_2,pred_plot_3,pred_plot_4,pred_plot_5)
+#lapply(pred_plot_list, get_mse_from_pred_plot)
+```
+```{r pred-plot-fold-lasso-og, fig.cap="Precipitation prediction and target values in the test set in each fold. Predictions in red and target values in black."}
+pred_plot_1 + pred_plot_2 + pred_plot_3 + pred_plot_4 +
+  pred_plot_5
+```
+
+
 
 In general the model fits the data sufficiently to predict the general
 form of the time series but misses some modes and is off in the larger

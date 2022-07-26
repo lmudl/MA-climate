@@ -12,12 +12,12 @@ library(glmnet)
 # features_cv <- sst[1:370,]
 # target_cv <- precip[1:370]
 
-sst_cv <- readRDS("data/processed/sst_cv.rds")
+sst_cv <- readRDS("data/processed/noclust_sst_cv.rds")
 precip_cv <- readRDS("data/processed/precip_cv.rds")
 
 lasso_og <- cv_for_ts(sst = sst_cv, precip = precip_cv, nfold = 5, 
                               size_train = 60, size_test = 14,
-                              save_folder = "testing-lasso-og",
+                              save_folder = "noclust-lasso",
                               model = "lasso", 
                               include_ts_vars=FALSE,
                               stand=FALSE, diff_features=FALSE, 
@@ -35,7 +35,3 @@ lasso_og <- cv_for_ts(sst = sst_cv, precip = precip_cv, nfold = 5,
 # features_cv2 <- prepare_sst(features_cv2)
 # plot_and_save_cv_results(err_mat, 5, ids, lambdas, features_cv2, target_cv2,
 #                          save_to = "results/CV-lasso/cv-lasso-og-data-16-06-22")
-
-
-# latest result done with
-# cv-lasso-og-data-16-06-22

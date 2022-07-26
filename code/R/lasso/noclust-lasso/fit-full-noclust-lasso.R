@@ -11,8 +11,7 @@ source("code/R/helper-functions.R")
 # plot predictions etc
 
 # path to and save_to
-#save_to <- "cv-lasso-og-data-16-06-22"
-save_to <- "testing-lasso-og"
+save_to <- "noclust-lasso"
 full_save_to <- paste0("results/CV-lasso/",save_to,"/")
 
 # load err mat, lambdas and get lambda min
@@ -24,10 +23,10 @@ l_min_id <- which.min(apply(err_mat, 1, mean))
 l_min <- lambdas[l_min_id]
 
 # load data for fitting and evaluating full model
-sst_cv <- readRDS("data/processed/sst_cv.rds")
+sst_cv <- readRDS("data/processed/noclust_sst_cv.rds")
 precip_cv <- readRDS("data/processed/precip_cv.rds")
 
-sst_eval <- readRDS("data/processed/sst_eval.rds")
+sst_eval <- readRDS("data/processed/noclust_sst_eval.rds")
 precip_eval <- readRDS("data/processed/precip_eval.rds")
 
 
@@ -52,18 +51,17 @@ comp_mse(preds, precip_eval) # 1326.809
 
 
 # what if we fit full model on all lambdas?
-full_model2 <- glmnet(sst_cv, precip_cv, lambda=lambdas,
-                     standardize=FALSE)
-preds2 <- predict(full_model2, newx = sst_eval)
-errors2 <- apply(preds2, 2, function(x) comp_mse(x, precip_eval))
-wm2 <- which.min(errors2)
-df2 <- data.frame(predictions = preds2[,wm2], targets = precip_eval)
-plt2 <- ggplot() + geom_line(data=df2, mapping= aes(x=seq(length(predictions)), y=predictions, col = "red")) +
-  geom_line(data=df, mapping=aes(x=seq(lengths(predictions)), y=targets))
-plt2
-plot(ts(errors2))
-l_min_id
-wm2
+# full_model2 <- glmnet(sst_train, precip_train, lambda=lambdas,
+#                      standardize=FALSE)
+# preds2 <- predict(full_model2, newx = sst_eval)
+# errors2 <- apply(preds2, 2, function(x) comp_mse(x, precip_eval))
+# wm2 <- which.min(errors)
+# df2 <- data.frame(predictions = preds2[,wm2], targets = precip_eval)
+# plt2 <- ggplot() + geom_line(data=df, mapping= aes(x=seq(length(predictions)), y=predictions, col = "red")) +
+#   geom_line(data=df, mapping=aes(x=seq(lengths(predictions)), y=targets))
+# plt2
+# plot(ts(errors2))
+
 # level of regularisation is a lot lower than found on the cross validation
 
 

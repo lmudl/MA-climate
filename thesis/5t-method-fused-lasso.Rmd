@@ -1,0 +1,37 @@
+# Fused Lasso Regression
+
+## The fused lasso
+
+```{r}
+# TODO add statistical learning with sparsity to references.
+```
+
+As expected and seen in the results, the LASSO choose single
+SST regions as predictors as opposed to whole regions.
+
+```{r}
+# TODO make reference to achieved results here
+```
+
+```{r}
+# TODO cite general LASSO properties here
+# how it acts in situations where coefficients are grouped
+# or highly correlated.
+```
+
+```{r}
+# TODO add plot of the graph given by our helper functions.
+```
+
+```{r}
+# TODO add graphic of fig.2 fused lasso
+```
+
+The fused LASSO solves the problem:
+
+$$\min_{\beta} 1/2 \sum_{i=1}^n(y_i - x_i^T\beta_i)^2 + \lambda \sum_{i,j \in E} |\beta_i - \beta_j| + \gamma \cdot \lambda \sum_{i=1}^p|\beta_i|  ,$$
+with $x_i$ being the ith row of the predictor matrix and 
+E is the edge set of an underlying graph.
+$\hat{\beta}$ is computed as a function of $\lambda$, with fixed $\gamma$. $\gamma$ > 0 introduces sparsity to the fused solution, with higher values placing more priority on the sparsity of the solution. 
+
+

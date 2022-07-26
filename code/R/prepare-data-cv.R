@@ -4,6 +4,7 @@ save_to <- "data/processed/"
 #setwd("Repos/MA-climate/")
 source("code/R/helper-functions.R")
 library(raster)
+library(igraph)
 
 # raw data ####
 precip <- readRDS("data/interim/drought/chirps_setreftime_aggregated.rds")
@@ -104,4 +105,18 @@ ext <- extent(-180,0,-50,40)
 small_sst <- crop(sst,ext)
 small_graph_sst <- igraph_from_raster(small_sst)
 saveRDS(small_graph_sst, paste0(save_to, "small_graph_sst.rds"))
+
+# create new graph AND sst for cv and eval WITHOUT graph-clusters ##############
+g <- readRDS("data/processed/graph_sst.rds")
+sst_cv <- readRDS("data/processed/sst_cv.rds")
+sst_eval <- readRDS("data/processed/sst_eval.rds")
+cl <- clusters(g)
+log_drop <- cl$membership!=1
+new_g <- delete.vertices(g, log_drop)
+saveRDS(new_g, "data/processed/noclust_graph_sst.rds")
+noclust_sst_cv <- sst_cv[,!log_drop]
+saveRDS(noclust_sst_cv, "data/processed/noclust_sst_cv.rds")
+noclust_sst_eval <- sst_eval[,!log_drop]
+saveRDS(noclust_sst_eval, "data/processed/noclust_sst_eval.rds")
+
 

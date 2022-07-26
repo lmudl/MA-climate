@@ -11,8 +11,7 @@ source("code/R/helper-functions.R")
 # plot predictions etc
 
 # path to and save_to
-#save_to <- "cv-lasso-og-data-16-06-22"
-save_to <- "testing-lasso-og"
+save_to <- "noclust-lasso-stand"
 full_save_to <- paste0("results/CV-lasso/",save_to,"/")
 
 # load err mat, lambdas and get lambda min
@@ -22,14 +21,17 @@ ids <- readRDS(paste0(full_save_to,"index-list.rds"))
 
 l_min_id <- which.min(apply(err_mat, 1, mean))
 l_min <- lambdas[l_min_id]
+#l_min <- exp(-1.75)
 
 # load data for fitting and evaluating full model
-sst_cv <- readRDS("data/processed/sst_cv.rds")
+sst_cv <- readRDS("data/processed/noclust_sst_cv.rds")
 precip_cv <- readRDS("data/processed/precip_cv.rds")
-
-sst_eval <- readRDS("data/processed/sst_eval.rds")
+sst_eval <- readRDS("data/processed/noclust_sst_eval.rds")
 precip_eval <- readRDS("data/processed/precip_eval.rds")
 
+
+sst_cv <- standardize_train(sst_cv)
+sst_eval <- standardize_test(sst_cv, sst_eval)
 
 # fit full model
 full_model <- glmnet(sst_cv, precip_cv, lambda=l_min,
@@ -39,7 +41,6 @@ saveRDS(full_model, paste0(full_save_to, "full-model.rds"))
 
 # predict on evaluation data
 preds <- c(predict(full_model, newx = sst_eval))
-
 # plot predictions against true data
 ms_start <- nrow(sst_cv)+1
 ms_end <- nrow(sst_cv)+nrow(sst_eval)
@@ -48,24 +49,17 @@ plt <- plot_predictions(df)
 saveRDS(plt, paste0(full_save_to,"pred-plots/pred-plot-full.rds"))
 
 # get mse on evaluation data set
-comp_mse(preds, precip_eval) # 1326.809
+comp_mse(preds, precip_eval) # 2290.062
 
-
-# what if we fit full model on all lambdas?
-full_model2 <- glmnet(sst_cv, precip_cv, lambda=lambdas,
-                     standardize=FALSE)
-preds2 <- predict(full_model2, newx = sst_eval)
-errors2 <- apply(preds2, 2, function(x) comp_mse(x, precip_eval))
-wm2 <- which.min(errors2)
-df2 <- data.frame(predictions = preds2[,wm2], targets = precip_eval)
-plt2 <- ggplot() + geom_line(data=df2, mapping= aes(x=seq(length(predictions)), y=predictions, col = "red")) +
-  geom_line(data=df, mapping=aes(x=seq(lengths(predictions)), y=targets))
-plt2
-plot(ts(errors2))
-l_min_id
-wm2
-# level of regularisation is a lot lower than found on the cross validation
-
-
-# what if we fit the whole model how much lambdas do we get?
-# fullfull <- glmnet(sst, precip, standardize = FALSE)
+# TESTING
+# fm <- glmnet(sst_cv, precip_cv, standardize = FALSE)
+# preds <- predict(fm, newx = sst_eval)
+# dim(preds)
+# plot(ts(preds[,64]))
+# errs <- apply(preds, 2, function(x) comp_mse(x, precip_eval))
+# plot(errs)
+# 
+# l_min
+# l_min_id
+# which.min(errs)
+# errs[60:80]

@@ -1,4 +1,4 @@
-# Fused on OG standardized
+# Fused on OG gamma 0.1 stand
 
 ```{r, echo = FALSE}
 knitr::opts_chunk$set(warning = FALSE, message = FALSE, echo = FALSE)
@@ -22,7 +22,7 @@ source("../code/R/helper-functions.R")
 # length(ids$test$Testing060)
 ```
 ```{r}
-path_to_model_folder <- "../results/CV-fused/small-fused-1k-stand/"
+path_to_model_folder <- "../results/CV-fused/large-fused-5k-stand-gamma-01/"
 ```
 
 ## Error plots
@@ -33,7 +33,7 @@ path_to_model_folder <- "../results/CV-fused/small-fused-1k-stand/"
 <!-- err_mat <- err_mat[1:60,] -->
 <!-- ``` -->
 
-<!-- ```{r} -->
+<!-- ```{r} --
 <!-- lambda_id <- c(1:60) -->
 <!-- mse <- apply(err_mat, 1, mean) -->
 <!-- b <- mse -->
@@ -44,6 +44,7 @@ path_to_model_folder <- "../results/CV-fused/small-fused-1k-stand/"
 ```{r}
 err_mat <- readRDS(paste0(path_to_model_folder, "/err-mat.rds"))
 #lambdas <- readRDS(paste0(path_to_model_folder, "/lambda-vec.rds"))
+plot(err_mat[,1])
 ```
 
 
@@ -51,6 +52,12 @@ err_mat <- readRDS(paste0(path_to_model_folder, "/err-mat.rds"))
 err_line_plot <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-line-plot.rds"))
 err_line_plot
 # a <- ggplot_build(err_bars_plot)
+```
+```{r}
+err_line_plot + ylim(c(0,5000))
+```
+```{r}
+rm(err_line_plot)
 ```
 
 
@@ -74,6 +81,18 @@ err_mat_resc_list <- replot_err_mat(err_mat_p_list)
 err_mat_resc_list[[1]] + err_mat_resc_list[[2]] + err_mat_resc_list[[3]] + err_mat_resc_list[[4]] + err_mat_resc_list[[5]]
 ```
 
+```{r}
+# inspect the models
+model_list <- load_models(paste0(path_to_model_folder, "fold-models"))
+m1 <- model_list[[1]]
+b1 <- m1$beta
+vec <- apply(b1, 1, sum)
+sum(vec!=0)
+w <- b1[,st] != 0
+b1[w,st]
+range(b1[w,])
+plot(ts(c(b1[w,])))
+```
 
 
 Below we can see the minimum MSE for each fold.
@@ -96,10 +115,12 @@ pc4 <- readRDS(paste0(path_to_model_folder, "/coef-plots/coef-plot-fold-4.rds"))
 pc5 <- readRDS(paste0(path_to_model_folder, "/coef-plots/coef-plot-fold-5.rds"))
 
 l <- list(pc1,pc2,pc3,pc4,pc5)
+l <- list(pc2,pc3,pc4,pc5)
 a1 <- ggarrange(plotlist = l, ncol = 3, nrow = 2,
          common.legend = TRUE)
 a1
 ```
+
 ```{r}
 pc1 <- readRDS(paste0(path_to_model_folder, "/coef-plots/coef-plot-drop-out-fold-1.rds"))
 pc2 <- readRDS(paste0(path_to_model_folder, "/coef-plots/coef-plot-drop-out-fold-2.rds"))
@@ -123,32 +144,24 @@ the predictions made by the model.
 pred_plot_1 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-1.rds"))
 #pred_plot_1
 mse_1 <- get_mse_from_pred_plot(pred_plot_1)
-```
-```{r}
+
 pred_plot_2 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-2.rds"))
 #pred_plot_2
 mse_2 <- get_mse_from_pred_plot(pred_plot_2)
 
-```
-```{r}
+
 pred_plot_3 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-3.rds"))
 #pred_plot_3
 mse_3 <- get_mse_from_pred_plot(pred_plot_3)
-
-```
-```{r}
 pred_plot_4 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-4.rds"))
 #pred_plot_4
 mse_4 <- get_mse_from_pred_plot(pred_plot_4)
 
-```
-```{r}
+
 pred_plot_5 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-5.rds"))
 #pred_plot_5
 mse_5 <- get_mse_from_pred_plot(pred_plot_5)
 
-```
-```{r}
 pred_plot_list <- list(pred_plot_1,pred_plot_2,pred_plot_3,pred_plot_4,pred_plot_5)
 #lapply(pred_plot_list, get_mse_from_pred_plot)
 ```
@@ -156,15 +169,34 @@ pred_plot_list <- list(pred_plot_1,pred_plot_2,pred_plot_3,pred_plot_4,pred_plot
 pred_plot_1 + pred_plot_2 + pred_plot_3 + pred_plot_4 +
   pred_plot_5
 ```
-
 ```{r}
 best_l_res <- readRDS(paste0(path_to_model_folder, "best-lambda-res.rds"))
 best_l_res
 ```
 
 ```{r}
-pred_full <- readRDS(paste0(path_to_model_folder, "pred-plots/pred-plot-full.rds"))
-get_mse_from_pred_plot(pred_full)
-pred_full
+err_line_full <- readRDS(paste0(path_to_model_folder, "err-mat-plots/error-line-plot-full.rds"))
+err_line_full
 ```
+
+
+```{r}
+rm(err_line_full)
+pred_plot_full <- readRDS(paste0(path_to_model_folder, "pred-plots/pred-plot-full.rds"))
+attr(pred_plot_full, "mse")
+pred_plot_full
+```
+
+```{r}
+coef_full <- readRDS(paste0(path_to_model_folder, "coef-plots/coef-plot-full.rds"))
+coef_full
+```
+
+```{r}
+coef_full_drop <- readRDS(paste0(path_to_model_folder, "coef-plots/coef-plot-drop-out-full.rds"))
+coef_full_drop
+
+```
+
+
 

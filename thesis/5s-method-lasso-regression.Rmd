@@ -1,0 +1,42 @@
+# LASSO Regression
+
+## The LASSO
+We want to create a model that has predictive and
+explanatory power. Predictive power meaning it can
+predict the precipitation in the Central Amazonas Basin, "reasonably well". Explanatory power in the sense of being interpretable, so that we can identify those regions in sea
+that give us most information about future precipitation. Our problem setting is high dimensional with n << p. The number of predictors is a lot bigger than the number of actual observations.
+This creates issues with a classic linear model since the linear problem is underdefined.
+One possible model for the problem at hand is a LASSO regression model.
+
+In general for the linear model:
+
+$$y_i = \beta_0 + \pmb{x}_i^T\pmb{\beta} + \epsilon_i  $$
+Where the $y_i$ refers to the mean precipitation for a given month $i$ and $x_i$ is the vector of sea surface temperature at different locations around the globe.
+$\epsilon_i$ is the residual and we wish to estimate the $\beta$´s from the data.
+As already stated this is not possible with a classic linear model since the number of predictors exceeds the number of observations. We therefore can not estimate a $\beta$ for every grid point in the sea.
+From a physical point of view it also seems reasonable that some regions in the ocean have a higher predictive power than others. For example regions that are closer to the Amazonas may have more influence on precipitation in the same month. But regions more far away may have more information on the precipitation half a year in the future.
+We therefore would like to use a model that can find the most important regions in the sea for predicting precipitation for some point in the future.
+One possible solution for this is a LASSO regression model, as implemented in
+R by the *glmnet* package.
+This model "automatically" performs model selection, but be aware that because of the time dependencies in our data, normal Cross Validation methods may be unjustified or at least have to be applied with caution.
+The glmnet package implements the regression problem in the following manner, solving:
+
+$$\min_{\beta_0, \beta} \frac{1}{N} \sum_{i=1}^N w_il(y_i,\beta_0 + \beta^Tx_i) + \lambda [(1-\alpha)||\beta||_2^2/2 + \alpha||\beta||_1] $$
+This is a lasso regression for $\alpha = 1$ and ridge regression for $\alpha = 0$, $\alpha$ controls the overall strength of regularization or penalty.
+Intuitively this means we try to find those $\beta$´s that minimise the negative log likelihood of our data (this is equal to maximizing the log-likelihood). But at the same time we can not include too many $\beta$ since this will make the second and third term in the formula grow.
+As result the algorithm chooses only those predictors that have the most predictive power.
+How many predictors are included depends on the strength of regularization given by $\alpha$.
+*Remark*: Among strongly correlated predictors only one is chosen in the classical lasso model. Ridge regression shrinks the coefficients to zero. 
+Elastic net with $\alpha=0.5$ tends to either include or drop the entire group together.
+To specifically choose a group of predictors, variations of the lasso or other models have to be considered.
+
+## TODO here
+maybe drop into with linear model
+just put lasso formula directly
+talk about the stuff that is written already
+note probelms with correaltion of predictors and grouping
+
+
+
+
+

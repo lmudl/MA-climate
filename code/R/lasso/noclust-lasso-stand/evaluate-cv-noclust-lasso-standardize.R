@@ -5,7 +5,7 @@ library(ggplot2)
 library(glmnet)
 source("code/R/helper-functions.R")
 
-model_folder <- "cv-lasso-standardize2"
+model_folder <- "noclust-lasso-stand"
 save_to <- paste0("results/CV-lasso/", model_folder, "/")
 
 # load the error-matrix, lambda and the model_list ####
@@ -15,7 +15,7 @@ ids <- readRDS(paste0(save_to, "index-list.rds"))
 model_list <- load_models(paste0(save_to,"fold-models"))
 
 # Data loading
-sst_cv <- readRDS("data/processed/sst_cv.rds")
+sst_cv <- readRDS("data/processed/noclust_sst_cv.rds")
 precip_cv <- readRDS("data/processed/precip_cv.rds")
 
 plot_save_errors(err_mat = err_mat, lambdas = lambdas, save_to = save_to)
@@ -27,6 +27,6 @@ plot_predictions_best_l(err_mat = err_mat, model_list = model_list, ids = ids,
                         include_ts_vars = FALSE,
                         diff_features = FALSE,
                         des_features = FALSE,
-                        standardize_response = FALSE,
+                        standardize_response = TRUE,
                         standardize_features = TRUE)
 

@@ -85,14 +85,16 @@ saveRDS(plt, paste0(full_save_to,"pred-plots/pred-plot-full.rds"))
 comp_mse(preds, precip_eval) # 
 
 # TESTING
-fm <- glmnet(sst_cv, precip_cv, standardize = FALSE, lambda = lambdas)
-preds <- predict(fm, newx = sst_eval)
-err <- apply(preds, 2, function(x) comp_mse(x, precip_eval))
-length(err)
-plot(err)
-df <- data.frame(predictions = preds[,40], targets = precip_eval, ids=ids_cheat)
-plot_predictions(df)
-which.min(err)
-err[40]
+full_model2 <- glmnet(sst_cv, precip_cv, lambda=lambdas,
+                      standardize=FALSE, standardize.response = FALSE)
+preds2 <- predict(full_model2, newx = sst_eval)
+errors2 <- apply(preds2, 2, function(x) comp_mse(x, precip_eval))
+wm2 <- which.min(errors2)
+df2 <- data.frame(predictions = preds2[,wm2], targets = precip_eval)
+plt2 <- ggplot() + geom_line(data=df2, mapping= aes(x=seq(length(predictions)), y=predictions, col = "red")) +
+  geom_line(data=df, mapping=aes(x=seq(lengths(predictions)), y=targets))
+plt2
+plot(ts(errors2))
 l_min_id
+wm2
 
