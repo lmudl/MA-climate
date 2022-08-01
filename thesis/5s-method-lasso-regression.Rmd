@@ -1,11 +1,16 @@
+---
+output:
+  html_document: default
+  pdf_document: default
+---
 # LASSO Regression
 
 ## The LASSO
 We want to create a model that has predictive and
 explanatory power. Predictive power meaning it can
-predict the precipitation in the Central Amazonas Basin, "reasonably well". Explanatory power in the sense of being interpretable, so that we can identify those regions in sea
+predict the precipitation in the Central Amazon Basin, "reasonably well". Explanatory power in the sense of being interpretable, so that we can identify those regions in sea
 that give us most information about future precipitation. Our problem setting is high dimensional with n << p. The number of predictors is a lot bigger than the number of actual observations.
-This creates issues with a classic linear model since the linear problem is underdefined.
+This creates issues with a classic linear model since the linear problem is underdetermined.
 One possible model for the problem at hand is a LASSO regression model.
 
 In general for the linear model:
@@ -14,7 +19,7 @@ $$y_i = \beta_0 + \pmb{x}_i^T\pmb{\beta} + \epsilon_i  $$
 Where the $y_i$ refers to the mean precipitation for a given month $i$ and $x_i$ is the vector of sea surface temperature at different locations around the globe.
 $\epsilon_i$ is the residual and we wish to estimate the $\beta$´s from the data.
 As already stated this is not possible with a classic linear model since the number of predictors exceeds the number of observations. We therefore can not estimate a $\beta$ for every grid point in the sea.
-From a physical point of view it also seems reasonable that some regions in the ocean have a higher predictive power than others. For example regions that are closer to the Amazonas may have more influence on precipitation in the same month. But regions more far away may have more information on the precipitation half a year in the future.
+From a physical point of view it also seems reasonable that some regions in the ocean have a higher predictive power than others. For example regions that are closer to the Amazon may have more influence on precipitation in the same month. But regions more far away may have more information on the precipitation half a year in the future.
 We therefore would like to use a model that can find the most important regions in the sea for predicting precipitation for some point in the future.
 One possible solution for this is a LASSO regression model, as implemented in
 R by the *glmnet* package.

@@ -1,0 +1,11 @@
+title: "Predicting Droughts in the Amazon Basin based on Global Sea Surface Temperatures"
+author: "Dario Lepke"
+bibliography: ref-lib.bib
+biblio-style: apalike
+link-citations: yes
+documentclass: book
+output_dir: "thesis-book"
+delete_merged_file: TRUE
+rmd_files:
+  html: ["index.Rmd", "1a-related-work.Rmd", "1b-EDA-precip.Rmd", "1bb-EDA-sst.Rmd"]
+  latex: ["index.Rmd", "1a-related-work.Rmd", "1b-EDA-precip.Rmd", "1bb-EDA-sst.Rmd"]

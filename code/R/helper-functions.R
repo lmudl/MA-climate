@@ -206,15 +206,17 @@ mon_plots <- function(raster_obj) {
     mon_means <- calc(mon, mean)
     mon_sd <- calc(mon, sd)
     mon_trend <- calc(mon, get_trend)
-    m_plot <- plot_summary(mon_means) + #ggtitle(paste("Means for month", i)) +
+    m_plot <- plot_summary(mon_means) + ggtitle(paste(month.name[i])) +
       theme(#axis.text.x=element_blank(), #remove x axis labels
         #axis.ticks.x=element_blank(), #remove x axis ticks
         #axis.text.y=element_blank(),  #remove y axis labels
         #axis.ticks.y=element_blank(), #remove y axis ticks
         axis.title.x = element_blank(),
-        axis.title.y = element_blank()
+        axis.title.y = element_blank(),
+        plot.title = element_text(size=5),
       )
-    sd_plot <- plot_summary(mon_sd)  + ggtitle(paste("SD for month", i)) +
+    m_plot$labels$fill <- "Mean"
+    sd_plot <- plot_summary(mon_sd)  + ggtitle(paste(month.name[i])) +
       #ggtitle(paste("Means for month", i)) +
       theme(#axis.text.x=element_blank(), #remove x axis labels
         #axis.ticks.x=element_blank(), #remove x axis ticks
@@ -222,8 +224,9 @@ mon_plots <- function(raster_obj) {
         #axis.ticks.y=element_blank(), #remove y axis ticks
         axis.title.x = element_blank(),
         axis.title.y = element_blank(),
-        plot.title = element_text(size=5)
+        plot.title = element_text(size=5),
       )
+    sd_plot$labels$fill <- "SD"
     trend_plot <- plot_summary(mon_trend) + #ggtitle(paste("trend for month", i)) +
       #ggtitle(paste("Means for month", i)) +
       theme(#axis.text.x=element_blank(), #remove x axis labels
@@ -737,7 +740,9 @@ cut_data <- function(df, ndiff) {
 
 cv_lasso <- function(sst, precip, index_list, save_folder, include_ts_vars, stand,
                      diff_features, des_features, standardize_features,
-                     standardize_response, diff_n, stand_then_diff, center_response=FALSE) {
+                     standardize_response, diff_n, stand_then_diff, center_response=FALSE,
+                     boxcox_response = FALSE,
+                     log_response = FALSE) {
   # dir.create(paste0("results/CV-lasso/", save_folder))
   # dir.create(paste0("results/CV-lasso/", save_folder, "/fold-models"))
   lambda_vec <- get_lambda_values(sst, precip)
@@ -753,19 +758,26 @@ cv_lasso <- function(sst, precip, index_list, save_folder, include_ts_vars, stan
     y_test <- precip[id_test]
     save_path <- paste0 ("results/CV-lasso/", save_folder, "/")
     
-    
-    if(stand_then_diff == TRUE) {
-      x_train <- standardize_train(x_train)
-      x_test <- standardize_test(x_train, x_test)
-      
-      max_ndiffs <- diff_n[2]
-      x_train <- apply(x_train, 2, function(x) diff(x, lag=1, difference=max_ndiffs))
-      y_train <- y_train[-c(seq(max_ndiffs))]
-      
-      x_test <- apply(x_test, 2, function(x) diff(x, lag=1, difference=max_ndiffs))
-      y_test <- y_test[-c(seq(max_ndiffs))]
-      print("differentiated features")
+    if(log_response == TRUE) {
+      y_train <- log(y_train)
     }
+    
+    if(boxcox_response == TRUE) {
+      lb <- BoxCox.lambda(y_train)
+      y_train <- BoxCox(y_train, lb)
+    }
+    # if(stand_then_diff == TRUE) {
+    #   x_train <- standardize_train(x_train)
+    #   x_test <- standardize_test(x_train, x_test)
+    #   
+    #   max_ndiffs <- diff_n[2]
+    #   x_train <- apply(x_train, 2, function(x) diff(x, lag=1, difference=max_ndiffs))
+    #   y_train <- y_train[-c(seq(max_ndiffs))]
+    #   
+    #   x_test <- apply(x_test, 2, function(x) diff(x, lag=1, difference=max_ndiffs))
+    #   y_test <- y_test[-c(seq(max_ndiffs))]
+    #   print("differentiated features")
+    # }
     if(include_ts_vars == TRUE) {
       x_train <- add_ts_vars(x_train)
       keep_vec <- complete.cases(x_train)
@@ -788,74 +800,76 @@ cv_lasso <- function(sst, precip, index_list, save_folder, include_ts_vars, stan
       #                            "lambda-vec-fold", j, ".rds")
       # saveRDS(lambda_vec, file=lambda_fold_path)
     }
-    if(diff_features == TRUE) {
-      # lasso og diff does not have fac_month and time_ind code
-      # between ## are new
-      # ndiffs <- apply(x_train, 2, unitroot_ndiffs)
-      # max_ndiffs <- max(ndiffs)
-      max_ndiffs <- 1
-      ##
-      nr <- nrow(x_train)
-      time_ind <- seq(nr)
-      fac_month <- time_ind %% 12
-      fac_month[fac_month == 0] <- 12
-      fac_month <- as.factor(fac_month)
-      ##
-      x_train <- apply(x_train, 2, function(x) diff(x, lag=1, difference=max_ndiffs))
-      
-      ##
-      time_ind <- time_ind[-c(seq(max_ndiffs))]
-      fac_month <- fac_month[-c(seq(max_ndiffs))]
-      x_train <- cbind(x_train, time_ind, fac_month)
-      x_train <- data.matrix(x_train)
-      ##
-      # y_train <- y_train[-c(seq(max_ndiffs))]
-      y_train <- diff(y_train, max_ndiffs)
-      
-      ##
-      time_ind2 <- seq(nr+1,nr+nrow(x_test))
-      fac_month2 <- time_ind2 %% 12
-      fac_month2[fac_month2 == 0] <- 12
-      fac_month2 <- as.factor(fac_month2)
-      ##
-      
-      x_test <- apply(x_test, 2, function(x) diff(x, lag=1, difference=max_ndiffs))
-      ##
-      time_ind2 <- time_ind2[-c(seq(max_ndiffs))]
-      fac_month2 <- fac_month2[-c(seq(max_ndiffs))]
-      x_test <- cbind(x_test, time_ind2, fac_month2)
-      ##
-      
-      # y_test <- y_test[-c(seq(max_ndiffs))]
-      y_test <- diff(y_test, max_ndiffs)
-      
-      # add_time <- function(df) {
-      #   rn <- rownames(df)
-      #   s <- strsplit(rn, "X", "")
-      #   time_vec <- sapply(s, FUN = function(x) as.integer(x[[2]]))
-      #   df <- cbind(time_vec, df)
-      #   return(df)
-      # }
-      # 
-      # add_month_fac <- function(df) {
-      #   t_vec <- df[, "time_vec"]
-      #   fac_month <- t_vec %% 12
-      #   fac_month[fac_month == 0] <- 12
-      #   fac_month <- as.factor(fac_month)
-      #   df <- cbind(fac_month, df)
-      #   return(df)
-      # }
-      # 
-    }
+    # if(diff_features == TRUE) {
+    #   # lasso og diff does not have fac_month and time_ind code
+    #   # between ## are new
+    #   # ndiffs <- apply(x_train, 2, unitroot_ndiffs)
+    #   # max_ndiffs <- max(ndiffs)
+    #   max_ndiffs <- 1
+    #   ##
+    #   nr <- nrow(x_train)
+    #   time_ind <- seq(nr)
+    #   fac_month <- time_ind %% 12
+    #   fac_month[fac_month == 0] <- 12
+    #   fac_month <- as.factor(fac_month)
+    #   ##
+    #   x_train <- apply(x_train, 2, function(x) diff(x, lag=1, difference=max_ndiffs))
+    #   
+    #   ##
+    #   time_ind <- time_ind[-c(seq(max_ndiffs))]
+    #   fac_month <- fac_month[-c(seq(max_ndiffs))]
+    #   x_train <- cbind(x_train, time_ind, fac_month)
+    #   x_train <- data.matrix(x_train)
+    #   ##
+    #   # y_train <- y_train[-c(seq(max_ndiffs))]
+    #   y_train <- diff(y_train, max_ndiffs)
+    #   
+    #   ##
+    #   time_ind2 <- seq(nr+1,nr+nrow(x_test))
+    #   fac_month2 <- time_ind2 %% 12
+    #   fac_month2[fac_month2 == 0] <- 12
+    #   fac_month2 <- as.factor(fac_month2)
+    #   ##
+    #   
+    #   x_test <- apply(x_test, 2, function(x) diff(x, lag=1, difference=max_ndiffs))
+    #   ##
+    #   time_ind2 <- time_ind2[-c(seq(max_ndiffs))]
+    #   fac_month2 <- fac_month2[-c(seq(max_ndiffs))]
+    #   x_test <- cbind(x_test, time_ind2, fac_month2)
+    #   ##
+    #   
+    #   # y_test <- y_test[-c(seq(max_ndiffs))]
+    #   y_test <- diff(y_test, max_ndiffs)
+    #   
+    #   # add_time <- function(df) {
+    #   #   rn <- rownames(df)
+    #   #   s <- strsplit(rn, "X", "")
+    #   #   time_vec <- sapply(s, FUN = function(x) as.integer(x[[2]]))
+    #   #   df <- cbind(time_vec, df)
+    #   #   return(df)
+    #   # }
+    #   # 
+    #   # add_month_fac <- function(df) {
+    #   #   t_vec <- df[, "time_vec"]
+    #   #   fac_month <- t_vec %% 12
+    #   #   fac_month[fac_month == 0] <- 12
+    #   #   fac_month <- as.factor(fac_month)
+    #   #   df <- cbind(fac_month, df)
+    #   #   return(df)
+    #   # }
+    #   # 
+    # }
     if(diff_n[1] == TRUE) {
       # ndiffs <- apply(features_i, 2, unitroot_ndiffs)
       # max_ndiffs <- max(ndiffs)
       max_ndiffs <- diff_n[2]
       x_train <- apply(x_train, 2, function(x) diff(x, lag=1, difference=max_ndiffs))
       y_train <- y_train[-c(seq(max_ndiffs))]
+      id_train <- id_train[-c(seq(max_ndiffs))]
       
       x_test <- apply(x_test, 2, function(x) diff(x, lag=1, difference=max_ndiffs))
       y_test <- y_test[-c(seq(max_ndiffs))]
+      id_test <-  id_test[-c(seq(max_ndiffs))]
       print("differentiated features")
     }
     if(des_features == TRUE) {
@@ -865,12 +879,18 @@ cv_lasso <- function(sst, precip, index_list, save_folder, include_ts_vars, stan
       # x_together <- rbind(x_train,x_test)
       # x_together <- apply(x_together, 2, function(x) c(stl(ts(x, frequency=12), s.window = "periodic",
       #                                               robust = TRUE)$time.series[,"remainder"]))
-      x_train <- apply(x_train, 2, function(x) c(stl(ts(x, frequency=12), s.window = "periodic",
-                                                     robust = TRUE)$time.series[,"remainder"]))
-      x_together <- rbind(x_train, x_test)
-      x_together <- apply(x_together, 2, function(x) c(stl(ts(x, frequency=12), s.window = "periodic",
-                                                           robust = TRUE)$time.series[,"remainder"]))
-      x_test <- x_together[-c(seq(nrow(x_train))),]
+      
+      
+      # x_train <- apply(x_train, 2, function(x) c(stl(ts(x, frequency=12), s.window = "periodic",
+      #                                                robust = TRUE)$time.series[,"remainder"]))
+      # x_together <- rbind(x_train, x_test)
+      # x_together <- apply(x_together, 2, function(x) c(stl(ts(x, frequency=12), s.window = "periodic",
+      #                                                      robust = TRUE)$time.series[,"remainder"]))
+      # x_test <- x_together[-c(seq(nrow(x_train))),]
+      
+      x_train <- deseas_train(x_train)
+      x_test <- deseas_test(x_train, x_test)
+      
     }
     if(standardize_features == TRUE) {
       # mean_x_train <- apply(x_train,2, mean)
@@ -903,6 +923,7 @@ cv_lasso <- function(sst, precip, index_list, save_folder, include_ts_vars, stan
       y_train <- scale(y_train, center = mean_y_train,
                        scale = FALSE)
     }
+
     
     trained_model <- glmnet(data.matrix(x_train), y_train, lambda = lambda_vec,
                             standardize=FALSE, standardize.response = FALSE)
@@ -913,6 +934,13 @@ cv_lasso <- function(sst, precip, index_list, save_folder, include_ts_vars, stan
     }
     if(center_response == TRUE) {
       predicted <- apply(predicted, 2, function(x)  x + mean_y_train)
+    }
+    if(boxcox_response == TRUE) {
+      predicted <- apply(predicted, 2, function(x) InvBoxCox(x, lambda = lb))
+    }
+    if(log_response == TRUE) {
+      predicted <- apply(predicted, 2, exp)
+
     }
     err_col <- apply(predicted, 2, function(x) mean((x-y_test)^2))
     err_mat[,j] <- err_col
@@ -965,7 +993,7 @@ custom_stand <- function(x) {
 
 cv_fused_lasso <- function(sst, precip, index_list, save_folder, graph,
                            maxsteps, stand, standardize_features, standardize_response,
-                           gamma, parallelize) {
+                           gamma, parallelize, center_response) {
   # dir.create(paste0("results/CV-lasso/", save_folder))
   # dir.create(paste0("results/CV-lasso/", save_folder, "/fold-models"))
   # maxsteps <- maxsteps
@@ -976,7 +1004,7 @@ cv_fused_lasso <- function(sst, precip, index_list, save_folder, graph,
     for(j in 1:length(index_list$train)) {
       err_mat[,j] <- cv_run_fused(j, err_mat, nfold, sst, precip, index_list, save_folder, graph,
                                   maxsteps, stand, standardize_features, standardize_response,
-                                  gamma)
+                                  gamma, center_response)
     }
     return(err_mat)
   }
@@ -992,7 +1020,7 @@ cv_fused_lasso <- function(sst, precip, index_list, save_folder, graph,
                          print(paste("start job", j))
                          cv_run_fused(j = j, err_mat, nfold, sst, precip, index_list, save_folder, graph,
                                       maxsteps, stand, standardize_features, standardize_response,
-                                      gamma)
+                                      gamma,center_response)
                        }
     doParallel::stopImplicitCluster()
     return(err_mat)
@@ -1004,7 +1032,9 @@ cv_for_ts <- function(sst, precip, nfold = 5, size_train = 60, size_test = 14, s
                       stand=FALSE, diff_features=FALSE, des_features=FALSE,
                       standardize_features=FALSE, standardize_response=FALSE,
                       gamma=0, parallelize = FALSE, diff_n=FALSE,
-                      stand_then_diff = FALSE, center_response = FALSE) {
+                      stand_then_diff = FALSE, center_response = FALSE,
+                      boxcox_response = FALSE,
+                      log_response = FALSE) {
   a <- Sys.time()
   if(model == "fused" & is.null(graph)){
     stop("for the fused LASSO a graph object is needed")
@@ -1050,7 +1080,9 @@ cv_for_ts <- function(sst, precip, nfold = 5, size_train = 60, size_test = 14, s
                         diff_features, des_features,
                         standardize_features = standardize_features,
                         standardize_response = standardize_response, diff_n = diff_n,
-                        stand_then_diff = stand_then_diff, center_response = center_response)
+                        stand_then_diff = stand_then_diff, center_response = center_response,
+                        boxcox_response = boxcox_response,
+                        log_response = log_response)
     print("finished fitting")
     index_list_path <- paste0("results/CV-lasso/", save_folder, "/index-list.rds")
     # lambda_vec_path <- paste0("results/CV-lasso/", save_folder, "/lambda-vec.rds")
@@ -1076,7 +1108,8 @@ cv_for_ts <- function(sst, precip, nfold = 5, size_train = 60, size_test = 14, s
                               standardize_features = standardize_features,
                               standardize_response = standardize_response,
                               gamma=gamma,
-                              parallelize = parallelize)
+                              parallelize = parallelize,
+                              center_response = center_response)
     index_list_path <- paste0("results/CV-fused/", save_folder, "/index-list.rds")
     #lambda_vec_path <- paste0("results/CV-lasso/", save_folder, "/lambda-vec.rds")
     err_mat_path <- paste0("results/CV-fused/", save_folder, "/err-mat.rds")
@@ -1146,7 +1179,10 @@ get_best_lambda_fused <- function(conf) {
 fit_eval_full_lasso <- function(save_to, sst_cv_path, precip_cv_path,
                                 sst_eval_path, precip_eval_path,
                                 standardize_response, center_response,
-                                standardize_features, diff_n) {
+                                standardize_features, diff_n,
+                                des_features=FALSE,
+                                boxcox_response = FALSE,
+                                log_response = FALSE) {
   # path to and save_to
   full_save_to <- paste0("results/CV-lasso/",save_to,"/")
   
@@ -1168,6 +1204,36 @@ fit_eval_full_lasso <- function(save_to, sst_cv_path, precip_cv_path,
   
   # TODO diff features
   # TODO maybe timelags
+  # deseas 
+  if(log_response == TRUE) {
+    y_train <- log(y_train)
+  }
+  
+  if(boxcox_response == TRUE) {
+    lb <- BoxCox.lambda(y_train)
+    y_train <- BoxCox(y_train, lb)
+  }
+  
+  if(des_features == TRUE) {
+    #stop("under construction deseasonalised")
+    # x_train <- apply(x_train, 2, function(x) c(stl(ts(x, frequency=12), s.window = "periodic",
+    #                                                  robust = TRUE)$time.series[,"remainder"]))
+    # x_together <- rbind(x_train,x_test)
+    # x_together <- apply(x_together, 2, function(x) c(stl(ts(x, frequency=12), s.window = "periodic",
+    #                                               robust = TRUE)$time.series[,"remainder"]))
+    
+    
+    # x_train <- apply(x_train, 2, function(x) c(stl(ts(x, frequency=12), s.window = "periodic",
+    #                                                robust = TRUE)$time.series[,"remainder"]))
+    # x_together <- rbind(x_train, x_test)
+    # x_together <- apply(x_together, 2, function(x) c(stl(ts(x, frequency=12), s.window = "periodic",
+    #                                                      robust = TRUE)$time.series[,"remainder"]))
+    # x_test <- x_together[-c(seq(nrow(x_train))),]
+    
+    x_train <- deseas_train(x_train)
+    x_test <- deseas_test(x_train, x_test)
+    
+  }
   
   if(diff_n[1] == TRUE) {
     # ndiffs <- apply(features_i, 2, unitroot_ndiffs)
@@ -1175,15 +1241,17 @@ fit_eval_full_lasso <- function(save_to, sst_cv_path, precip_cv_path,
     max_ndiffs <- diff_n[2]
     x_train <- apply(x_train, 2, function(x) diff(x, lag=1, difference=max_ndiffs))
     y_train <- y_train[-c(seq(max_ndiffs))]
+    id_train <- id_train[-c(seq(max_ndiffs))]
     
     x_test <- apply(x_test, 2, function(x) diff(x, lag=1, difference=max_ndiffs))
     y_test <- y_test[-c(seq(max_ndiffs))]
+    id_test <-  id_test[-c(seq(max_ndiffs))]
     print("differentiated features")
   }
   
   if(standardize_features == TRUE) {
-    x_train <- standardize_train(y_train)
-    x_test <- standardize_test(x_test, x_train)
+    x_train <- standardize_train(x_train)
+    x_test <- standardize_test(x_train, x_test)
   }
   
   if(standardize_response == TRUE) {
@@ -1209,10 +1277,16 @@ fit_eval_full_lasso <- function(save_to, sst_cv_path, precip_cv_path,
   # predict on evaluation data
   preds <- predict(full_model, newx = x_test)
   if(standardize_response == TRUE) {
-    preds <- apply(preds, 2, function(x) x*sdn_y_train+mean_y_train)
+    preds <- apply(preds, 2, function(x) x*sdn_y_train + mean_y_train)
   }
   if(center_response == TRUE) {
-    preds <- preds + mean_y_train
+    preds <- apply(preds, 2, function(x) x + mean_y_train)
+  }
+  if(boxcox_response == TRUE) {
+    preds <- apply(preds, 2, function(x) InvBoxCox(x, lambda = lb))
+  }
+  if(log_response == TRUE) {
+    preds <- apply(preds, 2, exp)
   }
   ms_start <- nrow(x_train)+1
   ms_end <- nrow(x_train)+nrow(x_test)
@@ -1233,7 +1307,7 @@ fit_eval_full_lasso <- function(save_to, sst_cv_path, precip_cv_path,
   saveRDS(plt2, paste0(full_save_to, "pred-plots/best-pred-plot-full.rds"))
   
   df3 <- data.frame(loglambdas = log(lambdas), errs = all_errors)
-  plt3 <- ggplot(df, aes(x = loglambdas, y=errs)) + 
+  plt3 <- ggplot(df3, aes(x = loglambdas, y=errs)) + 
     geom_vline(xintercept = log(l_min), linetype = "dashed", colour = "red") + geom_point() +
     geom_vline(xintercept = log(l_opt), linetype = "dashed", colour = "blue")          
   saveRDS(plt3, paste0(full_save_to, "full-model-all-errors-plot.rds"))
@@ -1266,6 +1340,7 @@ fit_full_fused <- function(conf) {
   sst_cv_path <- conf$features_cv_path
   precip_cv_path <- conf$target_cv_path
   
+  center_response <- conf$center_response
   standardize_response <- conf$standardize_response
   standardize_features <- conf$standardize_features
   
@@ -1281,6 +1356,9 @@ fit_full_fused <- function(conf) {
   if(!conf$small) {
     g <- readRDS("data/processed/graph_sst.rds")
   }
+  if(conf$noclust) {
+    g <- readRDS("data/processed/noclust_graph_sst.rds")
+  }
   
   if(standardize_features == TRUE) {
     sst_cv <- standardize_train(sst_cv)
@@ -1289,7 +1367,11 @@ fit_full_fused <- function(conf) {
     print(vcount(g) == ncol(sst_cv))
     print("standardized features, cutted graph nodes with zero variance")
   }
-  
+  if(center_response == TRUE) {
+    mean_precip_cv <- mean(precip_cv)
+    precip_cv <- scale(precip_cv, center = mean_precip_cv,
+                     scale = FALSE)
+  }
   full_mod <- fusedlasso(y = precip_cv, X = sst_cv, graph = g,
                          verbose = TRUE, maxsteps = conf$maxsteps,
                          gamma = conf$gamma)
@@ -1330,7 +1412,9 @@ check_and_iterate_fused <- function(conf){
   }
 }
 
-### misc rndm ##################################################################
+### misc rndm / pipeline##################################################################
+
+# standardizing
 standardize_train <- function(df_train) {
   mean_vec <- apply(df_train, 2, mean)
   sdn_vec <- apply(df_train, 2, sdN)
@@ -1344,7 +1428,6 @@ standardize_train <- function(df_train) {
   return(df_train)
 }
 
-
 standardize_test <- function(df_train_stand, df_test) {
   mean_vec <- attr(df_train_stand, "center")
   sdn_vec <- attr(df_train_stand, "scale")
@@ -1354,6 +1437,41 @@ standardize_test <- function(df_train_stand, df_test) {
   df_test <- df_test[, nonzero_sd_cols]
   return(df_test)
 }
+
+# deseasonalising
+get_seas <- function(x) {
+  stl_res <- stl(ts(x, frequency=12), s.window = 49,#37
+                 robust = TRUE) #immer robust true, besser
+  # stl_res <- stl(ts(x, frequency=12), s.window = "periodic",
+  #                robust = TRUE)
+  # what about log transforming and s.window="periodic"?
+  stl_seas <- stl_res$time.series[,"seasonal"]
+  return(stl_seas)
+}
+
+
+deseas_train <- function(x_train) {
+  seas_train <- apply(x_train, 2, get_seas)
+  x_train <- x_train - seas_train
+  attr(x_train,"seas_train") <- seas_train
+  return(x_train)
+}
+
+deseas_test <- function(deseas_x_train, x_test) {
+  seas_train <- attr(deseas_x_train, "seas_train")
+  n_needed <- nrow(x_test)
+  start_id <- nrow(seas_train)-11
+  end_id <- nrow(seas_train)
+  last_val_mat <- seas_train[start_id:end_id,]
+  rep_val_mat <- apply(last_val_mat, 2, function(x) rep_len(x,n_needed))
+  x_test <- x_test - rep_val_mat
+  return(x_test)
+}
+
+
+# differenciating
+
+
 ################################################################################
 
 plot_fused_full <- function(conf) {
@@ -1369,6 +1487,7 @@ plot_fused_full <- function(conf) {
   sst_eval <- readRDS(sst_eval_path)
   precip_eval <- readRDS(precip_eval_path)
   
+  center_response <- conf$center_response
   standardize_features <- conf$standardize_features
   standardize_response <- conf$standardize_response
   
@@ -1377,6 +1496,9 @@ plot_fused_full <- function(conf) {
   } 
   if(!conf$small) {
     g <- readRDS("data/processed/graph_sst.rds")
+  }
+  if(conf$noclust) {
+    g <- readRDS("data/processed/noclust_graph_sst.rds")
   }
   
   best_l_res <- readRDS(paste0(model_path, "best-lambda-res.rds"))
@@ -1397,16 +1519,20 @@ plot_fused_full <- function(conf) {
   # des
   # time vars
   preds <- predict.genlasso(full_model, Xnew = sst_eval)
-  
+  attr(preds, "best_l") <- best_l_cv
   #dim(preds$fit)
-  
+  if(center_response == TRUE) {
+    precip_cv_path <- conf$target_cv_path
+    precip_cv <- readRDS(precip_cv_path)
+    mean_y_train <- mean(precip_cv)
+    preds$fit <- apply(preds$fit, 2, function(x)  x + mean_y_train)
+  }
   if(standardize_response == TRUE) {
     precip_cv_path <- conf$target_cv_path
     precip_cv <- readRDS(precip_cv_path)
     sdn_y_train <- sdN(precip_cv)
     mean_y_train <- mean(precip_cv)
     preds$fit <- apply(preds$fit, 2, function(x)  x*sdn_y_train + mean_y_train)
-    attr(preds, "best_l") <- best_l_cv
   }
   saveRDS(preds, paste0(model_path, "all_preds_full_model.rds"))
   print("saved all predictions")
@@ -1435,6 +1561,9 @@ plot_fused_full <- function(conf) {
   if(standardize_response == TRUE) {
     preds_bl$fit <- preds_bl$fit*sdn_y_train + mean_y_train
   }
+  if(center_response == TRUE) {
+    preds_bl$fit <- preds_bl$fit + mean_y_train
+  }
   pnames <- names(precip_eval)
   ids <- as.integer(sub("X", "", pnames))
   plot_df <- data.frame(targets = precip_eval, ids = ids, predictions = c(preds_bl$fit))
@@ -1444,7 +1573,7 @@ plot_fused_full <- function(conf) {
   print("plotted predictions best l")
   rm(pred_plt)
   
-  #plot_coef_map_full_fused(full_model, h, sst_cv, drop_out=TRUE, model_path)
+  # plot_coef_map_full_fused(full_model, h, sst_cv, drop_out=TRUE, model_path)
   plot_coef_map_full_fused(full_model, h, sst_cv, drop_out=FALSE, model_path)
   print("plotted coef map")
 }
@@ -1461,13 +1590,13 @@ plot_coef_map_full_fused <- function(full_model, h, sst_cv, drop_out, save_to) {
     b <- boxplot(nz)
     out_val <- unique(b$out)
     out_id <- nz %in% out_val
+    coef_mat <- coef_mat[!out_id,]
   }
   plt <- plot_nonzero_coefficients(coef_mat)
   if(drop_out == FALSE) saveRDS(plt, paste0(save_to, "/coef-plots/", "coef-plot-full.rds"))
   if(drop_out == TRUE) saveRDS(plt, paste0(save_to, "/coef-plots/", "coef-plot-drop-out-full.rds"))
   
 }
-
 
 
 ############ Plotting the CV-results ###########################################
@@ -1779,7 +1908,7 @@ plot_predictions <- function(plot_df) {
 # plot predictions
 plot_predictions_best_l_fused <- function(err_mat, model_list,
                                           ids, features, target,
-                                          save_to, center_target = TRUE,
+                                          save_to, center_response = FALSE,
                                           standardize_features = FALSE,
                                           standardize_response = FALSE) {
   target <- scale(target, center = TRUE, scale = FALSE)
@@ -1816,11 +1945,18 @@ plot_predictions_best_l_fused <- function(err_mat, model_list,
       # #                 scale=sdn_y_train)
       #target_i <- y_test_i
     }
+    if(center_response == TRUE) {
+      y_train_i <- target[ids_tr_i]
+      mean_y_train_i <- mean(y_train_i)
+    }
     target_i <- target[ids_i]
     preds <- c(predict.genlasso(model_i, Xnew=features_i,
                                 lambda = l_min)$fit)
     if(standardize_response == TRUE) {
       preds <- preds*sdn_y_train_i + mean_y_train_i
+    }
+    if(center_response == TRUE) {
+      preds <- preds + mean_y_train_i
     }
     plot_df <- data.frame(targets=target_i, predictions=preds,
                           ids=ids_i)
@@ -2176,6 +2312,15 @@ library(raster)
 run_all_fused <- function(model_name, parts = c("all")) {
   path_config <- paste0("code/R/fused-lasso/", model_name,"/", "config-", model_name, ".yml")
   conf <- config::get(file = path_config)
+  if(is.null(conf$center_response)) {
+    conf$center_response <- FALSE
+  }
+  if(is.null(conf$noclust)) {
+    conf$noclust <- FALSE
+  }
+  if(conf$center_response & conf$standardize_response) {
+    stop("cant center AND standardize response, choose only on in the config")
+  }
   # setwd("Repos/MA-climate/")
   # load packages
   library(sp)
@@ -2220,9 +2365,11 @@ run_all_fused <- function(model_name, parts = c("all")) {
               include_ts_vars = conf$include_ts_vars,
               diff_features = conf$diff_features,
               des_features = conf$des_features,
+              center_response = conf$center_response,
               standardize_features = conf$standardize_features, 
               standardize_response = conf$standardize_response,
-              gamma = conf$gamma)
+              gamma = conf$gamma
+              )
     print("finished cv")
   }
   if("plot-cv" %in% parts) {
@@ -2313,7 +2460,7 @@ get_l_1se_high_low <- function(err_bar_plot) {
   
   b_right <- d2$x > l_min
   l_1se_high <- d2$x[min(which(b & b_right))]
-  if(l1_se_high==1) {
+  if(l_1se_high==1) {
     message("lambda 1se is maximum lambda")
   }
   
@@ -2322,8 +2469,8 @@ get_l_1se_high_low <- function(err_bar_plot) {
   return(l_list)
 }
 # TESTING
-err_bar_plot_new <- err_bar_plot +    
-  geom_vline(xintercept = l_list$l_1se_high, linetype = "dashed", colour = "blue") +
-  geom_vline(xintercept = l_list$l_1se_low, linetype = "dashed", colour = "purple")
+# err_bar_plot_new <- err_bar_plot +    
+#   geom_vline(xintercept = l_list$l_1se_high, linetype = "dashed", colour = "blue") +
+#   geom_vline(xintercept = l_list$l_1se_low, linetype = "dashed", colour = "purple")
 
 # plot testers inside fused CV##################################################

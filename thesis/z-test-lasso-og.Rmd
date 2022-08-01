@@ -1,4 +1,4 @@
-# test lasso new plots
+# lasso center
 
 ```{r, echo=FALSE}
 knitr::opts_chunk$set(warning = FALSE, message = FALSE, echo = FALSE)
@@ -21,7 +21,12 @@ source("../code/R/helper-functions.R")
 # length(ids$test$Testing060)
 ```
 ```{r}
-path_to_model_folder <- "../results/CV-lasso/testing-lasso-og/"
+# path_to_model_folder <- "../results/CV-lasso/test-deseas-lasso/"
+# path_to_model_folder <- "../results/CV-lasso/test-boxcox-lasso/"
+# path_to_model_folder <- "../results/CV-lasso/test-lasso-center/"
+# path_to_model_folder  <-"../results/CV-lasso/test-log-target-lasso/"
+path_to_model_folder <- "../results/CV-lasso/test-lasso-og/"
+
 ```
 
 
@@ -97,11 +102,11 @@ We therefore also inspect the MSE for each individual fold.
 
 
 ```{r err-fold-lasso-og, fig.cap="MSE of the CV for the different lambda values on the a log scale. The red dotted line shows the lambda for which minimum MSE was obtained."}
-p1 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/new-err-plot-fold-1.rds"))
-p2 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/new-err-plot-fold-2.rds"))
-p3 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/new-err-plot-fold-3.rds"))
-p4 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/new-err-plot-fold-4.rds"))
-p5 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/new-err-plot-fold-5.rds"))
+p1 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-plot-fold-1.rds"))
+p2 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-plot-fold-2.rds"))
+p3 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-plot-fold-3.rds"))
+p4 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-plot-fold-4.rds"))
+p5 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-plot-fold-5.rds"))
 
 p1 + p2 + p3 + p4 + p5
 
@@ -292,6 +297,24 @@ full_preds <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-full.r
 full_preds
 mse_full <- get_mse_from_pred_plot(full_preds)
 mse_full
+```
+
+```{r}
+full_best <- readRDS(paste0(path_to_model_folder,
+                         "pred-plots/best-pred-plot-full.rds"))
+full_best
+```
+
+
+```{r}
+full_fit <- readRDS(paste0(path_to_model_folder, "pred-plots/fitted-preds-plot-full.rds"))
+full_fit
+```
+
+
+```{r}
+full_all_err <- readRDS(paste0(path_to_model_folder, "full-model-all-errors-plot.rds"))
+full_all_err
 ```
 
 Over the more than 5 years of validation data the model predicts the

@@ -11,7 +11,7 @@ custom_stand <- function(x) {
 
 cv_run_fused <- function(j, err_mat, nfold, sst, precip, index_list, save_folder, graph,
                          maxsteps, stand, standardize_features, standardize_response,
-                         gamma) {
+                         gamma, center_response) {
   id_train <- unlist(index_list$train[j], use.names = FALSE)
   id_test <- unlist(index_list$test[j], use.names = FALSE)
   x_train <- sst[id_train,]
@@ -55,12 +55,21 @@ cv_run_fused <- function(j, err_mat, nfold, sst, precip, index_list, save_folder
     # y_test <- scale(y_test, center=mean_y_train, 
     #                 scale=sdn_y_train)
   }
+  if(center_response == TRUE) {
+    mean_y_train <- mean(y_train)
+    y_train <- scale(y_train, center = mean_y_train,
+                     scale = FALSE)
+  }
+    
   trained_model <- fusedlasso(y=y_train, X=x_train, graph=graph,
                               verbose=TRUE, maxsteps = maxsteps,
                               gamma=gamma)
   predicted <- predict.genlasso(trained_model, Xnew=x_test)
   if(standardize_response == TRUE) {
     predicted$fit <- apply(predicted$fit, 2, function(x)  x*sdn_y_train + mean_y_train)
+  }
+  if(center_response == TRUE) {
+    predicted$fit <- apply(predicted$fit, 2, function(x)  x + mean_y_train)
   }
   err_col <- apply(predicted$fit, 2, function(x) mean((x-y_test)^2))
   #err_mat[,j] <- err_col

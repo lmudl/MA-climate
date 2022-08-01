@@ -1,3 +1,8 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
 # Fused on OG gamma 0.1 stand
 
 ```{r, echo = FALSE}
@@ -83,15 +88,15 @@ err_mat_resc_list[[1]] + err_mat_resc_list[[2]] + err_mat_resc_list[[3]] + err_m
 
 ```{r}
 # inspect the models
-model_list <- load_models(paste0(path_to_model_folder, "fold-models"))
-m1 <- model_list[[1]]
-b1 <- m1$beta
-vec <- apply(b1, 1, sum)
-sum(vec!=0)
-w <- b1[,st] != 0
-b1[w,st]
-range(b1[w,])
-plot(ts(c(b1[w,])))
+# model_list <- load_models(paste0(path_to_model_folder, "fold-models"))
+# m1 <- model_list[[1]]
+# b1 <- m1$beta
+# vec <- apply(b1, 1, sum)
+# sum(vec!=0)
+# w <- b1[,st] != 0
+# b1[w,st]
+# range(b1[w,])
+# plot(ts(c(b1[w,])))
 ```
 
 
@@ -193,10 +198,17 @@ coef_full
 ```
 
 ```{r}
+rm(coef_full)
+```
+
+```{r}
 coef_full_drop <- readRDS(paste0(path_to_model_folder, "coef-plots/coef-plot-drop-out-full.rds"))
 coef_full_drop
 
 ```
 
+```{r}
+rm(coef_full_drop)
+```
 
 

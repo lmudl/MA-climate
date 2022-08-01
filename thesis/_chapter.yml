@@ -1,0 +1,6 @@
+author: "Dario Lepke"
+bibliography: ref-lib.bib
+biblio-style: apalike
+link-citations: yes
+documentclass: book
+delete_merged_file: TRUE

@@ -1,9 +1,55 @@
+library(igraph)
+library(genlasso)
+setwd("Repos/MA-climate/")
+source("code/R/helper-functions.R")
+
 get_weights <- function(lattice_graph) {
   dist_latt <- distances(lattice_graph)
   dist_latt[upper.tri(dist_latt)] <- 0
   w <- (dist_latt[dist_latt!=0])^(-1)
   return(w)
 }
+
+get_weighted_pen_mat <- function(pen_mat, weights) {
+  for(i in seq(nrow(pen_mat))) {
+    pen_mat[i,] <- spen_mat[i,]*weights[i]
+  }
+  return(pen_mat)
+}
+
+# lattice graph
+l <- make_lattice(c(5,5))
+dims <- c(5,5)
+ec <- create_coords(dims)
+V(l)$x <- ec$x_vec
+V(l)$y <- ec$y_vec
+# get weights according to adjacency on manhattan grid
+ws <- get_weights(l)
+l <- set_vertex_attr(l, "name", value=LETTERS[1:25])
+plot(l)
+
+f0 <- make_full_graph(25)
+f <- make_full_graph(25)
+V(f)$x <- ec$x_vec
+V(f)$y <- ec$y_vec
+plot(f)
+E(f)$weight <- ws
+is_weighted(f)
+# f <- set_vertex_attr(f, "name", value=LETTERS[1:25])
+plot(f, edge.width=f$weight*10, layout=layout.grid)
+f2 <- delete.vertices(f, c("G","H","I","L","N","Q","R","S"))
+plot(f2, edge.width=E(f2)$weight*5)
+
+d0 <-  getDgSparse(f0)
+# will fail after assigning node_names
+# weights wil not affect here, but we could use weights
+# to multiply with rows
+d <- getDgSparse(f)
+head(d)
+head(ws)
+all(d==d0)
+dim(d)
+length(ws)
 
 create_pen_mat <- function() {}
 # take raster obj
@@ -34,8 +80,8 @@ land <- which(is.na(vals))
 fg <- delete_vertices(fg, land)
 plot(fg, vertex.label = NA, edge.width =0.00002)
 
-real_g,vertex.size = 1, edge.width=0.00001,
-vertex.label = NA, vertex.color = cl$membership*1
+#real_g,vertex.size = 1, edge.width=0.00001,
+#vertex.label = NA, vertex.color = cl$membership*1
 create_weighted_graph <- function() {
   
 }
@@ -173,6 +219,8 @@ ec <- create_coords(dims)
 V(l)$x <- ec$x_vec
 V(l)$y <- ec$y_vec
 ws <- get_weights(l)
+l <- set_vertex_attr(l, "name", value=LETTERS[1:25])
+plot(l)
 
 f0 <- make_full_graph(25)
 f <- make_full_graph(25)
@@ -187,8 +235,25 @@ f2 <- delete.vertices(f, c("G","H","I","L","N","Q","R","S"))
 plot(f2, edge.width=E(f2)$weight*5)
 
 d0 <-  getDgSparse(f0)
+# will fail after assigning node_names
+# weights wil not affect here, but we could use weights
+# to multiply with rows
 d <- getDgSparse(f)
+head(d)
+head(ws)
 all(d==d0)
+dim(d)
+length(ws)
+
+
+
+a <- weight_sparse(d, ws)
+head(a)
+
+# important here
+ws[1:10]
+d[1:10,]
+#
 
 (any(graph.laplacian(f) != t(d)%*%d))  
 l0 = abs(crossprod(d0))

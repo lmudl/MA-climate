@@ -1,4 +1,9 @@
-# EDA SST
+---
+output:
+  html_document: default
+  pdf_document: default
+---
+## EDA SST
 
 We explore the **sea surface temperature data** set, used in the paper by Ciemer et al (@ciemer2020early). 
 ERSST (Extended Reconstructed Sea Surface Temperature, @huang2017noaa) is a reanalysis from observed data given in the International Comprehensive Ocean-Athmosphere Data Set (ICOADS). Which contains observations **from 1800/01 until 2016/12**, made by ships and buoys for example.
@@ -25,12 +30,11 @@ library(ggpubr)
 source("../code/R/helper-functions.R")
 ```
 
-## SST values raw
 ```{r}
 (sst_dens_plot <- readRDS("../results/eda/sst_dens_plot.rds"))
 ```
 
-## Mean at each location
+### Mean at each location
 ```{r}
 (sst_means_loc_plot <- readRDS("../results/eda/sst_means_loc_plot.rds"))
 ```
@@ -40,7 +44,7 @@ source("../code/R/helper-functions.R")
 ```
 
 
-## SD at each location
+### SD at each location
 ```{r, fig.cap="SST standard deviation at each location. The standard deviation was computed over the whole time period"}
 (sst_sds_loc_plot <- readRDS("../results/eda/sst_sds_loc_plot.rds"))
 ```
@@ -49,7 +53,7 @@ source("../code/R/helper-functions.R")
 (sst_sds_dens_plot <- readRDS("../results/eda/sst_sds_dens_plot.rds"))
 ```
 
-## Mean and SD at each location
+### Mean and SD at each location
 
 ```{r mean-and-sd-sst-og, fig.cap="Mean and SD on the spatial map."}
 sst_means_loc_plot + (sst_sds_loc_plot + ggtitle("SD of sst at each location"))
@@ -60,7 +64,7 @@ sst_means_loc_plot + (sst_sds_loc_plot + ggtitle("SD of sst at each location"))
 ```
 
 
-## Trend at each location
+### Trend at each location
 
 ```{r, include=FALSE}
 a <- readRDS("../results/eda/sst_trends_loc_lm_plot.rds")
@@ -71,7 +75,7 @@ a + b
 ```{r}
 (sst_trends_loc_stl_plot <- readRDS("../results/eda/sst_trends_loc_stl_plot.rds"))
 ```
-## Means per month TEST
+### Means per month TEST
 
 ```{r}
 (sst_mean_arrange <- readRDS("../results/eda/sst_mean_arrange.rds"))
@@ -88,7 +92,7 @@ As expected there is a large seasonal component regarding the means.
 #### Open: summarise CAB for each month (mean Jan, Feb, etc.)
 ```
 
-## SD per month TEST
+### SD per month TEST
 
 ```{r}
 (sst_sd_arrange <- readRDS("../results/eda/sst_sd_arrange.rds"))
@@ -97,7 +101,7 @@ As expected there is a large seasonal component regarding the means.
 For the standard deviation we see as well large differences in values 
 during different months of the year.
 
-## Trend per month TEST
+### Trend per month TEST
 
 ```{r}
 (sst_trend_arrange <- readRDS("../results/eda/sst_trend_arrange.rds"))

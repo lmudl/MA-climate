@@ -119,4 +119,17 @@ saveRDS(noclust_sst_cv, "data/processed/noclust_sst_cv.rds")
 noclust_sst_eval <- sst_eval[,!log_drop]
 saveRDS(noclust_sst_eval, "data/processed/noclust_sst_eval.rds")
 
+# do the same for small data set
+small_g <-  readRDS("data/processed/small_graph_sst.rds")
+small_sst_cv <- readRDS("data/processed/small_sst_cv.rds")
+small_sst_eval <- readRDS("data/processed/small_sst_eval.rds")
+small_cl <- clusters(small_g)
+small_log_drop <- small_cl$membership!=1
+small_new_g <- delete.vertices(small_g, small_log_drop)
+saveRDS(small_new_g, "data/processed/small_noclust_graph_sst.rds")
+small_noclust_sst_cv <- small_sst_cv[,!small_log_drop]
+saveRDS(small_noclust_sst_cv, "data/processed/small_noclust_sst_cv.rds")
+small_noclust_sst_eval <- small_sst_eval[,!small_log_drop]
+saveRDS(small_noclust_sst_eval, "data/processed/small_noclust_sst_eval.rds")
+
 

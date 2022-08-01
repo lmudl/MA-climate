@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>2 EDA | Predicting Droughts in the Amazon Basin based on Global Sea Surface Temperatures</title>
+  <meta name="description" content="2 EDA | Predicting Droughts in the Amazon Basin based on Global Sea Surface Temperatures" />
+  <meta name="generator" content="bookdown 0.26 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="2 EDA | Predicting Droughts in the Amazon Basin based on Global Sea Surface Temperatures" />
+  <meta property="og:type" content="book" />
+  
+  
+  
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="2 EDA | Predicting Droughts in the Amazon Basin based on Global Sea Surface Temperatures" />
+  
+  
+  
+
+<meta name="author" content="Dario Lepke" />
+
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="related-work.html"/>
+
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
+
+
+
+<style type="text/css">
+/* Used with Pandoc 2.11+ new --citeproc when CSL is used */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
+</style>
+
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Introduction</a></li>
+<li class="chapter" data-level="1" data-path="related-work.html"><a href="related-work.html"><i class="fa fa-check"></i><b>1</b> Related work</a></li>
+<li class="chapter" data-level="2" data-path="eda.html"><a href="eda.html"><i class="fa fa-check"></i><b>2</b> EDA</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="eda.html"><a href="eda.html#eda-precipitation"><i class="fa fa-check"></i><b>2.1</b> EDA precipitation</a>
+<ul>
+<li class="chapter" data-level="2.1.1" data-path="eda.html"><a href="eda.html#overview"><i class="fa fa-check"></i><b>2.1.1</b> Overview</a></li>
+<li class="chapter" data-level="2.1.2" data-path="eda.html"><a href="eda.html#precipitation-values-raw"><i class="fa fa-check"></i><b>2.1.2</b> Precipitation values raw</a></li>
+<li class="chapter" data-level="2.1.3" data-path="eda.html"><a href="eda.html#mean-at-each-location"><i class="fa fa-check"></i><b>2.1.3</b> Mean at each location</a></li>
+<li class="chapter" data-level="2.1.4" data-path="eda.html"><a href="eda.html#sd-at-each-location"><i class="fa fa-check"></i><b>2.1.4</b> SD at each location</a></li>
+<li class="chapter" data-level="2.1.5" data-path="eda.html"><a href="eda.html#mean-and-sd-at-each-location"><i class="fa fa-check"></i><b>2.1.5</b> Mean and SD at each location</a></li>
+<li class="chapter" data-level="2.1.6" data-path="eda.html"><a href="eda.html#trend-at-each-location"><i class="fa fa-check"></i><b>2.1.6</b> Trend at each location</a></li>
+<li class="chapter" data-level="2.1.7" data-path="eda.html"><a href="eda.html#means-per-month-test"><i class="fa fa-check"></i><b>2.1.7</b> Means per month TEST</a></li>
+<li class="chapter" data-level="2.1.8" data-path="eda.html"><a href="eda.html#sd-per-month-test"><i class="fa fa-check"></i><b>2.1.8</b> SD per month TEST</a></li>
+<li class="chapter" data-level="2.1.9" data-path="eda.html"><a href="eda.html#trend-per-month-test"><i class="fa fa-check"></i><b>2.1.9</b> Trend per month TEST</a></li>
+</ul></li>
+<li class="chapter" data-level="2.2" data-path="eda.html"><a href="eda.html#eda-sst"><i class="fa fa-check"></i><b>2.2</b> EDA SST</a>
+<ul>
+<li class="chapter" data-level="2.2.1" data-path="eda.html"><a href="eda.html#sst-values-raw"><i class="fa fa-check"></i><b>2.2.1</b> SST values raw</a></li>
+<li class="chapter" data-level="2.2.2" data-path="eda.html"><a href="eda.html#mean-at-each-location-1"><i class="fa fa-check"></i><b>2.2.2</b> Mean at each location</a></li>
+<li class="chapter" data-level="2.2.3" data-path="eda.html"><a href="eda.html#sd-at-each-location-1"><i class="fa fa-check"></i><b>2.2.3</b> SD at each location</a></li>
+<li class="chapter" data-level="2.2.4" data-path="eda.html"><a href="eda.html#mean-and-sd-at-each-location-1"><i class="fa fa-check"></i><b>2.2.4</b> Mean and SD at each location</a></li>
+<li class="chapter" data-level="2.2.5" data-path="eda.html"><a href="eda.html#trend-at-each-location-1"><i class="fa fa-check"></i><b>2.2.5</b> Trend at each location</a></li>
+<li class="chapter" data-level="2.2.6" data-path="eda.html"><a href="eda.html#sd-per-month-test-1"><i class="fa fa-check"></i><b>2.2.6</b> SD per month TEST</a></li>
+<li class="chapter" data-level="2.2.7" data-path="eda.html"><a href="eda.html#trend-per-month-test-1"><i class="fa fa-check"></i><b>2.2.7</b> Trend per month TEST</a></li>
+</ul></li>
+</ul></li>
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Predicting Droughts in the Amazon Basin based on Global Sea Surface Temperatures</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="eda" class="section level1 hasAnchor" number="2">
+<h1><span class="header-section-number">2</span> EDA<a href="eda.html#eda" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<div id="eda-precipitation" class="section level2 hasAnchor" number="2.1">
+<h2><span class="header-section-number">2.1</span> EDA precipitation<a href="eda.html#eda-precipitation" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>In this section we want study the time series of precipitation in the
+Central Amazon Basin.
+The CHIRPS data set contains the <strong>precipitation data</strong>, created from in-situ and satellite measurements (<span class="citation">Funk et al. (<a href="eda.html#ref-funk2015climate" role="doc-biblioref">2015</a>)</span>). It can be downloaded for example from here [<a href="https://www.chc.ucsb.edu/data/chirps" class="uri">https://www.chc.ucsb.edu/data/chirps</a>].
+It contains observations <strong>from 1981 to 2021</strong>. Data comes on a <strong>high resolution of 0.05 grid</strong>.</p>
+<p>Time frame: 1980 to 2016</p>
+<div id="overview" class="section level3 hasAnchor" number="2.1.1">
+<h3><span class="header-section-number">2.1.1</span> Overview<a href="eda.html#overview" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Below the area of the Central Amazon Basin that is object of our study.</p>
+<div class="figure"><span style="display:block;" id="fig:unnamed-chunk-5"></span>
+<img src="_main_files/figure-html/unnamed-chunk-5-1.png" alt="Localisation of the area under study. The central amazon basin (CAB) spanning across 0,-10 latitude and -70,-55 longitude" width="672" />
+<p class="caption">
+Figure 2.1: Localisation of the area under study. The central amazon basin (CAB) spanning across 0,-10 latitude and -70,-55 longitude
+</p>
+</div>
+</div>
+<div id="precipitation-values-raw" class="section level3 hasAnchor" number="2.1.2">
+<h3><span class="header-section-number">2.1.2</span> Precipitation values raw<a href="eda.html#precipitation-values-raw" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Firstly we inspect the precipitation values in general
+<img src="_main_files/figure-html/unnamed-chunk-6-1.png" width="672" />
+Its form is a unimodal, right-skewed distribution.
+The values range from <code>r[1]</code> tom <code>r[2]</code>.</p>
+</div>
+<div id="mean-at-each-location" class="section level3 hasAnchor" number="2.1.3">
+<h3><span class="header-section-number">2.1.3</span> Mean at each location<a href="eda.html#mean-at-each-location" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div class="figure"><span style="display:block;" id="fig:unnamed-chunk-7"></span>
+<img src="_main_files/figure-html/unnamed-chunk-7-1.png" alt="Precipitation mean at each location. The mean was computed over the whole time period" width="672" />
+<p class="caption">
+Figure 2.2: Precipitation mean at each location. The mean was computed over the whole time period
+</p>
+</div>
+<div class="figure"><span style="display:block;" id="fig:unnamed-chunk-8"></span>
+<img src="_main_files/figure-html/unnamed-chunk-8-1.png" alt="Density of means, means were computed for each location over the whole time period" width="672" />
+<p class="caption">
+Figure 2.3: Density of means, means were computed for each location over the whole time period
+</p>
+</div>
+<p>As we can see most locations have a mean precipitation of around 200 mm/month, over
+the whole time series. Regionally in the “upper left” corner of the Amazon Basin,
+mean precipitation is higher or equal to the mean. The reference
+point for “higher” is the mean of the location means. This region seems to be more
+or less spatially consistent. The rest of the region with lower mean precipitation
+has also some small areas where precipitation is again a little bit higher.
+For example in the upper right corner and on the bottom, right of the middle.</p>
+</div>
+<div id="sd-at-each-location" class="section level3 hasAnchor" number="2.1.4">
+<h3><span class="header-section-number">2.1.4</span> SD at each location<a href="eda.html#sd-at-each-location" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div class="figure"><span style="display:block;" id="fig:unnamed-chunk-9"></span>
+<img src="_main_files/figure-html/unnamed-chunk-9-1.png" alt="Precipitation standard deviation at each location. The standard deviation was computed over the whole time period" width="672" />
+<p class="caption">
+Figure 2.4: Precipitation standard deviation at each location. The standard deviation was computed over the whole time period
+</p>
+</div>
+<div class="figure"><span style="display:block;" id="fig:unnamed-chunk-10"></span>
+<img src="_main_files/figure-html/unnamed-chunk-10-1.png" alt="Density of standard deviations, standard deviations were computed for each location over the whole time period" width="672" />
+<p class="caption">
+Figure 2.5: Density of standard deviations, standard deviations were computed for each location over the whole time period
+</p>
+</div>
+<p>For the standard deviation we also see regional patterns. These patterns overlap
+with the regions of the mean but their magnitude is flipped. Meaning,
+in the upper left where we observe larger mean values we generally observe lower
+standard deviation and in the lower and upper right corners, higher standard
+deviations.</p>
+<p>Question: There are obviously regional differences in magnitude of mean
+and standard deviations. Should we therefore NOT normalise the time series, prior
+to clustering? Mean and SD contain information and the variables are all measured
+on the same scale. (Consideration: seasonality might play a role, meaning
+that the values of different months come a different distribution)</p>
+</div>
+<div id="mean-and-sd-at-each-location" class="section level3 hasAnchor" number="2.1.5">
+<h3><span class="header-section-number">2.1.5</span> Mean and SD at each location<a href="eda.html#mean-and-sd-at-each-location" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p><img src="_main_files/figure-html/unnamed-chunk-11-1.png" width="672" />
+<img src="_main_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
+</div>
+<div id="trend-at-each-location" class="section level3 hasAnchor" number="2.1.6">
+<h3><span class="header-section-number">2.1.6</span> Trend at each location<a href="eda.html#trend-at-each-location" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p><img src="_main_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
+<p>Many regions dont have a trend and trends in general seem to be quite small.
+We can identify some regions with similar up or downward trends.
+We also computed plots for the deseasonalised data but it looked almost the same</p>
+<p>Plot means and sd for each month respectively</p>
+<!-- ## Means per month -->
+<!-- ### January -->
+<!-- ```{r} -->
+<!-- mon_mean[[1]] -->
+<!-- ``` -->
+<!-- ### February -->
+<!-- ```{r} -->
+<!-- mon_mean[[2]] -->
+<!-- ``` -->
+<!-- ### March -->
+<!-- ```{r} -->
+<!-- mon_mean[[3]] -->
+<!-- ``` -->
+<!-- ### April -->
+<!-- ```{r} -->
+<!-- mon_mean[[4]] -->
+<!-- ``` -->
+<!-- ### May -->
+<!-- ```{r} -->
+<!-- mon_mean[[5]] -->
+<!-- ``` -->
+<!-- ### June -->
+<!-- ```{r} -->
+<!-- mon_mean[[6]] -->
+<!-- ``` -->
+<!-- ### July -->
+<!-- ```{r} -->
+<!-- mon_mean[[7]] -->
+<!-- ``` -->
+<!-- ### August -->
+<!-- ```{r} -->
+<!-- mon_mean[[8]] -->
+<!-- ``` -->
+<!-- ### September -->
+<!-- ```{r} -->
+<!-- mon_mean[[9]] -->
+<!-- ``` -->
+<!-- ### October -->
+<!-- ```{r} -->
+<!-- mon_mean[[10]] -->
+<!-- ``` -->
+<!-- ### November -->
+<!-- ```{r} -->
+<!-- mon_mean[[11]] -->
+<!-- ``` -->
+<!-- ### December -->
+<!-- ```{r} -->
+<!-- mon_mean[[12]] -->
+<!-- ``` -->
+<!-- ### {-} -->
+<!-- We see spatial patterns of the mean evolving over time. -->
+<!-- For example: From May until August there is a spatial separation in -->
+<!-- two parts that dissolves in september. -->
+<!-- As expected there is a large seasonal component regarding the means. -->
+</div>
+<div id="means-per-month-test" class="section level3 hasAnchor" number="2.1.7">
+<h3><span class="header-section-number">2.1.7</span> Means per month TEST<a href="eda.html#means-per-month-test" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p><img src="_main_files/figure-html/unnamed-chunk-16-1.png" width="672" />
+We see spatial patterns of the mean evolving over time.
+For example: From May until August there is a spatial separation in
+two parts that dissolves in september.
+As expected there is a large seasonal component regarding the means.</p>
+<!-- ## SD per month -->
+<!-- ### January -->
+<!-- ```{r} -->
+<!-- mon_sd[[1]] -->
+<!-- ``` -->
+<!-- ### February -->
+<!-- ```{r} -->
+<!-- mon_sd[[2]] -->
+<!-- ``` -->
+<!-- ### March -->
+<!-- ```{r} -->
+<!-- mon_sd[[3]] -->
+<!-- ``` -->
+<!-- ### April -->
+<!-- ```{r} -->
+<!-- mon_sd[[4]] -->
+<!-- ``` -->
+<!-- ### May -->
+<!-- ```{r} -->
+<!-- mon_sd[[5]] -->
+<!-- ``` -->
+<!-- ### June -->
+<!-- ```{r} -->
+<!-- mon_sd[[6]] -->
+<!-- ``` -->
+<!-- ### July -->
+<!-- ```{r} -->
+<!-- mon_sd[[7]] -->
+<!-- ``` -->
+<!-- ### August -->
+<!-- ```{r} -->
+<!-- mon_sd[[8]] -->
+<!-- ``` -->
+<!-- ### September -->
+<!-- ```{r} -->
+<!-- mon_sd[[9]] -->
+<!-- ``` -->
+<!-- ### October -->
+<!-- ```{r} -->
+<!-- mon_sd[[10]] -->
+<!-- ``` -->
+<!-- ### November -->
+<!-- ```{r} -->
+<!-- mon_sd[[11]] -->
+<!-- ``` -->
+<!-- ### December -->
+<!-- ```{r} -->
+<!-- mon_sd[[12]] -->
+<!-- ``` -->
+<!-- ### {-} -->
+<!-- For the standard deviation we see as well large differences in values  -->
+<!-- during different months of the year. -->
+</div>
+<div id="sd-per-month-test" class="section level3 hasAnchor" number="2.1.8">
+<h3><span class="header-section-number">2.1.8</span> SD per month TEST<a href="eda.html#sd-per-month-test" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p><img src="_main_files/figure-html/unnamed-chunk-18-1.png" width="672" /></p>
+<p>For the standard deviation we see as well large differences in values
+during different months of the year.</p>
+</div>
+<div id="trend-per-month-test" class="section level3 hasAnchor" number="2.1.9">
+<h3><span class="header-section-number">2.1.9</span> Trend per month TEST<a href="eda.html#trend-per-month-test" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p><img src="_main_files/figure-html/unnamed-chunk-19-1.png" width="672" /></p>
+
+</div>
+</div>
+<div id="eda-sst" class="section level2 hasAnchor" number="2.2">
+<h2><span class="header-section-number">2.2</span> EDA SST<a href="eda.html#eda-sst" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>We explore the <strong>sea surface temperature data</strong> set, used in the paper by Ciemer et al (<span class="citation">Ciemer et al. (<a href="eda.html#ref-ciemer2020early" role="doc-biblioref">2020</a>)</span>).
+ERSST (Extended Reconstructed Sea Surface Temperature, <span class="citation">Huang et al. (<a href="eda.html#ref-huang2017noaa" role="doc-biblioref">2017</a>)</span>) is a reanalysis from observed data given in the International Comprehensive Ocean-Athmosphere Data Set (ICOADS). Which contains observations <strong>from 1800/01 until 2016/12</strong>, made by ships and buoys for example.
+The data comes on a <strong>2x2 degree grid</strong>, where data was missing <strong>interpolation techniques were used</strong>.
+See paper for reference.
+the file contains <strong>two variables</strong> that are measured across different dimensions.
+The two variables contain the <strong>sea surface temperatures and the respective SST anomalies</strong> (with respect to the 1971-2000 monthly climatology).</p>
+<div id="sst-values-raw" class="section level3 hasAnchor" number="2.2.1">
+<h3><span class="header-section-number">2.2.1</span> SST values raw<a href="eda.html#sst-values-raw" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p><img src="_main_files/figure-html/unnamed-chunk-23-1.png" width="672" /></p>
+</div>
+<div id="mean-at-each-location-1" class="section level3 hasAnchor" number="2.2.2">
+<h3><span class="header-section-number">2.2.2</span> Mean at each location<a href="eda.html#mean-at-each-location-1" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p><img src="_main_files/figure-html/unnamed-chunk-24-1.png" width="672" /></p>
+<p><img src="_main_files/figure-html/unnamed-chunk-25-1.png" width="672" /></p>
+</div>
+<div id="sd-at-each-location-1" class="section level3 hasAnchor" number="2.2.3">
+<h3><span class="header-section-number">2.2.3</span> SD at each location<a href="eda.html#sd-at-each-location-1" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div class="figure"><span style="display:block;" id="fig:unnamed-chunk-26"></span>
+<img src="_main_files/figure-html/unnamed-chunk-26-1.png" alt="SST standard deviation at each location. The standard deviation was computed over the whole time period" width="672" />
+<p class="caption">
+Figure 2.6: SST standard deviation at each location. The standard deviation was computed over the whole time period
+</p>
+</div>
+<div class="figure"><span style="display:block;" id="fig:unnamed-chunk-27"></span>
+<img src="_main_files/figure-html/unnamed-chunk-27-1.png" alt="Density of standard deviations, standard deviations were computed for each location over the whole time period" width="672" />
+<p class="caption">
+Figure 2.7: Density of standard deviations, standard deviations were computed for each location over the whole time period
+</p>
+</div>
+</div>
+<div id="mean-and-sd-at-each-location-1" class="section level3 hasAnchor" number="2.2.4">
+<h3><span class="header-section-number">2.2.4</span> Mean and SD at each location<a href="eda.html#mean-and-sd-at-each-location-1" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div class="figure"><span style="display:block;" id="fig:mean-and-sd-sst-og"></span>
+<img src="_main_files/figure-html/mean-and-sd-sst-og-1.png" alt="Mean and SD on the spatial map." width="672" />
+<p class="caption">
+Figure 2.8: Mean and SD on the spatial map.
+</p>
+</div>
+<p><img src="_main_files/figure-html/unnamed-chunk-28-1.png" width="672" /></p>
+</div>
+<div id="trend-at-each-location-1" class="section level3 hasAnchor" number="2.2.5">
+<h3><span class="header-section-number">2.2.5</span> Trend at each location<a href="eda.html#trend-at-each-location-1" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p><img src="_main_files/figure-html/unnamed-chunk-30-1.png" width="672" />
+### Means per month TEST</p>
+<p><img src="_main_files/figure-html/unnamed-chunk-31-1.png" width="672" />
+We see spatial patterns of the mean evolving over time.
+For example: From May until August there is a spatial separation in
+two parts that dissolves in september.
+As expected there is a large seasonal component regarding the means.</p>
+</div>
+<div id="sd-per-month-test-1" class="section level3 hasAnchor" number="2.2.6">
+<h3><span class="header-section-number">2.2.6</span> SD per month TEST<a href="eda.html#sd-per-month-test-1" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p><img src="_main_files/figure-html/unnamed-chunk-33-1.png" width="672" /></p>
+<p>For the standard deviation we see as well large differences in values
+during different months of the year.</p>
+</div>
+<div id="trend-per-month-test-1" class="section level3 hasAnchor" number="2.2.7">
+<h3><span class="header-section-number">2.2.7</span> Trend per month TEST<a href="eda.html#trend-per-month-test-1" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p><img src="_main_files/figure-html/unnamed-chunk-34-1.png" width="672" /></p>
+
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-ciemer2020early" class="csl-entry">
+Ciemer, Catrin, Lars Rehm, Juergen Kurths, Reik V Donner, Ricarda Winkelmann, and Niklas Boers. 2020. <span>“An Early-Warning Indicator for Amazon Droughts Exclusively Based on Tropical Atlantic Sea Surface Temperatures.”</span> <em>Environmental Research Letters</em> 15 (9): 094087.
+</div>
+<div id="ref-PIC" class="csl-entry">
+Climate Impact Research (PIK) e. V., Potsdam Institute for. 2021. <span>“Potsdam Insitute for Climate Impact Research.”</span> 2021. <a href="https://www.pik-potsdam.de/en">https://www.pik-potsdam.de/en</a>.
+</div>
+<div id="ref-funk2015climate" class="csl-entry">
+Funk, Chris, Pete Peterson, Martin Landsfeld, Diego Pedreros, James Verdin, Shraddhanand Shukla, Gregory Husak, et al. 2015. <span>“The Climate Hazards Infrared Precipitation with Stations-a New Environmental Record for Monitoring Extremes.”</span> <em>Scientific Data</em> 2 (1): 1–21.
+</div>
+<div id="ref-huang2017noaa" class="csl-entry">
+Huang, Boyin, Peter W Thorne, Viva F Banzon, Tim Boyer, Gennady Chepurin, Jay H Lawrimore, Matthew J Menne, et al. 2017. <span>“NOAA Extended Reconstructed Sea Surface Temperature (ERSST), Version 5.”</span> <em>NOAA National Centers for Environmental Information</em> 30: 8179–8205.
+</div>
+<div id="ref-schlund2020constraining" class="csl-entry">
+Schlund, Manuel, Veronika Eyring, Gustau Camps-Valls, Pierre Friedlingstein, Pierre Gentine, and Markus Reichstein. 2020. <span>“Constraining Uncertainty in Projected Gross Primary Production with Machine Learning.”</span> <em>Journal of Geophysical Research: Biogeosciences</em> 125 (11): e2019JG005619.
+</div>
+<div id="ref-schulzweida2019cdo" class="csl-entry">
+Schulzweida, Uwe. 2019. <span>“CDO User Guide (Version 1.9. 6).”</span> <em>Max Planck Institute for Meteorology: Hamburg, Germany</em>.
+</div>
+<div id="ref-smith2008improvements" class="csl-entry">
+Smith, Thomas M, Richard W Reynolds, Thomas C Peterson, and Jay Lawrimore. 2008. <span>“Improvements to NOAA’s Historical Merged Land–Ocean Surface Temperature Analysis (1880–2006).”</span> <em>Journal of Climate</em> 21 (10): 2283–96.
+</div>
+</div>
+</div>
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="related-work.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"whatsapp": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": null,
+"text": null
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": null,
+"text": null
+},
+"download": null,
+"search": {
+"engine": "fuse",
+"options": null
+},
+"toc": {
+"collapse": "subsection"
+}
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>

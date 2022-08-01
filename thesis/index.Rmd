@@ -3,9 +3,11 @@ title: "Predicting Droughts in the Amazon Basin based on Global Sea Surface Temp
 author: "Dario Lepke"
 site: bookdown::bookdown_site
 output:
-  bookdown::gitbook: default
+  bookdown::pdf_book:
     split_bib: FALSE
-#  bookdown::pdf_book:
+  bookdown::gitbook:
+    # split_by: section
+    split_bib: FALSE
 bibliography: ref-lib.bib
 biblio-style: apalike
 link-citations: yes
@@ -15,6 +17,7 @@ documentclass: book
 
 ```{r, include=FALSE}
 knitr::opts_chunk$set(echo=FALSE, warning = FALSE, message = FALSE)
+# options(knitr.duplicate.label = "allow")
 ```
 
 With future climate change droughts in the Amazon forest may become more

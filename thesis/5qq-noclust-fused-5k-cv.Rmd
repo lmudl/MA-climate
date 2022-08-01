@@ -1,3 +1,8 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
 # Noclust Fused 5k
 
 ```{r, echo = FALSE}
@@ -131,6 +136,7 @@ object.size(pc5)
 dim(pc5$data)
 pc5$data
 ?object.size
+rm(pc5)
 ```
 
 

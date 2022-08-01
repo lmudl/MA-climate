@@ -1,0 +1,21 @@
+default:
+  features_cv_path: "data/processed/noclust_sst_cv.rds"
+  target_cv_path: "data/processed/precip_cv.rds"
+  features_eval_path: "data/processed/noclust_sst_eval.rds"
+  target_eval_path: "data/processed/precip_eval.rds"
+  save_folder: "noclust-center-large-fused-5k"
+  nfold:  5
+  size_train:  60
+  size_test:  14
+  small:  FALSE
+  noclust: TRUE
+  model:  "fused"
+  parallelize: TRUE
+  maxsteps:  5000
+  gamma:  0
+  center_response: FALSE
+  standardize_response:  TRUE
+  standardize_features:  FALSE
+  include_ts_vars:  FALSE
+  diff_features:  FALSE
+  des_features:  FALSE
