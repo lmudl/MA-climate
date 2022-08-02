@@ -17,6 +17,7 @@ saveRDS(sst_dens_plot, "results/eda/sst_dens_plot.rds")
 
 # mean on raster plot ####
 sst_means <- calc(sst, mean)
+attr(sst_means, "var") <- "sst"
 sst_means_loc_plot <- plot_summary(sst_means) + 
   ggtitle("Mean of sst at each location")
 saveRDS(sst_means_loc_plot, "results/eda/sst_means_loc_plot.rds")
@@ -28,6 +29,7 @@ saveRDS(sst_means_dens_plot, "results/eda/sst_means_dens_plot.rds")
 
 # sd on raster plot ####
 sst_sds <- calc(sst, sd)
+attr(sst_sds, "var") <- "sst"
 sst_sds_loc_plot <- plot_summary(sst_sds)
 saveRDS(sst_sds_loc_plot, "results/eda/sst_sds_loc_plot.rds")
 
@@ -39,6 +41,7 @@ saveRDS(sst_sds_dens_plot, "results/eda/sst_sds_dens_plot.rds")
 # trend on raster plot ####
 # NOTE: we take trends from deseasonalised data
 sst_des <- readRDS("data/processed/rtsa_deseasonalised_sst.rds")
+sst_des@trends_slope <- add_var_as_attr(precip_des@trend_slope, "sst")
 sst_trends_loc_stl_plot <- plot_summary(sst_des@trend_slope)
 saveRDS(sst_trends_loc_stl_plot, "results/eda/sst_trends_loc_stl_plot.rds")
 # OR
@@ -48,7 +51,7 @@ saveRDS(sst_trends_loc_lm_plot, "results/eda/sst_trends_loc_lm_plot.rds")
 # compare and find that they are on a factor different
 
 # plot list of monthly mean and sd ####
-sst_plot_list <- mon_plots(sst)
+sst_plot_list <- mon_plots(sst, "sst")
 
 sst_mon_mean <- sst_plot_list[[1]]
 sst_mean_arrange <- ggarrange(plotlist = sst_mon_mean, ncol = 3, nrow = 4,

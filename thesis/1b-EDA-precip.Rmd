@@ -60,7 +60,7 @@ precip_dens_plot <- readRDS("../results/eda/precip_dens_plot.rds")
 ```
 
 Its form is a uni-modal, right-skewed density.
-The values range from 0 up to `max(precip_dens_plot$data$value)`, but only few observations take these high values, forming a large tail.
+The values range from 0 up to `r round(max(precip_dens_plot$data$value))`, but only few observations take these high values, forming a large tail.
 This might be a indication for large outliers in the data or due to 
 some locations with very high precipitation values in general.
 
@@ -76,7 +76,7 @@ precip_means_loc_plot$labels$fill <- "Mean"
 #          panel.grid.minor = element_blank(),
 #          legend.background = element_rect(fill='transparent'),
 #          legend.box.background = element_rect(fill='transparent'))
-precip_means_loc_plot + scale_fill_gradient2(low="brown", high ="dark green", midpoint = mean(precip_means_loc_plot$data$val, na.rm = TRUE))
+# precip_means_loc_plot + scale_fill_gradient2(low="brown", high ="dark green", midpoint = mean(precip_means_loc_plot$data$val, na.rm = TRUE))
 ```
 
 ```{r, eval=FALSE, include = FALSE, fig.cap="Density of means, means were computed for each location over the whole time period"}
@@ -98,7 +98,7 @@ precip_sds_loc_plot$labels$fill <- "SD"
 
 ```{r, mean-sd-precip, fig.cap= "Mean and standard deviation at each location. The standard deviation was computed over the whole time period. The white line on the scale at the side of the plots indicates the mean of the respective quantity"}
 p <- precip_means_loc_plot +  precip_sds_loc_plot  +
-  plot_annotation("Mean and SD of each location in the CAB for the complete time series")
+  plot_annotation("Precipitation mean and SD at each CAB location")
 p
 ```
 

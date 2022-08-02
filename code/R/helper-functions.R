@@ -144,9 +144,17 @@ plot_dens_gg <- function(raster_obj) {
 plot_summary <- function(summary) {
   df <- base::as.data.frame(cbind(coordinates(summary), getValues(summary)))
   colnames(df) <- c("Longitude","Latitude", "val")
-  plt <- ggplot(data = df, aes(x = Longitude, y = Latitude, fill = val)) +
-    geom_raster(interpolate = FALSE) +
-    scale_fill_gradient2(low = "red", high = "blue", midpoint = mean(df$val, na.rm = TRUE))
+  var <- attr(summary,"var")
+  if(var == "precip") {
+    plt <- ggplot(data = df, aes(x = Longitude, y = Latitude, fill = val)) +
+      geom_raster(interpolate = FALSE) +
+      scale_fill_gradient2(low = "brown", high = "dark green", midpoint = mean(df$val, na.rm = TRUE))
+  }
+  if(var == "sst") {
+    plt <- ggplot(data = df, aes(x = Longitude, y = Latitude, fill = val)) +
+      geom_raster(interpolate = FALSE) +
+      scale_fill_gradient2(low = "blue", high = "red", midpoint = mean(df$val, na.rm = TRUE))
+  }
   return(plt)
 }
 
@@ -166,12 +174,19 @@ get_trend <- function(vec) {
 # plot the trends of the data after computing it from the data
 # in: data for example: aggregate::precip() and the trends computed by get_trend
 # out: plot showing the trend values on a map
-plot_trends <- function(data, trends) {
+plot_trends <- function(data, trends, var) {
   df <- base::as.data.frame(cbind(coordinates(data), trends))
   colnames(df) <- c("Longitude","Latitude", "val")
-  plt <- ggplot(data = df, aes(x = Longitude, y = Latitude, fill = val)) +
-    geom_raster(interpolate = FALSE) +
-    scale_fill_gradient2(low = "red", high = "blue", midpoint = mean(df$val, na.rm=TRUE))
+  if(var == "precip") {
+    plt <- ggplot(data = df, aes(x = Longitude, y = Latitude, fill = val)) +
+      geom_raster(interpolate = FALSE) +
+      scale_fill_gradient2(low = "brown", high = "dark green", midpoint = mean(df$val, na.rm = TRUE))
+  }
+  if(var == "sst") {
+    plt <- ggplot(data = df, aes(x = Longitude, y = Latitude, fill = val)) +
+      geom_raster(interpolate = FALSE) +
+      scale_fill_gradient2(low = "blue", high = "red", midpoint = mean(df$val, na.rm = TRUE))
+  }
   return(plt)
 }
 
@@ -187,6 +202,11 @@ create_ind_mat <- function(raster_obj) {
   return(ind_mat)
 }
 
+add_var_as_attr <- function(object, variable) {
+  attr(object, "var") <- variable
+  return(object)
+}
+
 # creates a list which contains 3 lists with each 12 plots
 # first list for loc means for each month
 # second list for loc sds for each month
@@ -195,7 +215,7 @@ create_ind_mat <- function(raster_obj) {
 # the trends from the deseasonalised data
 # in: raster object
 # out: list with 1. list of month mean 2. list of month sd
-mon_plots <- function(raster_obj) {
+mon_plots <- function(raster_obj, variable) {
   ind_mat <- create_ind_mat(raster_obj)
   plot_list_m <- list()
   plot_list_sd <- list()
@@ -206,6 +226,11 @@ mon_plots <- function(raster_obj) {
     mon_means <- calc(mon, mean)
     mon_sd <- calc(mon, sd)
     mon_trend <- calc(mon, get_trend)
+    
+    mon_means <- add_var_as_attr(mon_means, variable)
+    mon_sd <- add_var_as_attr(mon_sd, variable)
+    mon_trend <- add_var_as_attr(mon_trend, variable)
+    
     m_plot <- plot_summary(mon_means) + ggtitle(paste(month.name[i])) +
       theme(#axis.text.x=element_blank(), #remove x axis labels
         #axis.ticks.x=element_blank(), #remove x axis ticks

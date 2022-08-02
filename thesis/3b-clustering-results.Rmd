@@ -1,4 +1,4 @@
-# Clustering results
+## Clustering results
 
 ```{r, include=FALSE}
 library(patchwork)
@@ -9,7 +9,7 @@ library(patchwork)
 We summarize and compare the results we obtain
 if we center or don't center the data.
 
-## K-means and PAM gap statistics without PCA
+### K-means and PAM gap statistics without PCA
 
 ```{r, echo = FALSE}
 replotted_gap_kmeans_centered_plot <- readRDS("../results/clustering/replotted_gap_kmeans_centered_plot.rds")
@@ -25,7 +25,7 @@ We can see that on the original data, neither K-means nor PAM
 find an optimal number of clusters that is lower than the maximum
 number specified.
 
-### Scree plot
+#### Scree plot
 
 ```{r, echo = FALSE, fig.cap= "Scree plot with the principal components on the x-axis and the respective percentage of variance explained on the y-axis. The PCA was done after centering the data.The first three and four PC`s together explain 67.77 and 70.69% of the variance respectively"}
 scree_plot_pca_centered <- readRDS("../results/clustering/scree_plot_pca_centered.rds")
@@ -38,7 +38,7 @@ The variance that is explained by the principal components indicates that, the 3
 Following we compare the results of a gap statistic when the first 3 and 4 principal components are used, for K-means and PAM respectively.
 The first three and four PC`s used explain 67.77 and 70.69% of the variance respectively.
 
-## K-means and PAM gap statistics after applying PCA
+#### K-means and PAM gap statistics after applying PCA
 
 
 ```{r, echo = FALSE, fig.cap= "Gap statistic plots for K-means and PAM when using 3 and 4 PC's respectively."}
@@ -51,7 +51,7 @@ find 5 and 12 as optimal number of clusters, respectively. When we choose to use
 the first 4 principal components, both algorithms choose 13 as the optimal number.
 
 
-## Summary
+### Summary
 We used the gap statistic as evaluation tool to find the optimal number
 of clusters in our data.  
 It was applied by using K-means and PAM as cluster algorithms, on

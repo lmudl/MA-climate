@@ -1,6 +1,6 @@
-# Clustering Methods
+## Clustering Methods
 
-## K-means
+### K-means
 In the following we briefly describe the K-means procedure.
 Beforehand we have to specify a number of clusters $C$ we believe exist in our data. Then we randomly initialize $C$ cluster centers in the feature space.
 Now two steps are repeated until convergence:
@@ -47,7 +47,7 @@ Now how "large" these violations have to be so that
 k-means does not work well anymore has no clear-cut answer.
 
 
-## K-medoids
+### K-medoids
 We can adjust k-means procedure so that we can use other distances
 than the Euclidean distance. The only part of the k-means algorithm
 that uses Euclidean distance is when we compute the cluster centers.
@@ -55,11 +55,11 @@ We can replace this step by formalizing an optimization with respect
 to the cluster members. For example so that each center
 has to be one of the observations assigned to the cluster. K-medoids is far more computationally intensive than K-means.
 
-### K-medoids characteristics
+#### K-medoids characteristics
 K-medoids is less sensitive to outliers, because it minimizes sum of pairwise dissimilarities instead of sum of squared Euclidean distances. As stated above it is also more computationally intensive.
 
 
-## PCA
+### PCA
 Goal is reduction of correlated and eventually large number p variables to a few.
 We accomplish this by creating new variables that are linear combinations of the 
 original ones. We call these new variables principle components.
@@ -122,7 +122,7 @@ The columns of $UD$ are the principal components of $X$.
 So the SVD gives us the matrix $V$ (the first $q$ columns give the solution to the minimization problem above) as well as the principal components from $UD$ (@hastie2009elements).
 
 
-## Gap statistic
+### Gap statistic
 ```{r, include = FALSE, echo=FALSE}
 #(see gap statistic in plain english stackoverflow)
 ```

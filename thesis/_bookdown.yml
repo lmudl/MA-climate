@@ -7,5 +7,5 @@ documentclass: book
 output_dir: "thesis-book"
 delete_merged_file: TRUE
 rmd_files:
-  html: ["index.Rmd", "1a-related-work.Rmd", "1b-EDA-precip.Rmd", "1bb-EDA-sst.Rmd"]
-  latex: ["index.Rmd", "1a-related-work.Rmd", "1b-EDA-precip.Rmd", "1bb-EDA-sst.Rmd"]
+  html: [ "index.Rmd", "1a-related-work.Rmd", "1b-EDA-precip.Rmd", "1c-glyph-plots.Rmd", "1bb-EDA-sst.Rmd"]
+  latex: ["index.Rmd", "1a-related-work.Rmd", "1b-EDA-precip.Rmd", "1c-glyph-plots.Rmd", "1bb-EDA-sst.Rmd"]

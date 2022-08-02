@@ -15,31 +15,105 @@ One possible model for the problem at hand is a LASSO regression model.
 
 In general for the linear model:
 
-$$y_i = \beta_0 + \pmb{x}_i^T\pmb{\beta} + \epsilon_i  $$
+\begin{equation}
+y_i = \beta_0 + \pmb{x}_i^T\pmb{\beta} + \epsilon_i (\#eq:lm-gen)
+\end{equation}
+
+see \@ref(eq:lm-gen)
 Where the $y_i$ refers to the mean precipitation for a given month $i$ and $x_i$ is the vector of sea surface temperature at different locations around the globe.
 $\epsilon_i$ is the residual and we wish to estimate the $\beta$´s from the data.
 As already stated this is not possible with a classic linear model since the number of predictors exceeds the number of observations. We therefore can not estimate a $\beta$ for every grid point in the sea.
 From a physical point of view it also seems reasonable that some regions in the ocean have a higher predictive power than others. For example regions that are closer to the Amazon may have more influence on precipitation in the same month. But regions more far away may have more information on the precipitation half a year in the future.
 We therefore would like to use a model that can find the most important regions in the sea for predicting precipitation for some point in the future.
 One possible solution for this is a LASSO regression model, as implemented in
-R by the *glmnet* package.
+R by the *glmnet* package (@glmnet-package).
 This model "automatically" performs model selection, but be aware that because of the time dependencies in our data, normal Cross Validation methods may be unjustified or at least have to be applied with caution.
 The glmnet package implements the regression problem in the following manner, solving:
 
-$$\min_{\beta_0, \beta} \frac{1}{N} \sum_{i=1}^N w_il(y_i,\beta_0 + \beta^Tx_i) + \lambda [(1-\alpha)||\beta||_2^2/2 + \alpha||\beta||_1] $$
+\begin{equation}
+\min_{\beta_0, \beta} \frac{1}{N} \sum_{i=1}^N w_il(y_i,\beta_0 + \beta^Tx_i) + \lambda [(1-\alpha)||\beta||_2^2/2 + \alpha||\beta||_1] (\#eq:glmnet)
+\end{equation}
+
 This is a lasso regression for $\alpha = 1$ and ridge regression for $\alpha = 0$, $\alpha$ controls the overall strength of regularization or penalty.
-Intuitively this means we try to find those $\beta$´s that minimise the negative log likelihood of our data (this is equal to maximizing the log-likelihood). But at the same time we can not include too many $\beta$ since this will make the second and third term in the formula grow.
+Intuitively this means we try to find those $\beta$´s that minimize the negative log likelihood of our data (this is equal to maximizing the log-likelihood). But at the same time we can not include too many $\beta$ since this will make the second and third term in the formula grow.
 As result the algorithm chooses only those predictors that have the most predictive power.
 How many predictors are included depends on the strength of regularization given by $\alpha$.
 *Remark*: Among strongly correlated predictors only one is chosen in the classical lasso model. Ridge regression shrinks the coefficients to zero. 
 Elastic net with $\alpha=0.5$ tends to either include or drop the entire group together.
 To specifically choose a group of predictors, variations of the lasso or other models have to be considered.
 
+## Optimization
+The glmnet function finds a solution path for the lasso problem
+via coordinate descent.
+The implemented algorithm was suggested by @van2007prediction.
+We can write down the optimization procedure as follows:
+Given $N$ observation pairs $(x_i, y_i)$ with $Y \in \mathbb{R}$
+and $X \in \mathbb{R}^p$, we approximate the regression function
+with $E(Y|X = x) = \beta_0 + x^T\beta$, Here $x_{ij}$
+are considered standardized, so $\sum_{i=1}^N=0$,$\frac{1}{N}\sum_{i=1}^Nx_{ij}^2=1$ for $j = 1,...,p$.
+We then solve the problem:
+
+\begin{equation}
+\min_{(\beta_0, \beta)\in\mathbb{R}^{p+1}}  \big{[} \frac{1}{2N}
+\sum_{i=1}^N (y_i - \beta_0 - x_i^T\beta)^2 + \lambda [(1-\alpha)||\beta||_2^2/2 + \alpha||\beta||_1 \big{]}
+(\#eq:glmnet2)
+\end{equation}
+
+Note that this solves the elastic net problem that also 
+uses a ridge penalty. We follow the elastic net description
+but in our case $\alpha = 1$, using only the lasso penalty.
+We consider now a coordinate descent step for solving \@ref(eq:glmnet2).
+Given we have estimates $\tilde{\beta_0}$ and $\tilde{\beta_l}$
+and we want to partially optimize with respect to $\beta_j$, and $i \neq j$. When $\beta_j > 0$, 
+
+\begin{equation}
+\left.\frac{\partial R_{\lambda}}{\partial \beta_{j}}\right|_{\beta=\tilde{\beta}}=-\frac{1}{N} \sum_{i=1}^{N} x_{i j}\left(y_{i}-\tilde{\beta}_{0}-x_{i}^{\top} \tilde{\beta}\right)+\lambda(1-\alpha) \beta_{j}+\lambda \alpha .
+(\#eq:glm-large)
+\end{equation}
+
+And similar expressions exist for $\tilde{\beta}_{j}<0$. $\tilde{\beta}_{j}=0$ is treated separately.
+The coordinate-wise update has then the form:
+
+
+\begin{equation}
+\tilde{\beta}_{j} \leftarrow \frac{S\left(\frac{1}{N} \sum_{i=1}^{N} x_{i j}\left(y_{i}-\tilde{y}_{i}^{(j)}\right), \lambda \alpha\right)}{1+\lambda(1-\alpha)}
+.
+(\#eq:glm-step)
+\end{equation}
+
+with
+
+- $\tilde{y}_{i}^{(j)}=\tilde{\beta}_{0}+\sum_{\ell \neq j} x_{i \ell} \tilde{\beta}_{\ell}$ standing for fitted value without the contribution from $x_{i j}$, and therefore $y_{i}-\tilde{y}_{i}^{(j)}$ is the partial residual when fitting $\beta_{j}$. Because we applied a standardization, $\frac{1}{N} \sum_{i=1}^{N} x_{i j}\left(y_{i}-\tilde{y}_{i}^{(j)}\right)$ denotes the simple least-squares coefficient for fitting this partial residual to $x_{i j}$.
+
+- $S(z, \gamma)$ being the soft-thresholding operator. It's value is given by:
+
+\begin{equation}
+\operatorname{sign}(z)(|z|-\gamma)_{+}= \begin{cases}z-\gamma & \text { if } z>0 \text { and } \gamma<|z| \\ z+\gamma & \text { if } z<0 \text { and } \gamma<|z| \\ 0 & \text { if } \gamma \geq|z| .\end{cases} (\#eq:soft)
+\end{equation}
+
+So in summary the steps are as follows:
+Compute the simple least-squares coefficient on the partial residual,
+then apply soft-thresholding and proportional shrinkage for
+the lasso and ridge penalty, respectively.
+Again for our use case, since we use the lasso and $\alpha = 1$,
+we only apply soft-thresholding and no proportional shrinkage.
+
+The solutions are computed starting from smallest $\lambda_{max}$ for
+which all elements in $\hat{\beta}=0$. For all
+larger $\lambda$ the coefficients then stay 0. 
+The smallest $\lambda$ value
+$\lambda_{min}$ is then selected by $\lambda_{min}$ $\lambda_{max}$. The complete searched vector is constructed
+as sequence of K values, typical values are $\epsilon = 0.001$ and
+$K = 100$. This procedure is an example of so called *warm starts*.
+By default they always center the predictor variable.
+For additional information on other methods how speedup
+is obtainred refer to Section 2 in @glmnet-package.
+
 ## TODO here
 maybe drop into with linear model
 just put lasso formula directly
 talk about the stuff that is written already
-note probelms with correaltion of predictors and grouping
+note probelms with correlation of predictors and grouping
 
 
 

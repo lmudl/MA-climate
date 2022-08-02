@@ -1,9 +1,11 @@
+# Clustering
+
 In this chapter we will first summarize the main ideas of clustering
 and then apply it to the precipitation data.
 If not indicated otherwise the information is taken
 from Elements of Statistical Learning.
 
-# Main Idea Clustering
+## Main Idea Clustering
 We can describe an object by a set of measurements or its similarity to other objects.
 Using this similarity we can put a collection of objects into subgroups or clusters.
 The objects in the subgroups should then be more
