@@ -123,3 +123,40 @@ they compute projection onto the null and basic solutions of linear systems, the
 They change algorithm 2 becaus using xtild and stuff because are options are needed when D has structure using xtilde will destroy special structure in D.
 So when X general we use xtilde but using xtilde will destroy structure in D, therefore when X general AND D has structure use following:
 
+
+### argumentation
+They use gen lasso framework for writing it down
+related work, dual in general problem, primal did not solve that
+dual is not distinct
+all lambdas therefore path algorithm
+write down algorithm to solve
+for alg 2 general x use d tilde and x tilde
+if x is rank defficient add ridge penalty (see formula in og paper)
+if x is identity they use qr instead of linear system solvers
+they are direct and can be cleverly updated
+use direct solvers because decisions fom past influence future decisions
+if D has special structure they propose special implementations
+for fused lasso problem this means that sparse matrices have to 
+be solved. arbitrary solutions finding easy min l2 norm is harder,in general.
+they show how to compute l2 norm solutions from arbitrary solution.
+Using the special structure for (sparse) fused lasso problem
+of D, computing projections onto null and solving laplacian
+systems. because if D penalty matrix of undirected graph
+DTD is laplacian.
+
+
+show alg in general
+sho alg for general x
+  explain what to do when rank defficient
+but then use specialized implementation
+  explain DTD is sparse but solution has to be found 
+    with little trick
+  DTD is laplacian system and can be solved by cholesky.
+
+
+
+
+
+
+
+

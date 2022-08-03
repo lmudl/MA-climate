@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2021/W32TeX) (preloaded format=pdflatex 2021.6.3)  2 AUG 2022 21:02
+This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2021/W32TeX) (preloaded format=pdflatex 2021.6.3)  3 AUG 2022 12:58
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -273,6 +273,10 @@ Package graphics Info: Driver file: pdftex.def on input line 107.
 \Gin@req@height=\dimen167
 \Gin@req@width=\dimen168
 )
+\cslhangindent=\skip61
+\csllabelwidth=\skip62
+\cslentryspacingunit=\skip63
+
 (c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/hyperref/hyperref
 .sty
 Package: hyperref 2021-02-27 v7.00k Hypertext links for LaTeX
@@ -430,7 +434,7 @@ Package: uniquecounter 2019/12/15 v1.4 Provide unlimited unique counter (HO)
 Package uniquecounter Info: New unique counter `rerunfilecheck' on input line 2
 86.
 )
-\Hy@SectionHShift=\skip61
+\Hy@SectionHShift=\skip64
 )
 (c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/l3backend/l3backe
 nd-pdftex.def
@@ -440,24 +444,24 @@ File: l3backend-pdftex.def 2021-05-07 L3 backend support: PDF output (pdfTeX)
 ) (./_main.aux)
 \openout1 = `_main.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 79.
-LaTeX Font Info:    ... okay on input line 79.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 79.
-LaTeX Font Info:    ... okay on input line 79.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 79.
-LaTeX Font Info:    ... okay on input line 79.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 79.
-LaTeX Font Info:    ... okay on input line 79.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 79.
-LaTeX Font Info:    ... okay on input line 79.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 79.
-LaTeX Font Info:    ... okay on input line 79.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 79.
-LaTeX Font Info:    ... okay on input line 79.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 79.
-LaTeX Font Info:    ... okay on input line 79.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 79.
-LaTeX Font Info:    ... okay on input line 79.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 102.
+LaTeX Font Info:    ... okay on input line 102.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 102.
+LaTeX Font Info:    ... okay on input line 102.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 102.
+LaTeX Font Info:    ... okay on input line 102.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 102.
+LaTeX Font Info:    ... okay on input line 102.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 102.
+LaTeX Font Info:    ... okay on input line 102.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 102.
+LaTeX Font Info:    ... okay on input line 102.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 102.
+LaTeX Font Info:    ... okay on input line 102.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 102.
+LaTeX Font Info:    ... okay on input line 102.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 102.
+LaTeX Font Info:    ... okay on input line 102.
 
 (c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/epstopdf-pkg/epst
 opdf-base.sty
@@ -470,7 +474,7 @@ pdf-sys.cfg
 File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Liv
 e
 ))
-Package hyperref Info: Link coloring OFF on input line 79.
+Package hyperref Info: Link coloring OFF on input line 102.
 
 (c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/hyperref/nameref.
 sty
@@ -486,46 +490,46 @@ Package: gettitlestring 2019/12/15 v1.6 Cleanup title references (HO)
 )
 \c@section@level=\count293
 )
-LaTeX Info: Redefining \ref on input line 79.
-LaTeX Info: Redefining \pageref on input line 79.
-LaTeX Info: Redefining \nameref on input line 79.
+LaTeX Info: Redefining \ref on input line 102.
+LaTeX Info: Redefining \pageref on input line 102.
+LaTeX Info: Redefining \nameref on input line 102.
 (./_main.out) (./_main.out)
 \@outlinefile=\write3
 \openout3 = `_main.out'.
 
-LaTeX Font Info:    Trying to load font information for OT1+lmr on input line 8
-1.
+LaTeX Font Info:    Trying to load font information for OT1+lmr on input line 1
+04.
 (c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/lm/ot1lmr.fd
 File: ot1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
-LaTeX Font Info:    Trying to load font information for OML+lmm on input line 8
-1.
+LaTeX Font Info:    Trying to load font information for OML+lmm on input line 1
+04.
 (c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/lm/omllmm.fd
 File: omllmm.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
 LaTeX Font Info:    Trying to load font information for OMS+lmsy on input line 
-81.
+104.
 (c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/lm/omslmsy.fd
 File: omslmsy.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
 LaTeX Font Info:    Trying to load font information for OMX+lmex on input line 
-81.
+104.
 (c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/lm/omxlmex.fd
 File: omxlmex.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <12> on input line 81.
+(Font)              <12> on input line 104.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <8> on input line 81.
+(Font)              <8> on input line 104.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <6> on input line 81.
-LaTeX Font Info:    Trying to load font information for U+msa on input line 81.
-
+(Font)              <6> on input line 104.
+LaTeX Font Info:    Trying to load font information for U+msa on input line 104
+.
 (c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Trying to load font information for U+msb on input line 81.
-
+LaTeX Font Info:    Trying to load font information for U+msb on input line 104
+.
 (c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 ) [1
@@ -555,30 +559,63 @@ Chapter 1.
 
 ]
 Chapter 2.
-[9] (./_main.aux)
+[9] [10
+
+]
+Chapter 3.
+[11] [12]
+Chapter 4.
+LaTeX Font Info:    Trying to load font information for TS1+lmr on input line 2
+10.
+(c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/lm/ts1lmr.fd
+File: ts1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
+) [13
+
+] [14]
+Chapter 5.
+[15
+
+] [16] [17] (./_main.aux)
 Package rerunfilecheck Info: File `_main.out' has not changed.
-(rerunfilecheck)             Checksum: C19B7C93BD0A773342DC38824D880B8E;614.
+(rerunfilecheck)             Checksum: 0F91D7C900D31AA7D7E7FB8FBB794EFF;2356.
  ) 
 Here is how much of TeX's memory you used:
- 10200 strings out of 480517
- 148389 string characters out of 5898507
- 446521 words of memory out of 5000000
- 27670 multiletter control sequences out of 15000+600000
- 460768 words of font info for 69 fonts, out of 8000000 for 9000
+ 10377 strings out of 480517
+ 151320 string characters out of 5898507
+ 457318 words of memory out of 5000000
+ 27763 multiletter control sequences out of 15000+600000
+ 474367 words of font info for 74 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
- 60i,6n,66p,324b,350s stack positions out of 5000i,500n,10000p,200000b,80000s
-{c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-ec.
-enc}<c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/l
-mbx10.pfb><c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/publi
-c/lm/lmbx12.pfb><c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1
-/public/lm/lmr10.pfb><c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/fonts/
-type1/public/lm/lmr12.pfb><c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/f
-onts/type1/public/lm/lmr17.pfb><c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-d
-ist/fonts/type1/public/lm/lmro10.pfb>
-Output written on _main.pdf (9 pages, 161674 bytes).
+ 60i,9n,66p,500b,390s stack positions out of 5000i,500n,10000p,200000b,80000s
+{c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-mat
+hit.enc}{c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/
+lm-mathsy.enc}{c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvi
+ps/lm/lm-mathex.enc}{c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/fonts/e
+nc/dvips/lm/lm-rm.enc}{c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/fonts
+/enc/dvips/lm/lm-ec.enc}{c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/fon
+ts/enc/dvips/lm/lm-ts1.enc}<c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/
+fonts/type1/public/lm/lmbx10.pfb><c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf
+-dist/fonts/type1/public/lm/lmbx12.pfb><c:/Users/Mufasa/AppData/Roaming/TinyTeX
+/texmf-dist/fonts/type1/public/lm/lmex10.pfb><c:/Users/Mufasa/AppData/Roaming/T
+inyTeX/texmf-dist/fonts/type1/public/lm/lmmi10.pfb><c:/Users/Mufasa/AppData/Roa
+ming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmmi5.pfb><c:/Users/Mufasa/AppDat
+a/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmmi7.pfb><c:/Users/Mufasa/A
+ppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr10.pfb><c:/Users/Muf
+asa/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr12.pfb><c:/User
+s/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr17.pfb><c:
+/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr5.pfb
+><c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr7
+.pfb><c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/
+lmri10.pfb><c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/publ
+ic/lm/lmro10.pfb><c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/fonts/type
+1/public/lm/lmsy10.pfb><c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/font
+s/type1/public/lm/lmsy7.pfb><c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist
+/fonts/type1/public/amsfonts/symbols/msbm10.pfb><c:/Users/Mufasa/AppData/Roamin
+g/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm7.pfb>
+Output written on _main.pdf (17 pages, 292286 bytes).
 PDF statistics:
- 120 PDF objects out of 1000 (max. 8388607)
- 96 compressed objects within 1 object stream
- 23 named destinations out of 1000 (max. 500000)
- 49 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 361 PDF objects out of 1000 (max. 8388607)
+ 302 compressed objects within 4 object streams
+ 100 named destinations out of 1000 (max. 500000)
+ 145 words of extra memory for PDF output out of 10000 (max. 10000000)
 

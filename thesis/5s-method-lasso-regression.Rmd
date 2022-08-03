@@ -102,7 +102,7 @@ The solutions are computed starting from smallest $\lambda_{max}$ for
 which all elements in $\hat{\beta}=0$. For all
 larger $\lambda$ the coefficients then stay 0. 
 The smallest $\lambda$ value
-$\lambda_{min}$ is then selected by $\lambda_{min}$ $\lambda_{max}$. The complete searched vector is constructed
+$\lambda_{min}$ is then selected by $\lambda_{min}=\epsilon \lambda_{max}$. The complete searched vector is constructed
 as sequence of K values, typical values are $\epsilon = 0.001$ and
 $K = 100$. This procedure is an example of so called *warm starts*.
 By default they always center the predictor variable.
