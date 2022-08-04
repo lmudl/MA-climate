@@ -6,10 +6,29 @@ link-citations: yes
 documentclass: book
 output_dir: "thesis-book"
 delete_merged_file: TRUE
+output:
+  pdf_document:
+    latex_engine: xelatex
+  bookdown::pdf_document2:
+    latexe_engine: lualatex
 rmd_files:
-  html: [ "index.Rmd", "1a-related-work.Rmd", "1b-EDA-precip.Rmd", "1c-glyph-plots.Rmd", "1bb-EDA-sst.Rmd",
-    "1d-corr-summary.Rmd", "2-main-idea-clustering.Rmd", "3a-clustering-methods.Rmd",
-    "4-analyse-clustering-results.Rmd", "5s-method-lasso-regression.Rmd", "5t-method-fused-lasso.Rmd"]
+  html: [ "index.Rmd", 
+  "1a-related-work.Rmd", 
+  "1b-EDA-precip.Rmd", 
+  "1c-glyph-plots.Rmd", 
+  "1bb-EDA-sst.Rmd",
+    "1d-corr-summary.Rmd", 
+    "2-main-idea-clustering.Rmd", 
+    "3a-clustering-methods.Rmd",
+    "4-analyse-clustering-results.Rmd", 
+    "5s-method-lasso-regression.Rmd",
+    "z-test-lasso-og.Rmd", 
+    "z-test-lasso-stand.Rmd", 
+    "z-test-deseas-lasso.Rmd", 
+    "z-test-lasso-diff1.Rmd",
+    "5t-method-fused-lasso.Rmd"]
   latex: [ "index.Rmd", "1a-related-work.Rmd", "1b-EDA-precip.Rmd", "1c-glyph-plots.Rmd", "1bb-EDA-sst.Rmd",
     "1d-corr-summary.Rmd", "2-main-idea-clustering.Rmd", "3a-clustering-methods.Rmd",
-    "4-analyse-clustering-results.Rmd", "5s-method-lasso-regression.Rmd", "5t-method-fused-lasso.Rmd"]
+    "4-analyse-clustering-results.Rmd", "5s-method-lasso-regression.Rmd", 
+    "z-test-lasso-og.Rmd", "z-test-lasso-stand.Rmd", "z-test-deseas-lasso.Rmd", "z-test-lasso-diff1.Rmd",
+    "5t-method-fused-lasso.Rmd"]

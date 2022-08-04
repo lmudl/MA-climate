@@ -25,7 +25,7 @@ We do so by minimizing the mean scatter inside the clusters.
 We summarize this scatter as within-sum-of-squares
 
 \begin{equation} 
-W(C) = \frac{1}{2} \sum_{k=1}^{K} \sum_{C(i)=k} \sum_{C(i´)=k} ||x_i-x_{i´}||^2 \\
+W(C) = \frac{1}{2} \sum_{k=1}^{K} \sum_{C(i)=k} \sum_{C(i´)=k} ||x_i-x_{i´}||^2 
         = \sum_{k=1}^K N_k \sum_{C(i)=k} ||x_i-\bar{x}_k ||^2
 (\#eq:wss)
 \end{equation}

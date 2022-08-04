@@ -485,21 +485,134 @@ we want to cluster cells into homogen groups.</p>
 <h2><span class="header-section-number">4.2</span> Clustering Methods</h2>
 <div id="k-means" class="section level3" number="4.2.1">
 <h3><span class="header-section-number">4.2.1</span> K-means</h3>
+<p>In the following we briefly describe the K-means procedure.
+Beforehand we have to specify a number of clusters <span class="math inline">\(C\)</span> we believe exist in our data. Then we randomly initialize <span class="math inline">\(C\)</span> cluster centers in the feature space.
+Now two steps are repeated until convergence:</p>
+<ol style="list-style-type: decimal">
+<li>For each center we identify the points that are the closest to this center.<br />
+These points “belong” now to a cluster <span class="math inline">\(C\)</span>.</li>
+<li>In each cluster we compute the mean of each variable and get a vector of means.
+This mean vector is now the new center of the cluster.</li>
+</ol>
+<p>As a measure of dissimilarity we use the Euclidean distance:</p>
+<p><span class="math display" id="eq:eucl-dist">\[\begin{equation}
+d(x_i,x_{i´}) = \sum_{j=1}^p(x_{ij}-x_{i´j})^2=||x_i-x_{i´}||^2
+\tag{4.1}
+\end{equation}\]</span></p>
+<p>Meaning for the points <span class="math inline">\(i\)</span> and <span class="math inline">\(i´\)</span> we compute the squared difference for each
+variable and sum them up.
+As stated above we are searching for clusters that are
+themselves compact, meaning homogeneous.
+We do so by minimizing the mean scatter inside the clusters.
+We summarize this scatter as within-sum-of-squares</p>
+<p><span class="math display" id="eq:wss">\[\begin{equation}
+W(C) = \frac{1}{2} \sum_{k=1}^{K} \sum_{C(i)=k} \sum_{C(i´)=k} ||x_i-x_{i´}||^2 \\
+        = \sum_{k=1}^K N_k \sum_{C(i)=k} ||x_i-\bar{x}_k ||^2
+\tag{4.2}
+\end{equation}\]</span></p>
+<p>where <span class="math inline">\(\bar{x} = (\bar{x}_{1k},...,\bar{x}_{pk})\)</span> stands for the mean vectors of the <span class="math inline">\(k\)</span>th
+cluster and <span class="math inline">\(N_k = \sum_{i=1}^N I(C(i)=k)\)</span>.</p>
 </div>
 <div id="kmeans-characteristics" class="section level3" number="4.2.2">
 <h3><span class="header-section-number">4.2.2</span> Kmeans characteristics</h3>
+<p>variance of each distribution of each
+attribute (variable) is spherical, variance is
+symmetrical?
+all variables have same variance, not the case
+in our example, therefore scaling or pca
+equal number of observations in each clusters, we don`t know</p>
+<p>Since we use the Euclidean distance the similarity measures will be sensitive to outliers and scale.
+K-means assumes that the variance of a variable´s distribution is spherical, meaning it wight not work well in situations that violate this assumptions (f.e non-spherical data). Further assumptions are same variance of the variables, and equally sized clusters.
+Now how “large” these violations have to be so that
+k-means does not work well anymore has no clear-cut answer.</p>
 </div>
 <div id="k-medoids" class="section level3" number="4.2.3">
 <h3><span class="header-section-number">4.2.3</span> K-medoids</h3>
+<p>We can adjust k-means procedure so that we can use other distances
+than the Euclidean distance. The only part of the k-means algorithm
+that uses Euclidean distance is when we compute the cluster centers.
+We can replace this step by formalizing an optimization with respect
+to the cluster members. For example so that each center
+has to be one of the observations assigned to the cluster. K-medoids is far more computationally intensive than K-means.</p>
 <div id="k-medoids-characteristics" class="section level4" number="4.2.3.1">
 <h4><span class="header-section-number">4.2.3.1</span> K-medoids characteristics</h4>
+<p>K-medoids is less sensitive to outliers, because it minimizes sum of pairwise dissimilarities instead of sum of squared Euclidean distances. As stated above it is also more computationally intensive.</p>
 </div>
 </div>
 <div id="pca" class="section level3" number="4.2.4">
 <h3><span class="header-section-number">4.2.4</span> PCA</h3>
+<p>Goal is reduction of correlated and eventually large number p variables to a few.
+We accomplish this by creating new variables that are linear combinations of the
+original ones. We call these new variables principle components.
+The new variables are not correlated any more and ordered according
+to the variance they explain. The first <span class="math inline">\(k &lt; p\)</span> principal components then contain the majority
+of variance (<span class="citation">Fahrmeir et al. (<a href="#ref-fahrmeir1996multivariate" role="doc-biblioref">1996</a>)</span>).
+As they are ordered they also provide a sequence of best linear approximations
+of our data.
+Let <span class="math inline">\(x_1, x_2,...,x_N\)</span>, be our observations and we represent them by a rank-q linear
+model</p>
+<p><span class="math display" id="eq:rank-lin">\[\begin{equation}
+f(\lambda) = \mu + V_q\lambda
+\tag{4.3}
+\end{equation}\]</span></p>
+<p>with <span class="math inline">\(\mu\)</span> a location vector in <span class="math inline">\(\mathbb{R}^p\)</span> and <span class="math inline">\(V_q\)</span> is a <span class="math inline">\(p \times q\)</span> matrix
+with columns being orthogonal unit vectors as columns. <span class="math inline">\(\lambda\)</span> is a <span class="math inline">\(q\)</span> vector
+of parameters.
+In other words we are trying to fit a hyperplane of rank q to the data.
+If we fit this model to minimize reconstruction error using least squares we solve</p>
+<p><span class="math display" id="eq:min-rec-1">\[\begin{equation} \min_{\mu, \{\lambda_i\}, V_q } \sum_{i=1}^N||x_i - \mu - V_q\lambda_i ||^2
+\tag{4.4}
+\end{equation}\]</span></p>
+<p>If we partially optimize for <span class="math inline">\(\mu\)</span> and <span class="math inline">\(\lambda_i\)</span> we obtain</p>
+<p><span class="math display">\[ \hat{\mu} = \bar{x},\]</span>
+<span class="math display">\[\hat{\lambda_i} = V_q^T(x_i - \bar{x}) \]</span>
+Therefore we need to search for the orthogonal matrix <span class="math inline">\(V_q\)</span></p>
+<p><span class="math display" id="eq:min-rec-2">\[\begin{equation}
+\min_{V_q} \sum_{i=1}^N ||(x_i-\bar{x}) - V_qV_q^t(x_i-\bar{x})||^2
+\tag{4.5}
+\end{equation}\]</span></p>
+<p>We can assume here that <span class="math inline">\(\bar{x}\)</span> is 0, if this not the case we can simply
+center the observations <span class="math inline">\(\tilde{x}_i = x_i - \bar{x}\)</span>.
+<span class="math inline">\(H_q = V_qV_q^T\)</span> projects each observation <span class="math inline">\(x_i\)</span> from the
+original feature space onto the subspace that is spanned by the columns of <span class="math inline">\(V_q\)</span>.
+<span class="math inline">\(H_qx_i\)</span> is then the orthogonal projection of <span class="math inline">\(x_i\)</span>
+Hence <span class="math inline">\(H_q\)</span> is also called the <em>projection matrix</em>.</p>
+<p>We find <span class="math inline">\(V_q\)</span> then by constructing the <em>singular value decomposition</em> of our data matrix X.
+<span class="math inline">\(X\)</span> contains the (centered) observations in rows, giving a <span class="math inline">\(N \times p\)</span> matrix.
+The SVD is then:</p>
+<p><span class="math display" id="eq:svd">\[\begin{equation}
+X = UDV^T
+\tag{4.6}
+\end{equation}\]</span></p>
+<p>Where <span class="math inline">\(U\)</span> is an orthogonal matrix containing the <em>left singular vectors</em> <span class="math inline">\(u_j\)</span> as columns, and <span class="math inline">\(V\)</span> contains the <em>right singular vectors</em> <span class="math inline">\(v_j\)</span>. The columns of <span class="math inline">\(U\)</span> span the columns space of <span class="math inline">\(X\)</span> and the columns of <span class="math inline">\(V\)</span> span the row space. <span class="math inline">\(D\)</span> is diagonal matrix which contains <em>singular values</em>, <span class="math inline">\(d_1 \leq d_2 \leq ... \leq d_p \leq 0\)</span>. <em>Singular values</em> are square roots of non-negative eigenvalues.
+The columns of <span class="math inline">\(UD\)</span> are the principal components of <span class="math inline">\(X\)</span>.
+So the SVD gives us the matrix <span class="math inline">\(V\)</span> (the first <span class="math inline">\(q\)</span> columns give the solution to the minimization problem above) as well as the principal components from <span class="math inline">\(UD\)</span> (<span class="citation">Hastie et al. (<a href="#ref-hastie2009elements" role="doc-biblioref">2009</a>)</span>).</p>
 </div>
 <div id="gap-statistic" class="section level3" number="4.2.5">
 <h3><span class="header-section-number">4.2.5</span> Gap statistic</h3>
+<p>The idea of the gap statistic was introduced by <span class="citation">Tibshirani, Walther, and Hastie (<a href="#ref-tibshirani2001estimating" role="doc-biblioref">2001</a>)</span>
+As stated above we usually measure how compact our clusters are
+by assessing <span class="math inline">\(W(C)\)</span> or <span class="math inline">\(log(W_c)\)</span>. Where low values indicate compact clusters. To compare the value then, we need a reference.
+We therefore want to estimate how large <span class="math inline">\(W_c\)</span> were if there were
+no clusters present in our data.
+The larger the difference between the <span class="math inline">\(W_c\)</span> from the data and
+the one from the reference the more likely we are to say that
+the found number of clusters is indeed correct.
+We construct reference data by sampling from a uniform distribution
+based on our data. Say we have <span class="math inline">\(p\)</span> variables. We sample <span class="math inline">\(n\)</span> times from
+each of the <span class="math inline">\(p\)</span> uniformly distributed variables, where maximum and
+minimum are obtained from our data.
+We then cluster the reference data in the same we cluster our observed data and compute <span class="math inline">\(W_c\)</span>. We repeat this process several times and compute the average of <span class="math inline">\(W_c\)</span>, <span class="math inline">\(E \{log(W_c)\}\)</span>.
+The gap statistic is then the difference</p>
+<p><span class="math display" id="eq:gap">\[\begin{equation}
+E \{log(W_c) \} - log(W_c).
+\tag{4.7}
+\end{equation}\]</span></p>
+<p>So in cases where our data is formed of clusters we would expect
+a high gap statistic.
+As <span class="citation">Tibshirani, Walther, and Hastie (<a href="#ref-tibshirani2001estimating" role="doc-biblioref">2001</a>)</span> note and as it is also done in the used R function
+clusgap, doing a PCA on the data and compute the gap statistic on the
+PCA scores can improves the results of gap statistic.</p>
 <!--chapter:end:3a-clustering-methods.Rmd-->
 </div>
 </div>
@@ -522,152 +635,115 @@ we want to cluster cells into homogen groups.</p>
 <!--chapter:end:5s-method-lasso-regression.Rmd-->
 </div>
 </div>
-<div id="the-fused-lasso" class="section level1" number="6">
-<h1><span class="header-section-number">6</span> The fused lasso</h1>
-<div id="general" class="section level2" number="6.1">
-<h2><span class="header-section-number">6.1</span> General</h2>
-<pre class="r"><code># TODO
-# Intro name and motivation fused lasso
-# friedmann introduced name
-# hastie combination lasso and fusion therefore fused lasso
-# we use implementation from genlasso package 
-# then we describe the formula as given in the package description
-# omptimization as in paper</code></pre>
-<pre class="r"><code># TODO add statistical learning with sparsity to references.</code></pre>
-<pre class="r"><code># TODO add to summary of LASSO defaults, that characteristic 
-# of LASSO</code></pre>
-<pre class="r"><code># TODO make reference to achieved results here</code></pre>
-<pre class="r"><code># TODO cite general LASSO properties here
-# how it acts in situations where coefficients are grouped
-# or highly correlated.</code></pre>
-<pre class="r"><code># TODO add plot of the graph given by our helper functions.</code></pre>
-<pre class="r"><code># TODO add graphic of fig.2 fused lasso</code></pre>
-<pre class="r"><code>#TODO note the fused lasso paper here are</code></pre>
-<pre class="r"><code># TODO add efficient implementations of hte generlaized lasso dual path
-# algorithm to references</code></pre>
-<pre class="r"><code># TODO ?check generalized dual path algorithm og paper?</code></pre>
-<pre class="r"><code># Efficient Implementations of the Generalized Lasso Dual Path
-# Algorithm</code></pre>
-<p>As expected and seen in the results, the different LASSO models choose single
-SST regions as predictors as opposed to whole regions.
-Since the LASSO only regularizes the magnitude of coefficients
-but ignores their ordering.<br />
-We therefore use the so-called <em>fused lasso</em> as implemented in the <em>genlasso</em> package and the respective <em>fusedlasso</em> function. (<span class="citation">R. Tibshirani et al. (<a href="#ref-tibshirani2005sparsity" role="doc-biblioref">2005</a>)</span>, <span class="citation">Taylor B. Arnold and Tibshirani (<a href="#ref-genlassopackage" role="doc-biblioref">2020</a>)</span>)
-The fused lasso is a generalization of the lasso for problems with features
-that can be ordered in a meaningful way. It penalizes not only the coefficients’
-<span class="math inline">\(L_1\)</span>-norm but also their differences given their ordering, introducing sparsity
-in both of them <span class="citation">R. Tibshirani et al. (<a href="#ref-tibshirani2005sparsity" role="doc-biblioref">2005</a>)</span>.
-In our case the fused lasso thus penalizes the differences of SST coefficients
-that are close to each other.</p>
-<p>The fused LASSO as implemented in <em>genlasso</em> package solves the problem:</p>
-<!-- $$\min_{\beta} 1/2 \sum_{i=1}^n(y_i - x_i^T\beta_i)^2 + \lambda \sum_{i,j \in E} |\beta_i - \beta_j| + \gamma \cdot \lambda \sum_{i=1}^p|\beta_i|  ,$$ -->
-<p><span class="math display" id="eq:fused-lasso">\[\begin{equation}
-\min_{\beta} 1/2 \sum_{i=1}^n(y_i - x_i^T\beta_i)^2 + \lambda \sum_{i,j \in E} |\beta_i - \beta_j| + \gamma \cdot \lambda \sum_{i=1}^p|\beta_i|,
-\tag{6.1}
-\end{equation}\]</span></p>
-<p>with <span class="math inline">\(x_i\)</span> being the ith row of the predictor matrix and
-E is the edge set of an underlying graph.
-Regularizing <span class="math inline">\(|\beta_i-\beta_j|\)</span>, penalizes large differences in
-close coefficients. In our case “close” means small distances
-as defined on 2-dimensional longitude/latitude grid. This grid defines a graph that can be used to compute the distances for
-each location.
-The third term <span class="math inline">\(\gamma \cdot \lambda \sum_{i=1}^p|\beta_i|\)</span>,
-controls the sparsity of the coefficients. <span class="math inline">\(\gamma=0\)</span> leads to complete fusion of the coefficients (no sparsity) and <span class="math inline">\(\gamma\)</span> &gt; 0 introduces sparsity to the solution, with higher values placing more priority on sparsity.
-<span class="math inline">\(\hat{\beta}\)</span> is computed as a function of <span class="math inline">\(\lambda\)</span>, with fixed <span class="math inline">\(\gamma\)</span>.</p>
-<div id="implementation" class="section level3" number="6.1.1">
-<h3><span class="header-section-number">6.1.1</span> Implementation</h3>
-<p>The summary of the algorithm is taken from the paper proposing
-the implementation, <span class="citation">Taylor B. Arnold and Tibshirani (<a href="#ref-arnold2016efficient" role="doc-biblioref">2016</a>)</span> and the original paper introducing
-the algorithm <span class="citation">R. J. Tibshirani and Taylor (<a href="#ref-tibshirani2011solution" role="doc-biblioref">2011</a>)</span>.
-In the fused lasso setting the coefficients <span class="math inline">\(\beta \in \mathbb{R}^p\)</span> can be thought of
-as nodes of a given undirected Graph <span class="math inline">\(G\)</span>, with edge set <span class="math inline">\(E \subset {1,...,p}^2\)</span>.
-Now lets assume that <span class="math inline">\(E\)</span> has <span class="math inline">\(m\)</span> edges which are enumerated <span class="math inline">\(e_1,...,e_m\)</span>.
-The fused lasso penalty matrix <span class="math inline">\(D\)</span> is then <span class="math inline">\(m \times p\)</span>, where
-each row corresponds to an edge in <span class="math inline">\(E\)</span>.
-So when <span class="math inline">\(e_l = (i,j)\)</span>, we write <span class="math inline">\(l_{th}\)</span> row of <span class="math inline">\(D\)</span> as</p>
-<!-- $$ D_l = (0,...-1,...1,...) \in \mathbb{R}^p, $$ -->
-<p><span class="math display" id="eq:pen-mat">\[\begin{equation}
-D_l = (0,...-1,...1,...) \in \mathbb{R}^p,
-\tag{6.2}
-\end{equation}\]</span></p>
-<p>meaning <span class="math inline">\(D_l\)</span> has all zeros except for the the <span class="math inline">\(i_{th}\)</span> and <span class="math inline">\(j_{th}\)</span>
-location.</p>
-<p><a href="#eq:fused-lasso">(6.1)</a> is solved by a dual path algorithm that was proposed
-by <span class="citation">Taylor B. Arnold and Tibshirani (<a href="#ref-arnold2016efficient" role="doc-biblioref">2016</a>)</span> for different use cases of the (sparse) fused lasso.
-They describe the dual path algorithm based on the notation of the generalized
-lasso problem <span class="citation">R. J. Tibshirani and Taylor (<a href="#ref-tibshirani2011solution" role="doc-biblioref">2011</a>)</span>:</p>
-<p><span class="math display" id="eq:gen-lasso">\[\begin{equation}
-\hat{\beta}=\underset{\beta \in \mathbb{R}^{p}}{\arg \min } \frac{1}{2}\|y-X \beta\|_{2}^{2}+\lambda\|D \beta\|_{1},
-\tag{6.3}
-\end{equation}\]</span></p>
-<p>where <span class="math inline">\(y \in \mathbb{R}^n\)</span> is the vector of the outcome,
-<span class="math inline">\(X \in \mathbb{R}^{n \times p}\)</span> a predictor matrix, <span class="math inline">\(D \in \mathbb{R}^{m \times p}\)</span>
-denotes a penalty matrix, and <span class="math inline">\(\lambda \geq 0\)</span> is a regularization parameter.
-The dual path algorithm solves not the primal but the dual solution of the problem
-and computes the solution for a whole path instead of single values of <span class="math inline">\(\lambda\)</span>.
-Hence the “dual” and “path” that make up the name.
-<span class="citation">Taylor B. Arnold and Tibshirani (<a href="#ref-arnold2016efficient" role="doc-biblioref">2016</a>)</span> argue that the strength of the original algorithm
-<span class="citation">R. J. Tibshirani and Taylor (<a href="#ref-tibshirani2011solution" role="doc-biblioref">2011</a>)</span> lays in the fact that it applies to a unified framework
-in which <span class="math inline">\(D\)</span> can be a general penalty matrix.
-Let’s consider the case when <span class="math inline">\(X=I\)</span> and <span class="math inline">\(rank(X)=p\)</span> (this is called the “signal approximator” case),
-the dual problem of <a href="#eq:gen-lasso">(6.3)</a> is then:</p>
-<p><span class="math display" id="eq:dual">\[\begin{equation}
-\hat{u} \in \underset{\substack{u \in \mathbb{R}^{\omega}}}{\arg \min } \frac{1}{2}\left\|y-D^{T} u\right\|_{\frac{2}{2}} \text { subject to }\|u\|_{\infty} \leq \lambda.
-\tag{6.4}
-\end{equation}\]</span></p>
-<p>The primal and dual solutions, <span class="math inline">\(\hat{\beta}\)</span> and <span class="math inline">\(\hat{u}\)</span> are related by:</p>
-<p><span class="math display" id="eq:dual-relate">\[\begin{equation}
-\hat{\beta}=y-D^{T} \hat{u} .
-\tag{6.5}
-\end{equation}\]</span></p>
-<p>While the primal solution is unique, this does not need to be the case
-for dual solution (note the element notation in <a href="#eq:dual">(6.4)</a>.
-The dual path algorithm starts at $= $ and computes the
-path until <span class="math inline">\(\lambda = 0\)</span>.
-Conceptually the algorithm keeps track of the coordinates of the dual
-solutions it computed for each lambda <span class="math inline">\(\hat{u}(\lambda)\)</span>.
-The solutions are equal to <span class="math inline">\(+-\lambda\)</span>, meaning they lie on the boundary
-of the region <span class="math inline">\([-\lambda,\lambda]\)</span>. Along the path it computes
-the critical values of <span class="math inline">\(\lambda\)</span>, <span class="math inline">\(\lambda_1, \lambda_2,...,\)</span>
-at which the coordinates of these solutions hit or leave the boundary.</p>
-<p>There are two algorithms described in the paper and the various specialized implementations
-that can increase efficiency depending on the use cases.
-This depends on <span class="math inline">\(X\)</span>, and/or the special structure of <span class="math inline">\(D\)</span>.
-Algorithm 1 handles the <span class="math inline">\(X=I\)</span> case and Algorithm 2 the general <span class="math inline">\(X\)</span> case.
-As we introduced the dual in <a href="#eq:dual">(6.4)</a>, it assumed <span class="math inline">\(X=I\)</span>, which is not satisfied
-in our case.
-For the general <span class="math inline">\(X\)</span> case the problem formulation can be rewritten so that the
-formula only changes <span class="math inline">\(D\)</span> and <span class="math inline">\(y\)</span> to <span class="math inline">\(\tilde{D}\)</span> and <span class="math inline">\(\tilde{y}\)</span> and then the same Algorithm can be applied. <span class="math inline">\(\tilde{D}=DX^+\)</span> and <span class="math inline">\(\tilde{y}=XX^+y\)</span>, where <span class="math inline">\(X^x\)</span> is the
-Moore-Penrose pseudoinverse of <span class="math inline">\(X \in \mathbb{R}^{n \times p}\)</span>.
-Algorithm 2 therefore transforms <span class="math inline">\(X\)</span> and <span class="math inline">\(y\)</span> in a certain way and then applies Algorithm 1
-to the transformed problem.
-Its also easy to see that in our case <span class="math inline">\(p &gt; n\)</span> and <span class="math inline">\(X\)</span> is column rank deficient.
-They solve this by adding a small fixed $l_2 $penalty to the original problem,which
-leads to:</p>
-<p><span class="math display" id="eq:add-ridge">\[\begin{equation}
-\operatorname{minimize}_{\beta \in \mathbb{R}^{p}} \frac{1}{2}\|y-X \beta\|_{2}^{2}+\lambda\|D \beta\|_{1}+\varepsilon\|\beta\|_{2}^{2},
-\tag{6.6}
-\end{equation}\]</span></p>
-<p>and this is the same as</p>
-<p><span class="math display" id="eq:add-ridge2">\[\begin{equation}
-\underset{\beta}{\operatorname{minimize}} \frac{1}{2}\left\|y^{*}-\left(X^{*}\right) \beta\right\|_{2}^{2}+\lambda\|D \beta\|_{1},
-\tag{6.7}
-\end{equation}\]</span></p>
-<p>with <span class="math inline">\(y^{*}=(y, 0)^{T}\)</span> and <span class="math inline">\(X^{*}=\left[\begin{array}{c}x \\ \varepsilon \cdot I\end{array}\right]\)</span>. Because <span class="math inline">\(\operatorname{rank}\left(X^{*}\right)=p\)</span>,
-again it is possible to apply one of the algorithms.</p>
+<div id="lasso-center" class="section level1" number="6">
+<h1><span class="header-section-number">6</span> lasso center</h1>
+<p>Placeholder</p>
+<div id="lasso-model" class="section level2" number="6.1">
+<h2><span class="header-section-number">6.1</span> LASSO model</h2>
+</div>
+<div id="error-plots" class="section level2" number="6.2">
+<h2><span class="header-section-number">6.2</span> Error plots</h2>
+</div>
+<div id="coefficient-plots" class="section level2" number="6.3">
+<h2><span class="header-section-number">6.3</span> Coefficient plots</h2>
+</div>
+<div id="inspect-predictions-from-each-fold" class="section level2" number="6.4">
+<h2><span class="header-section-number">6.4</span> Inspect predictions from each fold</h2>
+</div>
+<div id="inspect-predictions-from-best-cv-lambda" class="section level2" number="6.5">
+<h2><span class="header-section-number">6.5</span> Inspect predictions from best CV-lambda</h2>
+</div>
+<div id="summary-1" class="section level2" number="6.6">
+<h2><span class="header-section-number">6.6</span> Summary</h2>
+<!--chapter:end:z-test-lasso-og.Rmd-->
+</div>
+</div>
+<div id="lasso-stand" class="section level1" number="7">
+<h1><span class="header-section-number">7</span> lasso stand</h1>
+<p>Placeholder</p>
+<div id="lasso-model-1" class="section level2" number="7.1">
+<h2><span class="header-section-number">7.1</span> LASSO model</h2>
+</div>
+<div id="error-plots-1" class="section level2" number="7.2">
+<h2><span class="header-section-number">7.2</span> Error plots</h2>
+</div>
+<div id="coefficient-plots-1" class="section level2" number="7.3">
+<h2><span class="header-section-number">7.3</span> Coefficient plots</h2>
+</div>
+<div id="inspect-predictions-from-each-fold-1" class="section level2" number="7.4">
+<h2><span class="header-section-number">7.4</span> Inspect predictions from each fold</h2>
+</div>
+<div id="inspect-predictions-from-best-cv-lambda-1" class="section level2" number="7.5">
+<h2><span class="header-section-number">7.5</span> Inspect predictions from best CV-lambda</h2>
+</div>
+<div id="summary-2" class="section level2" number="7.6">
+<h2><span class="header-section-number">7.6</span> Summary</h2>
+<!--chapter:end:z-test-lasso-stand.Rmd-->
+</div>
+</div>
+<div id="lasso-center-1" class="section level1" number="8">
+<h1><span class="header-section-number">8</span> lasso center</h1>
+<p>Placeholder</p>
+<div id="lasso-model-2" class="section level2" number="8.1">
+<h2><span class="header-section-number">8.1</span> LASSO model</h2>
+</div>
+<div id="error-plots-2" class="section level2" number="8.2">
+<h2><span class="header-section-number">8.2</span> Error plots</h2>
+</div>
+<div id="coefficient-plots-2" class="section level2" number="8.3">
+<h2><span class="header-section-number">8.3</span> Coefficient plots</h2>
+</div>
+<div id="inspect-predictions-from-each-fold-2" class="section level2" number="8.4">
+<h2><span class="header-section-number">8.4</span> Inspect predictions from each fold</h2>
+</div>
+<div id="inspect-predictions-from-best-cv-lambda-2" class="section level2" number="8.5">
+<h2><span class="header-section-number">8.5</span> Inspect predictions from best CV-lambda</h2>
+</div>
+<div id="summary-3" class="section level2" number="8.6">
+<h2><span class="header-section-number">8.6</span> Summary</h2>
+<!--chapter:end:z-test-deseas-lasso.Rmd-->
+</div>
+</div>
+<div id="lasso-center-2" class="section level1" number="9">
+<h1><span class="header-section-number">9</span> lasso center</h1>
+<p>Placeholder</p>
+<div id="lasso-model-3" class="section level2" number="9.1">
+<h2><span class="header-section-number">9.1</span> LASSO model</h2>
+</div>
+<div id="error-plots-3" class="section level2" number="9.2">
+<h2><span class="header-section-number">9.2</span> Error plots</h2>
+</div>
+<div id="coefficient-plots-3" class="section level2" number="9.3">
+<h2><span class="header-section-number">9.3</span> Coefficient plots</h2>
+</div>
+<div id="inspect-predictions-from-each-fold-3" class="section level2" number="9.4">
+<h2><span class="header-section-number">9.4</span> Inspect predictions from each fold</h2>
+</div>
+<div id="inspect-predictions-from-best-cv-lambda-3" class="section level2" number="9.5">
+<h2><span class="header-section-number">9.5</span> Inspect predictions from best CV-lambda</h2>
+</div>
+<div id="summary-4" class="section level2" number="9.6">
+<h2><span class="header-section-number">9.6</span> Summary</h2>
+<!--chapter:end:z-test-lasso-diff1.Rmd-->
+</div>
+</div>
+<div id="the-fused-lasso" class="section level1" number="10">
+<h1><span class="header-section-number">10</span> The fused lasso</h1>
+<p>Placeholder</p>
+<div id="general" class="section level2" number="10.1">
+<h2><span class="header-section-number">10.1</span> General</h2>
+<div id="implementation" class="section level3" number="10.1.1">
+<h3><span class="header-section-number">10.1.1</span> Implementation</h3>
 <!--chapter:end:5t-method-fused-lasso.Rmd-->
 <div id="refs" class="references csl-bib-body hanging-indent">
-<div id="ref-genlassopackage" class="csl-entry">
-Arnold, Taylor B., and Ryan J. Tibshirani. 2020. <em>Genlasso: Path Algorithm for Generalized Lasso Problems</em>. <a href="https://CRAN.R-project.org/package=genlasso">https://CRAN.R-project.org/package=genlasso</a>.
+<div id="ref-fahrmeir1996multivariate" class="csl-entry">
+Fahrmeir, Ludwig, Wolfgang Brachinger, Alfred Hamerle, and Gerhard Tutz. 1996. <em>Multivariate Statistische Verfahren</em>. Walter de Gruyter.
 </div>
-<div id="ref-arnold2016efficient" class="csl-entry">
-Arnold, Taylor B, and Ryan J Tibshirani. 2016. <span>“Efficient Implementations of the Generalized Lasso Dual Path Algorithm.”</span> <em>Journal of Computational and Graphical Statistics</em> 25 (1): 1–27.
+<div id="ref-hastie2009elements" class="csl-entry">
+Hastie, Trevor, Robert Tibshirani, Jerome H Friedman, and Jerome H Friedman. 2009. <em>The Elements of Statistical Learning: Data Mining, Inference, and Prediction</em>. Vol. 2. Springer.
 </div>
-<div id="ref-tibshirani2005sparsity" class="csl-entry">
-Tibshirani, Robert, Michael Saunders, Saharon Rosset, Ji Zhu, and Keith Knight. 2005. <span>“Sparsity and Smoothness via the Fused Lasso.”</span> <em>Journal of the Royal Statistical Society: Series B (Statistical Methodology)</em> 67 (1): 91–108.
-</div>
-<div id="ref-tibshirani2011solution" class="csl-entry">
-Tibshirani, Ryan J, and Jonathan Taylor. 2011. <span>“The Solution Path of the Generalized Lasso.”</span> <em>The Annals of Statistics</em> 39 (3): 1335–71.
+<div id="ref-tibshirani2001estimating" class="csl-entry">
+Tibshirani, Robert, Guenther Walther, and Trevor Hastie. 2001. <span>“Estimating the Number of Clusters in a Data Set via the Gap Statistic.”</span> <em>Journal of the Royal Statistical Society: Series B (Statistical Methodology)</em> 63 (2): 411–23.
 </div>
 </div>
 </div>

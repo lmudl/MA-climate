@@ -5,6 +5,7 @@ site: bookdown::bookdown_site
 output:
   bookdown::pdf_book:
     split_bib: FALSE
+    latex_engine: xelatex
   bookdown::gitbook:
     # split_by: section
     split_bib: FALSE
