@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2021/W32TeX) (preloaded format=pdflatex 2021.6.3)  3 AUG 2022 12:58
+This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2021/W32TeX) (preloaded format=pdflatex 2021.6.3)  4 AUG 2022 17:39
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -175,88 +175,107 @@ Package xcolor Info: Model `HSB' substituted by `hsb' on input line 1369.
 Package xcolor Info: Model `Gray' substituted by `gray' on input line 1370.
 Package xcolor Info: Model `wave' substituted by `hsb' on input line 1371.
 )
+(c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/fancyvrb/fancyvrb
+.sty
+Package: fancyvrb 2021/01/20 v3.7 verbatim text (tvz,hv)
+
+(c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/graphics/keyval.s
+ty
+Package: keyval 2014/10/28 v1.15 key=value parser (DPC)
+\KV@toks@=\toks23
+)
+\FV@CodeLineNo=\count269
+\FV@InFile=\read2
+\FV@TabBox=\box52
+\c@FancyVerbLine=\count270
+\FV@StepNumber=\count271
+\FV@OutFile=\write3
+)
+(c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/framed/framed.sty
+Package: framed 2011/10/22 v 0.96: framed or shaded text with page breaks
+\OuterFrameSep=\skip52
+\fb@frw=\dimen148
+\fb@frh=\dimen149
+\FrameRule=\dimen150
+\FrameSep=\dimen151
+)
 (c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/tools/longtable.s
 ty
 Package: longtable 2021-05-07 v4.16 Multi-page Table package (DPC)
-\LTleft=\skip52
-\LTright=\skip53
-\LTpre=\skip54
-\LTpost=\skip55
-\LTchunksize=\count269
-\LTcapwidth=\dimen148
-\LT@head=\box52
-\LT@firsthead=\box53
-\LT@foot=\box54
-\LT@lastfoot=\box55
-\LT@gbox=\box56
-\LT@cols=\count270
-\LT@rows=\count271
-\c@LT@tables=\count272
-\c@LT@chunks=\count273
-\LT@p@ftn=\toks23
+\LTleft=\skip53
+\LTright=\skip54
+\LTpre=\skip55
+\LTpost=\skip56
+\LTchunksize=\count272
+\LTcapwidth=\dimen152
+\LT@head=\box53
+\LT@firsthead=\box54
+\LT@foot=\box55
+\LT@lastfoot=\box56
+\LT@gbox=\box57
+\LT@cols=\count273
+\LT@rows=\count274
+\c@LT@tables=\count275
+\c@LT@chunks=\count276
+\LT@p@ftn=\toks24
 )
 (c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/booktabs/booktabs
 .sty
 Package: booktabs 2020/01/12 v1.61803398 Publication quality tables
-\heavyrulewidth=\dimen149
-\lightrulewidth=\dimen150
-\cmidrulewidth=\dimen151
-\belowrulesep=\dimen152
-\belowbottomsep=\dimen153
-\aboverulesep=\dimen154
-\abovetopsep=\dimen155
-\cmidrulesep=\dimen156
-\cmidrulekern=\dimen157
-\defaultaddspace=\dimen158
-\@cmidla=\count274
-\@cmidlb=\count275
-\@aboverulesep=\dimen159
-\@belowrulesep=\dimen160
-\@thisruleclass=\count276
-\@lastruleclass=\count277
-\@thisrulewidth=\dimen161
+\heavyrulewidth=\dimen153
+\lightrulewidth=\dimen154
+\cmidrulewidth=\dimen155
+\belowrulesep=\dimen156
+\belowbottomsep=\dimen157
+\aboverulesep=\dimen158
+\abovetopsep=\dimen159
+\cmidrulesep=\dimen160
+\cmidrulekern=\dimen161
+\defaultaddspace=\dimen162
+\@cmidla=\count277
+\@cmidlb=\count278
+\@aboverulesep=\dimen163
+\@belowrulesep=\dimen164
+\@thisruleclass=\count279
+\@lastruleclass=\count280
+\@thisrulewidth=\dimen165
 ) (c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/tools/array.sty
 Package: array 2021/04/20 v2.5e Tabular extension package (FMi)
-\col@sep=\dimen162
-\ar@mcellbox=\box57
-\extrarowheight=\dimen163
-\NC@list=\toks24
-\extratabsurround=\skip56
-\backup@length=\skip57
-\ar@cellbox=\box58
+\col@sep=\dimen166
+\ar@mcellbox=\box58
+\extrarowheight=\dimen167
+\NC@list=\toks25
+\extratabsurround=\skip57
+\backup@length=\skip58
+\ar@cellbox=\box59
 ) (c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/tools/calc.sty
 Package: calc 2017/05/25 v4.3 Infix arithmetic (KKT,FJ)
-\calc@Acount=\count278
-\calc@Bcount=\count279
-\calc@Adimen=\dimen164
-\calc@Bdimen=\dimen165
-\calc@Askip=\skip58
-\calc@Bskip=\skip59
+\calc@Acount=\count281
+\calc@Bcount=\count282
+\calc@Adimen=\dimen168
+\calc@Bdimen=\dimen169
+\calc@Askip=\skip59
+\calc@Bskip=\skip60
 LaTeX Info: Redefining \setlength on input line 80.
 LaTeX Info: Redefining \addtolength on input line 81.
-\calc@Ccount=\count280
-\calc@Cskip=\skip60
+\calc@Ccount=\count283
+\calc@Cskip=\skip61
 )
 (c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/etoolbox/etoolbox
 .sty
 Package: etoolbox 2020/10/05 v2.5k e-TeX tools for LaTeX (JAW)
-\etb@tempcnta=\count281
+\etb@tempcnta=\count284
 )
 (c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/mdwtools/footnote
 .sty
 Package: footnote 1997/01/28 1.13 Save footnotes around boxes
-\fn@notes=\box59
-\fn@width=\dimen166
+\fn@notes=\box60
+\fn@width=\dimen170
 )
 (c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/graphics/graphicx
 .sty
 Package: graphicx 2020/12/05 v1.2c Enhanced LaTeX Graphics (DPC,SPQR)
 
-(c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/graphics/keyval.s
-ty
-Package: keyval 2014/10/28 v1.15 key=value parser (DPC)
-\KV@toks@=\toks25
-)
 (c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/graphics/graphics
 .sty
 Package: graphics 2021/03/04 v1.4d Standard LaTeX Graphics (DPC,SPQR)
@@ -270,12 +289,12 @@ File: graphics.cfg 2016/06/04 v1.11 sample graphics configuration
 )
 Package graphics Info: Driver file: pdftex.def on input line 107.
 )
-\Gin@req@height=\dimen167
-\Gin@req@width=\dimen168
+\Gin@req@height=\dimen171
+\Gin@req@width=\dimen172
 )
-\cslhangindent=\skip61
-\csllabelwidth=\skip62
-\cslentryspacingunit=\skip63
+\cslhangindent=\skip62
+\csllabelwidth=\skip63
+\cslentryspacingunit=\skip64
 
 (c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/hyperref/hyperref
 .sty
@@ -326,9 +345,9 @@ Package: auxhook 2019-12-17 v1.6 Hooks for auxiliary files (HO)
 ns.sty
 Package: kvoptions 2020-10-07 v3.14 Key value format for package options (HO)
 )
-\@linkdim=\dimen169
-\Hy@linkcounter=\count282
-\Hy@pagecounter=\count283
+\@linkdim=\dimen173
+\Hy@linkcounter=\count285
+\Hy@pagecounter=\count286
 
 (c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/hyperref/pd1enc.d
 ef
@@ -349,7 +368,7 @@ Package: intcalc 2019/12/15 v1.3 Expandable calculations with integers (HO)
 ds.sty
 Package: etexcmds 2019/12/15 v1.7 Avoid name clashes with e-TeX commands (HO)
 )
-\Hy@SavedSpaceFactor=\count284
+\Hy@SavedSpaceFactor=\count287
 
 (c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/hyperref/puenc.de
 f
@@ -365,13 +384,13 @@ Package hyperref Info: Plain pages OFF on input line 4207.
 Package hyperref Info: Backreferencing OFF on input line 4212.
 Package hyperref Info: Implicit mode ON; LaTeX internals redefined.
 Package hyperref Info: Bookmarks ON on input line 4445.
-\c@Hy@tempcnt=\count285
+\c@Hy@tempcnt=\count288
 (c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/url/url.sty
 \Urlmuskip=\muskip17
 Package: url 2013/09/16  ver 3.4  Verb mode for urls, etc.
 )
 LaTeX Info: Redefining \url on input line 4804.
-\XeTeXLinkMargin=\dimen170
+\XeTeXLinkMargin=\dimen174
 
 (c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/tex/generic/bitset/bitset.s
 ty
@@ -382,9 +401,9 @@ ntcalc.sty
 Package: bigintcalc 2019/12/15 v1.5 Expandable calculations on big integers (HO
 )
 ))
-\Fld@menulength=\count286
-\Field@Width=\dimen171
-\Fld@charsize=\dimen172
+\Fld@menulength=\count289
+\Field@Width=\dimen175
+\Fld@charsize=\dimen176
 Package hyperref Info: Hyper figures OFF on input line 6075.
 Package hyperref Info: Link nesting OFF on input line 6080.
 Package hyperref Info: Hyper index ON on input line 6083.
@@ -400,9 +419,9 @@ LaTeX Info: Redefining \pageref on input line 6149.
 Package: atbegshi-ltx 2021/01/10 v1.0c Emulation of the original atbegshi
 package with kernel methods
 )
-\Hy@abspage=\count287
-\c@Item=\count288
-\c@Hfootnote=\count289
+\Hy@abspage=\count290
+\c@Item=\count291
+\c@Hfootnote=\count292
 
 LaTeX Warning: Command \LT@p@ftntext  has changed.
                Check if current package is valid.
@@ -420,8 +439,8 @@ Package: atveryend-ltx 2020/08/19 v1.0a Emulation of the original atvery packag
 e
 with kernel methods
 )
-\Fld@listcount=\count290
-\c@bookmark@seq@number=\count291
+\Fld@listcount=\count293
+\c@bookmark@seq@number=\count294
 
 (c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/rerunfilecheck/re
 runfilecheck.sty
@@ -434,34 +453,34 @@ Package: uniquecounter 2019/12/15 v1.4 Provide unlimited unique counter (HO)
 Package uniquecounter Info: New unique counter `rerunfilecheck' on input line 2
 86.
 )
-\Hy@SectionHShift=\skip64
+\Hy@SectionHShift=\skip65
 )
 (c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/l3backend/l3backe
 nd-pdftex.def
 File: l3backend-pdftex.def 2021-05-07 L3 backend support: PDF output (pdfTeX)
-\l__color_backend_stack_int=\count292
-\l__pdf_internal_box=\box60
+\l__color_backend_stack_int=\count295
+\l__pdf_internal_box=\box61
 ) (./_main.aux)
 \openout1 = `_main.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 102.
-LaTeX Font Info:    ... okay on input line 102.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 102.
-LaTeX Font Info:    ... okay on input line 102.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 102.
-LaTeX Font Info:    ... okay on input line 102.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 102.
-LaTeX Font Info:    ... okay on input line 102.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 102.
-LaTeX Font Info:    ... okay on input line 102.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 102.
-LaTeX Font Info:    ... okay on input line 102.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 102.
-LaTeX Font Info:    ... okay on input line 102.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 102.
-LaTeX Font Info:    ... okay on input line 102.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 102.
-LaTeX Font Info:    ... okay on input line 102.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 142.
+LaTeX Font Info:    ... okay on input line 142.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 142.
+LaTeX Font Info:    ... okay on input line 142.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 142.
+LaTeX Font Info:    ... okay on input line 142.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 142.
+LaTeX Font Info:    ... okay on input line 142.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 142.
+LaTeX Font Info:    ... okay on input line 142.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 142.
+LaTeX Font Info:    ... okay on input line 142.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 142.
+LaTeX Font Info:    ... okay on input line 142.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 142.
+LaTeX Font Info:    ... okay on input line 142.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 142.
+LaTeX Font Info:    ... okay on input line 142.
 
 (c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/epstopdf-pkg/epst
 opdf-base.sty
@@ -474,7 +493,7 @@ pdf-sys.cfg
 File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Liv
 e
 ))
-Package hyperref Info: Link coloring OFF on input line 102.
+Package hyperref Info: Link coloring OFF on input line 142.
 
 (c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/hyperref/nameref.
 sty
@@ -488,47 +507,47 @@ Package: refcount 2019/12/15 v3.6 Data extraction from label references (HO)
 gettitlestring.sty
 Package: gettitlestring 2019/12/15 v1.6 Cleanup title references (HO)
 )
-\c@section@level=\count293
+\c@section@level=\count296
 )
-LaTeX Info: Redefining \ref on input line 102.
-LaTeX Info: Redefining \pageref on input line 102.
-LaTeX Info: Redefining \nameref on input line 102.
+LaTeX Info: Redefining \ref on input line 142.
+LaTeX Info: Redefining \pageref on input line 142.
+LaTeX Info: Redefining \nameref on input line 142.
 (./_main.out) (./_main.out)
-\@outlinefile=\write3
-\openout3 = `_main.out'.
+\@outlinefile=\write4
+\openout4 = `_main.out'.
 
 LaTeX Font Info:    Trying to load font information for OT1+lmr on input line 1
-04.
+44.
 (c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/lm/ot1lmr.fd
 File: ot1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
 LaTeX Font Info:    Trying to load font information for OML+lmm on input line 1
-04.
+44.
 (c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/lm/omllmm.fd
 File: omllmm.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
 LaTeX Font Info:    Trying to load font information for OMS+lmsy on input line 
-104.
+144.
 (c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/lm/omslmsy.fd
 File: omslmsy.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
 LaTeX Font Info:    Trying to load font information for OMX+lmex on input line 
-104.
+144.
 (c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/lm/omxlmex.fd
 File: omxlmex.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <12> on input line 104.
+(Font)              <12> on input line 144.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <8> on input line 104.
+(Font)              <8> on input line 144.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <6> on input line 104.
-LaTeX Font Info:    Trying to load font information for U+msa on input line 104
+(Font)              <6> on input line 144.
+LaTeX Font Info:    Trying to load font information for U+msa on input line 144
 .
 (c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Trying to load font information for U+msb on input line 104
+LaTeX Font Info:    Trying to load font information for U+msb on input line 144
 .
 (c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
@@ -546,8 +565,8 @@ LaTeX Font Info:    External font `lmex10' loaded for size
 LaTeX Font Info:    External font `lmex10' loaded for size
 (Font)              <5> on input line 4.
 )
-\tf@toc=\write4
-\openout4 = `_main.toc'.
+\tf@toc=\write5
+\openout5 = `_main.toc'.
 
 [3] [4
 
@@ -566,7 +585,7 @@ Chapter 3.
 [11] [12]
 Chapter 4.
 LaTeX Font Info:    Trying to load font information for TS1+lmr on input line 2
-10.
+50.
 (c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/lm/ts1lmr.fd
 File: ts1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 ) [13
@@ -575,23 +594,31 @@ File: ts1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 Chapter 5.
 [15
 
-] [16] [17] (./_main.aux)
+] [16
+
+]
+Chapter 6.
+LaTeX Font Info:    Trying to load font information for T1+lmtt on input line 3
+00.
+(c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/lm/t1lmtt.fd
+File: t1lmtt.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
+) [17] [18] [19] [20] (./_main.aux)
 Package rerunfilecheck Info: File `_main.out' has not changed.
-(rerunfilecheck)             Checksum: 0F91D7C900D31AA7D7E7FB8FBB794EFF;2356.
+(rerunfilecheck)             Checksum: B12C4661CAAEC01B886050B5CC284D75;2571.
  ) 
 Here is how much of TeX's memory you used:
- 10377 strings out of 480517
- 151320 string characters out of 5898507
- 457318 words of memory out of 5000000
- 27763 multiletter control sequences out of 15000+600000
- 474367 words of font info for 74 fonts, out of 8000000 for 9000
+ 10915 strings out of 480517
+ 159619 string characters out of 5898507
+ 467430 words of memory out of 5000000
+ 28276 multiletter control sequences out of 15000+600000
+ 475005 words of font info for 76 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
- 60i,9n,66p,500b,390s stack positions out of 5000i,500n,10000p,200000b,80000s
-{c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-mat
-hit.enc}{c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/
-lm-mathsy.enc}{c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvi
-ps/lm/lm-mathex.enc}{c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/fonts/e
-nc/dvips/lm/lm-rm.enc}{c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/fonts
+ 60i,8n,66p,394b,390s stack positions out of 5000i,500n,10000p,200000b,80000s
+{c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-rm.
+enc}{c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-m
+athit.enc}{c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/l
+m/lm-mathsy.enc}{c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/d
+vips/lm/lm-mathex.enc}{c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/fonts
 /enc/dvips/lm/lm-ec.enc}{c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/fon
 ts/enc/dvips/lm/lm-ts1.enc}<c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/
 fonts/type1/public/lm/lmbx10.pfb><c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf
@@ -610,12 +637,15 @@ lmri10.pfb><c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/publ
 ic/lm/lmro10.pfb><c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/fonts/type
 1/public/lm/lmsy10.pfb><c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/font
 s/type1/public/lm/lmsy7.pfb><c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist
-/fonts/type1/public/amsfonts/symbols/msbm10.pfb><c:/Users/Mufasa/AppData/Roamin
-g/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm7.pfb>
-Output written on _main.pdf (17 pages, 292286 bytes).
+/fonts/type1/public/lm/lmtt10.pfb><c:/Users/Mufasa/AppData/Roaming/TinyTeX/texm
+f-dist/fonts/type1/public/lm/lmtti10.pfb><c:/Users/Mufasa/AppData/Roaming/TinyT
+eX/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb><c:/Users/Mufasa/A
+ppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm7.pfb
+>
+Output written on _main.pdf (20 pages, 338623 bytes).
 PDF statistics:
- 361 PDF objects out of 1000 (max. 8388607)
- 302 compressed objects within 4 object streams
- 100 named destinations out of 1000 (max. 500000)
- 145 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 413 PDF objects out of 1000 (max. 8388607)
+ 347 compressed objects within 4 object streams
+ 112 named destinations out of 1000 (max. 500000)
+ 161 words of extra memory for PDF output out of 10000 (max. 10000000)
 

@@ -1,0 +1,132 @@
+---
+title: "test file"
+author: "Dario Lepke"
+date: "2022-08-04"
+output: html_document
+---
+
+```{r}
+# load one coef plot from noclust we want to inspect
+
+coef_plot <- readRDS("../results/CV-fused/noclust-large-fused-5k/coef-plots/coef-plot-fold-1.rds")
+coef_plot
+```
+```{r}
+object.size(coef_plot)
+library(pryr)
+compare_size(coef_plot)
+```
+```{r}
+coef_plot
+ggsave("../results/CV-fused/noclust-large-fused-5k/coef-plots/test-ggsave.png", plot = coef_plot)
+library(png)
+gcoef <- readPNG("../results/CV-fused/noclust-large-fused-5k/coef-plots/test-ggsave.png")
+gcoef
+```
+```{r}
+library(ggplot2)
+d <- ggplot_build(coef_plot)
+d1 <- d$data[[1]]
+d2 <- d$data[[2]]
+head(d1)
+head(d2)
+table(d2$colour)
+
+coef_plot + geom_point(size=0.000001)
+coef_plot
+d$data[[2]]$size <- 10
+d
+
+a <- coef_plot + geom_point(size=0.001)
+a <- ggplot_build(a)
+head(a$data[[2]])
+table(d2$colour)
+```
+
+
+```{r}
+# transparent "#RRGGBBAA"
+d <- ggplot_build(coef_plot)
+sum(d$data[[2]]$colour == "#FFFFFF")
+change <- d$data[[2]]$colour == "#FFFFFF"
+d$data[[2]]$colour[change] <- "transparent"
+#d$data[[2]] <- d$data[[2]][-del,]
+
+d <- ggplot_gtable(d)
+plot(d)
+```
+
+```{r}
+tab <- ggplot_gtable(d)
+tab
+```
+```{r}
+cols <- grDevices::colors()
+str(cols)
+cols2 <- col2rgb(cols)
+str(cols2)
+```
+```{r}
+fm <- readRDS("../results/CV-fused/noclust-large-fused-5k/full-model.rds")
+```
+
+```{r}
+dim(fm$beta)
+plot(density(fm$beta[,ncol(fm$beta)]))
+coefs <- fm$beta[,ncol(fm$beta)]
+table(coefs)
+min(abs(coefs)) #457 mal
+plot(density(coefs))
+boxplot(coefs)
+
+
+```
+
+```{r}
+coefs <- fm$beta[,ncol(fm$beta)]
+
+sum(which(fm$beta[,ncol(fm$beta)] == 0))
+
+min(coefs)
+```
+```{r}
+ path_config <- paste0("code/R/fused-lasso/", model_name, "/config-", model_name, ".yml")
+ conf <- config::get(file = path_config)
+```
+
+```{r}
+coef_plot$layers[[2]]$aes_params$size <- 2
+coef_plot
+coef_plot 
+```
+
+```{r}
+coef_plot$layers[[2]]
+```
+```{r}
+fm$X
+colnames(fm$X)
+```
+
+```{r}
+all_coefs <- coefs
+drop_out = FALSE
+nonzero_coefs <- all_coefs != 0
+cnames <- colnames(fm$X)
+nonzero_coef_names <- cnames[nonzero_coefs]
+num_coef_names <- coef_names_to_numeric(nonzero_coef_names)
+coef_mat <- cbind(num_coef_names, coefs[nonzero_coefs])
+  if((drop_out == TRUE) & (sum(nonzero_coefs)!=0) ) {
+    nz <- round(all_coefs[nonzero_coefs],6)
+    b <- boxplot(nz)
+    out_val <- unique(b$out)
+    out_id <- nz %in% out_val
+    coef_mat <- coef_mat[!out_id,]
+  }
+plt <- plot_nonzero_coefficients(coef_mat)
+plt
+```
+
+
+
+
