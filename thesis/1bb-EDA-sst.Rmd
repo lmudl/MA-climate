@@ -79,7 +79,7 @@ a + b
 ```
 
 ```{r}
-(sst_mean_arrange <- readRDS("../results/eda/sst_mean_arrange.rds"))
+sst_mean_arrange <- readRDS("../results/eda/sst_mean_arrange.rds")
 sst_mean_arrange
 ```
 We see spatial patterns of the mean evolving over time.

@@ -182,34 +182,21 @@ the predictions made by the model.
 
 ```{r}
 pred_plot_1 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-1.rds"))
-#pred_plot_1
 mse_1 <- get_mse_from_pred_plot(pred_plot_1)
-```
-```{r}
+
 pred_plot_2 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-2.rds"))
-#pred_plot_2
 mse_2 <- get_mse_from_pred_plot(pred_plot_2)
 
-```
-```{r}
+
 pred_plot_3 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-3.rds"))
-#pred_plot_3
 mse_3 <- get_mse_from_pred_plot(pred_plot_3)
 
-```
-```{r}
 pred_plot_4 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-4.rds"))
-#pred_plot_4
 mse_4 <- get_mse_from_pred_plot(pred_plot_4)
 
-```
-```{r}
 pred_plot_5 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-5.rds"))
-#pred_plot_5
 mse_5 <- get_mse_from_pred_plot(pred_plot_5)
 
-```
-```{r}
 pred_plot_list <- list(pred_plot_1,pred_plot_2,pred_plot_3,pred_plot_4,pred_plot_5)
 #lapply(pred_plot_list, get_mse_from_pred_plot)
 ```
@@ -298,6 +285,13 @@ full_preds
 mse_full <- get_mse_from_pred_plot(full_preds)
 mse_full
 ```
+```{r}
+coef_full <- readRDS(paste0(path_to_model_folder,
+                     "coef-plots/coef-plot-full.rds"))
+coef_full
+```
+
+
 
 ```{r}
 full_best <- readRDS(paste0(path_to_model_folder,

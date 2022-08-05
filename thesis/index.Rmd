@@ -13,12 +13,15 @@ bibliography: ref-lib.bib
 biblio-style: apalike
 link-citations: yes
 documentclass: book
+header-includes:
+   - \usepackage{caption}
+   - \captionsetup[figure]{font=tiny}
 ---
 # Introduction {-}
 
 ```{r, include=FALSE}
-knitr::opts_chunk$set(echo=FALSE, warning = FALSE, message = FALSE)
-# options(knitr.duplicate.label = "allow")
+knitr::opts_chunk$set(echo=FALSE, warning = FALSE, message = FALSE, out.width = '50%', fig.align = 'center')
+options(knitr.duplicate.label = "allow")
 ```
 
 With future climate change droughts in the Amazon forest may become more
@@ -27,11 +30,23 @@ savanna, leading to high amounts of carbon released into the atmosphere.
 Therefore, predicting future droughts and understanding the underlying mechanisms 
 is of great interest. @ciemer2020early, established an 
 early warning indicator for droughts in the central Amazon basin (CAB), based on tropical Atlantic sea surface 
-temperatures (SSTs). In my thesis I would like to build on this work and improve the 
+temperatures (SSTs). Inspired by their work, the aim of this thesis is to build up on this work and improve its
 predictive power by using different statistical methods.
-Meaning, we seek to build a model that is able to predict droughts (resp. rainfall) based on preceding
-sea temperatures, desirably with as much lead time as possible. Also we want to 
-identify those sea regions that are most important for doing so, making interpretability a point of interest, too. A first model could be a cross-validated (generalised) LASSO approach
-trying to identify the most important oceanic regions and the respective time-scales.
+Here we seek to build a model that is able to predict monthly precipitation based on the
+sea surface temperatures. 
+Also we want to identify those sea regions that are most important for doing so, making interpretability a point of interest, too.
+Firstly we will analyze the data descriptively to 
+explore patterns and spatial dependencies.
+This includes a cluster analysis of the precipitation data
+in the central Amazon basin.
+Following we will compare two different regression approaches
+and their capability to predict precipitation as well as their interpretability of the SST regions selected by them.
+The first model is the lasso as proposed by @tibshirani1996regression. Comparing different model specifications we will carry on the findings from the lasso
+and fit a (sparse) fused lasso on the data (@tibshirani2005sparsity).
+Both models will be evaluated using a 5-fold forward selection,
+a model evaluation technique that takes into account the time dependencies present in the data at hand.
+We conclude with a summary of the findings in this work 
+and give an overview of strengths and limitations of the approaches used together with ideas for future research.
 
-The thesis will be done in cooperation with Dr. Niklas Boers from the Postdam Institute for Climate Impact Research (@PIC).
+
+This thesis was written and supervised in cooperation with Dr. Niklas Boers from the Potsdam Institute for Climate Impact Research (@PIC) and Dr. Fabian Scheipl (LMU)

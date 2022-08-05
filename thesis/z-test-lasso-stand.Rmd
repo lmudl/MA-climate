@@ -300,6 +300,13 @@ mse_full
 ```
 
 ```{r}
+coef_full <- readRDS(paste0(path_to_model_folder,
+                     "coef-plots/coef-plot-full.rds"))
+coef_full
+```
+
+
+```{r}
 full_best <- readRDS(paste0(path_to_model_folder,
                          "pred-plots/best-pred-plot-full.rds"))
 full_best
