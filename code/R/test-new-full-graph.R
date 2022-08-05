@@ -20,27 +20,67 @@ get_weighted_pen_mat <- function(pen_mat, weights) {
 # lattice graph
 l <- make_lattice(c(5,5))
 dims <- c(5,5)
+laplacian_matrix(l)
+
 ec <- create_coords(dims)
 V(l)$x <- ec$x_vec
-V(l)$y <- ec$y_vec
+V(l)$y <- rev(ec$y_vec)
 # get weights according to adjacency on manhattan grid
 ws <- get_weights(l)
 l <- set_vertex_attr(l, "name", value=LETTERS[1:25])
 plot(l)
+get.incidence(graph=l,types = )
 
 f0 <- make_full_graph(25)
 f <- make_full_graph(25)
 V(f)$x <- ec$x_vec
-V(f)$y <- ec$y_vec
+V(f)$y <- rev(ec$y_vec)
+plot(f)
+#f <- set_vertex_attr(f, "name", value=LETTERS[1:25])
 plot(f)
 E(f)$weight <- ws
 is_weighted(f)
 # f <- set_vertex_attr(f, "name", value=LETTERS[1:25])
-plot(f, edge.width=f$weight*10, layout=layout.grid)
+plot(f, edge.width=E(f)$weight*10, layout=layout.grid)
 f2 <- delete.vertices(f, c("G","H","I","L","N","Q","R","S"))
 plot(f2, edge.width=E(f2)$weight*5)
 
-d0 <-  getDgSparse(f0)
+d0 <-  getDgSparse(f)
+dim(d0)
+d0_weighted <- d0*ws
+d0_weighted2 <- d0*sqrt(ws)
+l1 <- t(d0_weighted)%*%d0_weighted
+l2 <- t(d0_weighted2)%*%d0_weighted2
+head(l1)[1,1:5]
+head(l2)[,1:5]
+head(la)[,1:5]
+all.equal(l2,la)
+
+plot(f)
+
+# IMPORTANT!!!
+# I might have found something here
+# from graph I can comput D sparse
+# then muliplicating each row with the weights square root
+# D then fulfills DTD=laplacian yeaaaaaah!!!!
+# when I delete nodes later (when deleting land)
+# i delete columns from D nice!
+
+# igraph from raster
+# create weighted D
+# then delete the same land cols
+# add weighted D as attribute
+
+
+# implement option D
+# if D is null set FALSE
+# config
+# cv for ts
+# cv_fused_lasso
+# fused_lasso
+
+
+
 # will fail after assigning node_names
 # weights wil not affect here, but we could use weights
 # to multiply with rows
@@ -50,6 +90,15 @@ head(ws)
 all(d==d0)
 dim(d)
 length(ws)
+
+# little thought
+a <- get.adjacency(f)
+b <- t(sqrt(ws))*sqrt(ws)
+head(b)[,1:5]
+m <- matrix(c(1:6), 3,2)
+m*c(1,1/2,1/3)
+la <- laplacian_matrix(f)
+head(la)[,1:5]
 
 create_pen_mat <- function() {}
 # take raster obj
