@@ -1,21 +1,27 @@
 ---
-title: "Predicting Droughts in the Amazon Basin based on Global Sea Surface Temperatures"
 author: "Dario Lepke"
 site: bookdown::bookdown_site
+output_dir: "thesis-book"
 output:
-  bookdown::pdf_book:
-    split_bib: FALSE
+  pdf_document:
     latex_engine: xelatex
+    includes:
+      in_header: "preamble-only.tex"
+      before_body: "body-only.tex"
   bookdown::gitbook:
     # split_by: section
     split_bib: FALSE
+  bookdown::pdf_book:
+    split_bib: FALSE
+    latex_engine: xelatex
+    includes:
+      in_header: "preamble-only.tex"
+      before_body: "body-only.tex"
+  bookdown::html_document2:
 bibliography: ref-lib.bib
 biblio-style: apalike
 link-citations: yes
 documentclass: book
-header-includes:
-   - \usepackage{caption}
-   - \captionsetup[figure]{font=tiny}
 ---
 # Introduction {-}
 

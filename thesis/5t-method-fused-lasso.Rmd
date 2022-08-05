@@ -196,7 +196,7 @@ but can also be rank deficient when the graph has more edges than nodes,
 hence $m > p$. 
 For sparse undetermined systems it is possible
 to find an arbitrary solution (here called the *basic* solution), but computing the solution with minimum $l_2$
-norm is a lot more difficult in general @van1996matrix.
+norm is a lot more difficult in general @van1996matrix .
 It is possible though to derive the minimum $l_2$ norm solution from
 the basic solution.
 In the case of penalty matrices that come from a graph the structure of $D$

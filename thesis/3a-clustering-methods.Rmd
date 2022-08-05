@@ -1,7 +1,7 @@
 ## Clustering Methods
 
-### K-means
-In the following we briefly describe the K-means procedure.
+### $k$-means
+In the following we briefly describe the $k$-means procedure.
 Beforehand we have to specify a number of clusters $C$ we believe exist in our data. Then we randomly initialize $C$ cluster centers in the feature space.
 Now two steps are repeated until convergence:
 
@@ -33,7 +33,7 @@ W(C) = \frac{1}{2} \sum_{k=1}^{K} \sum_{C(i)=k} \sum_{C(i´)=k} ||x_i-x_{i´}||^
 where $\bar{x} = (\bar{x}_{1k},...,\bar{x}_{pk})$ stands for the mean vectors of the $k$th
 cluster and $N_k = \sum_{i=1}^N I(C(i)=k)$. 
 
-### Kmeans characteristics
+### $k$-means characteristics
 variance of each distribution of each
 attribute (variable) is spherical, variance is
 symmetrical?
@@ -42,18 +42,18 @@ in our example, therefore scaling or pca
 equal number of observations in each clusters, we don`t know
 
 Since we use the Euclidean distance the similarity measures will be sensitive to outliers and scale.
-K-means assumes that the variance of a variable´s distribution is spherical, meaning it wight not work well in situations that violate this assumptions (f.e non-spherical data). Further assumptions are same variance of the variables, and equally sized clusters.
+$k$-means assumes that the variance of a variable´s distribution is spherical, meaning it wight not work well in situations that violate this assumptions (f.e non-spherical data). Further assumptions are same variance of the variables, and equally sized clusters.
 Now how "large" these violations have to be so that
-k-means does not work well anymore has no clear-cut answer.
+$k$-means does not work well anymore has no clear-cut answer.
 
 
 ### K-medoids
-We can adjust k-means procedure so that we can use other distances
-than the Euclidean distance. The only part of the k-means algorithm
+We can adjust $k$-means procedure so that we can use other distances
+than the Euclidean distance. The only part of the $k$-means algorithm
 that uses Euclidean distance is when we compute the cluster centers.
 We can replace this step by formalizing an optimization with respect
 to the cluster members. For example so that each center
-has to be one of the observations assigned to the cluster. K-medoids is far more computationally intensive than K-means.
+has to be one of the observations assigned to the cluster. K-medoids is far more computationally intensive than $k$-means.
 
 #### K-medoids characteristics
 K-medoids is less sensitive to outliers, because it minimizes sum of pairwise dissimilarities instead of sum of squared Euclidean distances. As stated above it is also more computationally intensive.

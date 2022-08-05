@@ -1,3 +1,8 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
 ## EDA SST
 
 We explore the sea surface temperature data set, used in the paper by Ciemer et al (@ciemer2020early). 
@@ -10,7 +15,9 @@ are computed to a climatology that spans a time frame we will use
 in the analysis. Using the anomalies therefore would eventually introduce information leakage because during the training process future values were used for fitting the model.
 
 ```{r, include = FALSE}
-knitr::opts_chunk$set(echo=FALSE, warning = FALSE, message = FALSE)
+knitr::opts_chunk$set(echo=FALSE, warning = FALSE, message = FALSE,
+                      fig.align='center')
+
 ```
 
 ```{r}
@@ -27,7 +34,7 @@ library(ggpubr)
 source("../code/R/helper-functions.R")
 ```
 
-```{r}
+```{r, out.width='50%'}
 sst_dens_plot <- readRDS("../results/eda/sst_dens_plot.rds")
 sst_dens_plot <- sst_dens_plot + ggtitle("Density of raw SST values") +
   ylab("Density") + xlab("SST")
@@ -78,10 +85,11 @@ a + b
 (sst_trends_loc_stl_plot <- readRDS("../results/eda/sst_trends_loc_stl_plot.rds"))
 ```
 
-```{r}
+```{r,  out.width='120%'}
 sst_mean_arrange <- readRDS("../results/eda/sst_mean_arrange.rds")
 sst_mean_arrange
 ```
+
 We see spatial patterns of the mean evolving over time.
 For example: From May until August there is a spatial separation in
 two parts that dissolves in september.
@@ -95,7 +103,7 @@ As expected there is a large seasonal component regarding the means.
 ```
 
 
-```{r}
+```{r, out.width='120%'}
 (sst_sd_arrange <- readRDS("../results/eda/sst_sd_arrange.rds"))
 ```
 

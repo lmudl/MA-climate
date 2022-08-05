@@ -12,7 +12,7 @@ and SST data for the common observation period from 1981 until 2016.
 
 In this section we want to study the time series of precipitation in the
 Central Amazon Basin.
-The CHIRPS data set contains the **precipitation data**, created from in-situ and satellite measurements (@funk2015climate). It can be downloaded for example from here [https://www.chc.ucsb.edu/data/chirps].
+The CHIRPS data set contains the **precipitation data**, created from in-situ and satellite measurements (@funk2015climate). It can be downloaded for example from [here](https://www.chc.ucsb.edu/data/chirps).
 It contains observations **from 1981 to 2016** and comes on a **high resolution of 0.05 grid**, which we aggregate to a 0.5 grid.
 
 ```{r setup, include = FALSE}

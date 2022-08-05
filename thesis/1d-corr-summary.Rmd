@@ -7,20 +7,24 @@ SST and precipitation data have been deseasonalised, meaning first each time ser
 decomposed by the stl algorithm according to 
 $$Monthly \textit{ } Data = Seasonal + Trend + Remainder$$
 Afterwards only trends and remainders time series were kept to constitute 
-a new time series that will be used as predictor (sst) and target (precipitation).
+a new time series that will be used as predictor (SST) and target (precipitation).
 
-In a next step we compute the correlations between each sst grid point time series and the mean precipitation time series.
-Since our goal is to predict the precipitation on the sst information, we are
-also interested in predicting future precipitation some months ahead.
+In a next step we compute the pearson correlation coefficient $\rho$ between each SST grid point time series and the mean precipitation time series.
+
+\begin{equation}
+\rho_{X,Y}=\frac{\mathbb{E}\left[\left(X-\mu_{X}\right)\left(Y-\mu_{Y}\right)\right]}{\sigma_X\sigma_Y}
+(\#eq:cor)
+\end{equation}
+
+
+Since our goal is to predict the precipitation on the SST information, we are
+also interested in the correlation of the SST and future precipitation some months ahead.
 To examine this we also compute the correlations for different time lags.
-For example we might use January sst data to predict precipitation in June, given
-a time lag of 6 months. 
+For example for a time lag of 6 month we correlate January SST data and precipitation in July.
 
 We consider time lags of 0,3,6 and 12 months.
 And show the density of the correlation values as well as their spatial distribution on a map. We also display the highest positive and negative correlation based on their
 respective 2.5% and 97.5% quantiles. All correlations that are between these values are set to 0 then.
-
-The correlation measure we use is the 
 
 
 ## Correlation of Sea Surface Temperature and Precipitation {.tabset .tabset-fade .tabset-pills}
@@ -96,12 +100,12 @@ knitr::include_graphics("../code/Rmarkdown/plots-markdown/og-data/corr-12.jpg")
 knitr::include_graphics("../code/Rmarkdown/plots-markdown/og-data/q-corr-12.jpg")
 ```
 
-Giving a timelag of one year, we can see that the distribution of correlations is now again similar to the distribution for timelag 0.
+Giving a time lag of one year, we can see that the distribution of correlations is now again similar to the distribution for time lag 0.
 This also hold for the location of positive and negative correlations in general,
 as well as for the strongest 5% of correlations.
  
 ### Deseasonalised Data {.tabset .tabset-fade .tabset-pills}
-Following, for each timelag we show the respective density of correlation values,
+Following, for each time lag we show the respective density of correlation values,
 their location on the map and also the 5% strongest positive and negative correlations.
 
 #### Timelag 0

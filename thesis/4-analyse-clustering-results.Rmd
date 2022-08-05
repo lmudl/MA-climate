@@ -10,7 +10,7 @@ gettorepo <- "../"
 
 We now analyze further the results we found.
 Namely the clusters we find after performing a PCA on the data,
-using the 3 first principal components and searching for 5 clusters using k-means. The first 3 principal components explain 67.8% of the variance
+using the 3 first principal components and searching for 5 clusters using $k$-means. The first 3 principal components explain 67.8% of the variance
 We found 5 as optimal number of clusters based on the gap statistic and the criteria from Tibsherani.
 
 ```{r, include=FALSE}
@@ -27,7 +27,7 @@ get_tibsh_k_from_gapplot <- function(df) {
 }
 get_tibsh_k_from_gapplot(plot$data)
 ```
-We show the map plot for the k-means clustering after applying the PCA as well as the time series of the resulting clusters.
+We show the map plot for the $k$-means clustering after applying the PCA as well as the time series of the resulting clusters.
 
 ```{r, echo = FALSE}
 km_pca_map_plot <- readRDS(paste0(gettorepo,("results/clustering/km_pca_map_plot.rds")))
@@ -38,24 +38,33 @@ c4_pca_km <- readRDS(paste0(gettorepo,"results/clustering/c4_pca_km_plot.rds"))
 c5_pca_km <- readRDS(paste0(gettorepo,"results/clustering/c5_pca_km_plot.rds"))
 ```
 
-```{r, echo = FALSE, fig.cap= "Spatial distribution of the found clusters in the CAB. We applied a centered PCA on the data and used 3 principal components before applying the K-means algorithm"}
+```{r, echo = FALSE, fig.cap= "Spatial distribution of the found clusters in the CAB. We applied a centered PCA on the data and used 3 principal components before applying the k-means algorithm"}
 km_pca_map_plot + 
 ggtitle("Precipitation clusters in the CAB,
-after centered PCA, using 3 PC's and applying kmeans")
+after centered PCA, using 3 PC's and applying k-means")
 ```
 
-The plot above shows the grid cells in the Central Amazon Basin colored according to the clusters that are assigned by k-means. The clusters are almost
+The plot above shows the grid cells in the Central Amazon Basin colored according to the clusters that are assigned by $k$-means. The clusters are almost
 completely spatially coherent. Meaning that the clusters are not scattered
 across different areas. One exception can be seen for Cluster 1 and 4. Parts of cluster 1 (orange) are inside cluster 4 (blue) and on the edge to cluster 3 (green). 
 
-```{r, echo = FALSE, fig.cap= "Plots of the time series in the clusters we found using the K-means algorithm. The x-axis shows the month of measurement, the y-axis the centered precipitation. Centering was done according to the overall CAB mean in each month. The mean inside each cluster for a month is displayed in blue."}
-c1_pca_km + c2_pca_km + c3_pca_km + c4_pca_km +
-  c5_pca_km
+```{r, echo = FALSE, fig.cap= "Plots of the time series in the clusters we found using the k-means algorithm. The x-axis shows the month of measurement, the y-axis the centered precipitation. Centering was done according to the overall CAB mean in each month. The mean inside each cluster for a month is displayed in blue."}
+l <- list(c1_pca_km, c2_pca_km, c3_pca_km,
+          c4_pca_km, c5_pca_km)
+quick <- function(a) {
+  a$labels$title <- paste("Cluster", a$labels$subtitle)
+  a$labels$subtitle <- NULL
+  return(a)
+} 
+l <- lapply(l, function(x) quick(x))
+# c1_pca_km + c2_pca_km + c3_pca_km + c4_pca_km +
+#   c5_pca_km
+l[[1]] + l[[2]] + l[[3]] + l[[4]] + l[[5]]
 ```
 
 We now inspect the original (centered) time series inside the clusters.  
 The time series are shown in gray and the monthly mean in the cluster is shown in blue. Since the time series are centered before applying the PCA and clustering, the zero value is the mean of the respective month of the whole CAB.  
-The clusters differ in their monthly differences from the monthly CAB mean (here 0 because the time series were centered before PCA and K-means) and their fluctuation/ variance. Also the size of the clusters are not all the same.  
+The clusters differ in their monthly differences from the monthly CAB mean (here 0 because the time series were centered before PCA and $k$-means) and their fluctuation/ variance. Also the size of the clusters are not all the same.  
 The mean in cluster 3 has lowest variability around the CAB mean, followed by clusters 2 and 5, and clusters 1 and 4 have the highest variability.  
 On average cluster 3 is on the level of the CAB overall mean.
 The clusters 2 and 5 are slightly below and cluster 4 is above the CAB mean,

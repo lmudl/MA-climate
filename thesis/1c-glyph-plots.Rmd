@@ -3,6 +3,7 @@
 ```{r, echo=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
 knitr::opts_chunk$set(warning = FALSE)
+knitr::opts_chunk$set(out.width = '75%', fig.align = 'center')
 ```
 
 This section provides a graphical presentation of the precipitation data known as glyph plots.
@@ -23,7 +24,11 @@ on a common or local scale. On the common scale all values are displayed on the 
 while on the local scale the axis are changed so that their ranges refer to the range on the respective
 location.
 Rescaling is done as follows
-$$x_{rescaled} = \frac{x - min(x)}{max(x) - min(x)}.$$
+
+\begin{equation}
+x_{rescaled} = \frac{x - \min(x)}{\max(x) - \min(x)}.
+(\#eq:rescale)
+\end{equation}
 
 This will help us to see the changes in value at each location *relative* to the range
 of the values at the same location.
@@ -86,7 +91,7 @@ Also regarding latitude the closer to the equator the less precipitation.
 ```{r, glyph-scale,fig.cap="Glyph map of de-seasonalised and smoothed precipitation. The time series are scaled locally, ranges are not the same in all cells. The different ranges are given in color shades, where lighter shading indicates a larger range and darker shades smaller ranges."}
 smoothed_scaled_colour_plot <- readRDS(paste0(ptp, "smoothed_scaled_colour_plot.rds"))
 smoothed_scaled_colour_plot + ggtitle("Glyph map of smoothed de-seasonalised monthly precipitation, locally scaled") +
-  theme(plot.title = element_textbox_simple()) +
+  #theme(plot.title = element_textbox_simple()) +
   theme(legend.position = "bottom") 
 ```
 
@@ -103,3 +108,9 @@ as compared to the complete are on average.
 Therefore in a later section we will discuss and apply clustering algorithms to
 the precipitation data.
 But for now we will have a look at the SST data.
+
+```{r}
+knitr::opts_chunk$set(out.width = '50%', fig.align = 'center')
+
+```
+

@@ -1,0 +1,55 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
+```{=latex}
+
+% FRONT PAGE -------------------------------------------------------------------
+  
+\begin{titlepage}
+\begin{center}
+
+\LARGE
+Master's Thesis
+    
+\vspace{0.5cm}
+      
+\rule{\textwidth}{1.5pt}
+\LARGE
+\textbf{Test}
+\rule{\textwidth}{1.5pt}
+   
+\vspace{0.5cm}
+      
+\large
+Department of Statistics \\
+Ludwig-Maximilians-Universität München 
+
+\vfill
+
+\Large
+\textbf{test}
+
+\vfill
+
+\large
+Munich, Month Day\textsuperscript{th}, Year
+      
+\vfill
+
+\includegraphics[width = 0.4\textwidth]{sigillum.png}
+
+\vfill
+
+\normalsize
+Submitted in partial fulfillment of the requirements for the degree of M. Sc.
+\\
+
+Supervised by test
+
+\end{center}
+\end{titlepage}
+\end{document}
+
+```
