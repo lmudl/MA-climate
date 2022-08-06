@@ -1,0 +1,73 @@
+### Lasso on clustered precipitation
+
+```{r, include=FALSE}
+knitr::opts_chunk$set(echo=FALSE, warning = FALSE, message = FALSE, out.width = '50%', fig.align = 'center')
+options(knitr.duplicate.label = "allow")
+```
+
+```{r}
+library(patchwork)
+library(ggpubr)
+library(raster)
+library(glmnet)
+library(Hmisc)
+library(patchwork)
+source("../code/R/helper-functions.R")
+```
+
+Recall that our cluster analysis proposes 5 clusters for the $k$-means algorithm. We came to this conclusion after applying a PCA and computing the gap statistic for different values of $k$.
+We apply the lasso now on each cluster and show for each cluster
+the learning curve, predictions and coefficient plot of the full model.
+
+#### Cluster 1
+```{r}
+path_to_model_folder <- "../results/CV-lasso/cluster-cv-lasso-og2/cluster-1/"
+err_bars_plot <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-bars-plot.rds"))
+p1 <- readRDS(paste0(path_to_model_folder, "err-mat-plots/err-plot-fold-1.rds"))
+p2 <- readRDS(paste0(path_to_model_folder, "err-mat-plots/err-plot-fold-2.rds"))
+p3 <- readRDS(paste0(path_to_model_folder, "err-mat-plots/err-plot-fold-3.rds"))
+p4 <- readRDS(paste0(path_to_model_folder, "err-mat-plots/err-plot-fold-4.rds"))
+p5 <- readRDS(paste0(path_to_model_folder, "err-mat-plots/err-plot-fold-5.rds"))
+pred_plot_1 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-1.rds"))
+pred_plot_2 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-2.rds"))
+pred_plot_3 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-3.rds"))
+pred_plot_4 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-4.rds"))
+pred_plot_5 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-5.rds"))
+full_preds <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-full.rds"))
+coef_plot_full <- readRDS(paste0(path_to_model_folder,
+               "coef-plots/coef-plot-full.rds"))
+full_model <- readRDS(paste0(path_to_model_folder, "full-model.rds"))
+intercept1 <- round(full_model$a0,2)
+lambda1 <- full_model$lambda
+mse1 <- get_mse_from_pred_plot(full_preds)
+```
+
+```{r cl1-err-bar, fig.cap="Model: Lasso on cluster 1. Mean squared error of the 5-fold blocked cross validation for a range of lambda values on the log scale. The points in the middle represent the average MSE for the respective lambda, the errorbars give the MSE +/- one standard deviation. The dotted line shows the lambda for which minimum MSE was obtained."}
+err_bars_plot + ggtitle("MSE for lasso on cluster 1")
+```
+
+\@ref(fig:cl1-err-bar) shows the MSE for the 5 folds
+when we fit the lasso on cluster 1 only.
+The learning curve has no steep increases or declines
+but increases steadily for less regularization after
+the minimum at `r round(log(lambda1),2)`. The minimum mean MSE
+is `r mse1`.
+
+
+```{r cl1-full-pred, fig.cap="Model: Lasso on cluster 1. Precipitation prediction and target values in the validation set. Predictions in red and target values in black. The model was fitted on the full CV data with the lambda value that minimised the average MSE"}
+full_preds + ggtitle("Predictions on evaluation set, lasso on cluster 1")
+```
+
+As we can see in the predictions on the evaluation set
+for cluster 1 (\@ref(fig:cl1-full-pred)),
+the model here as well can not predict the peaks in
+precipitations but catches well the lower values and the general seasonal trajectories.
+
+```{r cl1-coef-plot, fig.cap=paste("Model: Lasso on cluster 1. Coefficient plot of the full model. Fitted intercept of", intercept1)}
+coef_plot_full + ggtitle("Coefficient plot, lasso on cluster 1") + theme(legend.position = "bottom")
+```
+The nonzero coefficients chosen by the lasso 
+are all negative (\@ref(fig:cl1-coef-plot)), since the intercept of the model
+is relatively high (`r intercept1`), the coefficients only decrease the predictions and no predicted value
+is higher than the intercept.
+

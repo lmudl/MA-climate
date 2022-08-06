@@ -131,8 +131,6 @@ the model anew to predict the time series we held out
 as validation data
 
 
-
-
 ```{r}
 full_preds <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-full.rds"))
 full_preds

@@ -2222,9 +2222,17 @@ fit_full_model_for_cluster <- function(sst, full_save_to, ncluster) {
     precip_eval <- precip[start_eval:end_eval]
     full_model <- glmnet(sst_train, precip_train, lambda=l_min,
                          standardize=FALSE)
+    saveRDS(full_model, paste0(cluster_path, "full-model.rds"))
+    # plot coefficients
+    all_coefs <- full_model$beta
+    nonzero_coefs <- which(all_coefs != 0)
+    nonzero_coefs_names <- rownames(all_coefs)[nonzero_coefs]
+    num_coef_names <- coef_names_to_numeric(nonzero_coefs_names)
+    coef_mat <- cbind(num_coef_names, all_coefs[nonzero_coefs])
+    coef_plt <- plot_nonzero_coefficients(coef_mat)
+    saveRDS(coef_plt, paste0(cluster_path,"coef-plots/coef-plot-full.rds"))
     # predict on evaluation data
     preds <- c(predict(full_model, newx = sst_eval))
-    
     # plot predictions against true data
     df <- data.frame(predictions = preds, targets = precip_eval, ids=c(start_eval:end_eval))
     plt <- plot_predictions(df)
@@ -2295,16 +2303,23 @@ create_coords <- function(vec) {
   return(df)
 }
 
-igraph_from_raster <- function(raster_object) {
+igraph_from_raster <- function(raster_object, create_weighted_pen = FALSE) {
   dims <- dim(raster_object)[1:2]
+  vals <- values(raster_object[[1]])
+  land <- which(is.na(vals))
+  rm(raster_object)
+  
   dims <- rev(dims)
   g <- make_lattice(dims)
   ec <- create_coords(dims)
   V(g)$x <- ec$x_vec
   V(g)$y <- rev(ec$y_vec)
-  vals <- values(raster_object[[1]])
-  land <- which(is.na(vals))
+
+  if (create_weighted_pen) pen_mat <- create_pen_mat(g, dims, ec)
+  
   g <- delete_vertices(g, land)
+  pen_mat <- pen_mat[,-land]
+  attr(g, "weighted_pen_mat") <- pen_mat
   return(g)
 }
 
@@ -2320,7 +2335,30 @@ get_weights <- function(lattice_graph) {
   return(w)
 }
 
-create_pen_mat <- function() {}
+get_weighted_pen_mat <- function(pen_mat, weights) {
+  pen_mat <- pen_mat*sqrt(weights)
+  return(pen_mat)
+}
+
+# TODO
+# compute weights from lattice
+# create full graph from dims
+# give full graph same coordinates
+# give full graph weights
+# create sparse D from full graph
+# get weighted sparse D (get_weighted_pen_mat)
+# check if DTD is laplacian of full
+
+create_pen_mat <- function(g, dims, ec) {
+  ws <- get_weights(g)
+  f <- make_full_graph(dims[1]*dims[2])
+  V(f)$x <- ec$x_vec
+  V(f)$y <- rev(ec$y_vec)
+  E(f)$weight <- ws
+  pen_mat <- getDgSparse(f)
+  pen_mat <- get_weighted_pen_mat(pen_mat, ws)
+  return(pen_mat)
+}
 # take raster obj
 # create lattice
 # get weights

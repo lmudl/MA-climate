@@ -5,6 +5,7 @@ save_to <- "data/processed/"
 source("code/R/helper-functions.R")
 library(raster)
 library(igraph)
+library(genlasso)
 
 # raw data ####
 precip <- readRDS("data/interim/drought/chirps_setreftime_aggregated.rds")
@@ -132,4 +133,7 @@ saveRDS(small_noclust_sst_cv, "data/processed/small_noclust_sst_cv.rds")
 small_noclust_sst_eval <- small_sst_eval[,!small_log_drop]
 saveRDS(small_noclust_sst_eval, "data/processed/small_noclust_sst_eval.rds")
 
-
+# for full data set create weighted graph
+sst <- brick("data/interim/sst/ersst_setreftime.nc", varname = "sst")
+wg <- igraph_from_raster(sst, create_weighted_pen = TRUE)
+saveRDS(wg, "data/processed/weighted_graph_sst.rds")

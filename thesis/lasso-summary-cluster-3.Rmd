@@ -1,0 +1,64 @@
+#### Cluster 3
+
+```{r, include=FALSE}
+knitr::opts_chunk$set(echo=FALSE, warning = FALSE, message = FALSE, out.width = '50%', fig.align = 'center')
+options(knitr.duplicate.label = "allow")
+```
+
+```{r}
+library(patchwork)
+library(ggpubr)
+library(raster)
+library(glmnet)
+library(Hmisc)
+library(patchwork)
+source("../code/R/helper-functions.R")
+```
+
+```{r}
+path_to_model_folder <- "../results/CV-lasso/cluster-cv-lasso-og2/cluster-3/"
+err_bars_plot <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-bars-plot.rds"))
+p1 <- readRDS(paste0(path_to_model_folder, "err-mat-plots/err-plot-fold-1.rds"))
+p2 <- readRDS(paste0(path_to_model_folder, "err-mat-plots/err-plot-fold-2.rds"))
+p3 <- readRDS(paste0(path_to_model_folder, "err-mat-plots/err-plot-fold-3.rds"))
+p4 <- readRDS(paste0(path_to_model_folder, "err-mat-plots/err-plot-fold-4.rds"))
+p5 <- readRDS(paste0(path_to_model_folder, "err-mat-plots/err-plot-fold-5.rds"))
+pred_plot_1 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-1.rds"))
+pred_plot_2 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-2.rds"))
+pred_plot_3 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-3.rds"))
+pred_plot_4 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-4.rds"))
+pred_plot_5 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-5.rds"))
+full_preds <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-full.rds"))
+coef_plot_full <- readRDS(paste0(path_to_model_folder,
+                                 "coef-plots/coef-plot-full.rds"))
+full_model <- readRDS(paste0(path_to_model_folder, "full-model.rds"))
+intercept3 <- round(full_model$a0,2)
+lambda3 <- full_model$lambda
+mse3 <- get_mse_from_pred_plot(full_preds)
+```
+
+```{r cl3-err-bar, fig.cap="Model: Lasso on cluster 3. Mean squared error of the 5-fold blocked cross validation for a range of lambda values on the log scale. The points in the middle represent the average MSE for the respective lambda, the errorbars give the MSE +/- one standard deviation. The dotted line shows the lambda for which minimum MSE was obtained."}
+err_bars_plot + ggtitle("MSE for lasso on cluster 3")
+```
+
+\@ref(fig:cl3-err-bar) has its optimum at
+`r log(lambda3)` and a minimum mean MSE is `r mse3`.
+The error bars change in size and increase
+for lower regularization values after the minimum
+MSE is reached.
+
+
+```{r cl3-full-pred, fig.cap="Model: Lasso on cluster 3. Precipitation prediction and target values in the validation set. Predictions in red and target values in black. The model was fitted on the full CV data with the lambda value that minimised the average MSE"}
+full_preds + ggtitle("Predictions on evaluation set, lasso on cluster 3")
+```
+
+The first two seasons of precipitation are predicted well for cluster 3(\@ref(fig:cl3-full-pred)).
+But as the values increase in later seasons again
+the model can not predict the peaks in the precipitation data.
+
+```{r cl3-coef-plot, fig.cap=paste("Model: Lasso on cluster 3. Coefficient plot of the full model. Fitted intercept of", intercept3)}
+coef_plot_full + ggtitle("Coefficient plot, lasso on cluster 3") + theme(legend.position = "bottom")
+```
+Again here the lower $\lambda$ value leads to a higher number of coefficients chosen (@\ref(fig:cl3-coef-plot)). Also the intercept this time is lower (`r intercept3`), there are also large positive coefficients included in the model and
+predictions are higher than the intercept, too.
+

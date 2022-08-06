@@ -38,7 +38,7 @@ c4_pca_km <- readRDS(paste0(gettorepo,"results/clustering/c4_pca_km_plot.rds"))
 c5_pca_km <- readRDS(paste0(gettorepo,"results/clustering/c5_pca_km_plot.rds"))
 ```
 
-```{r, echo = FALSE, fig.cap= "Spatial distribution of the found clusters in the CAB. We applied a centered PCA on the data and used 3 principal components before applying the k-means algorithm"}
+```{r cluster-map, echo = FALSE, fig.cap= "Spatial distribution of the found clusters in the CAB. We applied a centered PCA on the data and used 3 principal components before applying the k-means algorithm"}
 km_pca_map_plot + 
 ggtitle("Precipitation clusters in the CAB,
 after centered PCA, using 3 PC's and applying k-means")

@@ -20,5 +20,20 @@ replot_coef_plots <- function(model, h) {
   plt <- plot_nonzero_coefficients(coef_mat)
   if(drop_out == FALSE) saveRDS(plt, paste0(save_to, "/coef-plots/", "coef-plot-full.rds"))
   if(drop_out == TRUE) saveRDS(plt, paste0(save_to, "/coef-plots/", "coef-plot-drop-out-full.rds"))
-  
 }
+
+
+replot_coef_plots_lasso <- function(model, h) {
+  all_coefs <- model$beta[,h]
+  nonzero_coefs <- all_coefs != 0
+  nonzero_coefs_names <- names(all_coefs[nonzero_coefs])
+  num_coef_names <- coef_names_to_numeric(nonzero_coefs_names)
+  coef_mat <- cbind(num_coef_names, all_coefs[nonzero_coefs])
+  plt <- plot_nonzero_coefficients(coef_mat)
+  return(plt)
+}
+
+replot_coef_plots_lasso(m1, best_l_id)
+
+saveRDS(plt, save_to, "/coef-plots/coef-plot-full.rds")
+

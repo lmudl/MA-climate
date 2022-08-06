@@ -10,10 +10,15 @@ get_weights <- function(lattice_graph) {
   return(w)
 }
 
-get_weighted_pen_mat <- function(pen_mat, weights) {
+get_weighted_pen_mat2 <- function(pen_mat, weights) {
   for(i in seq(nrow(pen_mat))) {
-    pen_mat[i,] <- spen_mat[i,]*weights[i]
+    pen_mat[i,] <- pen_mat[i,]*sqrt(weights[i])
   }
+  return(pen_mat)
+}
+
+get_weighted_pen_mat <- function(pen_mat, weights) {
+  pen_mat <- pen_mat*sqrt(weights)
   return(pen_mat)
 }
 
@@ -51,10 +56,15 @@ d0_weighted <- d0*ws
 d0_weighted2 <- d0*sqrt(ws)
 l1 <- t(d0_weighted)%*%d0_weighted
 l2 <- t(d0_weighted2)%*%d0_weighted2
+la <- laplacian_matrix(f)
 head(l1)[1,1:5]
 head(l2)[,1:5]
 head(la)[,1:5]
 all.equal(l2,la)
+
+r <- get_weighted_pen_mat(d0, ws)
+r2 <- get_weighted_pen_mat2(d0, ws)
+all.equal(r,r2)
 
 plot(f)
 
