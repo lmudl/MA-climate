@@ -42,7 +42,7 @@ err_bars_plot
 \@ref(fig:err-bar-plot-lasso-og) shows the MSE for all the 5 folds summarizing
 for each lambda value the mean MSE (black points) and indicates the dispersion
 of the MSE by one standard deviation by presenting error bars.
-The minimal average MSE is found at `r round(log(lambda1),2)` with a value of 
+The minimal average MSE is found at `r round(log(lambda),2)` with a value of 
 approximately 750.
 The MSE differ a lot between folds, as seen by the large errors bars.
 A common approach for choosing $\lambda$ from cross validation (or here forward validation),

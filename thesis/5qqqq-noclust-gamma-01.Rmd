@@ -118,31 +118,31 @@ And which lambda in the lambda vector resulted in the lowest prediction error on
 
 ## Coefficient plots
 
-```{r , fig.cap="Coefficient map plot for the different folds. Longitude and Latitude on the x and y-axis respectively. Positive values are coloured in blue, negative values in red."}
-pc1 <- readRDS(paste0(path_to_model_folder, "/coef-plots/coef-plot-fold-1.rds"))
-pc2 <- readRDS(paste0(path_to_model_folder, "/coef-plots/coef-plot-fold-2.rds"))
-pc3 <- readRDS(paste0(path_to_model_folder, "/coef-plots/coef-plot-fold-3.rds"))
-pc4 <- readRDS(paste0(path_to_model_folder, "/coef-plots/coef-plot-fold-4.rds"))
-pc5 <- readRDS(paste0(path_to_model_folder, "/coef-plots/coef-plot-fold-5.rds"))
-
-l <- list(pc1,pc2,pc3,pc4,pc5)
-l <- list(pc2,pc3,pc4,pc5)
-a1 <- ggarrange(plotlist = l, ncol = 3, nrow = 2,
-                common.legend = TRUE)
-a1
+```{r ,eval=FALSE fig.cap="Coefficient map plot for the different folds. Longitude and Latitude on the x and y-axis respectively. Positive values are coloured in blue, negative values in red."}
+# pc1 <- readRDS(paste0(path_to_model_folder, "/coef-plots/coef-plot-fold-1.rds"))
+# pc2 <- readRDS(paste0(path_to_model_folder, "/coef-plots/coef-plot-fold-2.rds"))
+# pc3 <- readRDS(paste0(path_to_model_folder, "/coef-plots/coef-plot-fold-3.rds"))
+# pc4 <- readRDS(paste0(path_to_model_folder, "/coef-plots/coef-plot-fold-4.rds"))
+# pc5 <- readRDS(paste0(path_to_model_folder, "/coef-plots/coef-plot-fold-5.rds"))
+# 
+# l <- list(pc1,pc2,pc3,pc4,pc5)
+# l <- list(pc2,pc3,pc4,pc5)
+# a1 <- ggarrange(plotlist = l, ncol = 3, nrow = 2,
+#                 common.legend = TRUE)
+# a1
 ```
 
 ```{r}
-pc1 <- readRDS(paste0(path_to_model_folder, "/coef-plots/coef-plot-drop-out-fold-1.rds"))
-pc2 <- readRDS(paste0(path_to_model_folder, "/coef-plots/coef-plot-drop-out-fold-2.rds"))
-pc3 <- readRDS(paste0(path_to_model_folder, "/coef-plots/coef-plot-drop-out-fold-3.rds"))
-pc4 <- readRDS(paste0(path_to_model_folder, "/coef-plots/coef-plot-drop-out-fold-4.rds"))
-pc5 <- readRDS(paste0(path_to_model_folder, "/coef-plots/coef-plot-drop-out-fold-5.rds"))
-
-l2 <- list(pc1,pc2,pc3,pc4,pc5)
-a2 <- ggarrange(plotlist = l2, ncol = 3, nrow = 2,
-                common.legend = TRUE)
-a2
+# pc1 <- readRDS(paste0(path_to_model_folder, "/coef-plots/coef-plot-drop-out-fold-1.rds"))
+# pc2 <- readRDS(paste0(path_to_model_folder, "/coef-plots/coef-plot-drop-out-fold-2.rds"))
+# pc3 <- readRDS(paste0(path_to_model_folder, "/coef-plots/coef-plot-drop-out-fold-3.rds"))
+# pc4 <- readRDS(paste0(path_to_model_folder, "/coef-plots/coef-plot-drop-out-fold-4.rds"))
+# pc5 <- readRDS(paste0(path_to_model_folder, "/coef-plots/coef-plot-drop-out-fold-5.rds"))
+# 
+# l2 <- list(pc1,pc2,pc3,pc4,pc5)
+# a2 <- ggarrange(plotlist = l2, ncol = 3, nrow = 2,
+#                 common.legend = TRUE)
+# a2
 ```
 
 
@@ -181,18 +181,18 @@ pred_plot_1 + pred_plot_2 + pred_plot_3 + pred_plot_4 +
   pred_plot_5
 ```
 ```{r}
-best_l_res <- readRDS(paste0(path_to_model_folder, "best-lambda-res.rds"))
-best_l_res
+# best_l_res <- readRDS(paste0(path_to_model_folder, "best-lambda-res.rds"))
+# best_l_res
 ```
 
 ```{r}
-err_line_full <- readRDS(paste0(path_to_model_folder, "err-mat-plots/error-line-plot-full.rds"))
-err_line_full
+# err_line_full <- readRDS(paste0(path_to_model_folder, "err-mat-plots/error-line-plot-full.rds"))
+# err_line_full
 ```
 
 
 ```{r}
-rm(err_line_full)
+#rm(err_line_full)
 pred_plot_full <- readRDS(paste0(path_to_model_folder, "pred-plots/pred-plot-full.rds"))
 attr(pred_plot_full, "mse")
 pred_plot_full

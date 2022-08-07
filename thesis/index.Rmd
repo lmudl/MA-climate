@@ -1,7 +1,6 @@
 ---
 author: "Dario Lepke"
 site: bookdown::bookdown_site
-output_dir: "thesis-book"
 output:
   bookdown::pdf_book:
     split_bib: FALSE
@@ -10,10 +9,10 @@ output:
       in_header: "preamble-only.tex"
       before_body: "body-only.tex"
   pdf_document:
-    latex_engine: xelatex
     includes:
       in_header: "preamble-only.tex"
       before_body: "body-only.tex"
+    latex_engine: xelatex
   bookdown::gitbook:
     # split_by: section
     split_bib: FALSE
@@ -24,6 +23,7 @@ output:
       in_header: "preamble-only.tex"
       before_body: "body-only.tex"
   bookdown::html_document2:
+    split_bib: FALSE
 bibliography: ref-lib.bib
 biblio-style: apalike
 link-citations: yes

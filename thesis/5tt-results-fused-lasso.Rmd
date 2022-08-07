@@ -1,0 +1,199 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
+## Model evaluation
+
+```{r}
+knitr::opts_chunk$set(echo=FALSE, warning = FALSE, message = FALSE, out.width = '50%', fig.align = 'center')
+options(knitr.duplicate.label = "allow")
+```
+
+In general we use the same evaluation methods for the fused lasso
+that we used for the lasso models.
+We define 5 folds with train and test, search for an optimal regularization
+value ($\lambda_{\min}$). Then we fit the model on the complete train and test
+data with $\lambda_{\min}$ and report the MSE on the evaluation set.
+But the difference for the lasso and the fused lasso is that we can
+define a $\lambda$ vector that we want to search for solutions for the
+lasso *before* starting the CV, in the fused lasso this is not possible.
+In the *fusedlasso* function we can define the number of steps 
+the model should take and a $\lambda$ that defines the end of
+the path (we will call it $\lambda_{end}$ here). The model terminates therefore if either the maximum number 
+of steps or the defined minimum $\lambda_{end}$ is reached (default is 0).
+This means that the first $\lambda_{start}$ for the fused lasso is different in 
+each fold and when the maximum number of steps is reached before
+the path reached $\lambda_{end}$ the last evaluated (or found) $\lambda_{last}$.
+Is not guaranteed to be the same across fold.
+So for the fused lasso we can not define the regularization values to evaluate,
+but must rather inspect the results for each fold.
+We solve this here rather pragmatically.
+We inspect MSE lines across the solution path for each fold.
+For the overlapping region we define the mean of all evaluated points
+and choose $\lambda_min$ as the amount of regularization that minimizes
+the MSE for common area of the solution path.
+The $\lambda$ values will not exactly be the same for the folds,
+so we have to interpolate the gaps between the actual $\lambda$, to create
+a common range we can compute the mean on.
+The interpolation is done via local polynomial regression fitting
+using the *loess* function in R with a span of 0.05 and degree 2 (@cleveland1992local).
+
+## Graph structure
+
+The fused lasso function allows the user to specify a penalty matrix or a graph
+alongside the input matrix $X$.
+If a graph is given, the penalty matrix is computed as the incidence matrix
+from the graph. We will describe shortly how we defined the graph.
+The SST data is defined on a $89 \times 180$ 2-dimensional grid.
+We define a $89 \times 180$ lattice graph, identify those nodes 
+that correspond to land areas and delete those nodes.
+Because of its resolution and the inclusion of large lakes in the
+SST data, this leads to cluster structures in the graph (see \@ref(fig:graph-plot))
+There are 7 clusters present in this graph colored according to their membership.
+The smallest cluster is the White Sea in Russia.
+The largest cluster are the connected SST nodes after deleting the land nodes.
+This separated the Mediterranean and the Red Sea and actually disconnected North and 
+South america. The large lake structures are clusters naturally.
+Some other structures like the Persian Gulf stay connected with the other SST regions
+but due to the original lattice of the graph, the only have few edges.
+Since the fused lasso penalizes only the difference of connected nodes,
+nodes with fewer edges and hence nodes to be compared to, 
+are less penalized in this graph.
+We fitted the fused lasso on graph \@ref(fig:graph-plot) and a graph that has these smaller clusters removed.
+What we found is that, deleting the smaller clusters improved
+the MSE compared to the fused lasso including the clusters. But still
+we can observe that nodes with fewer edges obtain larger coefficient values
+in general.
+Following we will summarize these findings.
+
+## Results
+
+### Fused lasso
+
+
+```{r graph-plot}
+k <- readRDS("../data/processed/graph_sst.rds")
+plot(k, vertex.label = NA, vertex.size=0.00001,
+          edge.width= 0.0001,
+          vertex.color=cl$membership*10)
+```
+
+
+## Results
+
+Before showing the results for the fus
+
+### Fused lasso 
+
+```{r, echo = FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE, echo = FALSE)
+```
+
+
+```{r}
+library(patchwork)
+library(ggpubr)
+library(raster)
+library(glmnet)
+library(Hmisc)
+source("../code/R/helper-functions.R")
+```
+
+```{r}
+path_to_model_folder <- "../results/CV-fused/large-fused-5k/"
+# h is here 5000
+```
+
+```{r}
+# err_mat <- readRDS(paste0(path_to_model_folder, "/err-mat.rds"))
+#min(apply(err_mat, 1, mean))
+#lambdas <- readRDS(paste0(path_to_model_folder, "/lambda-vec.rds"))
+```
+
+```{r}
+# best_l_res <- readRDS(paste0(path_to_model_folder, "best-lambda-res.rds"))
+# # log(best_l_res$lambda_min)
+# # best_l_res$err_plot + ylim(c(0,50000)) + xlim(3,6)
+# best_l_res$err_plot$labels$colour <- "Fold"
+# p <- best_l_res$err_plot + geom_vline(xintercept=log(best_l_res$lambda_min),
+#                         linetype="dashed",
+#                 color = "red", size=0.5)
+# p2 <- p + ylim(0,2000)
+# ggsave(paste0(path_to_model_folder,"best-lambda-res.png"),
+#        p2)
+```
+
+```{r err-line-fused-og, out.width='45%'}
+knitr::include_graphics(paste0(path_to_model_folder, "best-lambda-res.png"))
+```
+
+The error lines in the different folds differ in their trajectories as well
+as in their starting points (\@ref(fig:err-line-fused-og)). Note that we cut off fold 3 for better readability of the plot
+(the MSE reaches until 3000). The black line indicates the mean, computed for the area
+that is covered by all error lines (after interpolation).
+
+```{r}
+pred_plot_1 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-1.rds"))
+pred_plot_1 <- pred_plot_1 + ylab("Precipitation fold 1")
+mse_1 <- get_mse_from_pred_plot(pred_plot_1)
+
+pred_plot_2 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-2.rds"))
+pred_plot_2 <- pred_plot_2 + ylab("Precipitation fold 2")
+mse_2 <- get_mse_from_pred_plot(pred_plot_2)
+
+pred_plot_3 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-3.rds"))
+pred_plot_3 <- pred_plot_3 + ylab("Precipitation fold 3")
+mse_3 <- get_mse_from_pred_plot(pred_plot_3)
+
+pred_plot_4 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-4.rds"))
+pred_plot_4 <- pred_plot_4 + ylab("Precipitation fold 4")
+mse_4 <- get_mse_from_pred_plot(pred_plot_4)
+
+pred_plot_5 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-5.rds"))
+pred_plot_5 <- pred_plot_5 + ylab("Precipitation fold 5")
+mse_5 <- get_mse_from_pred_plot(pred_plot_5)
+
+#pred_plot_list <- list(pred_plot_1,pred_plot_2,pred_plot_3,pred_plot_4,pred_plot_5)
+```
+```{r pred-fold-fused-og,fig.cap="Precipitation prediction and target values in the test set in each fold. Predictions in red and target values in black."}
+pred_plot_1 + pred_plot_2 + pred_plot_3 + pred_plot_4 +
+  pred_plot_5
+```
+The predictions inside the folds are very similar to lasso without standardization
+(see \@ref(fig:pred-plot-fold-lasso-og)), the same holds for the predictions from
+the full model, but the MSE improves here (@\ref(fig:pred-plot-full-fused-og).
+
+```{r pred-plot-full-fused-og, fig.cap="Precipitation prediction and target values in the validation set. Predictions in red and target values in black. The model was fitted on the full CV data with the lambda value that minimised the average MSE"}
+full_preds <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-full.rds"))
+mse_full <- get_mse_from_pred_plot(full_preds)
+full_preds
+mse_full
+```
+```{r coef-plot-full-fused-og, eval=FALSE, fig.cap="Coefficient plot of the full fused lasso model."}
+coef_plot <- readRDS(paste0(path_to_model_folder,
+                     "coef-plots/coef-plot-full.rds"))
+#coef_plot <- coef_plot + theme(legend.position = "bottom", text = element_text(size = 8))
+coef_plot$layers[[2]]$aes_params$size <- 0.75
+coef_plot_now <- coef_plot
+coef_plot_now <- coef_plot_now + scale_colour_gradient2(name="Coefficients")
+ggsave(paste0(path_to_model_folder, "coef-plots/coef-plot-full.png"), plot = coef_plot_now)
+```
+```{r}
+knitr::include_graphics(paste0(path_to_model_folder, "coef-plots/coef-plot-full.png"))
+```
+```{r}
+# coef_plot2 <- readRDS(paste0(path_to_model_folder,
+#                      "coef-plots/coef-plot-drop-out-full.rds"))
+#coef_plot <- coef_plot + theme(legend.position = "bottom", text = element_text(size = 8))
+# coef_plot2$layers[[2]]$aes_params$size <- 0.75
+# coef_plot_now2 <- coef_plot2
+# coef_plot_now2 <- coef_plot_now2 + scale_colour_gradient2(name="Coefficients")
+#ggsave(paste0(path_to_model_folder, "coef-plots/coef-plot-drop-out-full.png"), plot = coef_plot_now2)
+knitr::include_graphics(paste0(path_to_model_folder, "coef-plots/coef-plot-drop-out-full.png"))
+
+```
+
+
+
+

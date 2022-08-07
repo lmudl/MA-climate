@@ -1,7 +1,7 @@
+output_dir: "thesis-book"
 delete_merged_file: TRUE
 rmd_files:
-  html: [
-  "index.Rmd",
+  html: ["index.Rmd",
     "1a-related-work.Rmd",
     "1b-EDA-precip.Rmd",
     "1c-glyph-plots.Rmd",
@@ -21,9 +21,9 @@ rmd_files:
     "lasso-summary-cluster-3.Rmd",
     "lasso-summary-cluster-4.Rmd",
     "lasso-summary-cluster-5.Rmd",
-    "5t-method-fused-lasso.Rmd"]
-  latex: [
-  "index.Rmd",
+    "5t-method-fused-lasso.Rmd",
+    "5tt-results-fused-lasso.Rmd"]
+  latex: ["index.Rmd",
     "1a-related-work.Rmd", 
     "1b-EDA-precip.Rmd",
     "1c-glyph-plots.Rmd",
@@ -43,4 +43,5 @@ rmd_files:
     "lasso-summary-cluster-3.Rmd",
     "lasso-summary-cluster-4.Rmd",
     "lasso-summary-cluster-5.Rmd",
-    "5t-method-fused-lasso.Rmd"]
+    "5t-method-fused-lasso.Rmd",
+    "5tt-results-fused-lasso.Rmd"]

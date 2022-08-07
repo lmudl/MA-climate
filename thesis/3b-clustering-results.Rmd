@@ -27,7 +27,7 @@ number specified.
 
 #### Scree plot
 
-```{r, echo = FALSE, fig.cap= "Scree plot with the principal components on the x-axis and the respective percentage of variance explained on the y-axis. The PCA was done after centering the data.The first three and four PC`s together explain 67.77 and 70.69% of the variance respectively"}
+```{r, echo = FALSE, fig.cap= "Scree plot with the principal components on the x-axis and the respective percentage of variance explained on the y-axis. The PCA was done after centering the data.The first three and four PC`s together explain 67.77 and 70.69\\% of the variance respectively"}
 scree_plot_pca_centered <- readRDS("../results/clustering/scree_plot_pca_centered.rds")
 scree_plot_pca_centered
 ```
