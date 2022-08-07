@@ -3,8 +3,7 @@ output:
   pdf_document: default
   html_document: default
 ---
-### diff1 lasso
-
+### diff1 lasso {#lasso-diff1}
 
 ```{r, include=FALSE}
 knitr::opts_chunk$set(echo=FALSE, warning = FALSE, message = FALSE, out.width = '50%', fig.align = 'center',
@@ -26,10 +25,26 @@ path_to_model_folder <- "../results/CV-lasso/test-diff1-lasso/"
 ```{r}
 err_mat <- readRDS(paste0(path_to_model_folder, "/err-mat.rds"))
 lambdas <- readRDS(paste0(path_to_model_folder, "/lambda-vec.rds"))
+mm <- min(apply(err_mat, 1, mean))
+wm <- which.min(apply(err_mat, 1, mean))
+full_model <- readRDS(paste0(path_to_model_folder, "full-model.rds"))
+intercept <- round(full_model$a0[wm],2)
+lambda <- round(lambdas[wm],2)
+rm(full_model)
 ```
 
+```{r err-bar-plot-lasso-diff1, fig.cap="Mean squared error of the 5-fold blocked cross validation for a range of lambda values on the log scale. The points in the middle represent the average MSE for the respective lambda, the errorbars give the MSE +/- one standard deviation. The dotted line shows the lambda for which minimum MSE was obtained."}
+err_bars_plot <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-bars-plot.rds"))
+err_bars_plot
+a <- ggplot_build(err_bars_plot)
+```
 
-```{r err-fold-lasso-og, fig.cap="MSE of the CV for the different lambda values on the a log scale. The red dotted line shows the lambda for which minimum MSE was obtained."}
+The MSE learning curve in \@ref(fig:err-bar-plot-lasso-diff1) has
+its minimum at $\lambda=$ `r lambda`. And shows increasing standard
+deviation for the MSE values across folds when $\lambda$ decreases
+to the end of the path.
+
+```{r err-fold-lasso-diff1, fig.cap="MSE of the CV for the different lambda values on the a log scale. The red dotted line shows the lambda for which minimum MSE was obtained."}
 p1 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-plot-fold-1.rds"))
 p2 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-plot-fold-2.rds"))
 p3 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-plot-fold-3.rds"))
@@ -39,12 +54,9 @@ p5 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-plot-fold-5.rds")
 p1 + p2 + p3 + p4 + p5
 
 ```
-
-```{r err-bar-plot-lasso-og, fig.cap="Mean squared error of the 5-fold blocked cross validation for a range of lambda values on the log scale. The points in the middle represent the average MSE for the respective lambda, the errorbars give the MSE +/- one standard deviation. The dotted line shows the lambda for which minimum MSE was obtained."}
-err_bars_plot <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-bars-plot.rds"))
-err_bars_plot
-a <- ggplot_build(err_bars_plot)
-```
+The range of MSE inside the different folds vary but overall
+the folds show similar trajectories and the optimal regularization
+chosen occurs at close values (on the log scale, \@ref(fig:err-fold-lasso-og).
 
 ```{r}
 pred_plot_1 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-1.rds"))
@@ -66,20 +78,34 @@ mse_5 <- get_mse_from_pred_plot(pred_plot_5)
 pred_plot_list <- list(pred_plot_1,pred_plot_2,pred_plot_3,pred_plot_4,pred_plot_5)
 ```
 
-```{r pred-plot-fold-lasso-og, fig.cap="Precipitation prediction and target values in the test set in each fold. Predictions in red and target values in black."}
+```{r pred-plot-fold-lasso-diff1, fig.cap="Precipitation prediction and target values in the test set in each fold. Predictions in red and target values in black."}
 pred_plot_1 + pred_plot_2 + pred_plot_3 + pred_plot_4 +
   pred_plot_5
 ```
+Here the prediction inside the folds show similar trajectories to  \@ref(fig:pred-plot-fold-lasso-og) or \@ref(fig:pred-plot-fold-lasso-stand),
+note that the prediction period is one month shorter because after differentiating
+the predictors we shorten the target variable by one month, too (\@ref(fig:pred-plot-fold-lasso-diff1)).
 
-```{r pred-plot-full-lasso-og, fi.cap="Precipitation prediction and target values in the validation set. Predictions in red and target values in black. The model was fitted on the full CV data with the lambda value that minimised the average MSE"}
+```{r pred-plot-full-lasso-diff1, fi.cap="Precipitation prediction and target values in the validation set. Predictions in red and target values in black. The model was fitted on the full CV data with the lambda value that minimised the average MSE"}
 full_preds <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-full.rds"))
 full_preds
 mse_full <- get_mse_from_pred_plot(full_preds)
 mse_full
 ```
 
-```{r}
+As for the other models we looked at before, the amplitudes are underestimated
+in \@ref(fig:pred-plot-fold-lasso-diff1). But the amplitudes are not decreasing
+(which can be observed for the other models and most prominently for
+\@ref(fig:pred-plot-fold-lasso-deseas)). In the peak around month 420,
+the predictions actually spike to their maximum value, but at the same time
+they strongly overestimate the period of low precipitation directly preceding.
+
+
+```{r coef-plot-full-lasso-diff1, fig.cap=paste("Coefficient plot of the full lasso model with fitted intercept of", intercept)}
 coef_full <- readRDS(paste0(path_to_model_folder,
                      "coef-plots/coef-plot-full.rds"))
 coef_full
 ```
+Investigating the coefficient plot for this model (@\ref(fig:coef-plot-full-lasso-diff1)), we find that here a lot of coefficients
+have large positive values, for example below the equator in the Pacific and Atlantic.
+

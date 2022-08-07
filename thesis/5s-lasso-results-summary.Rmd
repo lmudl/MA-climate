@@ -13,7 +13,7 @@ end of the observation period.
 For the full model we show the predictions and resulting coefficient
 map.
 
-### Lasso
+### Lasso {#lasso-og}
 ```{r}
 library(patchwork)
 library(ggpubr)
@@ -42,7 +42,8 @@ err_bars_plot
 \@ref(fig:err-bar-plot-lasso-og) shows the MSE for all the 5 folds summarizing
 for each lambda value the mean MSE (black points) and indicates the dispersion
 of the MSE by one standard deviation by presenting error bars.
-The minimal MSE is found at `r round(log(lambda1),2)`
+The minimal average MSE is found at `r round(log(lambda1),2)` with a value of 
+approximately 750.
 The MSE differ a lot between folds, as seen by the large errors bars.
 A common approach for choosing $\lambda$ from cross validation (or here forward validation),
 is to choose largest lambda that lays within one standard deviation of 
@@ -111,13 +112,14 @@ Overall the standard lasso shows here it can learn some meaningful connection.
 full_preds <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-full.rds"))
 mse_full <- get_mse_from_pred_plot(full_preds)
 full_preds
+mse_full
 ```
 The predictions from the full model on the evaluation set indicate 
 that the model is capable of predicting the seasonal variation in the precipitation
 data (\@ref(fig:pred-plot-full-lasso-og)). But it constantly fails to predict
 the peaks during the seasonal cycles.
 
-```{r coef-plot-full-lasso-og, fig.cap=paste("Coefficient plot of the full lasso model with fitted intercept of", intercept1)}
+```{r coef-plot-full-lasso-og, fig.cap=paste("Coefficient plot of the full lasso model with fitted intercept of", intercept)}
 coef_full <- readRDS(paste0(path_to_model_folder,
                      "coef-plots/coef-plot-full.rds"))
 coef_full + theme(legend.position = "bottom")

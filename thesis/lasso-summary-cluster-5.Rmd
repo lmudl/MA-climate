@@ -60,7 +60,7 @@ A very large negative coefficient value is chosen for
 . The intercept is `r intercept5`(\@ref(fig:cl5-coef-plot)).
 No locations next to the south-american coast line are chosen.
 
-#### Summary
+#### Cluster Summary
 Overall we did not improve MSE when fitting the lasso on each cluster and
 evaluated on the set, but in cluster 2.
 It seems that when the data has a lot of nonseasonal peaks and valleys,
@@ -97,6 +97,44 @@ mse5 <- get_mse_from_pred_plot(full_preds)
 knitr::kable(data.frame(c("1","2", "3", "4", "5"),
              c(mse1,mse2,mse3,mse4,mse5)), col.names = c("Cluster", "MSE"))
 ```
+
+## Lasso summary
+
+In this chapter we compared different settings for the lasso model to predict 
+the precipitation in the validation set.
+We chose a regularization level based on a 5-fold forward validation,
+meaning that time ordering was preserved during fitting and testing.
+The $\lambda$ that minimized the average MSE across all folds was selected
+and the model was refitted with this value on all training data.
+This full model was then used to predict precipitation on the validation set
+that was not used during the training phase.
+No observation was used for model fitting *and* testing, meaning
+there were no overlaps of fold time periods.
+We inspected the results of the lasso with and without standardization,
+after de-seasonalizing the SST data according to our validation scheme
+and after differentiating the SST data. We also used a cluster analysis
+to separate the CAB in 5 clusters and fit the lasso procedure on each cluster
+(see \@ref{cluster-methods} for details).
+If we solely compare MSE we find that standardizing the SST data improves the predictions results over the other lasso models. De-seasonalizing the predictors prior to model fitting did not yield competitive results,
+this might be due to the differences in SST seasonality between the data used for 
+forward validation (estimating optimal $\lambda$) and model evaluation.
+When differentiating the SST data we find that the obtained learning
+curves show similar trajectories and the dispersion at the optimal level of regularization is comparably small.
+When fitting the lasso on each of the clusters we found in \@ref{clustering-analyze-results.} we don't improve predictions on most clusters.
+But for one cluster (cluster 2, \@ref{cl2}) the lasso can actually predict the values in the validation set reasonably well since the precipitation values
+in this area don't disperse a lot from the seasonal signals.
+The regions that were included in the model varied greatly across models in general,
+which can also be explained by the different levels of regularization chosen.
+But some regions were included more often than others.
+Areas in the west Atlantic around the equator were included in all models but
+at different magnitudes. Also around the equator but in the east pacific coastal regions were included in almost all models but in the standardized lasso (see \@ref(fig:coef-plot-full-lasso-stand)). While we would expect these regions to
+be predictive, based on the paper by @ciemer2020early and our correlation analysis \@ref{correlation-chapter}. There also locations far away from the CAB that
+were included in all models. See for example that all models included a region
+in the Caspian sea. But in the de-seasonalized model this
+region has a very low coefficient value so for some larger levels of regularization
+it would probably not be included.
+Finally, the lasso can predict the seasonal patterns well, but when using the 
+precipitation averaged over the CAB, it fails to predict the higher values of seasonal amplitudes.
 
 
 

@@ -1,4 +1,4 @@
-## Clustering Methods
+## Clustering Methods {#clustering-methods}
 
 ### $k$-means
 In the following we briefly describe the $k$-means procedure.

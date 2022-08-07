@@ -1,4 +1,4 @@
-### standardized lasso
+### standardized lasso {#lasso-stand}
 ```{r}
 library(patchwork)
 library(ggpubr)
@@ -15,6 +15,7 @@ path_to_model_folder <- "../results/CV-lasso/test-lasso-stand/"
 ```{r}
 err_mat <- readRDS(paste0(path_to_model_folder, "/err-mat.rds"))
 lambdas <- readRDS(paste0(path_to_model_folder, "/lambda-vec.rds"))
+mm <- min(apply(err_mat, 1, mean))
 wm <- which.min(apply(err_mat, 1, mean))
 full_model <- readRDS(paste0(path_to_model_folder, "full-model.rds"))
 intercept <- round(full_model$a0[wm],2)
@@ -30,7 +31,8 @@ err_bars_plot
 The learning curve in \@ref(fig:err-bar-plot-lasso-stand) shows some 
 extreme behavior for $\lambda$ values around 0 on the logarithmic scale.
 For lower values the standard deviation of the MSE get extremely large.
-Inspecting the MSE lines sperately for each fold gives more insight.
+The minimum MSE is `r round(mm,2)`
+Inspecting the MSE lines separately for each fold gives more insight.
 
 
 ```{r err-fold-lasso-stand, fig.cap="MSE of the CV for the different lambda values on the a log scale. The red dotted line shows the lambda for which minimum MSE was obtained."}

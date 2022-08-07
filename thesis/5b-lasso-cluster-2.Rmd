@@ -1,4 +1,4 @@
-# Lasso on cluster 2 
+# Lasso on cluster 2
 
 ```{r, echo = FALSE}
 knitr::opts_chunk$set(warning = FALSE, message = FALSE, echo = FALSE)
