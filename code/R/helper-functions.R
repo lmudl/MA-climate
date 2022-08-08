@@ -948,7 +948,7 @@ cv_lasso <- function(sst, precip, index_list, save_folder, include_ts_vars, stan
       y_train <- scale(y_train, center = mean_y_train,
                        scale = FALSE)
     }
-
+    
     
     trained_model <- glmnet(data.matrix(x_train), y_train, lambda = lambda_vec,
                             standardize=FALSE, standardize.response = FALSE)
@@ -965,7 +965,7 @@ cv_lasso <- function(sst, precip, index_list, save_folder, include_ts_vars, stan
     }
     if(log_response == TRUE) {
       predicted <- apply(predicted, 2, exp)
-
+      
     }
     err_col <- apply(predicted, 2, function(x) mean((x-y_test)^2))
     err_mat[,j] <- err_col
@@ -1395,7 +1395,7 @@ fit_full_fused <- function(conf) {
   if(center_response == TRUE) {
     mean_precip_cv <- mean(precip_cv)
     precip_cv <- scale(precip_cv, center = mean_precip_cv,
-                     scale = FALSE)
+                       scale = FALSE)
   }
   full_mod <- fusedlasso(y = precip_cv, X = sst_cv, graph = g,
                          verbose = TRUE, maxsteps = conf$maxsteps,
@@ -1581,7 +1581,7 @@ plot_fused_full <- function(conf) {
     best_l <- best_l_cv
     h <- max(which(full_model$lambda <  best_l_cv))
   }
-  
+  saveRDS(h, paste0(model_path, "best_l_chosen"))
   preds_bl <- predict.genlasso(full_model, Xnew = sst_eval, lambda=best_l)
   if(standardize_response == TRUE) {
     preds_bl$fit <- preds_bl$fit*sdn_y_train + mean_y_train
@@ -1599,6 +1599,7 @@ plot_fused_full <- function(conf) {
   rm(pred_plt)
   
   # plot_coef_map_full_fused(full_model, h, sst_cv, drop_out=TRUE, model_path)
+  attr(full_)
   plot_coef_map_full_fused(full_model, h, sst_cv, drop_out=FALSE, model_path)
   print("plotted coef map")
 }
@@ -2314,7 +2315,7 @@ igraph_from_raster <- function(raster_object, create_weighted_pen = FALSE) {
   ec <- create_coords(dims)
   V(g)$x <- ec$x_vec
   V(g)$y <- rev(ec$y_vec)
-
+  
   if (create_weighted_pen) pen_mat <- create_pen_mat(g, dims, ec)
   
   g <- delete_vertices(g, land)
@@ -2432,7 +2433,7 @@ run_all_fused <- function(model_name, parts = c("all")) {
               standardize_features = conf$standardize_features, 
               standardize_response = conf$standardize_response,
               gamma = conf$gamma
-              )
+    )
     print("finished cv")
   }
   if("plot-cv" %in% parts) {
@@ -2537,3 +2538,84 @@ get_l_1se_high_low <- function(err_bar_plot) {
 #   geom_vline(xintercept = l_list$l_1se_low, linetype = "dashed", colour = "purple")
 
 # plot testers inside fused CV##################################################
+
+# save best_l_res as png because the rds is HUGE
+# while doing so save the best_l as rds so avoid having to load it again
+best_l_res_to_png <- function(path_to_model_folder) {
+  best_l_res <- readRDS(paste0(path_to_model_folder, "best-lambda-res.rds"))
+  best_l_res$err_plot$labels$colour <- "Fold"
+  best_l <- best_l_res$lambda_min
+  saveRDS(best_l, paste0(path_to_model_folder, "best_l_chosen.rds"))
+  print("saved best l")
+  p <- best_l_res$err_plot + geom_vline(xintercept=log(best_l),
+                                        linetype="dashed",
+                                        color = "red", size=0.5)
+  ggsave(paste0(path_to_model_folder, "best-lambda-res.png"))
+  print("saved as png")
+}
+
+# some coefficient plots have no legend (full models)
+# replot them by loading full model get best_l, compare to minimum lambda
+# in the full model and then replot the coefficients
+
+replot_coef_plots_fused <- function(model, h, drop_out=FALSE, path_to_model_folder) {
+  save_to <- path_to_model_folder
+  all_coefs <- model$beta[,h]
+  nonzero_coefs <- all_coefs != 0
+  cnames <- colnames(model$X)
+  nonzero_coef_names <- cnames[nonzero_coefs]
+  num_coef_names <- coef_names_to_numeric(nonzero_coef_names)
+  coef_mat <- cbind(num_coef_names, all_coefs[nonzero_coefs])
+  if(drop_out == TRUE & ((sum(nonzero_coefs)!=0))) {
+    nz <- round(all_coefs[nonzero_coefs],6)
+    b <- boxplot(nz)
+    out_val <- unique(b$out)
+    out_id <- nz %in% out_val
+    coef_mat <- coef_mat[out_id,]
+  }
+  plt <- plot_nonzero_coefficients(coef_mat)
+  plt$layers[[2]]$aes_params$size <- 0.75
+  plt <- plt + scale_colour_gradient2(name="Coefficients")
+  if(drop_out == FALSE) {
+    #saveRDS(plt, paste0(save_to, "/coef-plots/", "coef-plot-full.rds"))
+    ggsave(paste0(save_to, "/coef-plots/", "coef-plot-full.png"), plt,
+           width = 7, height = 7, units = "cm")
+  }
+  if(drop_out == TRUE) {
+    #saveRDS(plt, paste0(save_to, "/coef-plots/", "coef-plot-drop-out-full.rds"))
+    ggsave(paste0(save_to, "/coef-plots/", "coef-plot-drop-out-full.png"), plt,
+           width = 7, height = )
+  }
+  print("coef plots saved")
+}
+
+together <- function(path_to_model_folder, drop_out = FALSE) {
+  l <- list.files(path_to_model_folder)
+  if(!("best_l_chosen.rds" %in% l)) {
+    best_l_res_to_png(path_to_model_folder)
+  }
+  model <- readRDS(paste0(path_to_model_folder, "full-model.rds"))
+  best_l_cv <- readRDS(paste0(path_to_model_folder, "best_l_chosen.rds"))
+  if(best_l_cv < min(model$lambda)) {
+    print("current min lambda is larger than CV min lambda, choose current min lambda")
+    best_l <- min(model$lambda)
+    h <- which.min(model$lambda)
+  } else {
+    best_l <- best_l_cv
+    h <- max(which(model$lambda <  best_l_cv))
+  }
+  replot_coef_plots_fused(model, h, drop_out = drop_out, path_to_model_folder)
+}
+
+# for lasso best l for example from error bar plot
+replot_coef_plots_lasso <- function(model, h, drop_out=FALSE) {
+  all_coefs <- model$beta[,h]
+  nonzero_coefs <- all_coefs != 0
+  nonzero_coefs_names <- names(all_coefs[nonzero_coefs])
+  num_coef_names <- coef_names_to_numeric(nonzero_coefs_names)
+  coef_mat <- cbind(num_coef_names, all_coefs[nonzero_coefs])
+  plt <- plot_nonzero_coefficients(coef_mat)
+  return(plt)
+}
+
+

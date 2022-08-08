@@ -4,36 +4,49 @@
 # this will save us a lot of trouble when knitting the whole document
 
 # but we need the info which was the best-lambda here this is h
-replot_coef_plots <- function(model, h) {
-  all_coefs <- model$beta[,h]
-  nonzero_coefs <- all_coefs != 0
-  cnames <- colnames(model$X)
-  nonzero_coef_names <- coef_names_to_numeric(nonzer_coef_names)
-  coef_mat <- cbind(num_coef_names, all_coefs[nonzer_coefs])
-  if(drop_out == TRUE & ((sum(nonzero_coefs)!=0))) {
-    nz <- round(all_coefs[nonzero_coefs],6)
-    b <- boxplot(nz)
-    out_val <- unique(b$out)
-    out_id <- nz %in% out_val
-    coef_mat <- coef_mat[!out_id,]
-  }
-  plt <- plot_nonzero_coefficients(coef_mat)
-  if(drop_out == FALSE) saveRDS(plt, paste0(save_to, "/coef-plots/", "coef-plot-full.rds"))
-  if(drop_out == TRUE) saveRDS(plt, paste0(save_to, "/coef-plots/", "coef-plot-drop-out-full.rds"))
-}
-
-
-replot_coef_plots_lasso <- function(model, h) {
-  all_coefs <- model$beta[,h]
-  nonzero_coefs <- all_coefs != 0
-  nonzero_coefs_names <- names(all_coefs[nonzero_coefs])
-  num_coef_names <- coef_names_to_numeric(nonzero_coefs_names)
-  coef_mat <- cbind(num_coef_names, all_coefs[nonzero_coefs])
-  plt <- plot_nonzero_coefficients(coef_mat)
-  return(plt)
-}
+# replot_coef_plots_fused <- function(model, h) {
+#   all_coefs <- model$beta[,h]
+#   nonzero_coefs <- all_coefs != 0
+#   cnames <- colnames(model$X)
+#   nonzero_coef_names <- coef_names_to_numeric(nonzer_coef_names)
+#   coef_mat <- cbind(num_coef_names, all_coefs[nonzer_coefs])
+#   if(drop_out == TRUE & ((sum(nonzero_coefs)!=0))) {
+#     nz <- round(all_coefs[nonzero_coefs],6)
+#     b <- boxplot(nz)
+#     out_val <- unique(b$out)
+#     out_id <- nz %in% out_val
+#     coef_mat <- coef_mat[!out_id,]
+#   }
+#   plt <- plot_nonzero_coefficients(coef_mat)
+#   if(drop_out == FALSE) saveRDS(plt, paste0(save_to, "/coef-plots/", "coef-plot-full.rds"))
+#   if(drop_out == TRUE) saveRDS(plt, paste0(save_to, "/coef-plots/", "coef-plot-drop-out-full.rds"))
+# }
+# 
+# 
+# replot_coef_plots_lasso <- function(model, h) {
+#   all_coefs <- model$beta[,h]
+#   nonzero_coefs <- all_coefs != 0
+#   nonzero_coefs_names <- names(all_coefs[nonzero_coefs])
+#   num_coef_names <- coef_names_to_numeric(nonzero_coefs_names)
+#   coef_mat <- cbind(num_coef_names, all_coefs[nonzero_coefs])
+#   plt <- plot_nonzero_coefficients(coef_mat)
+#   return(plt)
+# }
 
 replot_coef_plots_lasso(m1, best_l_id)
-
 saveRDS(plt, save_to, "/coef-plots/coef-plot-full.rds")
 
+# how to get best_l_id?
+m <- readRDS("results/CV-fused/noclust-large-fused-5k/full-model.rds")
+# have to load best_l_res
+
+# load best_l_res,save best lambda from there in rds file
+# and save as png
+
+source("code/R/helper-functions.R")
+library(ggplot2)
+#together("results/CV-fused/noclust-large-fused-5k/")
+path_to_model_folder <- "results/CV-fused/noclust-large-fused-5k-gamma-01//"
+# debug(together)
+together(path_to_model_folder, drop_out=FALSE)
+together(path_to_model_folder, drop_out=TRUE)

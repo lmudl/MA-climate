@@ -1,0 +1,116 @@
+### Fused Lasso with clusters
+
+```{r, echo = FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE, echo = FALSE)
+```
+
+
+```{r}
+library(patchwork)
+library(ggpubr)
+library(raster)
+library(glmnet)
+library(Hmisc)
+source("../code/R/helper-functions.R")
+```
+
+```{r}
+path_to_model_folder <- "../results/CV-fused/noclust-large-fused-5k-gamma-005/"
+# h is here 5000
+```
+
+```{r}
+# err_mat <- readRDS(paste0(path_to_model_folder, "/err-mat.rds"))
+#min(apply(err_mat, 1, mean))
+#lambdas <- readRDS(paste0(path_to_model_folder, "/lambda-vec.rds"))
+```
+
+```{r}
+# best_l_res <- readRDS(paste0(path_to_model_folder, "best-lambda-res.rds"))
+# # log(best_l_res$lambda_min)
+# # best_l_res$err_plot + ylim(c(0,50000)) + xlim(3,6)
+# best_l_res$err_plot$labels$colour <- "Fold"
+# p <- best_l_res$err_plot + geom_vline(xintercept=log(best_l_res$lambda_min),
+#                         linetype="dashed",
+#                 color = "red", size=0.5)
+# p2 <- p + ylim(0,2000)
+# ggsave(paste0(path_to_model_folder,"best-lambda-res.png"),
+#        p2)
+```
+
+```{r err-line-fused-og, out.width='45%'}
+knitr::include_graphics(paste0(path_to_model_folder, "best-lambda-res.png"))
+```
+
+The error lines in the different folds differ in their trajectories as well
+as in their starting points (\@ref(fig:err-line-fused-og)). Note that we cut off fold 3 for better readability of the plot
+(the MSE reaches until 3000). The black line indicates the mean, computed for the area
+that is covered by all error lines (after interpolation).
+
+```{r}
+pred_plot_1 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-1.rds"))
+pred_plot_1 <- pred_plot_1 + ylab("Precipitation fold 1")
+mse_1 <- get_mse_from_pred_plot(pred_plot_1)
+
+pred_plot_2 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-2.rds"))
+pred_plot_2 <- pred_plot_2 + ylab("Precipitation fold 2")
+mse_2 <- get_mse_from_pred_plot(pred_plot_2)
+
+pred_plot_3 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-3.rds"))
+pred_plot_3 <- pred_plot_3 + ylab("Precipitation fold 3")
+mse_3 <- get_mse_from_pred_plot(pred_plot_3)
+
+pred_plot_4 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-4.rds"))
+pred_plot_4 <- pred_plot_4 + ylab("Precipitation fold 4")
+mse_4 <- get_mse_from_pred_plot(pred_plot_4)
+
+pred_plot_5 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-5.rds"))
+pred_plot_5 <- pred_plot_5 + ylab("Precipitation fold 5")
+mse_5 <- get_mse_from_pred_plot(pred_plot_5)
+
+#pred_plot_list <- list(pred_plot_1,pred_plot_2,pred_plot_3,pred_plot_4,pred_plot_5)
+```
+```{r pred-fold-fused-og,fig.cap="Precipitation prediction and target values in the test set in each fold. Predictions in red and target values in black."}
+pred_plot_1 + pred_plot_2 + pred_plot_3 + pred_plot_4 +
+  pred_plot_5
+```
+The predictions inside the folds are very similar to lasso without standardization
+(see \@ref(fig:pred-plot-fold-lasso-og)), the same holds for the predictions from
+the full model, but the MSE improves here (@\ref(fig:pred-plot-full-fused-og).
+
+```{r pred-plot-full-fused-og, fig.cap="Precipitation prediction and target values in the validation set. Predictions in red and target values in black. The model was fitted on the full CV data with the lambda value that minimised the average MSE"}
+full_preds <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-full.rds"))
+mse_full <- get_mse_from_pred_plot(full_preds)
+full_preds
+mse_full
+```
+
+```{r coef-plot-full-fused-og, eval=FALSE, fig.cap="Coefficient plot of the full fused lasso model."}
+coef_plot <- readRDS(paste0(path_to_model_folder,
+                            "coef-plots/coef-plot-full.rds"))
+#coef_plot <- coef_plot + theme(legend.position = "bottom", text = element_text(size = 8))
+coef_plot$layers[[2]]$aes_params$size <- 0.75
+coef_plot_now <- coef_plot
+coef_plot_now <- coef_plot_now + scale_colour_gradient2(name="Coefficients")
+ggsave(paste0(path_to_model_folder, "coef-plots/coef-plot-full.png"), plot = coef_plot_now)
+```
+
+```{r}
+knitr::include_graphics(paste0(path_to_model_folder, "coef-plots/coef-plot-full.png"))
+```
+
+```{r}
+# coef_plot2 <- readRDS(paste0(path_to_model_folder,
+#                      "coef-plots/coef-plot-drop-out-full.rds"))
+#coef_plot <- coef_plot + theme(legend.position = "bottom", text = element_text(size = 8))
+# coef_plot2$layers[[2]]$aes_params$size <- 0.75
+# coef_plot_now2 <- coef_plot2
+# coef_plot_now2 <- coef_plot_now2 + scale_colour_gradient2(name="Coefficients")
+#ggsave(paste0(path_to_model_folder, "coef-plots/coef-plot-drop-out-full.png"), plot = coef_plot_now2)
+knitr::include_graphics(paste0(path_to_model_folder, "coef-plots/coef-plot-drop-out-full.png"))
+
+```
+
+
+
+
