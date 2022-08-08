@@ -5,10 +5,18 @@ First we will analyse the original and then the de-seasonalized data.
 SST and precipitation data have been de-seasonalized, meaning first each time series was
 decomposed by the stl algorithm according to 
 $$Monthly \textit{ } Data = Seasonal + Trend + Remainder$$
+
 Afterwards only trends and remainders time series were kept to constitute 
 a new time series that will be used as predictor (SST) and target (precipitation).
 
-In a next step we compute the pearson correlation coefficient $\rho$ between each SST grid point time series and the mean precipitation time series.
+On a high level the stl algorithm separates the complete time series into cycle sub-series, one series for each month. Each cycle sub-series is then loess smoothed and passed through
+a low-pass filter. The smoothed sub-series minus the low-pass filter results give
+the seasonal component. The seasonal component is then subtracted from the original,
+raw data. This result also is loess smoothed and becomes the trend.
+Finally as we saw above, the remainder is what is left after we subtract
+the seasonal and trend component from the data (@cleveland1990stl).
+
+In the next step we compute the pearson correlation coefficient $\rho$ between each SST grid point time series and the mean precipitation time series.
 
 \begin{equation}
 \rho_{X,Y}=\frac{\mathbb{E}\left[\left(X-\mu_{X}\right)\left(Y-\mu_{Y}\right)\right]}{\sigma_X\sigma_Y}

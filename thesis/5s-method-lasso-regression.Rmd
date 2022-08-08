@@ -107,7 +107,11 @@ as sequence of K values, typical values are $\epsilon = 0.001$ and
 $K = 100$. This procedure is an example of so called *warm starts*.
 By default they always center the predictor variable.
 For additional information on other methods how speedup
-is obtainred refer to Section 2 in @glmnet-package.
+is obtained refer to Section 2 in @glmnet-package.
+
+## Model specifications
+
+
 
 ## TODO here
 maybe drop into with linear model

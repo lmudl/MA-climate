@@ -1,0 +1,8 @@
+# Appendix
+
+```{r sst-mean-month, out.width='120%'}
+sst_mean_arrange <- readRDS("../results/eda/sst_mean_arrange.rds")
+sst_mean_arrange
+```
+
+
