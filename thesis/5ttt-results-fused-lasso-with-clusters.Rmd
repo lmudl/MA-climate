@@ -1,4 +1,5 @@
-### Fused Lasso with clusters
+## Appendix Fused lasso results
+### Fused Lasso without clusters
 
 ```{r, echo = FALSE}
 knitr::opts_chunk$set(warning = FALSE, message = FALSE, echo = FALSE)

@@ -2567,25 +2567,38 @@ replot_coef_plots_fused <- function(model, h, drop_out=FALSE, path_to_model_fold
   num_coef_names <- coef_names_to_numeric(nonzero_coef_names)
   coef_mat <- cbind(num_coef_names, all_coefs[nonzero_coefs])
   if(drop_out == TRUE & ((sum(nonzero_coefs)!=0))) {
+    # nz <- round(all_coefs[nonzero_coefs],6)
+    # b <- boxplot(nz)
+    # out_val <- unique(b$out)
+    # out_id <- nz %in% out_val
+    # coef_mat <- coef_mat[out_id,]
+    
     nz <- round(all_coefs[nonzero_coefs],6)
-    b <- boxplot(nz)
-    out_val <- unique(b$out)
-    out_id <- nz %in% out_val
-    coef_mat <- coef_mat[out_id,]
+    q <- quantile(nz,probs=c(0.025,0.975), na.rm = TRUE)
+    keep <- (nz<q["2.5%"]) | (nz>q["97.5%"])
+    coef_mat1 <- coef_mat[keep,]
+    coef_mat2 <- coef_mat[!keep,]
+    plt1 <- plot_nonzero_coefficients(coef_mat1)
+    plt1$layers[[2]]$aes_params$size <- 0.75
+    plt1 <- plt1 + scale_colour_gradient2(name="Coefficients")
+    #saveRDS(plt, paste0(save_to, "/coef-plots/", "coef-plot-drop-out-full.rds"))
+    ggsave(paste0(save_to, "/coef-plots/", "coef-plot-drop-out-full1.png"), plt1,
+           width = 7, height = 7)
+    
+    coef_mat2 <- coef_mat[!keep,]
+    plt2 <- plot_nonzero_coefficients(coef_mat2)
+    plt2$layers[[2]]$aes_params$size <- 0.75
+    plt2 <- plt2 + scale_colour_gradient2(name="Coefficients")
+    ggsave(paste0(save_to, "/coef-plots/", "coef-plot-drop-out-full2.png"), plt2,
+           width = 7, height = 7)
   }
+  coef_mat <- coef_mat[c(1:nrow(coef_mat)),]
   plt <- plot_nonzero_coefficients(coef_mat)
   plt$layers[[2]]$aes_params$size <- 0.75
   plt <- plt + scale_colour_gradient2(name="Coefficients")
-  if(drop_out == FALSE) {
-    #saveRDS(plt, paste0(save_to, "/coef-plots/", "coef-plot-full.rds"))
-    ggsave(paste0(save_to, "/coef-plots/", "coef-plot-full.png"), plt,
-           width = 7, height = 7, units = "cm")
-  }
-  if(drop_out == TRUE) {
-    #saveRDS(plt, paste0(save_to, "/coef-plots/", "coef-plot-drop-out-full.rds"))
-    ggsave(paste0(save_to, "/coef-plots/", "coef-plot-drop-out-full.png"), plt,
-           width = 7, height = )
-  }
+  ggsave(paste0(save_to, "/coef-plots/", "coef-plot-full.png"), plt,
+         width = 7, height = 7)
+  
   print("coef plots saved")
 }
 

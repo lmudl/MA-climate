@@ -1,4 +1,4 @@
-### Fused Lasso with clusters
+### Fused Lasso without clusters gamma 01
 
 ```{r, echo = FALSE}
 knitr::opts_chunk$set(warning = FALSE, message = FALSE, echo = FALSE)
@@ -86,12 +86,12 @@ mse_full
 ```
 
 ```{r coef-plot-full-fused-og, eval=FALSE, fig.cap="Coefficient plot of the full fused lasso model."}
-coef_plot <- readRDS(paste0(path_to_model_folder,
-                            "coef-plots/coef-plot-full.rds"))
+coef_plot <- readRDS(paste0(path_to_model_folder,                "coef-plots/coef-plot-full.rds"))
 #coef_plot <- coef_plot + theme(legend.position = "bottom", text = element_text(size = 8))
+coef_plot$labels$colour <- "Coefficients"
 coef_plot$layers[[2]]$aes_params$size <- 0.75
 coef_plot_now <- coef_plot
-coef_plot_now <- coef_plot_now + scale_colour_gradient2(name="Coefficients")
+# coef_plot_now <- coef_plot_now + scale_colour_gradient2(name="Coefficients")
 ggsave(paste0(path_to_model_folder, "coef-plots/coef-plot-full.png"), plot = coef_plot_now)
 ```
 

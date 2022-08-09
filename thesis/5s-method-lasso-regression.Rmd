@@ -20,7 +20,7 @@ y_i = \beta_0 + \pmb{x}_i^T\pmb{\beta} + \epsilon_i (\#eq:lm-gen)
 \end{equation}
 
 see \@ref(eq:lm-gen)
-Where the $y_i$ refers to the mean precipitation for a given month $i$ and $x_i$ is the vector of sea surface temperature at different locations around the globe.
+Where the $y_i$ refers to the mean precipitation in the CAB for a given month $i$ and $x_i$ is the vector of sea surface temperature at different locations around the globe.
 $\epsilon_i$ is the residual and we wish to estimate the $\beta$´s from the data.
 As already stated this is not possible with a classic linear model since the number of predictors exceeds the number of observations. We therefore can not estimate a $\beta$ for every grid point in the sea.
 From a physical point of view it also seems reasonable that some regions in the ocean have a higher predictive power than others. For example regions that are closer to the Amazon may have more influence on precipitation in the same month. But regions more far away may have more information on the precipitation half a year in the future.
@@ -109,15 +109,90 @@ By default they always center the predictor variable.
 For additional information on other methods how speedup
 is obtained refer to Section 2 in @glmnet-package.
 
-## Model specifications
+## Model evaluation
 
+Given our data and the lasso we know want to find the $\lambda$
+that gives us the best trade-off between low prediction error and sparsity
+in the coefficients. As a measure of prediction error we use here the
+mean squared error.
 
+\begin{equation}
+MSE = \frac{1}{n} \sum_{i=1}^{n} (y_i - \hat{y_i})^2
+(\#eq:mse)
+\end{equation}
 
-## TODO here
-maybe drop into with linear model
-just put lasso formula directly
-talk about the stuff that is written already
-note probelms with correlation of predictors and grouping
+where $y_i$ is the true value and $\hat{y_i}$ the prediction from our model,
+for data of size $n$.
+The following summary on cross-validation can found in @hastie2009elements.
+Using the the complete data to fit the model
+and then choose the $\lambda$ that gives the lowest $MSE$,
+will give us good predictions on the training set but will generally
+perform bad on new data.
+This can be seen from the so-called bias-variance decomposition.
+Let's assume  $Y=f(X)+\varepsilon$ with $\mathrm{E}(\varepsilon)=0$ and $\operatorname{Var}(\varepsilon)=\sigma_{\varepsilon}^{2}$. 
+When using the MSE as loss we can describe the expected prediction error of a regression fit $\hat{f}(X)$ at point $X=x_{0}$ as:
+
+\begin{equation}
+\begin{aligned}
+\operatorname{Err}\left(x_{0}\right) &=E\left[\left(Y-\hat{f}\left(x_{0}\right)\right)^{2} \mid X=x_{0}\right] \\
+&=\sigma_{\varepsilon}^{2}+\left[\mathrm{E} \hat{f}\left(x_{0}\right)-f\left(x_{0}\right)\right]^{2}+E\left[\hat{f}\left(x_{0}\right)-\mathrm{E} \hat{f}\left(x_{0}\right)\right]^{2} \\
+&=\sigma_{\varepsilon}^{2}+\operatorname{Bias}^{2}\left(\hat{f}\left(x_{0}\right)\right)+\operatorname{Var}\left(\hat{f}\left(x_{0}\right)\right) \\
+&=\text { Irreducible Error }+\operatorname{Bias}^{2}+\text { Variance. }
+\end{aligned}
+(\#eq:bias-variance)
+\end{equation}
+
+The squared bias denotes how much the average of our estimates differs from the true mean.
+The variance is the expected squared deviation of our predictions around its mean.
+If we try to fit the training data perfectly we reduce the bias but also increase
+the models complexity. For the lasso this refers to choosing a lower level of regularization. Reducing the bias in this way will increase therefore the variance
+of the expected prediction error.
+A solution to this problem is to use one part of the data to fit the model
+and another part to test its performance. 
+We can repeat this process $k$ times and then choose the level
+of regularization that minimises the average prediction error.
+We refer to this as *$k$-fold cross validation*.
+A common approach is to split the data into 5 evenly sized partitions,
+fit the model on 4 of them and test it on the 5th.
+In our case we would fit the model on 4 partitions together and find the $\lambda$ that
+performs best on the 5th.
+Since each part can be used as test once, this leaves us with 5
+different models to fit and test.
+Now we choose beforehand the $\lambda$ vector that will be used each time
+we fit one of the 5 models.
+This leaves us with 5 prediction error values for each $\lambda$ in the vector.
+We then simply average the prediction errors for each $\lambda$ and choose
+the one that minimizes the average prediction error.
+This is defined as 
+
+\begin{equation}
+\mathrm{CV}(\hat{f}, \lambda)=\frac{1}{N} \sum_{i=1}^{N} L\left(y_{i}, \hat{f}^{-\kappa(i)}\left(x_{i}, \lambda\right)\right).
+(\#eq:cv)
+\end{equation}
+
+Where we define $\kappa: \{1,..., N\} \rightarrow {1,...K}$
+as indexing function that indicates to which part observation $i$ is
+allocated.$\hat{f}^{-\kappa(i)}$ is then the model fit on all 
+data but the observations in part $k$. $L()$ again denotes the MSE.
+As described earlier we choose that $\lambda$ minimizes \@ref(eq:cv),
+since it is an estimate of the test error curve.
+
+Usually we would assign the observations to the different partitions randomly
+if one can assume the observations to be *i.i.d*.
+Since our data consists of time series the observations are clearly not
+independent and the relationship between SST and precipitation
+might even be time-evolving. Splitting the data randomly would therefore
+destroy its time structure.
+To still make use a validation scheme related to cross-validation we choose
+a *5-fold rolling window forward validation* (see \@ref(fig:validation-scheme)),
+but choose to arrange the fold such that they don't overlap in time.
+This gives a compromise between number of models fitted, size of model in each
+fold and keeping the dependence structure in the data intact.
+Note that this way also each observation enters a fold only once,
+hence no $i$ is used in the training *and* in the test phase.
+For a comparison of different cross and forward validation approaches 
+see @schnaubelt2019comparison.
+
 
 
 

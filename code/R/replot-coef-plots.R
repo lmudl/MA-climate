@@ -46,7 +46,7 @@ m <- readRDS("results/CV-fused/noclust-large-fused-5k/full-model.rds")
 source("code/R/helper-functions.R")
 library(ggplot2)
 #together("results/CV-fused/noclust-large-fused-5k/")
-path_to_model_folder <- "results/CV-fused/noclust-large-fused-5k-gamma-01//"
+path_to_model_folder <- "results/CV-fused/noclust-large-fused-5k-gamma-005/"
 # debug(together)
 together(path_to_model_folder, drop_out=FALSE)
 together(path_to_model_folder, drop_out=TRUE)

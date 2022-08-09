@@ -67,13 +67,20 @@ we can observe that nodes with fewer edges obtain larger coefficient values
 in general.
 Following we will summarize these findings.
 
-```{r graph-plot}
-library(igraph)
-k <- readRDS("../data/processed/graph_sst.rds")
-cl <- clusters(k)
-plot(k, vertex.label = NA, vertex.size=0.00001,
-          edge.width= 0.0001,
-          vertex.color=cl$membership*10)
+```{r graph-plot2}
+# library(igraph)
+# k <- readRDS("../data/processed/graph_sst.rds")
+# cl <- clusters(k)
+# png(filename = "graph_plot.png")
+# plot(k, vertex.label = NA, vertex.size=0.00001,
+#           edge.width= 0.0001,
+#           vertex.color=cl$membership*10,
+#      mark.expand = 15)
+# dev.off()
+```
+
+```{r graph-plot, fig.cap='Graph of the SST and land areas used in fused lasso, colored vertices indicate sub-graphs'}
+knitr::include_graphics("graph_plot.png")
 ```
 
 ## Results
@@ -141,7 +148,7 @@ path_to_model_folder <- "../results/CV-fused/noclust-large-fused-5k/"
 #        p2)
 ```
 
-```{r err-line-fused-noclust, out.width='45%'}
+```{r err-line-fused-noclust, out.width='45%', fig.cap="Error lines in the fused lasso forward validation. Each line represents one fold, the black line the mean for the common interval of the smoothed error lines. The red dashed-line shows the minimum of the mean."}
 knitr::include_graphics(paste0(path_to_model_folder, "best-lambda-res.png"))
 ```
 
@@ -193,39 +200,53 @@ see \@ref(fig:pred-plot-full-fused-og)).
 We can see that the low values at the end of season 2 and 5 (around month 1363 and 1400),
 are better predicted than in the standard lasso.
 Also the fused lasso predicts the seasonality amplitudes slightly better.
-The resulting coefficient plot is given in figure \@ref(fig:coef-plot-full-fused-og).
+The resulting coefficient plot is given in Figure \@ref(fig:coef-plot-full-fused-og).
+
+The coefficent plots for the fused lasso show now the regions that the fused lasso
+selected (Figure \@ref:coef-plot-full-fused-noclust). 
 As expected the fused lasso assign the same coefficients for areas rather
 instead just for single points. 
+We can see from
+the legend that the coefficient values are skewed, note the large negative 
+coefficients in the Baltic sea.
+Due to the resulting coloring some regions are difficult to spot, for example
+the region before the south american coast of Chile and Peru.
+In the appendix we therefore give two alternatives of this plot (Figures \@ref(fig:coef-plot-full-fused-noclust-drop-out-1) and \@ref(fig:coef-plot-full-fused-noclust-drop-out-2))
+For both we computed the $2.5%$ and $97.5%$ quantiles of the coefficient values
+and displayed either only the coefficients inside or outside the interquantile
+interval.
+Coefficients with fewer edges, hence smaller regions are given higher values,
+as we already described earlier.
+We assume that in a fully connected graph, with weights according to distances
+these values would not be as large (relatively to other coefficient values) because they too would be more penalized than for the graph we created from the lattice structure.
+But regions that have many nodes will still be influential because
+their values summarize when used for predictions.
 When comparing to the coefficient plot from the lasso \@ref(fig:coef-plot-full-lasso-og),
 we see that some areas are included in both models,
 for example the positive coefficients around the area Gulf of Guinea,
 as well as the negative values around Chile and Peru. In the fused lasso
 plot the latter values are smaller in relation to the large negative values 
-in the Baltic sea.
-We note that the largest negative and positive values occur in regions,
-that have few edges in the graph.
-We assume that in a fully connected graph, with weights according to distances
-these values would not be as large (relatively to other coefficient values) because they too would be more penalized than for the graph we created from the lattice structure.
+in the Baltic sea. 
 
 
-```{r coef-plot-full-fused-noclust, eval=FALSE, fig.cap="Coefficient plot of the full fused lasso model."}
-coef_plot <- readRDS(paste0(path_to_model_folder,
-                      "coef-plots/coef-plot-full.rds"))
-head(coef_plot)
-coef_plot + aes(colours=)
-coef_plot$layers[[2]]$aes_params$size <- 0.75
-coef_plot$
-coef_plot <- coef_plot + theme(legend.position = "bottom", text = element_text(size = 8))
-coef_plot + geom_point(show.legend = TRUE)
-coef_plot$labels$colour <- "Coefficients"
-coef_plot$data
+```{r , eval=FALSE, fig.cap="Coefficient plot of the full fused lasso model."}
+# coef_plot <- readRDS(paste0(path_to_model_folder,
+#                       "coef-plots/coef-plot-full.rds"))
+# head(coef_plot)
+# coef_plot + aes(colours=)
+# coef_plot$layers[[2]]$aes_params$size <- 0.75
+# coef_plot$
+# coef_plot <- coef_plot + theme(legend.position = "bottom", text = element_text(size = 8))
+# coef_plot + geom_point(show.legend = TRUE)
+# coef_plot$labels$colour <- "Coefficients"
+# coef_plot$data
 # coef_plot_now <- coef_plot
 # ggsave(paste0(path_to_model_folder, "coef-plots/coef-plot-full.png"), plot = coef_plot_now)
 ```
-```{r}
+```{r coef-plot-full-fused-noclust}
 knitr::include_graphics(paste0(path_to_model_folder, "coef-plots/coef-plot-full.png"))
 ```
-```{r}
+```{r coef-plot-full-fused-noclust-drop-out-1, eval=FALSE}
 # coef_plot2 <- readRDS(paste0(path_to_model_folder,
 #                      "coef-plots/coef-plot-drop-out-full.rds"))
 #coef_plot <- coef_plot + theme(legend.position = "bottom", text = element_text(size = 8))
@@ -233,27 +254,43 @@ knitr::include_graphics(paste0(path_to_model_folder, "coef-plots/coef-plot-full.
 # coef_plot_now2 <- coef_plot2
 # coef_plot_now2 <- coef_plot_now2 + scale_colour_gradient2(name="Coefficients")
 #ggsave(paste0(path_to_model_folder, "coef-plots/coef-plot-drop-out-full.png"), plot = coef_plot_now2)
-knitr::include_graphics(paste0(path_to_model_folder, "coef-plots/coef-plot-drop-out-full.png"))
+knitr::include_graphics(paste0(path_to_model_folder, "coef-plots/coef-plot-drop-out-full1.png"))
+```
+
+```{r coef-plot-full-fused-noclust-drop-out-2, eval=FALSE}
+# coef_plot2 <- readRDS(paste0(path_to_model_folder,
+#                      "coef-plots/coef-plot-drop-out-full.rds"))
+#coef_plot <- coef_plot + theme(legend.position = "bottom", text = element_text(size = 8))
+# coef_plot2$layers[[2]]$aes_params$size <- 0.75
+# coef_plot_now2 <- coef_plot2
+# coef_plot_now2 <- coef_plot_now2 + scale_colour_gradient2(name="Coefficients")
+#ggsave(paste0(path_to_model_folder, "coef-plots/coef-plot-drop-out-full.png"), plot = coef_plot_now2)
+knitr::include_graphics(paste0(path_to_model_folder, "coef-plots/coef-plot-drop-out-full2.png"))
 ```
 
 
 ## Summary 
 After fitting different possible fused lasso models, we find that
-the the using the graph without separated clusters on the standard SST data
+the using the graph without separated clusters on the standard SST data
 without regularization worked best.
-Regularization did not improve the perfmance on the validation set.
+Regularization did not improve the performance on the validation set.
 Our interpretation of the findings is that on one hand the fused lasso
 chooses coefficients that are also apparent in the lasso results.
 The lasso chooses rather single points and discards the rest of a homogeneous area.
-The fused lasso chooses the area and distributes the coefficient value
+The fused lasso chooses the whole area and distributes the coefficient value
 evenly. But the fused lasso does so by penalizing the differences of neighboring
 coefficients. How strongly these are penalized depends on their distance that
 is defined by a graph (but could also be defined by a penalty matrix directly).
 We chose to represent the SST structure as lattice and removed nodes that 
 correspond to land.
-While doing so, areas that have only few direct connections to the large sea cluster, the 
-connections get eventually cut off, leaving behind the clusters we saw earlier.
-This gives the impression that the clusters are not connected at all to the larger SST
+Locations that contain mainly land and a relatively small area of water,
+may be represented as land area as a whole (the opposite is true when
+the region contains mainly SST.).
+When there is only a small connection between sea areas the connecting region
+is therefore represented as land and the corresponding node is deleted
+when the graph is created. This creates sub-graphs as we discussed earlier
+and showed in Figure \@ref(fig:graph).
+This gives the impression that the sub-graphs are not connected at all to the larger SST
 cluster. The Caspian Sea for example occurred as separated cluster, it could have also been
 a cluster in the Arctic, the fused lasso has no information anymore about its location
 if its a sub-graph. From a physical perspective this makes of course little sense.
@@ -269,4 +306,6 @@ Our initial motivation was to investigate the global connections between
 SST and precipitation, but to reduce computational costs for the fused lasso
 it would be practical and investigate the behavior of weighted fully connected
 graphs it would be an interesting point of future research.
+
+
 
