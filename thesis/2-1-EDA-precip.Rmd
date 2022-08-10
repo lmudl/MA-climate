@@ -1,0 +1,144 @@
+---
+output:
+  html_document: default
+  pdf_document: default
+---
+# Explorative analysis
+
+In this chapter, we will explore the values of the precipitation
+and SST data for the common observation period from 1981 until 2016.
+We analyze the data from three perspectives. Firstly the raw values without time or spatial dependency, second the mean and standard deviation for each spatial grid cell for the whole time series and then the mean and standard deviation for each grid cell
+but for each month of the year separately.
+
+## Precipitation
+
+Here we study the time series of precipitation in the
+Central Amazon Basin.
+The CHIRPS data set contains the precipitation data, created from in-situ and satellite measurements (@funk2015climate). It can be downloaded for example, from [here](https://www.chc.ucsb.edu/data/chirps).
+It contains observations from 1981 to 2016 and comes on a high resolution of 0.05 grid, which we aggregate to a 0.5 grid.
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo=FALSE, warning = FALSE, message = FALSE)
+#knitr::opts_chunk$set(fig.pos = "!H", out.extra = "")
+
+#knitr::opts_knit$set(root.dir="../")
+```
+
+
+```{r}
+library(ggplot2)
+library(sf)
+library(rnaturalearth)
+library(rnaturalearthdata)
+library(raster)
+library(patchwork)
+library(ggpubr)
+```
+
+```{r}
+source("../code/R/helper-functions.R")
+```
+
+```{r, include=FALSE}
+world <- ne_countries(scale = "medium", returnclass = "sf")
+# class(world)
+theme_set(theme_bw())
+```
+
+
+In \@ref(fig:CAB) we show the area of the Central Amazon Basin that is object of our study.
+
+```{r CAB, echo=FALSE, fig.cap="Location of the area under study. The central amazon basin (CAB) spanning across 0,-10 latitude and -70,-55 longitude", fig.align='center',out.width='50%'}
+cab_square_plot <- readRDS("../results/eda/cab_square_plot.rds")
+cab_square_plot + ggtitle("Location of area under study, central Amazon basin (CAB)")
+```
+
+```{r}
+precip_dens_plot <- readRDS("../results/eda/precip_dens_plot.rds")
+```
+
+
+Firstly we plot precipitation values in general in Figure \@ref(fig:precip-dens)
+Its form is a uni-modal, right-skewed density.
+The values range from 0 up to `r round(max(precip_dens_plot$data$value))`, but only few observations take these high values, forming a large tail.
+This might be a indication for large outliers in the data or due to 
+some locations with very high precipitation values in general.
+
+```{r precip-dens, out.width='50%', fig.cap="Density of the raw precipitation values without time or spatial dependency.", fig.align='center'}
+(precip_dens_plot + ylab("Precipitation") + xlab("Density") + ggtitle("Density of raw precipitation values"))
+```
+```{r , fig.cap="Precipitation mean at each location. The mean was computed over the whole time period"}
+precip_means_loc_plot <- readRDS("../results/eda/precip_means_loc_plot.rds")
+precip_means_loc_plot$labels$title <- NULL
+precip_means_loc_plot$labels$fill <- "Mean"
+# precip_means_loc_plot
+# precip_means_loc_plot + theme(panel.background = element_rect(fill='transparent'),
+#          plot.background = element_rect(fill='transparent', color=NA),
+#          panel.grid.major = element_blank(),
+#          panel.grid.minor = element_blank(),
+#          legend.background = element_rect(fill='transparent'),
+#          legend.box.background = element_rect(fill='transparent'))
+# precip_means_loc_plot + scale_fill_gradient2(low="brown", high ="dark green", midpoint = mean(precip_means_loc_plot$data$val, na.rm = TRUE))
+```
+```{r, eval=FALSE, include = FALSE, fig.cap="Density of means, means were computed for each location over the whole time period"}
+(precip_mean_dens_plot <- readRDS("../results/eda/precip_means_dens_plot.rds"))
+```
+```{r, fig.cap="Precipitation standard deviation at each location. The standard deviation was computed over the whole time period"}
+precip_sds_loc_plot <- readRDS("../results/eda/precip_sds_loc_plot.rds")
+precip_sds_loc_plot$labels$fill <- "SD"
+```
+```{r, eval = FALSE, fig.cap="Density of standard deviations, standard deviations were computed for each location over the whole time period"}
+(precip_sds_dens_plot <- readRDS("../results/eda/precip_sds_dens_plot.rds"))
+```
+```{r, mean-sd-precip, fig.cap= "Mean and standard deviation at each location. The standard deviation was computed over the whole time period. The white line on the scale at the side of the plots indicates the mean of the respective quantity", fig.align='center', out.width='50%'}
+p <- precip_means_loc_plot +  precip_sds_loc_plot  +
+  plot_annotation("Precipitation mean and SD at each CAB location")
+p
+```
+
+As we can see in Figure \@ref(fig:mean-sd-precip) most locations have a mean precipitation of around 200 mm/month, over
+the whole time series. Regionally in the "upper left" corner of the Amazon Basin,
+mean precipitation is higher or equal to the mean. The reference
+point for "higher" is the mean of the location means. This region seems to be more
+or less spatially consistent. The rest of the region with lower mean precipitation
+has also some small areas where precipitation is again a little bit higher. 
+For example in the upper right corner and on the bottom, right of the middle.
+For the standard deviation we also see regional patterns. These patterns overlap
+with the regions of the mean but their magnitude is flipped. Meaning,
+in the upper left where we observe larger mean values we generally observe lower
+standard deviation and in the lower and upper right corners, higher standard 
+deviations.
+We see spatial patterns of the mean evolving over time in (Figure \@ref(fig:mean-precip-month)).
+For example: From May until August there is a spatial separation in
+two parts that dissolves in September.
+As expected there is a large seasonal component regarding the means.
+For the standard deviation we see as well large differences in values 
+during different months of the year (Figure \@ref(fig:sd-precip-month).
+
+```{r, eval = FALSE}
+(precip_mean_dens_plot + ggtitle("Density of means")) + (precip_sds_dens_plot + ggtitle("Density of sd"))
+```
+```{r, eval= FALSE, include=FALSE}
+a <- readRDS("../results/eda/precip_trends_loc_lm_plot.rds")
+b <- readRDS("../results/eda/precip_trends_loc_stl_plot.rds")
+a + b
+```
+```{r, eval = FALSE, include = FALSE}
+(precip_trends_loc_stl_plot <- readRDS("../results/eda/precip_trends_loc_stl_plot.rds"))
+```
+```{r mean-precip-month, fig.cap="Mean precipitation values at each location, shown for the different months of a year separately. The white line on the scale at the side of the plots indicates the mean of the respective quantity"}
+precip_mean_arrange <- readRDS("../results/eda/precip_mean_arrange.rds")
+precip_mean_arrange
+# precip_mean_arrange$labels$fill <- "Mean"
+# annotate_figure(precip_mean_arrange,
+#                 top = text_grob("TEST"))
+# precip_mean_arrange$labels
+```
+
+
+```{r sd-precip-month, fig.cap="Mean precipitation values at each location, shown for the different months of a year separately. The white line on the scale at the side of the plots indicates the mean of the respective quantity"}
+precip_sd_arrange <- readRDS("../results/eda/precip_sd_arrange.rds")
+precip_sd_arrange
+```
+
+

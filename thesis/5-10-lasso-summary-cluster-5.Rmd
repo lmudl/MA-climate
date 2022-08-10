@@ -1,0 +1,148 @@
+#### Cluster 5
+
+```{r, echo=FALSE}
+knitr::opts_chunk$set(echo=FALSE, warning = FALSE, message = FALSE, out.width = '50%', fig.align = 'center')
+options(knitr.duplicate.label = "allow")
+```
+
+```{r}
+library(patchwork)
+library(ggpubr)
+library(raster)
+library(glmnet)
+library(Hmisc)
+library(patchwork)
+source("../code/R/helper-functions.R")
+```
+
+```{r}
+path_to_model_folder <- "../results/CV-lasso/cluster-cv-lasso-og2/cluster-5/"
+err_bars_plot <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-bars-plot.rds"))
+p1 <- readRDS(paste0(path_to_model_folder, "err-mat-plots/err-plot-fold-1.rds"))
+p2 <- readRDS(paste0(path_to_model_folder, "err-mat-plots/err-plot-fold-2.rds"))
+p3 <- readRDS(paste0(path_to_model_folder, "err-mat-plots/err-plot-fold-3.rds"))
+p4 <- readRDS(paste0(path_to_model_folder, "err-mat-plots/err-plot-fold-4.rds"))
+p5 <- readRDS(paste0(path_to_model_folder, "err-mat-plots/err-plot-fold-5.rds"))
+pred_plot_1 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-1.rds"))
+pred_plot_2 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-2.rds"))
+pred_plot_3 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-3.rds"))
+pred_plot_4 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-4.rds"))
+pred_plot_5 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-5.rds"))
+full_preds <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-full.rds"))
+coef_plot_full <- readRDS(paste0(path_to_model_folder,
+                                 "coef-plots/coef-plot-full.rds"))
+full_model <- readRDS(paste0(path_to_model_folder, "full-model.rds"))
+intercept5 <- round(full_model$a0,2)
+lambda5 <- full_model$lambda
+mse5 <- get_mse_from_pred_plot(full_preds)
+```
+
+```{r cl5-err-bar, fig.cap="Model: Lasso on cluster 5. Mean squared error of the 5-fold blocked cross validation for a range of lambda values on the log scale. The points in the middle represent the average MSE for the respective lambda, the errorbars give the MSE +/- one standard deviation. The dotted line shows the lambda for which minimum MSE was obtained."}
+err_bars_plot + ggtitle("MSE for lasso on cluster 5")
+```
+
+\@ref(fig:cl5-err-bar) indicates again chooses a higher optimal $\lambda$.
+The range of the error bars increases with decreasing regularization
+
+```{r cl5-full-pred, fig.cap="Model: Lasso on cluster 5. Precipitation prediction and target values in the validation set. Predictions in red and target values in black. The model was fitted on the full CV data with the lambda value that minimised the average MSE"}
+full_preds + ggtitle("Predictions on evaluation set, lasso on cluster 5")
+```
+For cluster 5 we also notice that the precipitation values in the evaluation set
+are very "wiggly".
+The higher regularization chosen from the forward validation again 
+does not allow the model to predict these fast changing curves well.
+Here too seasonality is predicted reasonably (\@ref(fig:cl5-full-pred)). 
+
+```{r cl5-coef-plot, fig.cap=paste("Model: Lasso on cluster 5. Coefficient plot of the full model. Fitted intercept of", intercept5)}
+coef_plot_full + ggtitle("Coefficient plot, lasso on cluster 5") + theme(legend.position = "bottom")
+```
+A very large negative coefficient value is chosen for
+. The intercept is `r intercept5`(\@ref(fig:cl5-coef-plot)).
+No locations next to the south-american coast line are chosen.
+
+#### Cluster Summary
+Overall we did not improve MSE when fitting the lasso on each cluster and
+evaluated on the set, but in cluster 2.
+It seems that when the data has a lot of nonseasonal peaks and valleys,
+the regularization chosen from the forward validation
+only suffices for predicting the seasonality.
+In cluster 2 where the precipitation time series in the validation set
+is not very "wiggly" (see for example cluster 4 we predict the
+precipitation data quite well.
+The cluster analysis helped us finding the homogeneous cluster 2 which is also the largest
+cluster, recall \@ref(fig:cluster-map).
+
+<!-- Table \@ref(tab:mse-cluster) summarizes the MSE for each cluster. -->
+
+```{r}
+path_to_model_folder <- "../results/CV-lasso/cluster-cv-lasso-og2/cluster-1/"
+full_preds <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-full.rds"))
+mse1 <- get_mse_from_pred_plot(full_preds)
+path_to_model_folder <- "../results/CV-lasso/cluster-cv-lasso-og2/cluster-2/"
+full_preds <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-full.rds"))
+mse2 <- get_mse_from_pred_plot(full_preds)
+path_to_model_folder <- "../results/CV-lasso/cluster-cv-lasso-og2/cluster-3/"
+full_preds <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-full.rds"))
+mse3 <- get_mse_from_pred_plot(full_preds)
+path_to_model_folder <- "../results/CV-lasso/cluster-cv-lasso-og2/cluster-4/"
+full_preds <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-full.rds"))
+mse4 <- get_mse_from_pred_plot(full_preds)
+path_to_model_folder <- "../results/CV-lasso/cluster-cv-lasso-og2/cluster-5/"
+full_preds <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-full.rds"))
+mse5 <- get_mse_from_pred_plot(full_preds)
+```
+
+
+```{r mse-cluster, fig.cap="Table of the MSE prediction errors for each cluster"}
+knitr::kable(data.frame(c("1","2", "3", "4", "5"),
+             c(mse1,mse2,mse3,mse4,mse5)), col.names = c("Cluster", "MSE")
+             , format="latex", caption = "Table of the MSE prediction errors for each cluster")
+```
+
+## Lasso summary
+
+In this chapter we compared different settings for the lasso model to predict 
+the precipitation in the validation set.
+We chose a regularization level based on a 5-fold forward validation,
+meaning that time ordering was preserved during fitting and testing.
+The $\lambda$ that minimized the average MSE across all folds was selected
+and the model was refitted with this value on all training data.
+This full model was then used to predict precipitation on the validation set
+that was not used during the training phase.
+No observation was used for model fitting *and* testing, meaning
+there were no overlaps of fold time periods.
+We inspected the results of the lasso with and without standardization,
+after de-seasonalizing the SST data according to our validation scheme
+and after differentiating the SST data. We also used a cluster analysis
+to separate the CAB in 5 clusters and fit the lasso procedure on each cluster
+(see \@ref{cluster-methods} for details).
+If we solely compare MSE we find that standardizing the SST data improves the predictions results over the other lasso models. De-seasonalizing the predictors prior to model fitting did not yield competitive results,
+this might be due to the differences in SST seasonality between the data used for 
+forward validation (estimating optimal $\lambda$) and model evaluation.
+When differentiating the SST data we find that the obtained learning
+curves show similar trajectories and the dispersion at the optimal level of regularization is comparably small.
+When fitting the lasso on each of the clusters we found in \@ref{clustering-analyze-results.} we don't improve predictions on most clusters.
+But for one cluster (cluster 2, \@ref{cl2}) the lasso can actually predict the values in the validation set reasonably well since the precipitation values
+in this area don't disperse a lot from the seasonal signals.
+The regions that were included in the model varied greatly across models in general,
+which can also be explained by the different levels of regularization chosen.
+But some regions were included more often than others.
+Areas in the west Atlantic around the equator were included in all models but
+at different magnitudes. Also around the equator but in the east pacific coastal regions were included in almost all models but in the standardized lasso (see \@ref(fig:coef-plot-full-lasso-stand)). While we would expect these regions to
+be predictive, based on the paper by @ciemer2020early and our correlation analysis \@ref{correlation-chapter}. There also locations far away from the CAB that
+were included in all models. See for example that all models included a region
+in the Caspian sea. But in the de-seasonalized model this
+region has a very low coefficient value so for some larger levels of regularization
+it would probably not be included.
+Finally, the lasso can predict the seasonal patterns well, but when using the 
+precipitation averaged over the CAB, it fails to predict the higher values of seasonal amplitudes.
+
+```{r mse-lasso, fig.cap = 'Table of the MSE prediction errors for the different lasso models.'}
+knitr::kable(data.frame(c("lasso","standardized", "differentiated", "de-seasonalized"),
+             c(1314.92, 1214.49,1361.82,1809.46)), col.names = c("Model", "MSE"),
+             format="latex", caption = "Table of the MSE prediction errors for the different lasso models.")
+```
+
+
+
+

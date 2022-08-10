@@ -1,0 +1,70 @@
+## Clustering results
+
+```{r, include=FALSE}
+library(patchwork)
+#bookdown::preview_chapter("code/Rmarkdown/thesis/3-clustering-results.Rmd")
+```
+
+
+We summarize and compare the results we obtain
+if we center or don't center the data.
+
+### $k$-means and PAM gap statistics without PCA
+
+```{r, echo = FALSE}
+replotted_gap_kmeans_centered_plot <- readRDS("../results/clustering/replotted_gap_kmeans_centered_plot.rds")
+replotted_gap_pam_centered_plot <- readRDS("../results/clustering/replotted_gap_pam_centered_plot.rds")
+```
+
+
+```{r gap-res, echo = FALSE, fig.cap= "Gap statistics for different number of clusters k, for the k-means (left) and the PAM (right) algorithm respectively. The dashed line indicates the optimal number of clusters found."}
+replotted_gap_kmeans_centered_plot + replotted_gap_pam_centered_plot
+```
+
+We can see that on the original data, neither $k$-means nor PAM
+find an optimal number of clusters that is lower than the maximum
+number specified (Figure \@ref(fig:gap-res).
+
+#### Scree plot
+
+```{r scree, echo = FALSE, fig.cap= "Scree plot with the principal components on the x-axis and the respective percentage of variance explained on the y-axis. The PCA was done after centering the data.The first three and four PC`s together explain 67.77 and 70.69\\% of the variance respectively"}
+scree_plot_pca_centered <- readRDS("../results/clustering/scree_plot_pca_centered.rds")
+scree_plot_pca_centered
+```
+
+We apply a PCA on the centered data.
+The variance that is explained by the principal components indicates that, the 3 principal components already explain a lot of the appearing variance in the data (Figure \@ref(fig:scree)). We now study the gap statistic results for $k$-means and K-medoids (here, meaning PAM) after applying the PCA and choosing the number of principal components to be used.
+
+Following we compare the results of a gap statistic when the first 3 and 4 principal components are used, for $k$-means and PAM respectively.
+The first three and four PC`s used explain 67.77 and 70.69% of the variance respectively.
+
+#### $k$-means and PAM gap statistics after applying PCA
+
+
+```{r gap-pam, echo = FALSE, fig.cap= "Gap statistic plots for k-means and PAM when using 3 and 4 PC's respectively."}
+replotted_summary_plot_pca_centered <- readRDS("../results/clustering/replotted_summary_plot_pca_centered.rds")
+replotted_summary_plot_pca_centered
+```
+
+The graphic shows the gap statistics resulting from $k$-means and PAM for 3 and 4 principal components respectively (\@ref(fig:gap-pam)). When 3 principal components are used $k$-means and PAM
+find 5 and 12 as optimal number of clusters, respectively. When we choose to use
+the first 4 principal components, both algorithms choose 13 as the optimal number.
+
+
+### Summary
+We used the gap statistic as evaluation tool to find the optimal number
+of clusters in our data.  
+It was applied by using $k$-means and PAM as cluster algorithms, on
+the centered data with and without applying a pca beforehand.
+When applied without PCA, PAM and $k$-means found the maximal number of 
+clusters optimal, regardless of centering.  
+The results differed regarding centering the data when a PCA was applied.  
+When the data was centered before the PCA, we find 5 and 12 (3 principal components,
+$k$-means and PAM, respectively) and 13 (4 principal components, both $k$-means and PAM) as optimal number of clusters.
+The results overall vary greatly and are sensitive to choices such as number of principal components, the algorithm and the decision criterion (here @tibshirani2001estimating).
+The value of the clustering itself can be evaluated only when used in
+combination with regression.  
+If useful, fitting different models for the different clusters should result
+in a lower overall average prediction error.
+We will proceed by using $k$-means for finding 5 clusters after applying a PCA on the centered data and use 3 principal components.
+

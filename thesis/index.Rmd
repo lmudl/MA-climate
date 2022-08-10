@@ -6,9 +6,9 @@ output:
     split_bib: FALSE
     latex_engine: xelatex
     includes:
-      in_header: "preamble-only.tex"
-      before_body: "body-only.tex"
-bibliography: ref-lib.bib
+      in_header: "0-preamble-only.tex"
+      before_body: "0-body-only.tex"
+bibliography: 0-ref-lib.bib
 biblio-style: apalike
 link-citations: yes
 documentclass: book

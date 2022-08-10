@@ -1,0 +1,6 @@
+# Appendix {-}
+
+```{r, eval=TRUE,include=TRUE,echo=TRUE,message=TRUE}
+print(sessionInfo())
+```
+

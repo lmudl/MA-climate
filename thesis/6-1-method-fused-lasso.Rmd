@@ -1,0 +1,206 @@
+# The fused lasso
+## Introduction
+```{r}
+# TODO
+# Intro name and motivation fused lasso
+# friedmann introduced name
+# hastie combination lasso and fusion therefore fused lasso
+# we use implementation from genlasso package 
+# then we describe the formula as given in the package description
+# omptimization as in paper
+```
+```{r}
+# TODO add statistical learning with sparsity to references.
+```
+```{r}
+# TODO add to summary of LASSO defaults, that characteristic 
+# of LASSO
+```
+```{r}
+# TODO make reference to achieved results here
+```
+
+```{r}
+# TODO cite general LASSO properties here
+# how it acts in situations where coefficients are grouped
+# or highly correlated.
+```
+
+```{r}
+# TODO add plot of the graph given by our helper functions.
+```
+
+```{r}
+# TODO add graphic of fig.2 fused lasso
+```
+
+```{r}
+#TODO note the fused lasso paper here are
+```
+
+```{r}
+# TODO add efficient implementations of hte generlaized lasso dual path
+# algorithm to references
+```
+
+```{r}
+# TODO ?check generalized dual path algorithm og paper?
+```
+
+```{r}
+# Efficient Implementations of the Generalized Lasso Dual Path
+# Algorithm
+```
+
+As expected and seen in the results, the different LASSO models choose single
+SST regions as predictors as opposed to whole regions.
+When predictors are highly correlated the lasso tends to
+choose only one of the variables and discard the others.
+Also the LASSO only regularizes the magnitude of coefficients
+but ignores their ordering.  
+We therefore use the so-called *fused lasso* as implemented in the *genlasso* package and the respective *fusedlasso* function. (@tibshirani2005sparsity, @genlassopackage)
+The fused lasso is a generalization of the lasso for problems with features
+that can be ordered in a meaningful way. It penalizes not only the coefficients'
+$L_1$-norm but also their differences given their ordering, introducing sparsity
+in both of them.
+In our case the fused lasso thus penalizes the differences of SST coefficients that are close to each other.
+
+The fused LASSO as implemented in *genlasso* package solves the problem:
+
+<!-- $$\min_{\beta} 1/2 \sum_{i=1}^n(y_i - x_i^T\beta_i)^2 + \lambda \sum_{i,j \in E} |\beta_i - \beta_j| + \gamma \cdot \lambda \sum_{i=1}^p|\beta_i|  ,$$ -->
+\begin{equation}
+\min_{\beta} 1/2 \sum_{i=1}^n(y_i - x_i^T\beta_i)^2 + \lambda \sum_{i,j \in E} |\beta_i - \beta_j| + \gamma \cdot \lambda \sum_{i=1}^p|\beta_i|,
+(\#eq:fused-lasso)
+\end{equation}
+
+
+with $x_i$ being the ith row of the predictor matrix and 
+E is the edge set of an underlying graph.
+Regularizing $|\beta_i-\beta_j|$, penalizes large differences in
+close coefficients. In our case "close" means small distances
+as defined on 2-dimensional longitude/latitude grid. This grid defines a graph that can be used to compute the distances for
+each location.
+The third term $\gamma \cdot \lambda \sum_{i=1}^p|\beta_i|$,
+controls the sparsity of the coefficients. $\gamma=0$ leads to complete fusion of the coefficients (no sparsity) and $\gamma$ > 0 introduces sparsity to the solution, with higher values placing more priority on sparsity. 
+$\hat{\beta}$ is computed as a function of $\lambda$, with fixed $\gamma$.
+
+
+## Implementation
+The summary of the algorithm is taken from the paper proposing
+the implementation, @arnold2016efficient and the original paper introducing 
+the algorithm @tibshirani2011solution.
+In the fused lasso setting the coefficients $\beta \in \mathbb{R}^p$ can be thought of
+as nodes of a given undirected Graph $G$, with edge set $E \subset {1,...,p}^2$.
+Now lets assume that $E$ has $m$ edges which are enumerated $e_1,...,e_m$.
+The fused lasso penalty matrix $D$ is then $m \times p$, where 
+each row corresponds to an edge in $E$.
+So when $e_l = (i,j)$, we write $l_{th}$ row of $D$ as 
+
+<!-- $$ D_l = (0,...-1,...1,...) \in \mathbb{R}^p, $$ -->
+\begin{equation}
+D_l = (0,...,-1,...,1,...) \in \mathbb{R}^p,
+(\#eq:pen-mat)
+\end{equation}
+
+meaning $D_l$ has all zeros except for the the $i_{th}$ and $j_{th}$
+location.
+
+\@ref(eq:fused-lasso) is solved by a dual path algorithm that was proposed
+by @arnold2016efficient for different use cases of the (sparse) fused lasso.
+They describe the dual path algorithm based on the notation of the generalized
+lasso problem @tibshirani2011solution:
+
+\begin{equation}
+\hat{\beta}=\underset{\beta \in \mathbb{R}^{p}}{\arg \min } \frac{1}{2}\|y-X \beta\|_{2}^{2}+\lambda\|D \beta\|_{1},
+(\#eq:gen-lasso)
+\end{equation}
+
+where $y \in \mathbb{R}^n$ is the vector of the outcome, 
+$X \in \mathbb{R}^{n \times p}$ a predictor matrix, $D \in \mathbb{R}^{m \times p}$
+denotes a penalty matrix, and $\lambda \geq 0$ is a regularization parameter.
+The dual path algorithm solves not the primal but the dual solution of the problem
+and computes the solution for a whole path instead of single values of $\lambda$.
+Hence the "dual" and "path" that make up the name.
+@arnold2016efficient argue that the strength of the original algorithm lays in the fact that it applies to a unified framework
+in which $D$ can be a general penalty matrix.
+Let's consider the case when $X=I$ and $rank(X)=p$ (this is called the "signal approximator" case),
+the dual problem of \@ref(eq:gen-lasso) is then:
+
+\begin{equation}
+\hat{u} \in \underset{\substack{u \in \mathbb{R}^{\omega}}}{\arg \min } \frac{1}{2}\left\|y-D^{T} u\right\|_{\frac{2}{2}} \text { subject to }\|u\|_{\infty} \leq \lambda.
+(\#eq:dual)
+\end{equation}
+
+The primal and dual solutions, $\hat{\beta}$ and $\hat{u}$ are related by:
+
+\begin{equation}
+\hat{\beta}=y-D^{T} \hat{u} .
+(\#eq:dual-relate)
+\end{equation}
+
+While the primal solution is unique, this does not need to be the case 
+for the dual solution (note the element notation in \@ref(eq:dual).
+The dual path algorithm starts at $\lambda = \infty$ and computes the
+path until $\lambda = 0$.
+Conceptually the algorithm keeps track of the coordinates of the dual
+solutions it computed for each lambda $\hat{u}(\lambda)$.
+The solutions are equal to $\pm\lambda$, meaning they lie on the boundary
+of the region $[-\lambda,\lambda]$. Along the path it computes
+the critical values of $\lambda$, $\lambda_1 \geq \lambda_2,...,$ 
+at which the coordinates of these solutions hit or leave the boundary.
+
+There are two algorithms described in the paper and the various specialized implementations
+that can increase efficiency depending on the use cases.
+This depends on $X$, and/or the special structure of $D$.
+Algorithm 1 handles the $X=I$ case and Algorithm 2 the general $X$ case.
+As we introduced the dual in \@ref(eq:dual), it assumed $X=I$, which is not satisfied 
+in our case.
+For the general $X$ case the problem formulation can be rewritten so that the
+formula only changes $D$ and $y$ to $\tilde{D}$ and $\tilde{y}$ and then the same algorithm can be applied. $\tilde{D}=DX^+$ and $\tilde{y}=XX^+y$, where $X^x$ is the 
+Moore-Penrose pseudoinverse of $X \in \mathbb{R}^{n \times p}$.
+Algorithm 2 therefore transforms $X$ and $y$ in a certain way and then applies Algorithm 1
+to the transformed problem.
+It's also easy to see that in our case $p > n$ and $X$ is column rank deficient.
+They solve this by adding a small fixed $l_2$ penalty to the original problem,which 
+leads to:
+
+
+\begin{equation}
+\operatorname{minimize}_{\beta \in \mathbb{R}^{p}} \frac{1}{2}\|y-X \beta\|_{2}^{2}+\lambda\|D \beta\|_{1}+\varepsilon\|\beta\|_{2}^{2},
+(\#eq:add-ridge)
+\end{equation}
+
+and this is the same as
+
+\begin{equation}
+\underset{\beta}{\operatorname{minimize}} \frac{1}{2}\left\|y^{*}-\left(X^{*}\right) \beta\right\|_{2}^{2}+\lambda\|D \beta\|_{1},
+(\#eq:add-ridge2)
+\end{equation}
+
+with $y^{*}=(y, 0)^{T}$ and $X^{*}=\left[\begin{array}{c}x \\ \varepsilon \cdot I\end{array}\right]$. Because $\operatorname{rank}\left(X^{*}\right)=p$,
+again it is possible to apply one of the algorithms.
+Instead of solving linear systems in each, we can apply a QR decomposition
+that can be updated in a neat way to avoid solving the complete 
+linear system in each step. See the appendix of @arnold2016efficient, for details.
+Special care has to be taken though for general X and certain $D$.
+"Blindly" applying the algorithms then would lead to a large drop in relative
+efficiency.
+Since $\tilde{D}= DX^+$ destroys the special structures that are present 
+in the penalty matrix,  special implementations are constructed including our case
+with general $X$ and $D$ coming from the sparse fused lasso.
+
+It can be shown that the computational costly steps in the algorithm reduce
+to solving linear systems of the form $DD^T = Dc$.
+When $D$ is the oriented incidence matrix of a graph, $D$ will be sparse
+but can also be rank deficient when the graph has more edges than nodes, 
+hence $m > p$. 
+For sparse undetermined systems it is possible
+to find an arbitrary solution (here called the *basic* solution), but computing the solution with minimum $l_2$
+norm is a lot more difficult in general @van1996matrix .
+It is possible though to derive the minimum $l_2$ norm solution from
+the basic solution.
+In the case of penalty matrices that come from a graph the structure of $D$
+can be used to improve efficiency when 
+When $D$ is the incidence matrix of a graph, then $D^TD$ is the Laplacian matrix of G.
+The Laplacian linear systems are then solved using a sparse Cholesky decomposition.
+For further details of the steps used in our case refer to Section 4 and 5 in @arnold2016efficient.

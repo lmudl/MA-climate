@@ -1,0 +1,201 @@
+---
+output:
+  html_document: default
+  pdf_document: default
+---
+# The lasso
+
+## Introduction
+We want to create a model that has predictive and
+explanatory power. Predictive power meaning it can
+predict the precipitation in the Central Amazon Basin, "reasonably well". Explanatory power in the sense of being interpretable, so that we can identify those regions in sea
+that give us most information about future precipitation. Our problem setting is high dimensional with n << p. The number of predictors is a lot bigger than the number of actual observations.
+This creates issues with a classic linear model since the linear problem is underdetermined.
+One possible model for the problem at hand is a LASSO regression model.
+
+In general for the linear model:
+
+\begin{equation}
+y_i = \beta_0 + x_i^T\beta + \epsilon_i (\#eq:lm-gen)
+\end{equation}
+
+see \@ref(eq:lm-gen)
+Where the $y_i$ refers to the mean precipitation in the CAB for a given month $i$ and $x_i$ is the vector of sea surface temperature at different locations around the globe.
+$\epsilon_i$ is the residual and we wish to estimate the $\beta$´s from the data.
+As already stated this is not possible with a classic linear model since the number of predictors exceeds the number of observations. We therefore can not estimate a $\beta$ for every grid point in the sea.
+From a physical point of view it also seems reasonable that some regions in the ocean have a higher predictive power than others. For example regions that are closer to the Amazon may have more influence on precipitation in the same month. But regions more far away may have more information on the precipitation half a year in the future.
+We therefore would like to use a model that can find the most important regions in the sea for predicting precipitation for some point in the future.
+One possible solution for this is a LASSO regression model, as implemented in
+R by the *glmnet* package (@glmnet-package).
+This model "automatically" performs model selection, but be aware that because of the time dependencies in our data, normal Cross Validation methods may be unjustified or at least have to be applied with caution.
+The glmnet package implements the regression problem in the following manner, solving:
+
+\begin{equation}
+\min_{\beta_0, \beta} \frac{1}{N} \sum_{i=1}^N w_il(y_i,\beta_0 + \beta^Tx_i) + \lambda [(1-\alpha)||\beta||_2^2/2 + \alpha||\beta||_1] (\#eq:glmnet)
+\end{equation}
+
+This is a lasso regression for $\alpha = 1$ and ridge regression for $\alpha = 0$, $\alpha$ controls the overall strength of regularization or penalty.
+Intuitively this means we try to find those $\beta$´s that minimize the negative log likelihood of our data (this is equal to maximizing the log-likelihood). But at the same time we can not include too many $\beta$ since this will make the second and third term in the formula grow.
+As result the algorithm chooses only those predictors that have the most predictive power.
+How many predictors are included depends on the strength of regularization given by $\alpha$.
+*Remark*: Among strongly correlated predictors only one is chosen in the classical lasso model. Ridge regression shrinks the coefficients to zero. 
+Elastic net with $\alpha=0.5$ tends to either include or drop the entire group together.
+To specifically choose a group of predictors, variations of the lasso or other models have to be considered.
+
+## Implementation
+The glmnet function finds a solution path for the lasso problem
+via coordinate descent.
+The implemented algorithm was suggested by @van2007prediction.
+We can write down the optimization procedure as follows:
+Given $N$ observation pairs $(x_i, y_i)$ with $Y \in \mathbb{R}$
+and $X \in \mathbb{R}^p$, we approximate the regression function
+with $E(Y|X = x) = \beta_0 + x^T\beta$, Here $x_{ij}$
+are considered standardized, so $\sum_{i=1}^N=0$,$\frac{1}{N}\sum_{i=1}^Nx_{ij}^2=1$ for $j = 1,...,p$.
+We then solve the problem:
+
+\begin{equation}
+\min_{(\beta_0, \beta)\in\mathbb{R}^{p+1}}  \big{[} \frac{1}{2N}
+\sum_{i=1}^N (y_i - \beta_0 - x_i^T\beta)^2 + \lambda [(1-\alpha)||\beta||_2^2/2 + \alpha||\beta||_1 \big{]}
+(\#eq:glmnet2)
+\end{equation}
+
+Note that this solves the elastic net problem that also 
+uses a ridge penalty. We follow the elastic net description
+but in our case $\alpha = 1$, using only the lasso penalty.
+We consider now a coordinate descent step for solving \@ref(eq:glmnet2).
+Given we have estimates $\tilde{\beta_0}$ and $\tilde{\beta_l}$
+and we want to partially optimize with respect to $\beta_j$, and $i \neq j$. When $\beta_j > 0$, 
+
+\begin{equation}
+\left.\frac{\partial R_{\lambda}}{\partial \beta_{j}}\right|_{\beta=\tilde{\beta}}=-\frac{1}{N} \sum_{i=1}^{N} x_{i j}\left(y_{i}-\tilde{\beta}_{0}-x_{i}^{\top} \tilde{\beta}\right)+\lambda(1-\alpha) \beta_{j}+\lambda \alpha .
+(\#eq:glm-large)
+\end{equation}
+
+And similar expressions exist for $\tilde{\beta}_{j}<0$. $\tilde{\beta}_{j}=0$ is treated separately.
+The coordinate-wise update has then the form:
+
+
+\begin{equation}
+\tilde{\beta}_{j} \leftarrow \frac{S\left(\frac{1}{N} \sum_{i=1}^{N} x_{i j}\left(y_{i}-\tilde{y}_{i}^{(j)}\right), \lambda \alpha\right)}{1+\lambda(1-\alpha)}
+.
+(\#eq:glm-step)
+\end{equation}
+
+with
+
+- $\tilde{y}_{i}^{(j)}=\tilde{\beta}_{0}+\sum_{\ell \neq j} x_{i \ell} \tilde{\beta}_{\ell}$ standing for fitted value without the contribution from $x_{i j}$, and therefore $y_{i}-\tilde{y}_{i}^{(j)}$ is the partial residual when fitting $\beta_{j}$. Because we applied a standardization, $\frac{1}{N} \sum_{i=1}^{N} x_{i j}\left(y_{i}-\tilde{y}_{i}^{(j)}\right)$ denotes the simple least-squares coefficient for fitting this partial residual to $x_{i j}$.
+
+- $S(z, \gamma)$ being the soft-thresholding operator. It's value is given by:
+
+\begin{equation}
+\operatorname{sign}(z)(|z|-\gamma)_{+}= \begin{cases}z-\gamma & \text { if } z>0 \text { and } \gamma<|z| \\ z+\gamma & \text { if } z<0 \text { and } \gamma<|z| \\ 0 & \text { if } \gamma \geq|z| .\end{cases} (\#eq:soft)
+\end{equation}
+
+So in summary the steps are as follows:
+Compute the simple least-squares coefficient on the partial residual,
+then apply soft-thresholding and proportional shrinkage for
+the lasso and ridge penalty, respectively.
+Again for our use case, since we use the lasso and $\alpha = 1$,
+we only apply soft-thresholding and no proportional shrinkage.
+
+The solutions are computed starting from smallest $\lambda_{max}$ for
+which all elements in $\hat{\beta}=0$. For all
+larger $\lambda$ the coefficients then stay 0. 
+The smallest $\lambda$ value
+$\lambda_{min}$ is then selected by $\lambda_{min}=\epsilon \lambda_{max}$. The complete searched vector is constructed
+as sequence of K values, typical values are $\epsilon = 0.001$ and
+$K = 100$. This procedure is an example of so called *warm starts*.
+By default they always center the predictor variable.
+For additional information on other methods how speedup
+is obtained refer to Section 2 in @glmnet-package.
+
+## Model evaluation
+
+Given our data and the lasso we know want to find the $\lambda$
+that gives us the best trade-off between low prediction error and sparsity
+in the coefficients. As a measure of prediction error we use here the
+mean squared error.
+
+\begin{equation}
+MSE = \frac{1}{n} \sum_{i=1}^{n} (y_i - \hat{y_i})^2
+(\#eq:mse)
+\end{equation}
+
+where $y_i$ is the true value and $\hat{y_i}$ the prediction from our model,
+for data of size $n$.
+The following summary on cross-validation can found in @hastie2009elements.
+Using the the complete data to fit the model
+and then choose the $\lambda$ that gives the lowest $MSE$,
+will give us good predictions on the training set but will generally
+perform bad on new data.
+This can be seen from the so-called bias-variance decomposition.
+Let's assume  $Y=f(X)+\varepsilon$ with $\mathrm{E}(\varepsilon)=0$ and $\operatorname{Var}(\varepsilon)=\sigma_{\varepsilon}^{2}$. 
+When using the MSE as loss we can describe the expected prediction error of a regression fit $\hat{f}(X)$ at point $X=x_{0}$ as:
+
+\begin{equation}
+\begin{aligned}
+\operatorname{Err}\left(x_{0}\right) &=E\left[\left(Y-\hat{f}\left(x_{0}\right)\right)^{2} \mid X=x_{0}\right] \\
+&=\sigma_{\varepsilon}^{2}+\left[\mathrm{E} \hat{f}\left(x_{0}\right)-f\left(x_{0}\right)\right]^{2}+E\left[\hat{f}\left(x_{0}\right)-\mathrm{E} \hat{f}\left(x_{0}\right)\right]^{2} \\
+&=\sigma_{\varepsilon}^{2}+\operatorname{Bias}^{2}\left(\hat{f}\left(x_{0}\right)\right)+\operatorname{Var}\left(\hat{f}\left(x_{0}\right)\right) \\
+&=\text { Irreducible Error }+\operatorname{Bias}^{2}+\text { Variance. }
+\end{aligned}
+(\#eq:bias-variance)
+\end{equation}
+
+The squared bias denotes how much the average of our estimates differs from the true mean.
+The variance is the expected squared deviation of our predictions around its mean.
+If we try to fit the training data perfectly we reduce the bias but also increase
+the models complexity. For the lasso this refers to choosing a lower level of regularization. Reducing the bias in this way will increase therefore the variance
+of the expected prediction error.
+A solution to this problem is to use one part of the data to fit the model
+and another part to test its performance. 
+We can repeat this process $k$ times and then choose the level
+of regularization that minimises the average prediction error.
+We refer to this as *$k$-fold cross validation*.
+A common approach is to split the data into 5 evenly sized partitions,
+fit the model on 4 of them and test it on the 5th.
+In our case we would fit the model on 4 partitions together and find the $\lambda$ that
+performs best on the 5th.
+Since each part can be used as test once, this leaves us with 5
+different models to fit and test.
+Now we choose beforehand the $\lambda$ vector that will be used each time
+we fit one of the 5 models.
+This leaves us with 5 prediction error values for each $\lambda$ in the vector.
+We then simply average the prediction errors for each $\lambda$ and choose
+the one that minimizes the average prediction error.
+This is defined as 
+
+\begin{equation}
+\mathrm{CV}(\hat{f}, \lambda)=\frac{1}{N} \sum_{i=1}^{N} L\left(y_{i}, \hat{f}^{-\kappa(i)}\left(x_{i}, \lambda\right)\right).
+(\#eq:cv)
+\end{equation}
+
+Where we define $\kappa: \{1,..., N\} \rightarrow {1,...K}$
+as indexing function that indicates to which part observation $i$ is
+allocated.$\hat{f}^{-\kappa(i)}$ is then the model fit on all 
+data but the observations in part $k$. $L()$ again denotes the MSE.
+As described earlier we choose that $\lambda$ minimizes \@ref(eq:cv),
+since it is an estimate of the test error curve.
+
+Usually we would assign the observations to the different partitions randomly
+if one can assume the observations to be *i.i.d*.
+Since our data consists of time series the observations are clearly not
+independent and the relationship between SST and precipitation
+might even be time-evolving. Splitting the data randomly would therefore
+destroy its time structure.
+To still make use a validation scheme related to cross-validation we choose
+a *5-fold rolling window forward validation* (see  @schnaubelt2019comparison for a graphical comparison of the
+different approaches),
+but choose to arrange the fold such that they don't overlap in time.
+This gives a compromise between number of models fitted, size of model in each
+fold and keeping the dependence structure in the data intact.
+Note that this way also each observation enters a fold only once,
+hence no $i$ is used in the training *and* in the test phase.
+For a comparison of different cross and forward validation approaches 
+see @schnaubelt2019comparison.
+
+
+
+
+
+

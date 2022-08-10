@@ -1,0 +1,122 @@
+### De-seasonalized lasso {#lasso-deseas}
+```{r}
+library(patchwork)
+library(ggpubr)
+library(raster)
+library(glmnet)
+library(Hmisc)
+source("../code/R/helper-functions.R")
+```
+
+```{r}
+path_to_model_folder <- "../results/CV-lasso/test-deseas-lasso/"
+```
+
+```{r}
+err_mat <- readRDS(paste0(path_to_model_folder, "/err-mat.rds"))
+lambdas <- readRDS(paste0(path_to_model_folder, "/lambda-vec.rds"))
+mm <- min(apply(err_mat, 1, mean))
+wm <- which.min(apply(err_mat, 1, mean))
+full_model <- readRDS(paste0(path_to_model_folder, "full-model.rds"))
+intercept <- round(full_model$a0[wm],2)
+lambda <- round(lambdas[wm],2)
+rm(full_model)
+```
+
+```{r err-bar-plot-lasso-deseas, fig.cap="Mean squared error of the 5-fold blocked cross validation for a range of lambda values on the log scale. The points in the middle represent the average MSE for the respective lambda, the errorbars give the MSE +/- one standard deviation. The dotted line shows the lambda for which minimum MSE was obtained."}
+err_bars_plot <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-bars-plot.rds"))
+err_bars_plot
+# a <- ggplot_build(err_bars_plot)
+```
+
+Initially with decreasing regularization the MSE decreases as well
+before it reaches its minimum and stays fairly constant afterwards (\@ref(fig:err-bar-plot-lasso-deseas)). The minimum average MSE achieved is
+higher than in the lasso with and without standardization (minimum average MSE here `r round(mm,2)`).
+In the decreasing area from the start of the path
+until its minimum, the size of the error bar increases.
+We inspect this further in the error plots for each fold.
+
+```{r err-fold-lasso-deseas, fig.cap="MSE of the CV for the different lambda values on the a log scale. The red dotted line shows the lambda for which minimum MSE was obtained."}
+p1 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-plot-fold-1.rds"))
+p2 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-plot-fold-2.rds"))
+p3 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-plot-fold-3.rds"))
+p4 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-plot-fold-4.rds"))
+p5 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-plot-fold-5.rds"))
+
+p1 + p2 + p3 + p4 + p5
+```
+
+Fold 4 causes the errorbars to increase in range, since it has a local maximum
+around l$log(\lambda)$) 1.25. Fold 5 shows a similar behavior but the
+size of the local maximum is smaller relatively to the other MSE values for this fold. Apart from that folds 1,2,3,5 show similar trajectories although the range
+of their MSE values differ (\@ref(fig:err-fold-lasso-deseas)).
+
+```{r}
+pred_plot_1 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-1.rds"))
+pred_plot_1 <- pred_plot_1 + ylab("Precipitation fold 1")
+mse_1 <- get_mse_from_pred_plot(pred_plot_1)
+
+pred_plot_2 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-2.rds"))
+pred_plot_2 <- pred_plot_2 + ylab("Precipitation fold 2")
+mse_2 <- get_mse_from_pred_plot(pred_plot_2)
+
+pred_plot_3 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-3.rds"))
+pred_plot_3 <- pred_plot_3 + ylab("Precipitation fold 3")
+mse_3 <- get_mse_from_pred_plot(pred_plot_3)
+
+pred_plot_4 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-4.rds"))
+pred_plot_4 <- pred_plot_4 + ylab("Precipitation fold 4")
+mse_4 <- get_mse_from_pred_plot(pred_plot_4)
+
+pred_plot_5 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-5.rds"))
+pred_plot_5 <- pred_plot_5 + ylab("Precipitation fold 5")
+mse_5 <- get_mse_from_pred_plot(pred_plot_5)
+
+pred_plot_list <- list(pred_plot_1,pred_plot_2,pred_plot_3,pred_plot_4,pred_plot_5)
+```
+
+```{r pred-plot-fold-lasso-deseas, fig.cap="Precipitation prediction and target values in the test set in each fold. Predictions in red and target values in black."}
+pred_plot_1 + pred_plot_2 + pred_plot_3 + pred_plot_4 +
+  pred_plot_5
+```
+
+
+```{r pred-plot-full-lasso-deseas, fi.cap="Precipitation prediction and target values in the validation set. Predictions in red and target values in black. The model was fitted on the full CV data with the lambda value that minimised the average MSE"}
+full_preds <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-full.rds"))
+full_preds
+mse_full <- get_mse_from_pred_plot(full_preds)
+#mse_full
+```
+
+In \@ref(fig:pred-plot-fold-lasso-deseas) we observe that the predictions
+are quite different from the other models so far,
+Folds 1 and 2 are not predicted accurately and in general the predictions
+are less smooth and don't work as well as in the other two models,
+which is also reflected in the higher average MSE minimum in \@ref(fig:err-bar-plot-lasso-deseas)
+```{r coef-plot-full-lasso-deseas, fig.cap=paste("Coefficient plot of the full lasso model with fitted intercept of", intercept)}
+coef_full <- readRDS(paste0(path_to_model_folder,
+                     "coef-plots/coef-plot-full.rds"))
+coef_full + theme(legend.position = "bottom")
+```
+
+The final predictions appear to be less smooth than in the other models so far
+(lasso with and without standardization), but generally as well
+underestimate the higher values in the data and overestimate low values
+around month 415.
+We see somehow better predictions for the peak in the first month of the
+validation period.
+The amplitude in the seasonal patterns of the predictions decrease faster than for example
+in \@ref(fig:pred-plot-full-lasso-og).
+Note that in our forward validation setting, the seasonality used to de-seasonalize the validation data is the last year of the training set.
+While during the forward validation phase, when we search for the optimal $\lambda$ to refit the full model, the test sets are smaller hence relate to shorter time periods.
+For the validation data we actually have 5 years that are de-seasonalized
+by the year preceding the validation time period. This estimation of seasonality
+might not be acccurate any more if the seasonality in later years of the validation data is not the same as in the last year from the forward validation data.
+This might be an explanation why predicting the seasonal precipitation patterns in the later years become less reliable.
+
+
+
+The model using de-seasonalized SST data chooses many regions in the highest
+latitudes and few regions around the equator (\@ref(fig:pred-plot-full-lasso-og))).
+Many coefficients of opposite signs can appear quite close to another,
+espicially in the higher latitudes.

@@ -1,0 +1,103 @@
+### Standardized lasso {#lasso-stand}
+```{r}
+library(patchwork)
+library(ggpubr)
+library(raster)
+library(glmnet)
+library(Hmisc)
+source("../code/R/helper-functions.R")
+```
+
+```{r}
+path_to_model_folder <- "../results/CV-lasso/test-lasso-stand/"
+```
+
+```{r}
+err_mat <- readRDS(paste0(path_to_model_folder, "/err-mat.rds"))
+lambdas <- readRDS(paste0(path_to_model_folder, "/lambda-vec.rds"))
+mm <- min(apply(err_mat, 1, mean))
+wm <- which.min(apply(err_mat, 1, mean))
+full_model <- readRDS(paste0(path_to_model_folder, "full-model.rds"))
+intercept <- round(full_model$a0[wm],2)
+lambda <- round(lambdas[wm],2)
+rm(full_model)
+```
+
+```{r err-bar-plot-lasso-stand, fig.cap="Mean squared error of the 5-fold blocked cross validation for a range of lambda values on the log scale. The points in the middle represent the average MSE for the respective lambda, the errorbars give the MSE +/- one standard deviation. The dotted line shows the lambda for which minimum MSE was obtained."}
+err_bars_plot <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-bars-plot.rds"))
+err_bars_plot
+# a <- ggplot_build(err_bars_plot)
+```
+The learning curve in \@ref(fig:err-bar-plot-lasso-stand) shows some 
+extreme behavior for $\lambda$ values around 0 on the logarithmic scale.
+For lower values the standard deviation of the MSE get extremely large.
+The minimum MSE is `r round(mm,2)`
+Inspecting the MSE lines separately for each fold gives more insight.
+
+
+```{r err-fold-lasso-stand, fig.cap="MSE of the CV for the different lambda values on the a log scale. The red dotted line shows the lambda for which minimum MSE was obtained."}
+p1 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-plot-fold-1.rds"))
+p2 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-plot-fold-2.rds"))
+p3 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-plot-fold-3.rds"))
+p4 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-plot-fold-4.rds"))
+p5 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-plot-fold-5.rds"))
+
+p1 + p2 + p3 + p4 + p5
+```
+The folds that drive the large MSE standard deviation are fold 4 and 5 (see \@ref(fig:err-fold-lasso-stand)). The range of the best $\lambda$ value
+chosen is larger than for the lasso without standardization. Fold 4 chooses
+very low regularization as optimal.
+
+
+```{r}
+pred_plot_1 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-1.rds"))
+pred_plot_1 <- pred_plot_1 + ylab("Precipitation fold 1")
+mse_1 <- get_mse_from_pred_plot(pred_plot_1)
+
+pred_plot_2 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-2.rds"))
+pred_plot_2 <- pred_plot_2 + ylab("Precipitation fold 2")
+mse_2 <- get_mse_from_pred_plot(pred_plot_2)
+
+pred_plot_3 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-3.rds"))
+pred_plot_3 <- pred_plot_3 + ylab("Precipitation fold 3")
+mse_3 <- get_mse_from_pred_plot(pred_plot_3)
+
+pred_plot_4 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-4.rds"))
+pred_plot_4 <- pred_plot_4 + ylab("Precipitation fold 4")
+mse_4 <- get_mse_from_pred_plot(pred_plot_4)
+
+pred_plot_5 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-5.rds"))
+pred_plot_5 <- pred_plot_5 + ylab("Precipitation fold 5")
+mse_5 <- get_mse_from_pred_plot(pred_plot_5)
+
+pred_plot_list <- list(pred_plot_1,pred_plot_2,pred_plot_3,pred_plot_4,pred_plot_5)
+```
+
+```{r pred-plot-fold-lasso-stand, fig.cap="Precipitation prediction and target values in the test set in each fold. Predictions in red and target values in black."}
+pred_plot_1 + pred_plot_2 + pred_plot_3 + pred_plot_4 +
+  pred_plot_5
+```
+The predictions on the test set are similar to those from the normal lasso,
+in fold 4 the peak is predicted exactly (\@ref(fig:pred-plot-fold-lasso-stand)). The Model from fold 2 underestimates 
+more than the respective fold model from the lasso without standardization (see \@ref(fig:pred-plot-fold-lasso-stand)).
+
+```{r pred-plot-full-lasso-stand, fi.cap="Precipitation prediction and target values in the validation set. Predictions in red and target values in black. The model was fitted on the full CV data with the lambda value that minimised the average MSE"}
+full_preds <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-full.rds"))
+full_preds
+#mse_full <- get_mse_from_pred_plot(full_preds)
+#mse_full
+```
+The predictions from the full model of the standardized lasso show
+the same behavior as the ones found in the lasso without standardization.
+Again seasonal patterns are predicted well but largest values are underestimated (\@ref(fig:coef-plot-full-lasso-stand)).
+
+```{r coef-plot-full-lasso-stand, fig.cap=paste("Coefficient plot of the full lasso model with fitted intercept of", intercept)}
+coef_full <- readRDS(paste0(path_to_model_folder,
+                     "coef-plots/coef-plot-full.rds"))
+coef_full + theme(legend.position = "bottom")
+```
+Figure \@ref(fig:coef-plot-full-lasso-stand) shows now the coefficient plot for the standardized lasso,
+the coefficient values are given on the standardized scale.
+The range of coefficient values is more symmetric around the 0 than for first lasso model
+and the locations differ as well. For example the two locations at pacific coast of
+South America are not included in the model here (compare \@ref(fig:coef-plot-full-lasso-og)).

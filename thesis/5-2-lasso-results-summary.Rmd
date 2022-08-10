@@ -1,0 +1,135 @@
+## Results
+
+```{r, include=FALSE}
+knitr::opts_chunk$set(echo=FALSE, warning = FALSE, message = FALSE, out.width = '50%', fig.align = 'center')
+options(knitr.duplicate.label = "allow")
+```
+
+Following we summarize the results of the different lasso approaches.
+For each approach we show the prediction errors for each test set
+during the forward validation as well as the actual predictions.
+The $\lambda$ that achieved the minimum MSE during the forward validation, will be used to fit the model to the complete training data and evaluated on the hold-out validation set at the
+end of the observation period.
+For the full model we show the predictions and resulting coefficient
+map.
+
+### Lasso {#lasso-og}
+```{r}
+library(patchwork)
+library(ggpubr)
+library(raster)
+library(glmnet)
+library(Hmisc)
+source("../code/R/helper-functions.R")
+```
+```{r}
+path_to_model_folder <- "../results/CV-lasso/test-lasso-og/"
+```
+```{r}
+err_mat <- readRDS(paste0(path_to_model_folder, "/err-mat.rds"))
+lambdas <- readRDS(paste0(path_to_model_folder, "/lambda-vec.rds"))
+wm <- which.min(apply(err_mat, 1, mean))
+full_model <- readRDS(paste0(path_to_model_folder, "full-model.rds"))
+intercept <- round(full_model$a0[wm],2)
+lambda <- round(lambdas[wm],2)
+rm(full_model)
+```
+
+```{r err-bar-plot-lasso-og, fig.cap="Mean squared error of the 5-fold blocked cross validation for a range of lambda values on the log scale. The points in the middle represent the average MSE for the respective lambda, the errorbars give the MSE +/- one standard deviation. The dotted line shows the lambda for which minimum MSE was obtained."}
+err_bars_plot <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-bars-plot.rds"))
+err_bars_plot
+```
+\@ref(fig:err-bar-plot-lasso-og) shows the MSE for all the 5 folds summarizing
+for each lambda value the mean MSE (black points) and indicates the dispersion
+of the MSE by one standard deviation by presenting error bars.
+The minimal average MSE is found at `r round(log(lambda),2)` with a value of 
+approximately 750.
+The MSE differ a lot between folds, as seen by the large errors bars.
+A common approach for choosing $\lambda$ from cross validation (or here forward validation),
+is to choose largest lambda that lays within one standard deviation of 
+the $\lambda_{\min}$ that minimizes the average MSE for the folds.
+Here we could not apply such a procedure because the error bars
+have such a wide spread. For the sake of comparability
+with other lasso models as well with the fused lasso later, we will
+choose the $\lambda_{\min}$ for all models when fitting the full model.
+
+
+
+```{r err-fold-lasso-og, fig.cap="MSE of the CV for the different lambda values on the a log scale. The red dotted line shows the lambda for which minimum MSE was obtained."}
+p1 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-plot-fold-1.rds"))
+p2 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-plot-fold-2.rds"))
+p3 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-plot-fold-3.rds"))
+p4 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-plot-fold-4.rds"))
+p5 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-plot-fold-5.rds"))
+
+p1 + p2 + p3 + p4 + p5
+
+```
+
+In \@ref(fig:err-fold-lasso-og) we display the prediction errors in each fold when
+predicting on the test sets. The optimal amount for folds 1 until 4 is 
+are very close, in fold 5 a larger value is chosen.
+Folds 1 and 2 have a local maximum in the beginning of the path, fold 5 has 
+a local maximum and minimum after the optimal $\lambda_{\min}$ value.
+Overall the average regularization seems to be a good compromise here.
+
+```{r}
+pred_plot_1 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-1.rds"))
+pred_plot_1 <- pred_plot_1 + ylab("Precipitation fold 1")
+mse_1 <- get_mse_from_pred_plot(pred_plot_1)
+
+pred_plot_2 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-2.rds"))
+pred_plot_2 <- pred_plot_2 + ylab("Precipitation fold 2")
+mse_2 <- get_mse_from_pred_plot(pred_plot_2)
+
+pred_plot_3 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-3.rds"))
+pred_plot_3 <- pred_plot_3 + ylab("Precipitation fold 3")
+mse_3 <- get_mse_from_pred_plot(pred_plot_3)
+
+pred_plot_4 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-4.rds"))
+pred_plot_4 <- pred_plot_4 + ylab("Precipitation fold 4")
+mse_4 <- get_mse_from_pred_plot(pred_plot_4)
+
+pred_plot_5 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-5.rds"))
+pred_plot_5 <- pred_plot_5 + ylab("Precipitation fold 5")
+mse_5 <- get_mse_from_pred_plot(pred_plot_5)
+
+pred_plot_list <- list(pred_plot_1,pred_plot_2,pred_plot_3,pred_plot_4,pred_plot_5)
+```
+
+```{r pred-plot-fold-lasso-og, fig.cap="Precipitation prediction and target values in the test set in each fold. Predictions in red and target values in black."}
+pred_plot_1 + pred_plot_2 + pred_plot_3 + pred_plot_4 +
+  pred_plot_5
+```
+We now inspect the actual predictions made in the test sets and plot them together
+with the respective target values (\@ref(fig:pred-plot-fold-lasso-og)).
+The precipitation in the test sets are predicted well, in general.
+But it misses maximum vales and local minimal.
+Overall the standard lasso shows here it can learn some meaningful connection.
+
+
+```{r pred-plot-full-lasso-og, fig.cap="Precipitation prediction and target values in the validation set. Predictions in red and target values in black. The model was fitted on the full CV data with the lambda value that minimised the average MSE"}
+full_preds <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-full.rds"))
+mse_full <- get_mse_from_pred_plot(full_preds)
+full_preds
+#mse_full
+```
+The predictions from the full model on the evaluation set indicate 
+that the model is capable of predicting the seasonal variation in the precipitation
+data (\@ref(fig:pred-plot-full-lasso-og)). But it constantly fails to predict
+the peaks during the seasonal cycles.
+
+```{r coef-plot-full-lasso-og, fig.cap=paste("Coefficient plot of the full lasso model with fitted intercept of", intercept)}
+coef_full <- readRDS(paste0(path_to_model_folder,
+                     "coef-plots/coef-plot-full.rds"))
+coef_full + theme(legend.position = "bottom")
+```
+Finally we plot the nonzero coefficients from the lasso directly
+on their locations on the map (\@ref(fig:coef-plot-full-lasso-og).
+As we can see from the coefficient value legend, the range of coefficient values
+is tilted towards negative values.
+Also maybe surprisingly, locations far away from the CAB are included in the model.
+We can observe negative and positive coefficients in the Atlantic ocean.
+Some but not of these regions can also be seen to be highly correlated from analysis
+done on the original and deseasonalised data, see \@ref{correlation-chapter}.
+

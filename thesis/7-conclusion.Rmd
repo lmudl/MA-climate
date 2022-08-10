@@ -1,0 +1,44 @@
+# Conclusion
+
+Studying the precipitation in the Amazon rain forest is a highly complex 
+and relevant problem. Predicting future precipitation
+may help to better anticipate the effects of droughts and floods, as well
+as improve projections of future climate change.
+In this work we tackled the problem from various angles.
+Our initial analysis of SST and precipitation revealed
+spatial patterns in the variables alone as well as their correlations.
+These findings further motivated the cluster analysis in chapter 4.
+Using a $k$-means with 5 centers we find spatially coherent cluster in the
+central Amazon basin.
+Although applying the lasso on each cluster separately did not improve the prediction
+results overall we find that for one cluster the predictions work especially well.
+For the lasso and the fused lasso, we used a blocked forward validation,
+since classic k-fold cross-validation is not applicable here.
+We implement the forward validation for the lasso and the fused lasso.
+For the fused lasso finding the optimal $\lambda$ after forward validation 
+is not straightforward, since the regularization path differs for the folds.
+Different preprocessing variants were investigated for the lasso.
+We compared the lasso, lasso with standardization, after de-seasonalizing and differentiation.
+Compared to the lasso without preprocessing only standardizing showed improvements.
+The fused lasso posed a challenge in from an algorithmic perspective,
+since in preparing the graph we introduced sub-graphs that distorted the
+real conditions underlying the data.
+By removing the sub-graphs we can mitigate some of these effects but
+find that a more worthwhile solution will be to use a weighted graph.
+This will make the computation eventually a lot more expensive as computation time
+in the dual path algorithm increases with the number of edges.
+Nevertheless, applying the fused lasso improved performance on the validation data
+and revealed predictive regions in the SST.
+Additionally it showed that when the graph structure does not represent
+the SST appropriately, introducing sparsity did not improve the model's performance.
+Overall we find that predicting the precipitation in the CAB
+is a challenging task, with interesting results for future research.
+As already mentioned the fused lasso approach could be improved with a weighted 
+graph. To reduce the computational cost one could use a cutoff value for smaller
+weights or use the SST window from @ciemer2020early instead of the global SST.
+For the central Amazon basin, the fused lasso could be applied solely to best performing 
+cluster. Other clustering approaches that take into account the spatial dependencies
+in the CAB, can be considered as well.
+Finally, the choice of evaluation method leaves space for many other possibilities
+and is a trade-off between efficient use of available data and computational cost,
+especially for the fused lasso.
