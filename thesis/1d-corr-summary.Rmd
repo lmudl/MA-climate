@@ -43,73 +43,74 @@ their location on the map and also the 5% strongest positive and negative correl
 
 #### Timelag 0
 
-```{r, echo = FALSE, out.width='40%', out.height='20%',fig.show='hold',fig.align='center'}
+```{r dens-0, echo = FALSE, out.width='40%', out.height='20%',fig.show='hold',fig.align='center', fig.cap='Density plot of the correlation values for timelag 0'}
 knitr::include_graphics(c("../code/Rmarkdown/plots-markdown/og-data/dens-0.jpg"))
 ```
-```{r corr-0, echo = FALSE, out.width='65%', out.height='65%',fig.show='hold',fig.align='center'}
+```{r corr-0, echo = FALSE, out.width='65%', out.height='65%',fig.show='hold',fig.align='center', fig.cap='Correlation plot between SST and mean precipidation in the CAB for timelag 0'}
 knitr::include_graphics("../code/Rmarkdown/plots-markdown/og-data/corr-0.jpg")
 ```
-```{r, echo = FALSE, out.width='65%', out.height='65%',fig.show='hold',fig.align='center'}
+```{r corr-0q, echo = FALSE, out.width='65%', out.height='65%',fig.show='hold',fig.align='center', fig.cap='Correlation plot between SST and mean precipidation in the CAB for timelag 0. Interquantile values are set to 0'}
 knitr::include_graphics("../code/Rmarkdown/plots-markdown/og-data/q-corr-0.jpg")
 ```
 Inspecting the density plot for time lag 0, we see two modi for correlations,
-one for negative correlations around -0.8 and one for positive correlations around 0.8. Also a small spike can be seen for low negative correlations.
-If we plot these correlations on the respective grid points we see a clear north-south negative-positive correlation distinction. The "boarder" is organised around the equator.
-The plot for the strongest 5% of correlations reveals areas with strong positive and negative correlations in the north and south respectively.
+one for negative correlations around -0.8 and one for positive correlations around 0.8. Also a small spike can be seen for low negative correlations (Figure \@ref(fig:dens-0)).
+If we plot these correlations on the respective grid points we see a clear north-south negative-positive correlation distinction. The "boarder" is organised around the equator (Figure \@ref(fig:corr-0)).
+The plot for the strongest 5% of correlations reveals areas with strong positive and negative correlations in the north and south respectively (Figure \@ref(fig:corr-0q)).
 
 #### Timelag 3
 
-```{r, echo = FALSE, out.width='40%', out.height='20%',fig.show='hold',fig.align='center'}
+```{r dens-3, echo = FALSE, out.width='40%', out.height='20%',fig.show='hold',fig.align='center', fig.cap='Density plot of the correlation values for timelag 3'}
 knitr::include_graphics(c("../code/Rmarkdown/plots-markdown/og-data/dens-3.jpg"))
 ```
-```{r, echo = FALSE, out.width='65%', out.height='65%',fig.show='hold',fig.align='center'}
+```{r corr-3, echo = FALSE, out.width='65%', out.height='65%',fig.show='hold',fig.align='center', fig.cap='Correlation plot between SST and mean precipidation in the CAB for timelag 3'}
 knitr::include_graphics("../code/Rmarkdown/plots-markdown/og-data/corr-3.jpg")
 ```
-```{r, echo = FALSE, out.width='65%', out.height='65%',fig.show='hold',fig.align='center'}
+```{r corr-3q, echo = FALSE, out.width='65%', out.height='65%',fig.show='hold',fig.align='center', fig.cap='Correlation plot between SST and mean precipidation in the CAB for timelag 3. Interquantile values are set to 0'}
 knitr::include_graphics("../code/Rmarkdown/plots-markdown/og-data/q-corr-3.jpg")
 ```
 
 The density of correlations for timelag 3, is left-skewed and has two
-modi that are organised around 0 and -0.125 respectively.
-The correlation map shows that the high positive and negative correlations are more close to equator here.
-Note that the legend for the correlationmap is "shifted" here, because the maximal negative correlation has a higher absolute value than the
+modi that are organised around 0 and -0.125 respectively (Figure \@ref(fig:dens-3)) .
+The correlation map shows that the high positive and negative correlations are more close to equator here (Figure \@ref(fig:corr-3)).
+Note that the legend for the correlation map is "shifted" here, because the maximal negative correlation has a higher absolute value than the
 maximal positive correlation.
-The strongest correlations also seem to be shifted towards the equator.
+The strongest correlations also seem to be shifted towards the equator (Figure \@ref(fig:corr-3q)).
 
 #### Timelag 6
 
-```{r, echo = FALSE, out.width='40%', out.height='20%',fig.show='hold',fig.align='center'}
+```{r dens-6, echo = FALSE, out.width='40%', out.height='20%',fig.show='hold',fig.align='center',fig.cap='Density plot of the correlation values for timelag 6'}
 knitr::include_graphics(c("../code/Rmarkdown/plots-markdown/og-data/dens-6.jpg"))
 ```
-```{r, echo = FALSE, out.width='65%', out.height='65%',fig.show='hold',fig.align='center'}
+```{r corr-6, echo = FALSE, out.width='65%', out.height='65%',fig.show='hold',fig.align='center', fig.cap='Correlation plot between SST and mean precipidation in the CAB for timelag 6'}
 knitr::include_graphics("../code/Rmarkdown/plots-markdown/og-data/corr-6.jpg")
 ```
-```{r, echo = FALSE, out.width='65%', out.height='65%',fig.show='hold',fig.align='center'}
+```{r corr-6q, echo = FALSE, out.width='65%', out.height='65%',fig.show='hold',fig.align='center', fig.cap='Correlation plot between SST and mean precipidation in the CAB for timelag 6. Interquantile values are set to 0'}
 knitr::include_graphics("../code/Rmarkdown/plots-markdown/og-data/q-corr-6.jpg")
 ```
+
 We can see the density plot for timelag 6 is pretty similar to the one
-of timelag 0 but seems to be "flipped" around 0.
-Similarly the correlation map shows (high) negative correlations in the south now and high postive correlations in the north.
+of timelag 0 but seems to be "flipped" around 0 (Figure \@ref(fig:dens-6)).
+Similarly the correlation map shows (high) negative correlations in the south now and high postive correlations in the north.(Figures \@ref(fig:corr-6) and (Figure \@ref(fig:corr-6q)))
 
 #### Timelag 12
 
-```{r, include = FALSE, eval = FALSE, echo = FALSE, out.width="25%", out.height="25%",fig.show='hold',fig.fullwidth=TRUE}
+```{r , include = FALSE, eval = FALSE, echo = FALSE, out.width="25%", out.height="25%",fig.show='hold',fig.fullwidth=TRUE}
 knitr::include_graphics(c("../code/Rmarkdown/plots-markdown/corr0.jpg","../code/Rmarkdown/plots-markdown/corr3.jpg","../code/Rmarkdown/plots-markdown/corr6.jpg","../code/Rmarkdown/plots-markdown/corr9.jpg", "../code/Rmarkdown/plots-markdown/corr12.jpg"))
 ```
 
-```{r, echo = FALSE, out.width='40%', out.height='20%',fig.show='hold',fig.align='center'}
+```{r dens-12, echo = FALSE, out.width='40%', out.height='20%',fig.show='hold',fig.align='center',fig.cap='Density plot of the correlation values for timelag 12'}
 knitr::include_graphics(c("../code/Rmarkdown/plots-markdown/og-data/dens-12.jpg"))
 ```
-```{r, echo = FALSE, out.width='65%', out.height='65%',fig.show='hold',fig.align='center'}
+```{r corr-12, echo = FALSE, out.width='65%', out.height='65%',fig.show='hold',fig.align='center', fig.cap='Correlation plot between SST and mean precipidation in the CAB for timelag 12'}
 knitr::include_graphics("../code/Rmarkdown/plots-markdown/og-data/corr-12.jpg")
 ```
-```{r, echo = FALSE, out.width='65%', out.height='65%',fig.show='hold',fig.align='center'}
+```{r corr-12q, echo = FALSE, out.width='65%', out.height='65%',fig.show='hold',fig.align='center', fig.cap='Correlation plot between SST and mean precipidation in the CAB for timelag 12. Interquantile values are set to 0'}
 knitr::include_graphics("../code/Rmarkdown/plots-markdown/og-data/q-corr-12.jpg")
 ```
 
-Giving a time lag of one year, we can see that the distribution of correlations is now again similar to the distribution for time lag 0.
+Giving a time lag of one year, we can see that the density of correlations is now again similar to the density for time lag 0 (Figure \@ref(fig:dens-12)).
 This also hold for the location of positive and negative correlations in general,
-as well as for the strongest 5% of correlations.
+as well as for the strongest 5% of correlations (Figures \@ref(fig:corr-12) and \@ref(fig:corr-12q)).
  
 ### De-seasonalized Data {.tabset .tabset-fade .tabset-pills}
 Following, for each time lag we show the respective density of correlation values,
@@ -117,79 +118,79 @@ their location on the map and also the 5% strongest positive and negative correl
 
 #### Timelag 0
 
-```{r, echo = FALSE, out.width='40%', out.height='20%',fig.show='hold',fig.align='center'}
+```{r des-dens-0, echo = FALSE, out.width='40%', out.height='20%',fig.show='hold',fig.align='center', fig.cap='Density plot of the correlation values for timelag 0 and de-seasonalized SST data'}
 knitr::include_graphics(c("../code/Rmarkdown/plots-markdown/des-data/dens-0.jpg"))
 ```
-```{r, echo = FALSE, out.width='65%', out.height='65%',fig.show='hold',fig.align='center'}
+```{r des-corr-0, echo = FALSE, out.width='65%', out.height='65%',fig.show='hold',fig.align='center', fig.cap='Correlation plot between SST and mean precipidation in the CAB for timelag 0 and de-sasonalized SST data'}
 knitr::include_graphics("../code/Rmarkdown/plots-markdown/des-data/corr-0.jpg")
 ```
-```{r, echo = FALSE, out.width='65%', out.height='65%',fig.show='hold',fig.align='center'}
+```{r des-corr-0q, echo = FALSE, out.width='65%', out.height='65%',fig.show='hold',fig.align='center', fig.cap='Correlation plot between SST and mean precipidation in the CAB for timelag 0 and de-sasonalized SST data. Interquantile values are set to 0'}
 knitr::include_graphics("../code/Rmarkdown/plots-markdown/des-data/q-corr-0.jpg")
 ```
 Inspecting the density plot for timelag 0, we see that after excluding seasonality from 
-the time series we get a left-skewed distribution of correlations. With a mode around 0.
+the time series we get a left-skewed density of correlations. With a mode around 0.
 In general the correlation values are a lot lower than in the original data.
-With a maximum at around -0.4 and +2.5 respectively.
+With a maximum at around -0.4 and +2.5 respectively (Figure \@ref(fig:des-dens-0)).
 We plot these correlations on the respective grid and see that the clear north south
-distinction in the correlations before de-seasonalizing the data does not appear anymore.
-The plot for the strongest 5% of correlations reveals areas with strongest positive and negative correlations. But as stated before the values are in general much lower.
+distinction in the correlations before de-seasonalizing the data does not appear anymore (Figure \@ref(fig:des-corr-0)).
+The plot for the strongest 5% of correlations reveals areas with strongest positive and negative correlations. But as stated before the values are in general much lower (Figure \@ref(fig:des-corr-0q)).
 
 #### Timelag 3
 
-```{r, echo = FALSE, out.width='40%', out.height='20%',fig.show='hold',fig.align='center'}
+```{r des-dens-3, echo = FALSE, out.width='40%', out.height='20%',fig.show='hold',fig.align='center',  fig.cap='Density plot of the correlation values for timelag 3 and de-seasonalized SST data'}
 knitr::include_graphics(c("../code/Rmarkdown/plots-markdown/des-data/dens-3.jpg"))
 ```
 
 
-```{r, echo = FALSE, out.width='65%', out.height='65%',fig.show='hold',fig.align='center'}
+```{r des-corr-3, echo = FALSE, out.width='65%', out.height='65%',fig.show='hold',fig.align='center', fig.cap='Correlation plot between SST and mean precipidation in the CAB for timelag 3 and de-sasonalized SST data'}
 knitr::include_graphics("../code/Rmarkdown/plots-markdown/des-data/corr-3.jpg")
 ```
 
 
-```{r, echo = FALSE, out.width='65%', out.height='65%',fig.show='hold',fig.align='center'}
+```{r des-corr-3q, echo = FALSE, out.width='65%', out.height='65%',fig.show='hold',fig.align='center', fig.cap='Correlation plot between SST and mean precipidation in the CAB for timelag 3 and de-sasonalized SST data. Interquantile values are set to 0'}
 knitr::include_graphics("../code/Rmarkdown/plots-markdown/des-data/q-corr-3.jpg")
 ```
 
 For the density of timelag 3 we get a similar picture as for timelag 0.
-The mode is a higher and the tails get a bit more mass.
-Also the correlation map does not seem to change a lot.
-The strongest correlations appear to be shifted to the left.
+The mode is a higher and the tails get a bit more mass (Figure \@ref(fig:des-dens-3)).
+Also the correlation map does not seem to change a lot (Figure \@ref(fig:des-corr-3)).
+The strongest correlations appear to be shifted to the left (Figure \@ref(fig:des-corr-3q)).
 
 #### Timelag 6
 
-```{r, echo = FALSE, out.width='40%', out.height='20%',fig.show='hold',fig.align='center'}
+```{r des-dens-6, echo = FALSE, out.width='40%', out.height='20%',fig.show='hold',fig.align='center',  fig.cap='Density plot of the correlation values for timelag 6 and de-seasonalized SST data'}
 knitr::include_graphics(c("../code/Rmarkdown/plots-markdown/des-data/dens-6.jpg"))
 ```
-```{r, echo = FALSE, out.width='65%', out.height='65%',fig.show='hold',fig.align='center'}
+```{r des-corr-6, echo = FALSE, out.width='65%', out.height='65%',fig.show='hold',fig.align='center', fig.cap='Correlation plot between SST and mean precipidation in the CAB for timelag 6 and de-sasonalized SST data'}
 knitr::include_graphics("../code/Rmarkdown/plots-markdown/des-data/corr-6.jpg")
 ```
-```{r, echo = FALSE, out.width='65%', out.height='65%',fig.show='hold',fig.align='center'}
+```{r des-corr-6q, echo = FALSE, out.width='65%', out.height='65%',fig.show='hold',fig.align='center', fig.cap='Correlation plot between SST and mean precipidation in the CAB for timelag 6 and de-sasonalized SST data. Interquantile values are set to 0'}
 knitr::include_graphics("../code/Rmarkdown/plots-markdown/des-data/q-corr-6.jpg")
 ```
-Since the distributions of correlation values are all unimodal we do not observe
+Since the density of correlation values are all unimodal we do not observe
 the "flip" we saw in the original data when comparing the densities of timelag 0 and
-6. The mode again gets larger and the maximum postive and negative correlation values
-get smaller.
-The strongest negative correlations are shifted further to left.
+6 (Figure \@ref(fig:des-dens-6)). The mode again gets larger and the maximum postive and negative correlation values
+get smaller (Figure \@ref(fig:des-corr-6)).
+The strongest negative correlations are shifted further to left (Figure \@ref(fig:des-corr-6q)).
 
 #### Timelag 12
 
-```{r, include = FALSE, eval = FALSE, echo = FALSE, out.width="25%", out.height="25%",fig.show='hold',fig.fullwidth=TRUE}
+```{r, include = FALSE, eval = FALSE, echo = FALSE, out.width="25%", out.height="25%",fig.show='hold',fig.fullwidth=TRUE, }
 knitr::include_graphics(c("../code/Rmarkdown/plots-markdown/corr0.jpg","../code/Rmarkdown/plots-markdown/corr3.jpg","../code/Rmarkdown/plots-markdown/corr6.jpg","../code/Rmarkdown/plots-markdown/corr9.jpg", "../code/Rmarkdown/plots-markdown/corr12.jpg"))
 ```
 
-```{r, echo = FALSE, out.width='40%', out.height='20%',fig.show='hold',fig.align='center'}
+```{r des-dens-12, echo = FALSE, out.width='40%', out.height='20%',fig.show='hold',fig.align='center',  fig.cap='Density plot of the correlation values for timelag 12 and de-seasonalized SST data'}
 knitr::include_graphics(c("../code/Rmarkdown/plots-markdown/des-data/dens-12.jpg"))
 ```
-```{r, echo = FALSE, out.width='65%', out.height='65%',fig.show='hold',fig.align='center'}
+```{r des-corr-12, echo = FALSE, out.width='65%', out.height='65%',fig.show='hold',fig.align='center', fig.cap='Correlation plot between SST and mean precipidation in the CAB for timelag 0 and de-sasonalized SST data'}
 knitr::include_graphics("../code/Rmarkdown/plots-markdown/des-data/corr-12.jpg")
 ```
-```{r, echo = FALSE, out.width='65%', out.height='65%',fig.show='hold',fig.align='center'}
+```{r des-corr-12q, echo = FALSE, out.width='65%', out.height='65%',fig.show='hold',fig.align='center', fig.cap='Correlation plot between SST and mean precipidation in the CAB for timelag 12 and de-sasonalized SST data. Interquantile values are set to 0'}
 knitr::include_graphics("../code/Rmarkdown/plots-markdown/des-data/q-corr-12.jpg")
 ```
 
-Given a timelag of one year, the distribution now has a mode around 6, and started at around 4 when timelag was 0. Also neither the positive nor negative correlations exceed values of 2.5.
-The consistent region of strong negative and positive correlations is now less organised or more scattered.
+Given a timelag of one year, the density now has a mode around 6, and started at around 4 when timelag was 0. Also neither the positive nor negative correlations exceed values of 2.5 (Figure \@ref(fig:des-dens-12)).
+The consistent region of strong negative and positive correlations is now less organised or more scattered (Figures  \@ref(fig:des-corr-12) and \@ref(fig:des-corr-12q)).
 
  
 

@@ -1,4 +1,4 @@
-# Clustering
+# Clustering {#cluster-chapter}
 
 In this chapter we will first summarize the main ideas of clustering
 and then apply it to the precipitation data.

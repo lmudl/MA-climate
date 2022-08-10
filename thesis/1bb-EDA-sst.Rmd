@@ -3,15 +3,15 @@ output:
   pdf_document: default
   html_document: default
 ---
-## EDA SST
+## Sea surface temperature
 
 We explore the sea surface temperature data set used in the paper by @ciemer2020early. 
-ERSST (Extended Reconstructed Sea Surface Temperature, @huang2017noaa) is a reanalysis of observed data given in the International Comprehensive Ocean-Atmosphere Data Set (ICOADS), which contains observations *from 1800 until 2016*, made by ships and buoys, for example.
+ERSST (Extended Reconstructed Sea Surface Temperature, @huang2017noaa) is a reanalysis of observed data given in the International Comprehensive Ocean-Atmosphere Data Set (ICOADS), which contains observations from 1800 until 2016, made by ships and buoys, for example.
 The data comes on a 2x2 degree grid, where data was missing they used interpolation techniques.
 The file contains two variables that are measured across different dimensions.
 The two variables consist of the sea surface temperatures and the respective SST anomalies (with respect to the 1971-2000 monthly climatology). Here we analyze the raw SST values since they compute the anomalies compared to a climatology that spans a time frame we will use
-in the analysis. Therefore, the anomlies would eventually introduce information
-leakage because future values were used for fitting the model during the trainin process.
+in the analysis. Therefore, the anomalies would eventually introduce information
+leakage because future values were used for fitting the model during the training process.
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(echo=FALSE, warning = FALSE, message = FALSE,
@@ -33,12 +33,7 @@ library(ggpubr)
 source("../code/R/helper-functions.R")
 ```
 
-```{r sst-dens, out.width='50%'}
-sst_dens_plot <- readRDS("../results/eda/sst_dens_plot.rds")
-sst_dens_plot <- sst_dens_plot + ggtitle("Density of raw SST values") +
-  ylab("Density") + xlab("SST")
-sst_dens_plot
-```
+
 
 As first impression of the SST data we show the density of the raw values (Figure \@ref(fig:sst-dens)).
 A large proportion of the data has temperatures around the null,
@@ -46,6 +41,12 @@ which we can account to the sea regions close to the Antarctic. Temperatures
 between 0 and 20 degrees are rather evenly distributed, for tropical 
 monthly SST the number of observations increases again.
 
+```{r sst-dens, out.width='50%', fig.cap='Density plot of the raw SST values'}
+sst_dens_plot <- readRDS("../results/eda/sst_dens_plot.rds")
+sst_dens_plot <- sst_dens_plot + ggtitle("Density of raw SST values") +
+  ylab("Density") + xlab("SST")
+sst_dens_plot
+```
 
 ```{r, }
 sst_means_loc_plot <- readRDS("../results/eda/sst_means_loc_plot.rds")
@@ -68,17 +69,18 @@ sst_sds_loc_plot <- readRDS("../results/eda/sst_sds_loc_plot.rds")
 (sst_sds_dens_plot <- readRDS("../results/eda/sst_sds_dens_plot.rds"))
 ```
 
-
-```{r mean-and-sd-sst-og, fig.cap="Mean and SD on the global map.The color scales show the mean for the shown variable as white.",  out.width='50%'}
-sst_means_loc_plot + sst_sds_loc_plot +
-  plot_annotation("Global SST mean and SD at each location")
-```
-Figure \@ref(fig:mean-and-sst-og) displays the mean and standard deviation
+Figure \@ref(fig:mean-and-sd-sst-og) displays the mean and standard deviation
 on each location for the complete observation period.
 The mean of each scale is shown in white. Hence on average the SST regions
 have a mean of around 12 degrees and the respective standard deviation is on
 average 2. While the temperature means appear to be change smoothly along
 the latitudes, the standard deviations have stronger local patterns. SST regions close to the coastlines at 50° latitude show the highest standard deviations.
+
+
+```{r mean-and-sd-sst-og, fig.cap="Mean and SD on the global map.The color scales show the mean for the shown variable as white.",  out.width='50%'}
+sst_means_loc_plot + sst_sds_loc_plot +
+  plot_annotation("Global SST mean and SD at each location")
+```
 
 We further inspect the SD patterns in Figure \@ref(fig:sst-sd-month),
 and detect a prominent region around the equator in the Pacific.
@@ -99,7 +101,7 @@ a + b
 (sst_trends_loc_stl_plot <- readRDS("../results/eda/sst_trends_loc_stl_plot.rds"))
 ```
 
-```{r eval = FALSE, sst-mean-month,  out.width='120%'}
+```{r  sst-mean-month2, eval = FALSE,  out.width='120%'}
 sst_mean_arrange <- readRDS("../results/eda/sst_mean_arrange.rds")
 sst_mean_arrange
 ```

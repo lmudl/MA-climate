@@ -23,8 +23,9 @@ rmd_files:
     "lasso-summary-cluster-5.Rmd",
     "5t-method-fused-lasso.Rmd",
     "5tt-results-fused-lasso.Rmd",
-    "5tttt-results-noclust-gamma01.Rmd",
-    "appendix.Rmd"]
+    "conclusion.Rmd",
+    "appendix.Rmd",
+    "references.Rmd"]
   latex: ["index.Rmd",
     "1a-related-work.Rmd", 
     "1b-EDA-precip.Rmd",
@@ -47,5 +48,6 @@ rmd_files:
     "lasso-summary-cluster-5.Rmd",
     "5t-method-fused-lasso.Rmd",
     "5tt-results-fused-lasso.Rmd",
-    "5tttt-results-noclust-gamma01.Rmd",
-    "appendix.Rmd"]
+    "conclusion.Rmd",
+    "appendix.Rmd",
+    "references.Rmd"]

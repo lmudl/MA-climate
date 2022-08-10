@@ -8,7 +8,7 @@ knitr::opts_chunk$set(out.width = '75%', fig.align = 'center')
 
 This section provides a graphical presentation of the precipitation data known as glyph plots.
 The idea of glyph maps, its application and general implementation that were
-used in this section are taken from @\ref:wickham2012glyph.
+used in this section are taken from @:wickham2012glyph.
 Glyph maps use a small icon or *glyph* to show multiple values at each location.
 In our case, we show a complete time series at each location instead
 of just single values. Different techniques can then be used compare the time series 

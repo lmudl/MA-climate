@@ -3,7 +3,7 @@ output:
   pdf_document: default
   html_document: default
 ---
-### diff1 lasso {#lasso-diff1}
+### Differentiated lasso {#lasso-diff1}
 
 ```{r, include=FALSE}
 knitr::opts_chunk$set(echo=FALSE, warning = FALSE, message = FALSE, out.width = '50%', fig.align = 'center',
@@ -90,7 +90,7 @@ the predictors we shorten the target variable by one month, too (\@ref(fig:pred-
 full_preds <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-full.rds"))
 full_preds
 mse_full <- get_mse_from_pred_plot(full_preds)
-mse_full
+#mse_full
 ```
 
 As for the other models we looked at before, the amplitudes are underestimated
@@ -106,6 +106,6 @@ coef_full <- readRDS(paste0(path_to_model_folder,
                      "coef-plots/coef-plot-full.rds"))
 coef_full
 ```
-Investigating the coefficient plot for this model (@\ref(fig:coef-plot-full-lasso-diff1)), we find that here a lot of coefficients
+Investigating the coefficient plot for this model (\@ref(fig:coef-plot-full-lasso-diff1)), we find that here a lot of coefficients
 have large positive values, for example below the equator in the Pacific and Atlantic.
 

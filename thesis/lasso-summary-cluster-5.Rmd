@@ -1,6 +1,6 @@
 #### Cluster 5
 
-```{r, include=FALSE}
+```{r, echo=FALSE}
 knitr::opts_chunk$set(echo=FALSE, warning = FALSE, message = FALSE, out.width = '50%', fig.align = 'center')
 options(knitr.duplicate.label = "allow")
 ```
@@ -72,7 +72,7 @@ precipitation data quite well.
 The cluster analysis helped us finding the homogeneous cluster 2 which is also the largest
 cluster, recall \@ref(fig:cluster-map).
 
-Table \@ref(tab:mse-cluster) summarize the MSE for each cluster.
+<!-- Table \@ref(tab:mse-cluster) summarizes the MSE for each cluster. -->
 
 ```{r}
 path_to_model_folder <- "../results/CV-lasso/cluster-cv-lasso-og2/cluster-1/"
@@ -95,7 +95,8 @@ mse5 <- get_mse_from_pred_plot(full_preds)
 
 ```{r mse-cluster, fig.cap="Table of the MSE prediction errors for each cluster"}
 knitr::kable(data.frame(c("1","2", "3", "4", "5"),
-             c(mse1,mse2,mse3,mse4,mse5)), col.names = c("Cluster", "MSE"))
+             c(mse1,mse2,mse3,mse4,mse5)), col.names = c("Cluster", "MSE")
+             , format="latex", caption = "Table of the MSE prediction errors for each cluster")
 ```
 
 ## Lasso summary
@@ -136,6 +137,11 @@ it would probably not be included.
 Finally, the lasso can predict the seasonal patterns well, but when using the 
 precipitation averaged over the CAB, it fails to predict the higher values of seasonal amplitudes.
 
+```{r mse-lasso, fig.cap = 'Table of the MSE prediction errors for the different lasso models.'}
+knitr::kable(data.frame(c("lasso","standardized", "differentiated", "de-seasonalized"),
+             c(1314.92, 1214.49,1361.82,1809.46)), col.names = c("Model", "MSE"),
+             format="latex", caption = "Table of the MSE prediction errors for the different lasso models.")
+```
 
 
 

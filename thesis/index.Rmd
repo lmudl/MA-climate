@@ -2,37 +2,17 @@
 author: "Dario Lepke"
 site: bookdown::bookdown_site
 output:
-  bookdown::pdf_document2:
-    extra_dependencies: ["float"]
-    split_bib: FALSE
-    latex_engine: xelatex
-    includes:
-      in_header: "preamble-only.tex"
-      before_body: "body-only.tex"
-  pdf_document:
-    extra_dependencies: ["flafter"]
-    includes:
-      in_header: "preamble-only.tex"
-      before_body: "body-only.tex"
-    latex_engine: xelatex
   bookdown::pdf_book:
-    extra_dependencies: ["flafter"]
     split_bib: FALSE
     latex_engine: xelatex
     includes:
       in_header: "preamble-only.tex"
       before_body: "body-only.tex"
-  bookdown::gitbook:
-    # split_by: section
-    split_bib: FALSE
-  bookdown::html_document2:
-    split_bib: FALSE
 bibliography: ref-lib.bib
 biblio-style: apalike
 link-citations: yes
 documentclass: book
 lof: yes
-lot: yes
 ---
 # Introduction {-}
 

@@ -1,0 +1,230 @@
+# explain gamma 01 results
+```{r}
+setwd("Repos/MA-climate/")
+source("code/R/helper-functions.R")
+library(genlasso)
+model_folder <- "small-fused-1k-gamma-01"
+path_to_model <- paste0("results/CV-fused/", model_folder)
+model_list <- load_models(paste0("results/CV-fused/", model_folder, "/fold-models"))
+m1 <- model_list[[1]]
+ids <- readRDS(paste0(path_to_model, "/index-list.rds"))
+precip_cv <- readRDS("data/processed/precip_cv.rds")
+sst_cv <- readRDS("data/processed/small_sst_cv.rds")
+id1_test <- ids$test$Testing060
+id1_train <- ids$train$Training060
+
+s <- sdN(precip_cv[id1_train])
+m <- mean(precip_cv[id1_train])
+
+pr <- predict.genlasso(m1, Xnew = sst_cv[id1,])
+pr$fit # predictions scaled
+
+pr$fit2 <- apply(pr$fit, 2, function(x) x*s+m)
+plot(ts(pr$fit2[,1000]))
+plot(ts(precip_cv[id1]))
+
+
+comp_mse(precip_cv[id1_test], pr$fit[,1])
+plot(ts(precip_cv[id1]))
+plot(ts(pr$fit[,1000]))
+
+err_col <- apply(pr$fit, 2, function(x) comp_mse(scale(precip_cv[id1_test],
+                                                       scale=s,
+                                                       center=m), x))
+plot(err_col)
+plot(ts(scale(precip_cv[id1_test]), s))
+plot(ts(pr$fit[,1000]))
+
+err_col <- apply(pr$fit, 2, function(x) comp_mse(scale(precip_cv[id1_test]), x))
+plot(err_col)
+
+
+
+# lil test
+data(mtcars)
+#?mtcars
+f1 <- lm(mpg~., data=mtcars)
+f1$coefficients
+plot(density(mtcars$mpg))
+mtcars$mpg <- scale(mtcars$mpg, center = TRUE, scale = TRUE)
+plot(density(mtcars$mpg))
+f2 <- lm(mpg~.-1, data=mtcars)
+f1$coefficients[-1] == f2$coefficients
+
+
+#
+sd(precip_cv[ids$train$Training282])
+mean(precip_cv[ids$test$Testing282])
+
+for(i in 1:5) {
+  print(mean(precip_cv[ids$train[[i]]]))
+  print(mean(precip_cv[ids$test[[i]]]))
+}
+
+for(i in 1:5) {
+  print(sd(precip_cv[ids$train[[i]]]))
+  print(sd(precip_cv[ids$test[[i]]]))
+}
+
+# fold 2 
+m2 <- model_list[[2]]
+id2_test <- ids$test$Testing134
+id2_train <- ids$train$Training134
+
+s2 <- sdN(precip_cv[id2_train])
+m2 <- mean(precip_cv[id2_train])
+
+s2b <- sdN(precip_cv[id2_test])
+m2b <- mean(precip_cv[id2_test])
+
+pr2 <- predict.genlasso(m1, Xnew = sst_cv[id2_test,])
+pr2$fit # predictions scaled
+
+pr2$fit2 <- apply(pr2$fit, 2, function(x) x*s2+m2)
+plot(ts(pr2$fit2[,1000]))
+plot(ts(precip_cv[id2_test]))
+err_col2 <- apply(pr2$fit2, 2, function(x) comp_mse(precip_cv[id2_test], x))
+plot(err_col2)
+
+pr2$fit2b <- apply(pr2$fit, 2, function(x) x*s2b+m2b)
+plot(ts(pr2$fit2b[,1000]))
+plot(ts(precip_cv[id2_test]))
+err_col2b <- apply(pr2$fit2b, 2, function(x) comp_mse(precip_cv[id2_test], x))
+plot(err_col2b)
+min(err_col2b)
+
+f <- apply(pr2$fit, 2, function(x) comp_mse(scale(precip_cv[id2_test]), x))
+plot(ts(f))
+plot(ts(scale(pr2$fit[,1000])))
+plot(ts(scale(precip_cv[id2_test])))
+lines(ts(scale(pr2$fit[,1000])))
+
+# what if I only center and 
+
+#  possibility:
+# what if I only center
+
+pr2$fit3 <- apply(pr2$fit, 2, function(x) scale(x, center = TRUE,
+                                                scale = TRUE))
+plot(ts(scale(pr2$fit[,3])))
+plot(ts(scale(precip_cv[id2_test], center = TRUE, scale = TRUE)))
+err_col3 <- apply(pr2$fit3, 2, function(x) comp_mse(scale(precip_cv[id2_test],
+                                                          center=TRUE,
+                                                          scale = TRUE), scale(x)))
+plot(err_col3)
+
+```
+
+```{r}
+source("../code/R/helper-functions.R")
+library(genlasso)
+library(patchwork)
+model_folder <- "small-fused-1k-gamma-01"
+path_to_model <- paste0("../results/CV-fused/", model_folder)
+model_list <- load_models(paste0("../results/CV-fused/", model_folder, "/fold-models"))
+ids <- readRDS(paste0(path_to_model, "/index-list.rds"))
+precip_cv <- readRDS("../data/processed/precip_cv.rds")
+sst_cv <- readRDS("../data/processed/small_sst_cv.rds")
+```
+
+```{r}
+i <- 1
+mod <- model_list[[i]]
+id_train <- ids$train[[i]]
+id_test <- ids$test[[i]]
+
+sst_train <- sst_cv[id_train,]
+sst_test <- sst_cv[id_test,]
+
+precip_train <- precip_cv[id_train]
+precip_test <- precip_cv[id_test]
+
+preds <- predict(mod, Xnew=sst_test)
+
+s <- sdN(precip_train)
+m <- mean(precip_train)
+
+preds$fit_resc <- apply(preds$fit, 2, function(x) (x*s+m))
+
+#s2 <- sdN(precip_test)
+
+df <- data.frame(p1 = preds$fit_resc[,1], p1000 = preds$fit_resc[,1000],
+                 target = precip_test, ids = id_test)
+ggplot() +
+  geom_line(df, mapping=aes(x= ids, y=p1)) +
+  geom_line(df, mapping=aes(x=ids, y=p1000)) +
+  geom_line(df, mapping=aes(x=ids, y=target))
+
+
+```
+```{r}
+insp_func <- function(i) {
+  mod <- model_list[[i]]
+  id_train <- ids$train[[i]]
+  id_test <- ids$test[[i]]
+  
+  sst_train <- sst_cv[id_train,]
+  sst_test <- sst_cv[id_test,]
+  
+  precip_train <- precip_cv[id_train]
+  precip_test <- precip_cv[id_test]
+  
+  preds <- predict(mod, Xnew=sst_test)
+  
+  s <- sdN(precip_train)
+  m <- mean(precip_train)
+  
+  preds$fit_resc <- apply(preds$fit, 2, function(x) (x*s+m))
+  # errs <- apply(preds$fit_resc, 2, function(x) comp_mse(x, precip_test))
+  # ind <- which.min(errs)
+  
+  #s2 <- sdN(precip_test)
+  
+  df <- data.frame(p1 = preds$fit_resc[,1], p1000 = preds$fit_resc[,1000],
+                   target = precip_test, ids = id_test)
+  p1 <- ggplot() +
+    geom_line(df, mapping=aes(x= ids, y=p1)) +
+    geom_line(df, mapping=aes(x=ids, y=p1000)) +
+    geom_line(df, mapping=aes(x=ids, y=target))
+  p2 <- ggplot() +
+    geom_line(df, mapping=aes(x= ids, y=p1)) +
+    geom_line(df, mapping=aes(x=ids, y=p1000))
+  p <- p1 + p2
+  return(p)
+}
+```
+
+```{r}
+insp_func(1)
+```
+
+```{r}
+insp_func(2)
+```
+```{r}
+insp_func(3)
+```
+```{r}
+insp_func(4)
+```
+
+```{r}
+insp_func(5)
+```
+
+
+
+```{r}
+# plot learning
+i <- 1
+mod <- model_list[[i]]
+plot(ts(mod$fit[,1000]))
+plot(ts(mod$y))
+
+err <- apply(mod$fit, 2, function(x) comp_mse(x*s+m, (mod$y)*s+m))
+plot(ts(err))
+which.min(err)
+
+```
+
+

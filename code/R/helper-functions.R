@@ -2581,7 +2581,7 @@ replot_coef_plots_fused <- function(model, h, drop_out=FALSE, path_to_model_fold
     plt1 <- plot_nonzero_coefficients(coef_mat1)
     plt1$layers[[2]]$aes_params$size <- 0.75
     plt1 <- plt1 + scale_colour_gradient2(name="Coefficients")
-    #saveRDS(plt, paste0(save_to, "/coef-plots/", "coef-plot-drop-out-full.rds"))
+    #saveRDS(plt1, paste0(save_to, "/coef-plots/", "coef-plot-drop-out-full.rds"))
     ggsave(paste0(save_to, "/coef-plots/", "coef-plot-drop-out-full1.png"), plt1,
            width = 7, height = 7)
     
@@ -2598,7 +2598,7 @@ replot_coef_plots_fused <- function(model, h, drop_out=FALSE, path_to_model_fold
   plt <- plt + scale_colour_gradient2(name="Coefficients")
   ggsave(paste0(save_to, "/coef-plots/", "coef-plot-full.png"), plt,
          width = 7, height = 7)
-  
+  saveRDS(plt, paste0(save_to, "coef-plots/", "coef-plot-full.rds"))
   print("coef plots saved")
 }
 

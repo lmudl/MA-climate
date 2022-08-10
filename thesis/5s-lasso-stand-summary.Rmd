@@ -1,4 +1,4 @@
-### standardized lasso {#lasso-stand}
+### Standardized lasso {#lasso-stand}
 ```{r}
 library(patchwork)
 library(ggpubr)
@@ -78,26 +78,26 @@ pred_plot_1 + pred_plot_2 + pred_plot_3 + pred_plot_4 +
   pred_plot_5
 ```
 The predictions on the test set are similar to those from the normal lasso,
-in fold 4 the peak is predicted exactly (\@ref(fig:pred-plot-fold-lasso)). The Model from fold 2 underestimates 
-more than the respective fold model from the lasso without standardization (see \@ref(fig:pred-plot-fold-lasso)).
+in fold 4 the peak is predicted exactly (\@ref(fig:pred-plot-fold-lasso-stand)). The Model from fold 2 underestimates 
+more than the respective fold model from the lasso without standardization (see \@ref(fig:pred-plot-fold-lasso-stand)).
 
 ```{r pred-plot-full-lasso-stand, fi.cap="Precipitation prediction and target values in the validation set. Predictions in red and target values in black. The model was fitted on the full CV data with the lambda value that minimised the average MSE"}
 full_preds <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-full.rds"))
 full_preds
-mse_full <- get_mse_from_pred_plot(full_preds)
-mse_full
+#mse_full <- get_mse_from_pred_plot(full_preds)
+#mse_full
 ```
 The predictions from the full model of the standardized lasso show
 the same behavior as the ones found in the lasso without standardization.
-Again seasonal patterns are predicted well but largest values are underestimated (\@ref:coef-plot-full-lasso-stand).
+Again seasonal patterns are predicted well but largest values are underestimated (\@ref(fig:coef-plot-full-lasso-stand)).
 
 ```{r coef-plot-full-lasso-stand, fig.cap=paste("Coefficient plot of the full lasso model with fitted intercept of", intercept)}
 coef_full <- readRDS(paste0(path_to_model_folder,
                      "coef-plots/coef-plot-full.rds"))
 coef_full + theme(legend.position = "bottom")
 ```
-\@ref:coef-plot-full-lasso-stand shows now the coefficient plot for the standardized lasso,
+Figure \@ref(fig:coef-plot-full-lasso-stand) shows now the coefficient plot for the standardized lasso,
 the coefficient values are given on the standardized scale.
 The range of coefficient values is more symmetric around the 0 than for first lasso model
 and the locations differ as well. For example the two locations at pacific coast of
-South America are not included in the model here (compare \@ref:coef-plot-full-lasso-og).
+South America are not included in the model here (compare \@ref(fig:coef-plot-full-lasso-og)).

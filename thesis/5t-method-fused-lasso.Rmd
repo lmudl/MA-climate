@@ -204,8 +204,3 @@ can be used to improve efficiency when
 When $D$ is the incidence matrix of a graph, then $D^TD$ is the Laplacian matrix of G.
 The Laplacian linear systems are then solved using a sparse Cholesky decomposition.
 For further details of the steps used in our case refer to Section 4 and 5 in @arnold2016efficient.
-
-
-
- 
-# References 

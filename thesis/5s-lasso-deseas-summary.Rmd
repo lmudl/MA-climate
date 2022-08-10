@@ -1,4 +1,4 @@
-### deseas lasso {#lasso-stand}
+### De-seasonalized lasso {#lasso-deseas}
 ```{r}
 library(patchwork)
 library(ggpubr)
@@ -30,7 +30,7 @@ err_bars_plot
 ```
 
 Initially with decreasing regularization the MSE decreases as well
-before it reaches its minimum and stays fairly constant afterwards (\@ref:(err-bar-plot-lasso-deseas)). The minimum average MSE achieved is
+before it reaches its minimum and stays fairly constant afterwards (\@ref(fig:err-bar-plot-lasso-deseas)). The minimum average MSE achieved is
 higher than in the lasso with and without standardization (minimum average MSE here `r round(mm,2)`).
 In the decreasing area from the start of the path
 until its minimum, the size of the error bar increases.
@@ -80,27 +80,33 @@ pred_plot_1 + pred_plot_2 + pred_plot_3 + pred_plot_4 +
   pred_plot_5
 ```
 
-In \@ref(fig:pred-plot-fold-lasso-deseas) we observe that the predictions
-are quite different from the other models so far (\@ref{lasso-og}, \@ref{lasso-stand}).
-Folds 1 and 2 are not predicted accurately and in general the predictions
-are less smooth and don't work as well as in the other two models,
-which is also reflected in the higher average MSE minimum in \@ref(fig:err-bar-plot-lasso-deseas)
 
 ```{r pred-plot-full-lasso-deseas, fi.cap="Precipitation prediction and target values in the validation set. Predictions in red and target values in black. The model was fitted on the full CV data with the lambda value that minimised the average MSE"}
 full_preds <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-full.rds"))
 full_preds
 mse_full <- get_mse_from_pred_plot(full_preds)
-mse_full
+#mse_full
+```
+
+In \@ref(fig:pred-plot-fold-lasso-deseas) we observe that the predictions
+are quite different from the other models so far,
+Folds 1 and 2 are not predicted accurately and in general the predictions
+are less smooth and don't work as well as in the other two models,
+which is also reflected in the higher average MSE minimum in \@ref(fig:err-bar-plot-lasso-deseas)
+```{r coef-plot-full-lasso-deseas, fig.cap=paste("Coefficient plot of the full lasso model with fitted intercept of", intercept)}
+coef_full <- readRDS(paste0(path_to_model_folder,
+                     "coef-plots/coef-plot-full.rds"))
+coef_full + theme(legend.position = "bottom")
 ```
 
 The final predictions appear to be less smooth than in the other models so far
 (lasso with and without standardization), but generally as well
 underestimate the higher values in the data and overestimate low values
-around month 415 (\@ref(fig:pred-plot-full-lasso-deseas)).
+around month 415.
 We see somehow better predictions for the peak in the first month of the
 validation period.
-The amplitude in the seasonal patterns of the predictions decrease faster than
-in \@ref(fig:pred-plot-full-lasso-og) and \@ref(fig:pred-plot-full-lasso-stand).
+The amplitude in the seasonal patterns of the predictions decrease faster than for example
+in \@ref(fig:pred-plot-full-lasso-og).
 Note that in our forward validation setting, the seasonality used to de-seasonalize the validation data is the last year of the training set.
 While during the forward validation phase, when we search for the optimal $\lambda$ to refit the full model, the test sets are smaller hence relate to shorter time periods.
 For the validation data we actually have 5 years that are de-seasonalized
@@ -109,12 +115,8 @@ might not be acccurate any more if the seasonality in later years of the validat
 This might be an explanation why predicting the seasonal precipitation patterns in the later years become less reliable.
 
 
-```{r coef-plot-full-lasso-deseas, fig.cap=paste("Coefficient plot of the full lasso model with fitted intercept of", intercept)}
-coef_full <- readRDS(paste0(path_to_model_folder,
-                     "coef-plots/coef-plot-full.rds"))
-coef_full + theme(legend.position = "bottom")
-```
+
 The model using de-seasonalized SST data chooses many regions in the highest
-latitudes and few regions around the equator (\@ref(fig:\@ref(fig:pred-plot-full-lasso-og))).
+latitudes and few regions around the equator (\@ref(fig:pred-plot-full-lasso-og))).
 Many coefficients of opposite signs can appear quite close to another,
 espicially in the higher latitudes.

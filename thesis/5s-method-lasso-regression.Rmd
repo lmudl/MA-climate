@@ -3,7 +3,7 @@ output:
   html_document: default
   pdf_document: default
 ---
-# LASSO Regression
+# The lasso
 
 ## Introduction
 We want to create a model that has predictive and
@@ -16,7 +16,7 @@ One possible model for the problem at hand is a LASSO regression model.
 In general for the linear model:
 
 \begin{equation}
-y_i = \beta_0 + \pmb{x}_i^T\pmb{\beta} + \epsilon_i (\#eq:lm-gen)
+y_i = \beta_0 + x_i^T\beta + \epsilon_i (\#eq:lm-gen)
 \end{equation}
 
 see \@ref(eq:lm-gen)
@@ -184,7 +184,8 @@ independent and the relationship between SST and precipitation
 might even be time-evolving. Splitting the data randomly would therefore
 destroy its time structure.
 To still make use a validation scheme related to cross-validation we choose
-a *5-fold rolling window forward validation* (see \@ref(fig:validation-scheme)),
+a *5-fold rolling window forward validation* (see  @schnaubelt2019comparison for a graphical comparison of the
+different approaches),
 but choose to arrange the fold such that they don't overlap in time.
 This gives a compromise between number of models fitted, size of model in each
 fold and keeping the dependence structure in the data intact.

@@ -32,7 +32,7 @@
 #   plt <- plot_nonzero_coefficients(coef_mat)
 #   return(plt)
 # }
-
+b
 replot_coef_plots_lasso(m1, best_l_id)
 saveRDS(plt, save_to, "/coef-plots/coef-plot-full.rds")
 
@@ -46,7 +46,7 @@ m <- readRDS("results/CV-fused/noclust-large-fused-5k/full-model.rds")
 source("code/R/helper-functions.R")
 library(ggplot2)
 #together("results/CV-fused/noclust-large-fused-5k/")
-path_to_model_folder <- "results/CV-fused/noclust-large-fused-5k-gamma-005/"
-# debug(together)
+path_to_model_folder <- "results/CV-fused/noclust-large-fused-5k/"
+#debug(together)
 together(path_to_model_folder, drop_out=FALSE)
-together(path_to_model_folder, drop_out=TRUE)
+#together(path_to_model_folder, drop_out=TRUE)

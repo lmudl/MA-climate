@@ -3,14 +3,14 @@ output:
   html_document: default
   pdf_document: default
 ---
-# EDA
+# Explorative analysis
 
 In this chapter, we will explore the values of the precipitation
 and SST data for the common observation period from 1981 until 2016.
 We analyze the data from three perspectives. Firstly the raw values without time or spatial dependency, second the mean and standard deviation for each spatial grid cell for the whole time series and then the mean and standard deviation for each grid cell
 but for each month of the year separately.
 
-## EDA precipitation
+## Precipitation
 
 Here we study the time series of precipitation in the
 Central Amazon Basin.
@@ -136,7 +136,7 @@ precip_mean_arrange
 ```
 
 
-```{r sd-precip-month, fig.cap="Mean precipitation values at each location, shown for the different months of a year separately. The white line on the scale at the side of the plots indicates the mean of the respective quantity"s}
+```{r sd-precip-month, fig.cap="Mean precipitation values at each location, shown for the different months of a year separately. The white line on the scale at the side of the plots indicates the mean of the respective quantity"}
 precip_sd_arrange <- readRDS("../results/eda/precip_sd_arrange.rds")
 precip_sd_arrange
 ```

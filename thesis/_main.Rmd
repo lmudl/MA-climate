@@ -1,0 +1,2750 @@
+---
+author: "Dario Lepke"
+site: bookdown::bookdown_site
+output:
+  bookdown::pdf_book:
+    split_bib: FALSE
+    latex_engine: xelatex
+    includes:
+      in_header: "preamble-only.tex"
+      before_body: "body-only.tex"
+bibliography: ref-lib.bib
+biblio-style: apalike
+link-citations: yes
+documentclass: book
+lof: yes
+---
+# Introduction {-}
+
+```{r, include=FALSE}
+knitr::opts_chunk$set(echo=FALSE, warning = FALSE, message = FALSE, out.width = '50%', fig.align = 'center')
+options(knitr.duplicate.label = "allow")
+```
+
+With future climate change drought in the Amazon forest may become more
+frequent and severe. Rain shortages can turn Amazon regions from rain forests into
+savanna, leading to high amounts of carbon released into the atmosphere.
+Therefore, predicting future rainfall and understanding the underlying mechanisms 
+are of great interest. @ciemer2020early established an 
+early warning indicator for water deficits in the central Amazon basin (CAB) based on tropical Atlantic sea surface 
+temperatures (SSTs). Inspired by their work, this thesis aims to build up on this work and improve its
+predictive power by using different statistical methods.
+Here we seek to build a model that can predict monthly precipitation based on the
+sea surface temperatures. 
+Also, we want to identify the most important sea regions for doing so, making interpretability a point of interest, too.
+Firstly we will analyze the data descriptively to 
+explore patterns and spatial dependencies.
+Including a cluster analysis of the precipitation data
+in the central Amazon basin.
+Following, we will compare two different regression approaches
+and their capability to predict precipitation and their interpretability of the SST regions selected by them.
+The first model is the lasso, as proposed by @tibshirani1996regression. Comparing different model specifications, we will carry on the findings from the lasso
+and fit a (sparse) fused lasso on the data (@tibshirani2005sparsity).
+Both models are evaluated using a 5-fold forward selection,
+a model evaluation technique that considers the time dependencies present in the data at hand.
+Finally, we summarize the findings in this work 
+and give an overview of strengths and limitations of the approaches used together with ideas for future research.
+
+
+This thesis was written and supervised in cooperation with Dr. Niklas Boers from the Potsdam Institute for Climate Impact Research (@PIC) and Dr. Fabian Scheipl (LMU).
+
+<!--chapter:end:index.Rmd-->
+
+# Related work 
+
+As already mentioned, the paper by @ciemer2020early created an early warning
+indicator for Amazon droughts using a complex network approach.
+They used two datasets, one for the sea surface temperatures (@smith2008improvements) and one for
+the precipitation (@funk2015climate), with monthly data from 1981 until 2016. The data can be downloaded in netcdf format and manipulated conveniently with Climate Data Operators (CDO, @schulzweida2019cdo). We can use CDO with wrappers for R and Python. The data is organized on a longitude/latitude grid.  
+By applying coupled networks, they identified 4 oceanic regions that correlate the most with rain in the amazon basin.
+Figure \@ref(fig:cross) shows the cross degree of SST and rainfall in the central Amazon basin (CAB, blue box) for positive and negative correlations. Darker shades indicate a more significant cross degree, hence a larger number of links and correlations with rainfall at more grid points in the CAB.  
+The correlations are measured using a spearman rank-order correlation coefficient.
+
+\begin{equation}
+ \rho = 1 - \frac{6\sum\Delta_{R_i}^2}{n(n^2-1)} .
+(\#eq:spearman-rank)
+\end{equation}
+
+Where $\Delta_{R_i}$ denotes the rank differences of observation at the same time $i$ and $n$ is the number of observations.
+An adjacency matrix describes the resulting network, where they chose threshold $p_{th}$, so that the network only represents the strongest 10% of correlations as links in the network.
+
+\begin{equation}
+A_{ij} = \begin{cases}0 \textrm{ } p_{ij} < p_{th}\\ 1 \textrm{ } p_{ij}\geq p_{th}\\\end{cases}  .
+(\#eq:adj-mat)
+\end{equation}
+
+The cross degree then gives the strength of correlation between a specific grid point $i$ of network $V_l$ (oceanic grid point) and another (sub)network $V_m$ (all grid points $j$ in the central amazon basin)
+
+\begin{equation}
+k_{i}^{lm} = \sum\limits_{j \in V_m} A_{ij}, i \in V_l\  .
+(\#eq:cross-deg)
+\end{equation}
+
+```{r cross, echo = FALSE, fig.align = 'center', out.width = '50%', fig.cap='Cross degree between sea surface temperature and continental rainfall anomalies. For each grid cell of sea surface temperature in the Atlantic and Pacific, the cross degree towards rainfall in the Central Amazon Basin (blue box) is shown, for a positive correlations and b negative correlations. Darker shading indicates a larger cross degree, implying a larger number of links and thus significant correlations with rainfall at more grid points in the Central Amazon Basin. Red areas outline coherent oceanic regions with a the 20\\% highest cross degrees for positive correlations, found in the Southern Pacific Ocean (SPO) and Southern Tropical Atlantic Ocean (STAO), and b the 20\\% highest cross degrees for negative correlations, found in the Central Pacific Ocean (CPO) and Northern Tropical Atlantic Ocean (NTAO) (Ciemer et al. (2020))'}
+knitr::include_graphics("../figures/cross-degree.jpg")
+```
+
+They further explore the relationship by constructing (weighted) networks for sliding windows of 24 months between the Central Amazon Basin and each ocean region. For each month except for the first two years, an individual network is computed based on the data of the previous 24 months.
+Then they took the average of the cross-correlations for each network, giving a new time series of average cross-correlation (ACC) values.
+Each ACC summarizes the connectivity of one region with the CAB for the last 24 months.  
+They found that NTAO and STAO gave the strongest signal. Hence they applied the same sliding window coupled network approach between the ocean regions NTAO and STAO.
+Before, they computed networks between the ocean and continental regions. Now it is defined between these two Atlantic regions, NTAO and STAO.  
+Figure \@ref(fig:early) shows the resulting time series and its comparison to the drought index time series.
+They found that using an ACC threshold for a drought (SPI below -1.5) lets them
+forecast 6 of the 7 droughts in the observation period, missing the 2005 drought, while also giving one false alarm in 2002. 
+
+```{r early, echo = FALSE, fig.align='center' ,out.width='75%', fig.cap='Early-warning signal for droughts in the central Amazon basin. We compare the time evolution of the average cross-correlation of the Northern Tropical Atlantic Ocean (NTAO) and Southern Tropical Atlantic Ocean (STAO), given by the blue curve, with the standardized precipitation index (SPI, orange) of the central Amazon basin. Orange dips indicate a negative SPI with a threshold for severely dry periods (SPI -1, dotted red line). We expect a drought event within the following one and a half years whenever the average cross-correlation between NTAO and STAO SST anomalies falls below an empirically found threshold of -0.06. Green circles indicate a matching forecast based on the Atlantic SST correlation structure, with one false alarm in 2002 indicated by a grey circle, where the threshold is crossed, but no drought took place in the direct aftermath (see Discussion). The temporal evolution of the average cross-correlation shown here is smoothed using a Chebyshev type-I low-pass filter with a cutoff at 24 months (Ciemer et al. (2020)).'}
+knitr::include_graphics("../figures/early-warning-signals.jpg")
+```
+
+
+The work by @ciemer2020early shows potential forecasting capabilities and limitations.
+While they could predict 5 out of 6 drought events, they also gave one false negative and one false positive result. Their work used a complex network approach that was applied stepwise (first two unweighted networks, then two weighted networks
+, and end a dichotomous threshold decision rule). For the thesis, we would like
+to create a more general predictive model that can learn the relationship between the
+SSTs and rainfall in the CAB. As already mentioned, the first step will be a lasso model. The classic lasso only chooses single points in the ocean as predictors, though. But our motivation is to discover predictive regions and not only single, separated points.
+Therefore in the next step we make use of a generalized form of the LASSO that also considers that chosen predictors should be close to each other. This model is the so-called fused lasso.  
+For the models, we also need a form of evaluation. Classic Cross-Validation assumes the independence of the observations, and in our setting this is clearly violated due to the time dependency of the data.
+We explore different possibilities to use an adjusted form of Cross Validation that considers this characteristic.
+<!-- Depending on how well the relationship between SST and rain can be established, we can take this a step further and use it as a so called "Emergent Constraint" (EC). -->
+<!-- Since different climate models give different answers about future climate  -->
+<!-- there is a need to narrow this "spread", which can be done by ECs. -->
+<!-- To do so, we need a plausible relationship between a Variable X and Y (here: SST and drought).   -->
+<!-- According to how well the relationship is represented in a climate model we  -->
+<!-- assign "credibility" to a climate model's future projections  -->
+<!-- (here: projections of future droughts in the Amazon rain forest).  -->
+<!-- In summary this can be used to reduce uncertainty in the ensemble of  -->
+<!-- climate models' future projections, f.e by using ML techniques as done by -->
+<!-- @schlund2020constraining. -->
+
+<!--chapter:end:1a-related-work.Rmd-->
+
+---
+output:
+  html_document: default
+  pdf_document: default
+---
+# Explorative analysis
+
+In this chapter, we will explore the values of the precipitation
+and SST data for the common observation period from 1981 until 2016.
+We analyze the data from three perspectives. Firstly the raw values without time or spatial dependency, second the mean and standard deviation for each spatial grid cell for the whole time series and then the mean and standard deviation for each grid cell
+but for each month of the year separately.
+
+## Precipitation
+
+Here we study the time series of precipitation in the
+Central Amazon Basin.
+The CHIRPS data set contains the precipitation data, created from in-situ and satellite measurements (@funk2015climate). It can be downloaded for example, from [here](https://www.chc.ucsb.edu/data/chirps).
+It contains observations from 1981 to 2016 and comes on a high resolution of 0.05 grid, which we aggregate to a 0.5 grid.
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo=FALSE, warning = FALSE, message = FALSE)
+#knitr::opts_chunk$set(fig.pos = "!H", out.extra = "")
+
+#knitr::opts_knit$set(root.dir="../")
+```
+
+
+```{r}
+library(ggplot2)
+library(sf)
+library(rnaturalearth)
+library(rnaturalearthdata)
+library(raster)
+library(patchwork)
+library(ggpubr)
+```
+
+```{r}
+source("../code/R/helper-functions.R")
+```
+
+```{r, include=FALSE}
+world <- ne_countries(scale = "medium", returnclass = "sf")
+# class(world)
+theme_set(theme_bw())
+```
+
+
+In \@ref(fig:CAB) we show the area of the Central Amazon Basin that is object of our study.
+
+```{r CAB, echo=FALSE, fig.cap="Location of the area under study. The central amazon basin (CAB) spanning across 0,-10 latitude and -70,-55 longitude", fig.align='center',out.width='50%'}
+cab_square_plot <- readRDS("../results/eda/cab_square_plot.rds")
+cab_square_plot + ggtitle("Location of area under study, central Amazon basin (CAB)")
+```
+
+```{r}
+precip_dens_plot <- readRDS("../results/eda/precip_dens_plot.rds")
+```
+
+
+Firstly we plot precipitation values in general in Figure \@ref(fig:precip-dens)
+Its form is a uni-modal, right-skewed density.
+The values range from 0 up to `r round(max(precip_dens_plot$data$value))`, but only few observations take these high values, forming a large tail.
+This might be a indication for large outliers in the data or due to 
+some locations with very high precipitation values in general.
+
+```{r precip-dens, out.width='50%', fig.cap="Density of the raw precipitation values without time or spatial dependency.", fig.align='center'}
+(precip_dens_plot + ylab("Precipitation") + xlab("Density") + ggtitle("Density of raw precipitation values"))
+```
+```{r , fig.cap="Precipitation mean at each location. The mean was computed over the whole time period"}
+precip_means_loc_plot <- readRDS("../results/eda/precip_means_loc_plot.rds")
+precip_means_loc_plot$labels$title <- NULL
+precip_means_loc_plot$labels$fill <- "Mean"
+# precip_means_loc_plot
+# precip_means_loc_plot + theme(panel.background = element_rect(fill='transparent'),
+#          plot.background = element_rect(fill='transparent', color=NA),
+#          panel.grid.major = element_blank(),
+#          panel.grid.minor = element_blank(),
+#          legend.background = element_rect(fill='transparent'),
+#          legend.box.background = element_rect(fill='transparent'))
+# precip_means_loc_plot + scale_fill_gradient2(low="brown", high ="dark green", midpoint = mean(precip_means_loc_plot$data$val, na.rm = TRUE))
+```
+```{r, eval=FALSE, include = FALSE, fig.cap="Density of means, means were computed for each location over the whole time period"}
+(precip_mean_dens_plot <- readRDS("../results/eda/precip_means_dens_plot.rds"))
+```
+```{r, fig.cap="Precipitation standard deviation at each location. The standard deviation was computed over the whole time period"}
+precip_sds_loc_plot <- readRDS("../results/eda/precip_sds_loc_plot.rds")
+precip_sds_loc_plot$labels$fill <- "SD"
+```
+```{r, eval = FALSE, fig.cap="Density of standard deviations, standard deviations were computed for each location over the whole time period"}
+(precip_sds_dens_plot <- readRDS("../results/eda/precip_sds_dens_plot.rds"))
+```
+```{r, mean-sd-precip, fig.cap= "Mean and standard deviation at each location. The standard deviation was computed over the whole time period. The white line on the scale at the side of the plots indicates the mean of the respective quantity", fig.align='center', out.width='50%'}
+p <- precip_means_loc_plot +  precip_sds_loc_plot  +
+  plot_annotation("Precipitation mean and SD at each CAB location")
+p
+```
+
+As we can see in Figure \@ref(fig:mean-sd-precip) most locations have a mean precipitation of around 200 mm/month, over
+the whole time series. Regionally in the "upper left" corner of the Amazon Basin,
+mean precipitation is higher or equal to the mean. The reference
+point for "higher" is the mean of the location means. This region seems to be more
+or less spatially consistent. The rest of the region with lower mean precipitation
+has also some small areas where precipitation is again a little bit higher. 
+For example in the upper right corner and on the bottom, right of the middle.
+For the standard deviation we also see regional patterns. These patterns overlap
+with the regions of the mean but their magnitude is flipped. Meaning,
+in the upper left where we observe larger mean values we generally observe lower
+standard deviation and in the lower and upper right corners, higher standard 
+deviations.
+We see spatial patterns of the mean evolving over time in (Figure \@ref(fig:mean-precip-month)).
+For example: From May until August there is a spatial separation in
+two parts that dissolves in September.
+As expected there is a large seasonal component regarding the means.
+For the standard deviation we see as well large differences in values 
+during different months of the year (Figure \@ref(fig:sd-precip-month).
+
+```{r, eval = FALSE}
+(precip_mean_dens_plot + ggtitle("Density of means")) + (precip_sds_dens_plot + ggtitle("Density of sd"))
+```
+```{r, eval= FALSE, include=FALSE}
+a <- readRDS("../results/eda/precip_trends_loc_lm_plot.rds")
+b <- readRDS("../results/eda/precip_trends_loc_stl_plot.rds")
+a + b
+```
+```{r, eval = FALSE, include = FALSE}
+(precip_trends_loc_stl_plot <- readRDS("../results/eda/precip_trends_loc_stl_plot.rds"))
+```
+```{r mean-precip-month, fig.cap="Mean precipitation values at each location, shown for the different months of a year separately. The white line on the scale at the side of the plots indicates the mean of the respective quantity"}
+precip_mean_arrange <- readRDS("../results/eda/precip_mean_arrange.rds")
+precip_mean_arrange
+# precip_mean_arrange$labels$fill <- "Mean"
+# annotate_figure(precip_mean_arrange,
+#                 top = text_grob("TEST"))
+# precip_mean_arrange$labels
+```
+
+
+```{r sd-precip-month, fig.cap="Mean precipitation values at each location, shown for the different months of a year separately. The white line on the scale at the side of the plots indicates the mean of the respective quantity"}
+precip_sd_arrange <- readRDS("../results/eda/precip_sd_arrange.rds")
+precip_sd_arrange
+```
+
+
+
+<!--chapter:end:1b-EDA-precip.Rmd-->
+
+## Glyph plots
+
+```{r, echo=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(warning = FALSE)
+knitr::opts_chunk$set(out.width = '75%', fig.align = 'center')
+```
+
+This section provides a graphical presentation of the precipitation data known as glyph plots.
+The idea of glyph maps, its application and general implementation that were
+used in this section are taken from @:wickham2012glyph.
+Glyph maps use a small icon or *glyph* to show multiple values at each location.
+In our case, we show a complete time series at each location instead
+of just single values. Different techniques can then be used compare the time series 
+between all locations or their individual shape on a local scale.
+We will show seasonal, de-seasonalized, and de-seasonalized data on a local scale.
+Seasonal time series are computed by computing the averages of each month on each location.
+Each seasonal time series therefore has only 12 values and can be plotted without smoothing.
+The de-seasonalized time series are computed by omitting the seasonal effects on each
+time series for the *complete* observation period 
+and therefore has to be smoothed to be visually inspectable.
+The de-seasonalized time series then can be used to compare the time series for each location
+on a common or local scale. On the common scale all values are displayed on the same axis range,
+while on the local scale the axis are changed so that their ranges refer to the range on the respective
+location.
+Rescaling is done as follows
+
+\begin{equation}
+x_{rescaled} = \frac{x - \min(x)}{\max(x) - \min(x)}.
+(\#eq:rescale)
+\end{equation}
+
+This will help us to see the changes in value at each location *relative* to the range
+of the values at the same location.
+But this also means that interpreting these plots has to be done carefully because,
+in this form of display, large difference might actually refer to only small changes in
+absolute values. It can be due to the small range of values at that location in general,
+that these changes seem to be large.
+To aid the interpretation of these plots we can use color shadings to draw attention to
+areas in which ranges are large, meaning larger differences in their relative values also 
+point to larger differences in their absolute values (i.e unscaled values, values on the global scale).
+Therefore locations with large ranges are shaded in lighter colors and smaller ranges are shaded
+in dark color, to make the lighter shaded areas more easily visible.
+
+To improve readability of glyph maps, one can also add boxed for each glyph as well as reference lines for global means. This way the trajectory of the glyphs can be viewed in comparison to the overall
+mean directly.
+
+
+```{r}
+#pathtoplots = ptp
+library(ggplot2)
+library(ggtext)
+ptp <- "../results/"
+```
+
+
+```{r,glyph-seasonal, fig.cap="Glyph map of seasonal precipitaton pattern. Each location is presented by a time series. The time series are seperated by boxes. The gray reference lines inside the boxes show the mid-range for easier comparison."}
+seasonal_plot <- readRDS(paste0(ptp, "seasonal_plot.rds"))
+seasonal_plot + ggtitle("Glyph map of seasonal precipitation patterns (averages for each month)") +
+  theme(plot.title = element_textbox_simple())
+```
+
+The above figure is a glyph-map of seasonal precipitation
+patterns (averages for each month) in the Central Amazon Basin.
+The gray reference lines show the mid-range for easier comparison
+of the patterns.
+We see differences in the seasonal patterns across the map.
+In the upper left for example, the seasonal patterns stay
+above mid-range while on the bottom-left they have values
+clearly towards the low end of the range. 
+Also some areas have multimodal patterns.
+The patterns differ in range and month of maximum and minimum precipitation.
+
+
+
+```{r, glyph-deseasonal,fig.cap="Glyph map of de-seasonalised and smoothed precipitation. Each location is presented by a time series. The time series are seperated by boxes. The gray reference lines inside the boxes show the mid-range for easier comparison. The time series are scaled globally, same positions inside the cells correspond to the same values in all locations."}
+smoothed_plot <- readRDS(paste0(ptp, "smoothed_plot.rds"))
+smoothed_plot + ggtitle("Glyph map of smoothed de-seasonalised monthly precipitation") +
+  theme(plot.title = element_textbox_simple())
+```
+
+This plot shows the smoothed de-seasonalized monthly precipitation, after global scaling. The same position
+within each cell corresponds to the same value in all locations.
+Some areas have almost a linear course, increasing, decreasing
+or constant. Others show a more "wiggly" courses.
+As overall pattern we can see that the forms of the patterns
+have a spatial connection, patterns are close to similar patterns,
+at the same latitude.
+Also regarding latitude the closer to the equator the less precipitation.
+
+```{r, glyph-scale,fig.cap="Glyph map of de-seasonalised and smoothed precipitation. The time series are scaled locally, ranges are not the same in all cells. The different ranges are given in color shades, where lighter shading indicates a larger range and darker shades smaller ranges."}
+smoothed_scaled_colour_plot <- readRDS(paste0(ptp, "smoothed_scaled_colour_plot.rds"))
+smoothed_scaled_colour_plot + ggtitle("Glyph map of smoothed de-seasonalised monthly precipitation, locally scaled") +
+  #theme(plot.title = element_textbox_simple()) +
+  theme(legend.position = "bottom") 
+```
+
+Now we inspect the glyph-map with de-seasonalized locally scaled values. This form of scaling emphasizes the individual shapes.
+Because of the applied scaling, big patterns may be just be tiny effects. Therefore colors are added according to range.
+Areas with lighter color have larger ranges than darker areas.
+The areas with steep linear increases and decreases have smaller ranges than or example the areas below -2.5 latitude in the left.
+
+The results of the precipitation glyphs indicate that the CAB might be separable in 
+different regions. If we can find a way to quantify the differences in these regions
+and separate them into clusters, we could then apply our regression models 
+to each of these clusters and eventually improve model accuracy on each region
+as compared to the complete are on average.
+Therefore in a later section we will discuss and apply clustering algorithms to
+the precipitation data.
+But for now we will have a look at the SST data.
+
+```{r}
+knitr::opts_chunk$set(out.width = '50%', fig.align = 'center')
+
+```
+
+
+<!--chapter:end:1c-glyph-plots.Rmd-->
+
+---
+output:
+  pdf_document: default
+  html_document: default
+---
+## Sea surface temperature
+
+We explore the sea surface temperature data set used in the paper by @ciemer2020early. 
+ERSST (Extended Reconstructed Sea Surface Temperature, @huang2017noaa) is a reanalysis of observed data given in the International Comprehensive Ocean-Atmosphere Data Set (ICOADS), which contains observations from 1800 until 2016, made by ships and buoys, for example.
+The data comes on a 2x2 degree grid, where data was missing they used interpolation techniques.
+The file contains two variables that are measured across different dimensions.
+The two variables consist of the sea surface temperatures and the respective SST anomalies (with respect to the 1971-2000 monthly climatology). Here we analyze the raw SST values since they compute the anomalies compared to a climatology that spans a time frame we will use
+in the analysis. Therefore, the anomalies would eventually introduce information
+leakage because future values were used for fitting the model during the training process.
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(echo=FALSE, warning = FALSE, message = FALSE,
+                      fig.align='center')
+
+```
+
+```{r}
+library(ggplot2)
+library(sf)
+library(rnaturalearth)
+library(rnaturalearthdata)
+library(raster)
+library(patchwork)
+library(ggpubr)
+```
+
+```{r}
+source("../code/R/helper-functions.R")
+```
+
+
+
+As first impression of the SST data we show the density of the raw values (Figure \@ref(fig:sst-dens)).
+A large proportion of the data has temperatures around the null,
+which we can account to the sea regions close to the Antarctic. Temperatures
+between 0 and 20 degrees are rather evenly distributed, for tropical 
+monthly SST the number of observations increases again.
+
+```{r sst-dens, out.width='50%', fig.cap='Density plot of the raw SST values'}
+sst_dens_plot <- readRDS("../results/eda/sst_dens_plot.rds")
+sst_dens_plot <- sst_dens_plot + ggtitle("Density of raw SST values") +
+  ylab("Density") + xlab("SST")
+sst_dens_plot
+```
+
+```{r, }
+sst_means_loc_plot <- readRDS("../results/eda/sst_means_loc_plot.rds")
+sst_means_loc_plot <- sst_means_loc_plot + ggtitle(NULL)
+sst_means_loc_plot$labels$fill <- "Mean"
+sst_means_loc_plot <- sst_means_loc_plot + scale_fill_gradient2(low = "blue", high = "red", midpoint=mean(sst_means_loc_plot$data$val, na.rm=TRUE))
+```
+
+```{r, eval = FALSE}
+(sst_mean_dens_plot <- readRDS("../results/eda/sst_means_dens_plot.rds"))
+```
+
+```{r, fig.cap="SST standard deviation at each location. We computed the standard deviation over the whole time period"}
+sst_sds_loc_plot <- readRDS("../results/eda/sst_sds_loc_plot.rds")
+#sst_sds_loc_plot$labels$fill <- "SD"
+# sst_sds_loc_plot <- sst_sds_loc_plot + scale_fill_gradient2(low = "blue", high = "red", midpoint=mean(sst_sds_loc_plot$data$val, na.rm=TRUE))
+```
+
+```{r, eval = FALSE, fig.cap="Density of standard deviations, we computed the standard deviations for each location over the whole time period"}
+(sst_sds_dens_plot <- readRDS("../results/eda/sst_sds_dens_plot.rds"))
+```
+
+Figure \@ref(fig:mean-and-sd-sst-og) displays the mean and standard deviation
+on each location for the complete observation period.
+The mean of each scale is shown in white. Hence on average the SST regions
+have a mean of around 12 degrees and the respective standard deviation is on
+average 2. While the temperature means appear to be change smoothly along
+the latitudes, the standard deviations have stronger local patterns. SST regions close to the coastlines at 50° latitude show the highest standard deviations.
+
+
+```{r mean-and-sd-sst-og, fig.cap="Mean and SD on the global map.The color scales show the mean for the shown variable as white.",  out.width='50%'}
+sst_means_loc_plot + sst_sds_loc_plot +
+  plot_annotation("Global SST mean and SD at each location")
+```
+
+We further inspect the SD patterns in Figure \@ref(fig:sst-sd-month),
+and detect a prominent region around the equator in the Pacific.
+Its standard deviation is highest in January and is referred to as the spatial 
+center of the El Nino-Souther Oscillation (ENSO) (@ciemer2020early).
+
+```{r, eval = FALSE}
+(sst_mean_dens_plot + ggtitle("Density of means")) + (sst_sds_dens_plot + ggtitle("Density of sd"))
+```
+
+```{r, eval = FALSE, include=FALSE}
+a <- readRDS("../results/eda/sst_trends_loc_lm_plot.rds")
+b <- readRDS("../results/eda/sst_trends_loc_stl_plot.rds")
+a + b
+```
+
+```{r, eval = FALSE}
+(sst_trends_loc_stl_plot <- readRDS("../results/eda/sst_trends_loc_stl_plot.rds"))
+```
+
+```{r  sst-mean-month2, eval = FALSE,  out.width='120%'}
+sst_mean_arrange <- readRDS("../results/eda/sst_mean_arrange.rds")
+sst_mean_arrange
+```
+
+
+
+```{r, include = FALSE}
+#Do we get stationary time series when we only take each january or february?
+#Check for stationarity of the different time series?
+#### Open: summarise CAB for each month (mean Jan, Feb, etc.)
+```
+
+
+```{r, sst-sd-month, fig.cap= "SST standard deviation at each location, shown for the different months of a year separately. The white line on the scale at the side of the plots indicates the mean of the respective quantity", out.width='120%'}
+(sst_sd_arrange <- readRDS("../results/eda/sst_sd_arrange.rds"))
+```
+
+```{r, eval = FALSE}
+(sst_trend_arrange <- readRDS("../results/eda/sst_trend_arrange.rds"))
+```
+
+
+
+
+
+<!--chapter:end:1bb-EDA-sst.Rmd-->
+
+# Correlation analysis {#correlation-chapter}
+
+We give a short overview over the correlation between monthly sea surface temperature and monthly mean precipitation in the Central Amazon Basin (CAB).
+First we will analyse the original and then the de-seasonalized data.
+SST and precipitation data have been de-seasonalized, meaning first each time series was
+decomposed by the stl algorithm according to 
+$$Monthly \textit{ } Data = Seasonal + Trend + Remainder$$
+
+Afterwards only trends and remainders time series were kept to constitute 
+a new time series that will be used as predictor (SST) and target (precipitation).
+
+On a high level the stl algorithm separates the complete time series into cycle sub-series, one series for each month. Each cycle sub-series is then loess smoothed and passed through
+a low-pass filter. The smoothed sub-series minus the low-pass filter results give
+the seasonal component. The seasonal component is then subtracted from the original,
+raw data. This result also is loess smoothed and becomes the trend.
+Finally as we saw above, the remainder is what is left after we subtract
+the seasonal and trend component from the data (@cleveland1990stl).
+
+In the next step we compute the pearson correlation coefficient $\rho$ between each SST grid point time series and the mean precipitation time series.
+
+\begin{equation}
+\rho_{X,Y}=\frac{\mathbb{E}\left[\left(X-\mu_{X}\right)\left(Y-\mu_{Y}\right)\right]}{\sigma_X\sigma_Y}
+(\#eq:cor)
+\end{equation}
+
+
+Since our goal is to predict the precipitation on the SST information, we are
+also interested in the correlation of the SST and future precipitation some months ahead.
+To examine this we also compute the correlations for different time lags.
+For example for a time lag of 6 month we correlate January SST data and precipitation in July.
+
+We consider time lags of 0,3,6 and 12 months.
+And show the density of the correlation values as well as their spatial distribution on a map. We also display the highest positive and negative correlation based on their
+respective 2.5% and 97.5% quantiles. All correlations that are between these values are set to 0 then.
+
+
+## Correlation of Sea Surface Temperature and Precipitation {.tabset .tabset-fade .tabset-pills}
+
+### Original Data {.tabset .tabset-fade .tabset-pills}
+
+Following, for each timelag we show the respective density of correlation values,
+their location on the map and also the 5% strongest positive and negative correlations.
+
+#### Timelag 0
+
+```{r dens-0, echo = FALSE, out.width='40%', out.height='20%',fig.show='hold',fig.align='center', fig.cap='Density plot of the correlation values for timelag 0'}
+knitr::include_graphics(c("../code/Rmarkdown/plots-markdown/og-data/dens-0.jpg"))
+```
+```{r corr-0, echo = FALSE, out.width='65%', out.height='65%',fig.show='hold',fig.align='center', fig.cap='Correlation plot between SST and mean precipidation in the CAB for timelag 0'}
+knitr::include_graphics("../code/Rmarkdown/plots-markdown/og-data/corr-0.jpg")
+```
+```{r corr-0q, echo = FALSE, out.width='65%', out.height='65%',fig.show='hold',fig.align='center', fig.cap='Correlation plot between SST and mean precipidation in the CAB for timelag 0. Interquantile values are set to 0'}
+knitr::include_graphics("../code/Rmarkdown/plots-markdown/og-data/q-corr-0.jpg")
+```
+Inspecting the density plot for time lag 0, we see two modi for correlations,
+one for negative correlations around -0.8 and one for positive correlations around 0.8. Also a small spike can be seen for low negative correlations (Figure \@ref(fig:dens-0)).
+If we plot these correlations on the respective grid points we see a clear north-south negative-positive correlation distinction. The "boarder" is organised around the equator (Figure \@ref(fig:corr-0)).
+The plot for the strongest 5% of correlations reveals areas with strong positive and negative correlations in the north and south respectively (Figure \@ref(fig:corr-0q)).
+
+#### Timelag 3
+
+```{r dens-3, echo = FALSE, out.width='40%', out.height='20%',fig.show='hold',fig.align='center', fig.cap='Density plot of the correlation values for timelag 3'}
+knitr::include_graphics(c("../code/Rmarkdown/plots-markdown/og-data/dens-3.jpg"))
+```
+```{r corr-3, echo = FALSE, out.width='65%', out.height='65%',fig.show='hold',fig.align='center', fig.cap='Correlation plot between SST and mean precipidation in the CAB for timelag 3'}
+knitr::include_graphics("../code/Rmarkdown/plots-markdown/og-data/corr-3.jpg")
+```
+```{r corr-3q, echo = FALSE, out.width='65%', out.height='65%',fig.show='hold',fig.align='center', fig.cap='Correlation plot between SST and mean precipidation in the CAB for timelag 3. Interquantile values are set to 0'}
+knitr::include_graphics("../code/Rmarkdown/plots-markdown/og-data/q-corr-3.jpg")
+```
+
+The density of correlations for timelag 3, is left-skewed and has two
+modi that are organised around 0 and -0.125 respectively (Figure \@ref(fig:dens-3)) .
+The correlation map shows that the high positive and negative correlations are more close to equator here (Figure \@ref(fig:corr-3)).
+Note that the legend for the correlation map is "shifted" here, because the maximal negative correlation has a higher absolute value than the
+maximal positive correlation.
+The strongest correlations also seem to be shifted towards the equator (Figure \@ref(fig:corr-3q)).
+
+#### Timelag 6
+
+```{r dens-6, echo = FALSE, out.width='40%', out.height='20%',fig.show='hold',fig.align='center',fig.cap='Density plot of the correlation values for timelag 6'}
+knitr::include_graphics(c("../code/Rmarkdown/plots-markdown/og-data/dens-6.jpg"))
+```
+```{r corr-6, echo = FALSE, out.width='65%', out.height='65%',fig.show='hold',fig.align='center', fig.cap='Correlation plot between SST and mean precipidation in the CAB for timelag 6'}
+knitr::include_graphics("../code/Rmarkdown/plots-markdown/og-data/corr-6.jpg")
+```
+```{r corr-6q, echo = FALSE, out.width='65%', out.height='65%',fig.show='hold',fig.align='center', fig.cap='Correlation plot between SST and mean precipidation in the CAB for timelag 6. Interquantile values are set to 0'}
+knitr::include_graphics("../code/Rmarkdown/plots-markdown/og-data/q-corr-6.jpg")
+```
+
+We can see the density plot for timelag 6 is pretty similar to the one
+of timelag 0 but seems to be "flipped" around 0 (Figure \@ref(fig:dens-6)).
+Similarly the correlation map shows (high) negative correlations in the south now and high postive correlations in the north.(Figures \@ref(fig:corr-6) and (Figure \@ref(fig:corr-6q)))
+
+#### Timelag 12
+
+```{r , include = FALSE, eval = FALSE, echo = FALSE, out.width="25%", out.height="25%",fig.show='hold',fig.fullwidth=TRUE}
+knitr::include_graphics(c("../code/Rmarkdown/plots-markdown/corr0.jpg","../code/Rmarkdown/plots-markdown/corr3.jpg","../code/Rmarkdown/plots-markdown/corr6.jpg","../code/Rmarkdown/plots-markdown/corr9.jpg", "../code/Rmarkdown/plots-markdown/corr12.jpg"))
+```
+
+```{r dens-12, echo = FALSE, out.width='40%', out.height='20%',fig.show='hold',fig.align='center',fig.cap='Density plot of the correlation values for timelag 12'}
+knitr::include_graphics(c("../code/Rmarkdown/plots-markdown/og-data/dens-12.jpg"))
+```
+```{r corr-12, echo = FALSE, out.width='65%', out.height='65%',fig.show='hold',fig.align='center', fig.cap='Correlation plot between SST and mean precipidation in the CAB for timelag 12'}
+knitr::include_graphics("../code/Rmarkdown/plots-markdown/og-data/corr-12.jpg")
+```
+```{r corr-12q, echo = FALSE, out.width='65%', out.height='65%',fig.show='hold',fig.align='center', fig.cap='Correlation plot between SST and mean precipidation in the CAB for timelag 12. Interquantile values are set to 0'}
+knitr::include_graphics("../code/Rmarkdown/plots-markdown/og-data/q-corr-12.jpg")
+```
+
+Giving a time lag of one year, we can see that the density of correlations is now again similar to the density for time lag 0 (Figure \@ref(fig:dens-12)).
+This also hold for the location of positive and negative correlations in general,
+as well as for the strongest 5% of correlations (Figures \@ref(fig:corr-12) and \@ref(fig:corr-12q)).
+ 
+### De-seasonalized Data {.tabset .tabset-fade .tabset-pills}
+Following, for each time lag we show the respective density of correlation values,
+their location on the map and also the 5% strongest positive and negative correlations.
+
+#### Timelag 0
+
+```{r des-dens-0, echo = FALSE, out.width='40%', out.height='20%',fig.show='hold',fig.align='center', fig.cap='Density plot of the correlation values for timelag 0 and de-seasonalized SST data'}
+knitr::include_graphics(c("../code/Rmarkdown/plots-markdown/des-data/dens-0.jpg"))
+```
+```{r des-corr-0, echo = FALSE, out.width='65%', out.height='65%',fig.show='hold',fig.align='center', fig.cap='Correlation plot between SST and mean precipidation in the CAB for timelag 0 and de-sasonalized SST data'}
+knitr::include_graphics("../code/Rmarkdown/plots-markdown/des-data/corr-0.jpg")
+```
+```{r des-corr-0q, echo = FALSE, out.width='65%', out.height='65%',fig.show='hold',fig.align='center', fig.cap='Correlation plot between SST and mean precipidation in the CAB for timelag 0 and de-sasonalized SST data. Interquantile values are set to 0'}
+knitr::include_graphics("../code/Rmarkdown/plots-markdown/des-data/q-corr-0.jpg")
+```
+Inspecting the density plot for timelag 0, we see that after excluding seasonality from 
+the time series we get a left-skewed density of correlations. With a mode around 0.
+In general the correlation values are a lot lower than in the original data.
+With a maximum at around -0.4 and +2.5 respectively (Figure \@ref(fig:des-dens-0)).
+We plot these correlations on the respective grid and see that the clear north south
+distinction in the correlations before de-seasonalizing the data does not appear anymore (Figure \@ref(fig:des-corr-0)).
+The plot for the strongest 5% of correlations reveals areas with strongest positive and negative correlations. But as stated before the values are in general much lower (Figure \@ref(fig:des-corr-0q)).
+
+#### Timelag 3
+
+```{r des-dens-3, echo = FALSE, out.width='40%', out.height='20%',fig.show='hold',fig.align='center',  fig.cap='Density plot of the correlation values for timelag 3 and de-seasonalized SST data'}
+knitr::include_graphics(c("../code/Rmarkdown/plots-markdown/des-data/dens-3.jpg"))
+```
+
+
+```{r des-corr-3, echo = FALSE, out.width='65%', out.height='65%',fig.show='hold',fig.align='center', fig.cap='Correlation plot between SST and mean precipidation in the CAB for timelag 3 and de-sasonalized SST data'}
+knitr::include_graphics("../code/Rmarkdown/plots-markdown/des-data/corr-3.jpg")
+```
+
+
+```{r des-corr-3q, echo = FALSE, out.width='65%', out.height='65%',fig.show='hold',fig.align='center', fig.cap='Correlation plot between SST and mean precipidation in the CAB for timelag 3 and de-sasonalized SST data. Interquantile values are set to 0'}
+knitr::include_graphics("../code/Rmarkdown/plots-markdown/des-data/q-corr-3.jpg")
+```
+
+For the density of timelag 3 we get a similar picture as for timelag 0.
+The mode is a higher and the tails get a bit more mass (Figure \@ref(fig:des-dens-3)).
+Also the correlation map does not seem to change a lot (Figure \@ref(fig:des-corr-3)).
+The strongest correlations appear to be shifted to the left (Figure \@ref(fig:des-corr-3q)).
+
+#### Timelag 6
+
+```{r des-dens-6, echo = FALSE, out.width='40%', out.height='20%',fig.show='hold',fig.align='center',  fig.cap='Density plot of the correlation values for timelag 6 and de-seasonalized SST data'}
+knitr::include_graphics(c("../code/Rmarkdown/plots-markdown/des-data/dens-6.jpg"))
+```
+```{r des-corr-6, echo = FALSE, out.width='65%', out.height='65%',fig.show='hold',fig.align='center', fig.cap='Correlation plot between SST and mean precipidation in the CAB for timelag 6 and de-sasonalized SST data'}
+knitr::include_graphics("../code/Rmarkdown/plots-markdown/des-data/corr-6.jpg")
+```
+```{r des-corr-6q, echo = FALSE, out.width='65%', out.height='65%',fig.show='hold',fig.align='center', fig.cap='Correlation plot between SST and mean precipidation in the CAB for timelag 6 and de-sasonalized SST data. Interquantile values are set to 0'}
+knitr::include_graphics("../code/Rmarkdown/plots-markdown/des-data/q-corr-6.jpg")
+```
+Since the density of correlation values are all unimodal we do not observe
+the "flip" we saw in the original data when comparing the densities of timelag 0 and
+6 (Figure \@ref(fig:des-dens-6)). The mode again gets larger and the maximum postive and negative correlation values
+get smaller (Figure \@ref(fig:des-corr-6)).
+The strongest negative correlations are shifted further to left (Figure \@ref(fig:des-corr-6q)).
+
+#### Timelag 12
+
+```{r, include = FALSE, eval = FALSE, echo = FALSE, out.width="25%", out.height="25%",fig.show='hold',fig.fullwidth=TRUE, }
+knitr::include_graphics(c("../code/Rmarkdown/plots-markdown/corr0.jpg","../code/Rmarkdown/plots-markdown/corr3.jpg","../code/Rmarkdown/plots-markdown/corr6.jpg","../code/Rmarkdown/plots-markdown/corr9.jpg", "../code/Rmarkdown/plots-markdown/corr12.jpg"))
+```
+
+```{r des-dens-12, echo = FALSE, out.width='40%', out.height='20%',fig.show='hold',fig.align='center',  fig.cap='Density plot of the correlation values for timelag 12 and de-seasonalized SST data'}
+knitr::include_graphics(c("../code/Rmarkdown/plots-markdown/des-data/dens-12.jpg"))
+```
+```{r des-corr-12, echo = FALSE, out.width='65%', out.height='65%',fig.show='hold',fig.align='center', fig.cap='Correlation plot between SST and mean precipidation in the CAB for timelag 0 and de-sasonalized SST data'}
+knitr::include_graphics("../code/Rmarkdown/plots-markdown/des-data/corr-12.jpg")
+```
+```{r des-corr-12q, echo = FALSE, out.width='65%', out.height='65%',fig.show='hold',fig.align='center', fig.cap='Correlation plot between SST and mean precipidation in the CAB for timelag 12 and de-sasonalized SST data. Interquantile values are set to 0'}
+knitr::include_graphics("../code/Rmarkdown/plots-markdown/des-data/q-corr-12.jpg")
+```
+
+Given a timelag of one year, the density now has a mode around 6, and started at around 4 when timelag was 0. Also neither the positive nor negative correlations exceed values of 2.5 (Figure \@ref(fig:des-dens-12)).
+The consistent region of strong negative and positive correlations is now less organised or more scattered (Figures  \@ref(fig:des-corr-12) and \@ref(fig:des-corr-12q)).
+
+ 
+
+## Summary
+
+### Original Data
+
+We can observe that the positive and negative correlations of sst and precipitation follow a spatial and temporal pattern.
+The location and density of the positive and negative correlation "wanders" over the equator in opposite directions.
+The densities and correlationmaps for timelag 0 and 6 appear to be quite similar but "flipped".
+The densities and correlationmaps for timelag 0 and 12 appear again to be similar.
+The same pattern seems to hold for the strongest correlations.
+
+### De-seasonalized Data
+Correlation values are in general a lot lower than in the original data and decrease with
+increasing timelag.
+We still observe temporal and regional patterns, although these dissolve a bit for
+a timelag of 12.
+
+
+
+
+
+
+<!--chapter:end:1d-corr-summary.Rmd-->
+
+# Clustering {#cluster-chapter}
+
+In this chapter we will first summarize the main ideas of clustering
+and then apply it to the precipitation data.
+If not indicated otherwise the information is taken
+from Elements of Statistical Learning.
+
+## Main Idea Clustering
+We can describe an object by a set of measurements or its similarity to other objects.
+Using this similarity we can put a collection of objects into subgroups or clusters.
+The objects in the subgroups should then be more
+similar to one another than to objects of different subgroups.
+This means inside the clusters we aim for homogeneity 
+and for observations of different clusters for heterogeneity.
+With the clustering analysis applied to the precipitation data we want to study if there are distinct groups (regions)
+apparent in the CAB. So that if we later apply the regression models we predict the precipitation for each group and not for the whole region.
+
+To explore the grouping in the data we need a measure
+of (dis)similarity. This measure is central and depends 
+on subject matter considerations.
+We construct the dissimilarities based on the measurements taken for each month.
+We interpret this as a multivariate analysis where,
+each month is one variable.
+So given the area in the CAB (resolution 5°x5°),
+we have 612 cells and 432 months, resulting in
+a $612 \times 432$ data matrix.
+we want to cluster cells into homogen groups.
+
+<!--chapter:end:2-main-idea-clustering.Rmd-->
+
+## Clustering Methods {#clustering-methods}
+
+### $k$-means
+In the following we briefly describe the $k$-means procedure.
+Beforehand we have to specify a number of clusters $C$ we believe exist in our data. Then we randomly initialize $C$ cluster centers in the feature space.
+Now two steps are repeated until convergence:
+
+1. For each center we identify the points that are the closest to this center.  
+These points "belong" now to a cluster $C$. 
+2. In each cluster we compute the mean of each variable and get a vector of means.
+This mean vector is now the new center of the cluster.
+
+As a measure of dissimilarity we use the Euclidean distance:
+
+\begin{equation} 
+d(x_i,x_{i´}) = \sum_{j=1}^p(x_{ij}-x_{i´j})^2=||x_i-x_{i´}||^2
+(\#eq:eucl-dist)
+\end{equation}
+
+Meaning for the points $i$ and $i´$ we compute the squared difference for each
+variable and sum them up.
+As stated above we are searching for clusters that are
+themselves compact, meaning homogeneous.
+We do so by minimizing the mean scatter inside the clusters.
+We summarize this scatter as within-sum-of-squares
+
+\begin{equation} 
+W(C) = \frac{1}{2} \sum_{k=1}^{K} \sum_{C(i)=k} \sum_{C(i´)=k} ||x_i-x_{i´}||^2 
+        = \sum_{k=1}^K N_k \sum_{C(i)=k} ||x_i-\bar{x}_k ||^2
+(\#eq:wss)
+\end{equation}
+
+where $\bar{x} = (\bar{x}_{1k},...,\bar{x}_{pk})$ stands for the mean vectors of the $k$th
+cluster and $N_k = \sum_{i=1}^N I(C(i)=k)$. 
+
+### $k$-means characteristics
+variance of each distribution of each
+attribute (variable) is spherical, variance is
+symmetrical?
+all variables have same variance, not the case 
+in our example, therefore scaling or pca
+equal number of observations in each clusters, we don`t know
+
+Since we use the Euclidean distance the similarity measures will be sensitive to outliers and scale.
+$k$-means assumes that the variance of a variable´s distribution is spherical, meaning it wight not work well in situations that violate this assumptions (f.e non-spherical data). Further assumptions are same variance of the variables, and equally sized clusters.
+Now how "large" these violations have to be so that
+$k$-means does not work well anymore has no clear-cut answer.
+
+
+### K-medoids
+We can adjust $k$-means procedure so that we can use other distances
+than the Euclidean distance. The only part of the $k$-means algorithm
+that uses Euclidean distance is when we compute the cluster centers.
+We can replace this step by formalizing an optimization with respect
+to the cluster members. For example so that each center
+has to be one of the observations assigned to the cluster. K-medoids is far more computationally intensive than $k$-means.
+
+#### K-medoids characteristics
+K-medoids is less sensitive to outliers, because it minimizes sum of pairwise dissimilarities instead of sum of squared Euclidean distances. As stated above it is also more computationally intensive.
+
+
+### PCA
+Goal is reduction of correlated and eventually large number p variables to a few.
+We accomplish this by creating new variables that are linear combinations of the 
+original ones. We call these new variables principle components.
+The new variables are not correlated any more and ordered according
+to the variance they explain. The first $k < p$ principal components then contain the majority
+of variance (@fahrmeir1996multivariate). 
+As they are ordered they also provide a sequence of best linear approximations
+of our data.
+Let $x_1, x_2,...,x_N$, be our observations and we represent them by a rank-q linear
+model 
+
+\begin{equation}
+f(\lambda) = \mu + V_q\lambda
+(\#eq:rank-lin)
+\end{equation}
+
+with $\mu$ a location vector in $\mathbb{R}^p$ and $V_q$ is a $p \times q$ matrix
+with columns being orthogonal unit vectors as columns. $\lambda$ is a $q$ vector
+of parameters.
+In other words we are trying to fit a hyperplane of rank q to the data.
+If we fit this model to minimize reconstruction error using least squares we solve
+
+\begin{equation} \min_{\mu, \{\lambda_i\}, V_q } \sum_{i=1}^N||x_i - \mu - V_q\lambda_i ||^2
+(\#eq:min-rec-1)
+\end{equation}
+
+If we partially optimize for $\mu$ and $\lambda_i$ we obtain
+
+$$ \hat{\mu} = \bar{x},$$
+$$\hat{\lambda_i} = V_q^T(x_i - \bar{x}) $$ 
+Therefore we need to search for the orthogonal matrix $V_q$
+
+\begin{equation}
+\min_{V_q} \sum_{i=1}^N ||(x_i-\bar{x}) - V_qV_q^t(x_i-\bar{x})||^2
+(\#eq:min-rec-2)
+\end{equation}
+
+We can assume here that $\bar{x}$ is 0, if this not the case we can simply
+center the observations $\tilde{x}_i = x_i - \bar{x}$.
+$H_q = V_qV_q^T$ projects each observation $x_i$ from the
+original feature space onto the subspace that is spanned by the columns of $V_q$.
+$H_qx_i$ is then the orthogonal projection of $x_i$
+Hence $H_q$ is also called the *projection matrix*.
+```{r, include=FALSE}
+# Stackoverflow post (https://math.stackexchange.com/questions/3982195/what-are-left-and-right-singular-vectors-in-svd)
+```
+
+We find $V_q$ then by constructing the *singular value decomposition* of our data matrix X.
+$X$ contains the (centered) observations in rows, giving a $N \times p$ matrix.
+The SVD is then:
+
+\begin{equation} 
+X = UDV^T
+(\#eq:svd)
+\end{equation}
+
+
+Where $U$ is an orthogonal matrix containing the *left singular vectors* $u_j$ as columns, and $V$ contains the *right singular vectors* $v_j$. The columns of $U$ span the columns space of $X$ and the columns of $V$ span the row space. $D$ is diagonal matrix which contains *singular values*, $d_1 \leq d_2 \leq ... \leq d_p \leq 0$. *Singular values* are square roots of non-negative eigenvalues.
+The columns of $UD$ are the principal components of $X$.
+So the SVD gives us the matrix $V$ (the first $q$ columns give the solution to the minimization problem above) as well as the principal components from $UD$ (@hastie2009elements).
+
+
+### Gap statistic
+```{r, include = FALSE, echo=FALSE}
+#(see gap statistic in plain english stackoverflow)
+```
+The idea of the gap statistic was introduced by @tibshirani2001estimating
+As stated above we usually measure how compact our clusters are 
+by assessing $W(C)$ or $log(W_c)$. Where low values indicate compact clusters. To compare the value then, we need a reference.
+We therefore want to estimate how large $W_c$ were if there were 
+no clusters present in our data.
+The larger the difference between the $W_c$ from the data and 
+the one from the reference the more likely we are to say that
+the found number of clusters is indeed correct.
+We construct reference data by sampling from a uniform distribution
+based on our data. Say we have $p$ variables. We sample $n$ times from
+each of the $p$ uniformly distributed variables, where maximum and 
+minimum are obtained from our data. 
+We then cluster the reference data in the same we cluster our observed data and compute $W_c$. We repeat this process several times and compute the average of $W_c$, $E \{log(W_c)\}$.
+The gap statistic is then the difference
+
+\begin{equation}
+E \{log(W_c) \} - log(W_c).
+(\#eq:gap)
+\end{equation}
+
+So in cases where our data is formed of clusters we would expect
+a high gap statistic.
+As @tibshirani2001estimating note and as it is also done in the used R function
+clusgap, doing a PCA on the data and compute the gap statistic on the
+PCA scores can improves the results of gap statistic.
+
+<!--chapter:end:3a-clustering-methods.Rmd-->
+
+## Clustering results
+
+```{r, include=FALSE}
+library(patchwork)
+#bookdown::preview_chapter("code/Rmarkdown/thesis/3-clustering-results.Rmd")
+```
+
+
+We summarize and compare the results we obtain
+if we center or don't center the data.
+
+### $k$-means and PAM gap statistics without PCA
+
+```{r, echo = FALSE}
+replotted_gap_kmeans_centered_plot <- readRDS("../results/clustering/replotted_gap_kmeans_centered_plot.rds")
+replotted_gap_pam_centered_plot <- readRDS("../results/clustering/replotted_gap_pam_centered_plot.rds")
+```
+
+
+```{r gap-res, echo = FALSE, fig.cap= "Gap statistics for different number of clusters k, for the k-means (left) and the PAM (right) algorithm respectively. The dashed line indicates the optimal number of clusters found."}
+replotted_gap_kmeans_centered_plot + replotted_gap_pam_centered_plot
+```
+
+We can see that on the original data, neither $k$-means nor PAM
+find an optimal number of clusters that is lower than the maximum
+number specified (Figure \@ref(fig:gap-res).
+
+#### Scree plot
+
+```{r scree, echo = FALSE, fig.cap= "Scree plot with the principal components on the x-axis and the respective percentage of variance explained on the y-axis. The PCA was done after centering the data.The first three and four PC`s together explain 67.77 and 70.69\\% of the variance respectively"}
+scree_plot_pca_centered <- readRDS("../results/clustering/scree_plot_pca_centered.rds")
+scree_plot_pca_centered
+```
+
+We apply a PCA on the centered data.
+The variance that is explained by the principal components indicates that, the 3 principal components already explain a lot of the appearing variance in the data (Figure \@ref(fig:scree)). We now study the gap statistic results for $k$-means and K-medoids (here, meaning PAM) after applying the PCA and choosing the number of principal components to be used.
+
+Following we compare the results of a gap statistic when the first 3 and 4 principal components are used, for $k$-means and PAM respectively.
+The first three and four PC`s used explain 67.77 and 70.69% of the variance respectively.
+
+#### $k$-means and PAM gap statistics after applying PCA
+
+
+```{r gap-pam, echo = FALSE, fig.cap= "Gap statistic plots for k-means and PAM when using 3 and 4 PC's respectively."}
+replotted_summary_plot_pca_centered <- readRDS("../results/clustering/replotted_summary_plot_pca_centered.rds")
+replotted_summary_plot_pca_centered
+```
+
+The graphic shows the gap statistics resulting from $k$-means and PAM for 3 and 4 principal components respectively (\@ref(fig:gap-pam)). When 3 principal components are used $k$-means and PAM
+find 5 and 12 as optimal number of clusters, respectively. When we choose to use
+the first 4 principal components, both algorithms choose 13 as the optimal number.
+
+
+### Summary
+We used the gap statistic as evaluation tool to find the optimal number
+of clusters in our data.  
+It was applied by using $k$-means and PAM as cluster algorithms, on
+the centered data with and without applying a pca beforehand.
+When applied without PCA, PAM and $k$-means found the maximal number of 
+clusters optimal, regardless of centering.  
+The results differed regarding centering the data when a PCA was applied.  
+When the data was centered before the PCA, we find 5 and 12 (3 principal components,
+$k$-means and PAM, respectively) and 13 (4 principal components, both $k$-means and PAM) as optimal number of clusters.
+The results overall vary greatly and are sensitive to choices such as number of principal components, the algorithm and the decision criterion (here @tibshirani2001estimating).
+The value of the clustering itself can be evaluated only when used in
+combination with regression.  
+If useful, fitting different models for the different clusters should result
+in a lower overall average prediction error.
+We will proceed by using $k$-means for finding 5 clusters after applying a PCA on the centered data and use 3 principal components.
+
+
+<!--chapter:end:3b-clustering-results.Rmd-->
+
+## Analyse clustering results {#clustering-analyze-results}
+
+
+```{r, echo=FALSE}
+library(patchwork)
+library(ggplot2)
+#bookdown::preview_chapter("code/Rmarkdown/thesis/3-clustering-results.Rmd")
+gettorepo <- "../"
+```
+
+We now analyze further the results we found.
+Namely the clusters we find after performing a PCA on the data,
+using the 3 first principal components and searching for 5 clusters using $k$-means. The first 3 principal components explain 67.8% of the variance
+We found 5 as optimal number of clusters based on the gap statistic and the criteria from @tibshirani2001estimating.
+
+```{r, include=FALSE}
+
+plot <- readRDS(paste0(gettorepo, "results/clustering/gap_pc3_centered_kmeans_plot.rds"))
+get_tibsh_k_from_gapplot <- function(df) {
+  gk <- df[,"gap"]
+  l <- length(gk)
+  gk <- gk[-l]
+  gk1 <- df[,"gap"][-1]
+  sk1 <- df[,"SE.sim"][-1]
+  d <- gk1 - sk1
+  return(which(gk >= d)[1])
+}
+get_tibsh_k_from_gapplot(plot$data)
+```
+
+We show the map plot for the $k$-means clustering after applying the PCA as well as the time series of the resulting clusters.
+
+```{r, echo = FALSE}
+km_pca_map_plot <- readRDS(paste0(gettorepo,("results/clustering/km_pca_map_plot.rds")))
+c1_pca_km <- readRDS(paste0(gettorepo,"results/clustering/c1_pca_km_plot.rds"))
+c2_pca_km <- readRDS(paste0(gettorepo,"results/clustering/c2_pca_km_plot.rds"))
+c3_pca_km <- readRDS(paste0(gettorepo,"results/clustering/c3_pca_km_plot.rds"))
+c4_pca_km <- readRDS(paste0(gettorepo,"results/clustering/c4_pca_km_plot.rds"))
+c5_pca_km <- readRDS(paste0(gettorepo,"results/clustering/c5_pca_km_plot.rds"))
+```
+
+```{r cluster-map, echo = FALSE, out.width= '50%',fig.cap= "Spatial distribution of the found clusters in the CAB. We applied a centered PCA on the data and used 3 principal components before applying the k-means algorithm"}
+km_pca_map_plot + 
+ggtitle("Precipitation clusters in the CAB,
+after centered PCA, using 3 PC's and applying k-means")
+```
+
+Figure \@ref(fig:cluster-map) shows the grid cells in the Central Amazon Basin colored according to the clusters that are assigned by $k$-means. The clusters are almost
+completely spatially coherent. Meaning that the clusters are not scattered
+across different areas. One exception can be seen for Cluster 1 and 4. Parts of cluster 1 (orange) are inside cluster 4 (blue) and on the edge to cluster 3 (green).
+
+
+```{r ts-clust, echo = FALSE, fig.cap= "Plots of the time series in the clusters we found using the k-means algorithm. The x-axis shows the month of measurement, the y-axis the centered precipitation. Centering was done according to the overall CAB mean in each month. The mean inside each cluster for a month is displayed in blue.", fig.align='center'}
+l <- list(c1_pca_km, c2_pca_km, c3_pca_km,
+          c4_pca_km, c5_pca_km)
+quick <- function(a) {
+  a$labels$title <- paste("Cluster", a$labels$subtitle)
+  a$labels$subtitle <- NULL
+  return(a)
+} 
+l <- lapply(l, function(x) quick(x))
+# c1_pca_km + c2_pca_km + c3_pca_km + c4_pca_km +
+#   c5_pca_km
+l[[1]] + l[[2]] + l[[3]] + l[[4]] + l[[5]]
+```
+
+We now inspect the original (centered) time series inside the clusters (\@ref(fig:ts-clust)).  
+The time series are shown in gray and the monthly mean in the cluster is shown in blue. Since the time series are centered before applying the PCA and clustering, the zero value is the mean of the respective month of the whole CAB.  
+The clusters differ in their monthly differences from the monthly CAB mean (here 0 because the time series were centered before PCA and $k$-means) and their fluctuation/ variance. Also the size of the clusters are not all the same.  
+The mean in cluster 3 has lowest variability around the CAB mean, followed by clusters 2 and 5, and clusters 1 and 4 have the highest variability.  
+On average cluster 3 is on the level of the CAB overall mean.
+The clusters 2 and 5 are slightly below and cluster 4 is above the CAB mean,
+on average. Cluster 1 is on average also on the CAB mean but shows more variance than cluster 3.
+
+
+
+<!--chapter:end:4-analyse-clustering-results.Rmd-->
+
+---
+output:
+  html_document: default
+  pdf_document: default
+---
+# The lasso
+
+## Introduction
+We want to create a model that has predictive and
+explanatory power. Predictive power meaning it can
+predict the precipitation in the Central Amazon Basin, "reasonably well". Explanatory power in the sense of being interpretable, so that we can identify those regions in sea
+that give us most information about future precipitation. Our problem setting is high dimensional with n << p. The number of predictors is a lot bigger than the number of actual observations.
+This creates issues with a classic linear model since the linear problem is underdetermined.
+One possible model for the problem at hand is a LASSO regression model.
+
+In general for the linear model:
+
+\begin{equation}
+y_i = \beta_0 + x_i^T\beta + \epsilon_i (\#eq:lm-gen)
+\end{equation}
+
+see \@ref(eq:lm-gen)
+Where the $y_i$ refers to the mean precipitation in the CAB for a given month $i$ and $x_i$ is the vector of sea surface temperature at different locations around the globe.
+$\epsilon_i$ is the residual and we wish to estimate the $\beta$´s from the data.
+As already stated this is not possible with a classic linear model since the number of predictors exceeds the number of observations. We therefore can not estimate a $\beta$ for every grid point in the sea.
+From a physical point of view it also seems reasonable that some regions in the ocean have a higher predictive power than others. For example regions that are closer to the Amazon may have more influence on precipitation in the same month. But regions more far away may have more information on the precipitation half a year in the future.
+We therefore would like to use a model that can find the most important regions in the sea for predicting precipitation for some point in the future.
+One possible solution for this is a LASSO regression model, as implemented in
+R by the *glmnet* package (@glmnet-package).
+This model "automatically" performs model selection, but be aware that because of the time dependencies in our data, normal Cross Validation methods may be unjustified or at least have to be applied with caution.
+The glmnet package implements the regression problem in the following manner, solving:
+
+\begin{equation}
+\min_{\beta_0, \beta} \frac{1}{N} \sum_{i=1}^N w_il(y_i,\beta_0 + \beta^Tx_i) + \lambda [(1-\alpha)||\beta||_2^2/2 + \alpha||\beta||_1] (\#eq:glmnet)
+\end{equation}
+
+This is a lasso regression for $\alpha = 1$ and ridge regression for $\alpha = 0$, $\alpha$ controls the overall strength of regularization or penalty.
+Intuitively this means we try to find those $\beta$´s that minimize the negative log likelihood of our data (this is equal to maximizing the log-likelihood). But at the same time we can not include too many $\beta$ since this will make the second and third term in the formula grow.
+As result the algorithm chooses only those predictors that have the most predictive power.
+How many predictors are included depends on the strength of regularization given by $\alpha$.
+*Remark*: Among strongly correlated predictors only one is chosen in the classical lasso model. Ridge regression shrinks the coefficients to zero. 
+Elastic net with $\alpha=0.5$ tends to either include or drop the entire group together.
+To specifically choose a group of predictors, variations of the lasso or other models have to be considered.
+
+## Implementation
+The glmnet function finds a solution path for the lasso problem
+via coordinate descent.
+The implemented algorithm was suggested by @van2007prediction.
+We can write down the optimization procedure as follows:
+Given $N$ observation pairs $(x_i, y_i)$ with $Y \in \mathbb{R}$
+and $X \in \mathbb{R}^p$, we approximate the regression function
+with $E(Y|X = x) = \beta_0 + x^T\beta$, Here $x_{ij}$
+are considered standardized, so $\sum_{i=1}^N=0$,$\frac{1}{N}\sum_{i=1}^Nx_{ij}^2=1$ for $j = 1,...,p$.
+We then solve the problem:
+
+\begin{equation}
+\min_{(\beta_0, \beta)\in\mathbb{R}^{p+1}}  \big{[} \frac{1}{2N}
+\sum_{i=1}^N (y_i - \beta_0 - x_i^T\beta)^2 + \lambda [(1-\alpha)||\beta||_2^2/2 + \alpha||\beta||_1 \big{]}
+(\#eq:glmnet2)
+\end{equation}
+
+Note that this solves the elastic net problem that also 
+uses a ridge penalty. We follow the elastic net description
+but in our case $\alpha = 1$, using only the lasso penalty.
+We consider now a coordinate descent step for solving \@ref(eq:glmnet2).
+Given we have estimates $\tilde{\beta_0}$ and $\tilde{\beta_l}$
+and we want to partially optimize with respect to $\beta_j$, and $i \neq j$. When $\beta_j > 0$, 
+
+\begin{equation}
+\left.\frac{\partial R_{\lambda}}{\partial \beta_{j}}\right|_{\beta=\tilde{\beta}}=-\frac{1}{N} \sum_{i=1}^{N} x_{i j}\left(y_{i}-\tilde{\beta}_{0}-x_{i}^{\top} \tilde{\beta}\right)+\lambda(1-\alpha) \beta_{j}+\lambda \alpha .
+(\#eq:glm-large)
+\end{equation}
+
+And similar expressions exist for $\tilde{\beta}_{j}<0$. $\tilde{\beta}_{j}=0$ is treated separately.
+The coordinate-wise update has then the form:
+
+
+\begin{equation}
+\tilde{\beta}_{j} \leftarrow \frac{S\left(\frac{1}{N} \sum_{i=1}^{N} x_{i j}\left(y_{i}-\tilde{y}_{i}^{(j)}\right), \lambda \alpha\right)}{1+\lambda(1-\alpha)}
+.
+(\#eq:glm-step)
+\end{equation}
+
+with
+
+- $\tilde{y}_{i}^{(j)}=\tilde{\beta}_{0}+\sum_{\ell \neq j} x_{i \ell} \tilde{\beta}_{\ell}$ standing for fitted value without the contribution from $x_{i j}$, and therefore $y_{i}-\tilde{y}_{i}^{(j)}$ is the partial residual when fitting $\beta_{j}$. Because we applied a standardization, $\frac{1}{N} \sum_{i=1}^{N} x_{i j}\left(y_{i}-\tilde{y}_{i}^{(j)}\right)$ denotes the simple least-squares coefficient for fitting this partial residual to $x_{i j}$.
+
+- $S(z, \gamma)$ being the soft-thresholding operator. It's value is given by:
+
+\begin{equation}
+\operatorname{sign}(z)(|z|-\gamma)_{+}= \begin{cases}z-\gamma & \text { if } z>0 \text { and } \gamma<|z| \\ z+\gamma & \text { if } z<0 \text { and } \gamma<|z| \\ 0 & \text { if } \gamma \geq|z| .\end{cases} (\#eq:soft)
+\end{equation}
+
+So in summary the steps are as follows:
+Compute the simple least-squares coefficient on the partial residual,
+then apply soft-thresholding and proportional shrinkage for
+the lasso and ridge penalty, respectively.
+Again for our use case, since we use the lasso and $\alpha = 1$,
+we only apply soft-thresholding and no proportional shrinkage.
+
+The solutions are computed starting from smallest $\lambda_{max}$ for
+which all elements in $\hat{\beta}=0$. For all
+larger $\lambda$ the coefficients then stay 0. 
+The smallest $\lambda$ value
+$\lambda_{min}$ is then selected by $\lambda_{min}=\epsilon \lambda_{max}$. The complete searched vector is constructed
+as sequence of K values, typical values are $\epsilon = 0.001$ and
+$K = 100$. This procedure is an example of so called *warm starts*.
+By default they always center the predictor variable.
+For additional information on other methods how speedup
+is obtained refer to Section 2 in @glmnet-package.
+
+## Model evaluation
+
+Given our data and the lasso we know want to find the $\lambda$
+that gives us the best trade-off between low prediction error and sparsity
+in the coefficients. As a measure of prediction error we use here the
+mean squared error.
+
+\begin{equation}
+MSE = \frac{1}{n} \sum_{i=1}^{n} (y_i - \hat{y_i})^2
+(\#eq:mse)
+\end{equation}
+
+where $y_i$ is the true value and $\hat{y_i}$ the prediction from our model,
+for data of size $n$.
+The following summary on cross-validation can found in @hastie2009elements.
+Using the the complete data to fit the model
+and then choose the $\lambda$ that gives the lowest $MSE$,
+will give us good predictions on the training set but will generally
+perform bad on new data.
+This can be seen from the so-called bias-variance decomposition.
+Let's assume  $Y=f(X)+\varepsilon$ with $\mathrm{E}(\varepsilon)=0$ and $\operatorname{Var}(\varepsilon)=\sigma_{\varepsilon}^{2}$. 
+When using the MSE as loss we can describe the expected prediction error of a regression fit $\hat{f}(X)$ at point $X=x_{0}$ as:
+
+\begin{equation}
+\begin{aligned}
+\operatorname{Err}\left(x_{0}\right) &=E\left[\left(Y-\hat{f}\left(x_{0}\right)\right)^{2} \mid X=x_{0}\right] \\
+&=\sigma_{\varepsilon}^{2}+\left[\mathrm{E} \hat{f}\left(x_{0}\right)-f\left(x_{0}\right)\right]^{2}+E\left[\hat{f}\left(x_{0}\right)-\mathrm{E} \hat{f}\left(x_{0}\right)\right]^{2} \\
+&=\sigma_{\varepsilon}^{2}+\operatorname{Bias}^{2}\left(\hat{f}\left(x_{0}\right)\right)+\operatorname{Var}\left(\hat{f}\left(x_{0}\right)\right) \\
+&=\text { Irreducible Error }+\operatorname{Bias}^{2}+\text { Variance. }
+\end{aligned}
+(\#eq:bias-variance)
+\end{equation}
+
+The squared bias denotes how much the average of our estimates differs from the true mean.
+The variance is the expected squared deviation of our predictions around its mean.
+If we try to fit the training data perfectly we reduce the bias but also increase
+the models complexity. For the lasso this refers to choosing a lower level of regularization. Reducing the bias in this way will increase therefore the variance
+of the expected prediction error.
+A solution to this problem is to use one part of the data to fit the model
+and another part to test its performance. 
+We can repeat this process $k$ times and then choose the level
+of regularization that minimises the average prediction error.
+We refer to this as *$k$-fold cross validation*.
+A common approach is to split the data into 5 evenly sized partitions,
+fit the model on 4 of them and test it on the 5th.
+In our case we would fit the model on 4 partitions together and find the $\lambda$ that
+performs best on the 5th.
+Since each part can be used as test once, this leaves us with 5
+different models to fit and test.
+Now we choose beforehand the $\lambda$ vector that will be used each time
+we fit one of the 5 models.
+This leaves us with 5 prediction error values for each $\lambda$ in the vector.
+We then simply average the prediction errors for each $\lambda$ and choose
+the one that minimizes the average prediction error.
+This is defined as 
+
+\begin{equation}
+\mathrm{CV}(\hat{f}, \lambda)=\frac{1}{N} \sum_{i=1}^{N} L\left(y_{i}, \hat{f}^{-\kappa(i)}\left(x_{i}, \lambda\right)\right).
+(\#eq:cv)
+\end{equation}
+
+Where we define $\kappa: \{1,..., N\} \rightarrow {1,...K}$
+as indexing function that indicates to which part observation $i$ is
+allocated.$\hat{f}^{-\kappa(i)}$ is then the model fit on all 
+data but the observations in part $k$. $L()$ again denotes the MSE.
+As described earlier we choose that $\lambda$ minimizes \@ref(eq:cv),
+since it is an estimate of the test error curve.
+
+Usually we would assign the observations to the different partitions randomly
+if one can assume the observations to be *i.i.d*.
+Since our data consists of time series the observations are clearly not
+independent and the relationship between SST and precipitation
+might even be time-evolving. Splitting the data randomly would therefore
+destroy its time structure.
+To still make use a validation scheme related to cross-validation we choose
+a *5-fold rolling window forward validation* (see  @schnaubelt2019comparison for a graphical comparison of the
+different approaches),
+but choose to arrange the fold such that they don't overlap in time.
+This gives a compromise between number of models fitted, size of model in each
+fold and keeping the dependence structure in the data intact.
+Note that this way also each observation enters a fold only once,
+hence no $i$ is used in the training *and* in the test phase.
+For a comparison of different cross and forward validation approaches 
+see @schnaubelt2019comparison.
+
+
+
+
+
+
+
+<!--chapter:end:5s-method-lasso-regression.Rmd-->
+
+## Results
+
+```{r, include=FALSE}
+knitr::opts_chunk$set(echo=FALSE, warning = FALSE, message = FALSE, out.width = '50%', fig.align = 'center')
+options(knitr.duplicate.label = "allow")
+```
+
+Following we summarize the results of the different lasso approaches.
+For each approach we show the prediction errors for each test set
+during the forward validation as well as the actual predictions.
+The $\lambda$ that achieved the minimum MSE during the forward validation, will be used to fit the model to the complete training data and evaluated on the hold-out validation set at the
+end of the observation period.
+For the full model we show the predictions and resulting coefficient
+map.
+
+### Lasso {#lasso-og}
+```{r}
+library(patchwork)
+library(ggpubr)
+library(raster)
+library(glmnet)
+library(Hmisc)
+source("../code/R/helper-functions.R")
+```
+```{r}
+path_to_model_folder <- "../results/CV-lasso/test-lasso-og/"
+```
+```{r}
+err_mat <- readRDS(paste0(path_to_model_folder, "/err-mat.rds"))
+lambdas <- readRDS(paste0(path_to_model_folder, "/lambda-vec.rds"))
+wm <- which.min(apply(err_mat, 1, mean))
+full_model <- readRDS(paste0(path_to_model_folder, "full-model.rds"))
+intercept <- round(full_model$a0[wm],2)
+lambda <- round(lambdas[wm],2)
+rm(full_model)
+```
+
+```{r err-bar-plot-lasso-og, fig.cap="Mean squared error of the 5-fold blocked cross validation for a range of lambda values on the log scale. The points in the middle represent the average MSE for the respective lambda, the errorbars give the MSE +/- one standard deviation. The dotted line shows the lambda for which minimum MSE was obtained."}
+err_bars_plot <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-bars-plot.rds"))
+err_bars_plot
+```
+\@ref(fig:err-bar-plot-lasso-og) shows the MSE for all the 5 folds summarizing
+for each lambda value the mean MSE (black points) and indicates the dispersion
+of the MSE by one standard deviation by presenting error bars.
+The minimal average MSE is found at `r round(log(lambda),2)` with a value of 
+approximately 750.
+The MSE differ a lot between folds, as seen by the large errors bars.
+A common approach for choosing $\lambda$ from cross validation (or here forward validation),
+is to choose largest lambda that lays within one standard deviation of 
+the $\lambda_{\min}$ that minimizes the average MSE for the folds.
+Here we could not apply such a procedure because the error bars
+have such a wide spread. For the sake of comparability
+with other lasso models as well with the fused lasso later, we will
+choose the $\lambda_{\min}$ for all models when fitting the full model.
+
+
+
+```{r err-fold-lasso-og, fig.cap="MSE of the CV for the different lambda values on the a log scale. The red dotted line shows the lambda for which minimum MSE was obtained."}
+p1 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-plot-fold-1.rds"))
+p2 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-plot-fold-2.rds"))
+p3 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-plot-fold-3.rds"))
+p4 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-plot-fold-4.rds"))
+p5 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-plot-fold-5.rds"))
+
+p1 + p2 + p3 + p4 + p5
+
+```
+
+In \@ref(fig:err-fold-lasso-og) we display the prediction errors in each fold when
+predicting on the test sets. The optimal amount for folds 1 until 4 is 
+are very close, in fold 5 a larger value is chosen.
+Folds 1 and 2 have a local maximum in the beginning of the path, fold 5 has 
+a local maximum and minimum after the optimal $\lambda_{\min}$ value.
+Overall the average regularization seems to be a good compromise here.
+
+```{r}
+pred_plot_1 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-1.rds"))
+pred_plot_1 <- pred_plot_1 + ylab("Precipitation fold 1")
+mse_1 <- get_mse_from_pred_plot(pred_plot_1)
+
+pred_plot_2 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-2.rds"))
+pred_plot_2 <- pred_plot_2 + ylab("Precipitation fold 2")
+mse_2 <- get_mse_from_pred_plot(pred_plot_2)
+
+pred_plot_3 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-3.rds"))
+pred_plot_3 <- pred_plot_3 + ylab("Precipitation fold 3")
+mse_3 <- get_mse_from_pred_plot(pred_plot_3)
+
+pred_plot_4 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-4.rds"))
+pred_plot_4 <- pred_plot_4 + ylab("Precipitation fold 4")
+mse_4 <- get_mse_from_pred_plot(pred_plot_4)
+
+pred_plot_5 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-5.rds"))
+pred_plot_5 <- pred_plot_5 + ylab("Precipitation fold 5")
+mse_5 <- get_mse_from_pred_plot(pred_plot_5)
+
+pred_plot_list <- list(pred_plot_1,pred_plot_2,pred_plot_3,pred_plot_4,pred_plot_5)
+```
+
+```{r pred-plot-fold-lasso-og, fig.cap="Precipitation prediction and target values in the test set in each fold. Predictions in red and target values in black."}
+pred_plot_1 + pred_plot_2 + pred_plot_3 + pred_plot_4 +
+  pred_plot_5
+```
+We now inspect the actual predictions made in the test sets and plot them together
+with the respective target values (\@ref(fig:pred-plot-fold-lasso-og)).
+The precipitation in the test sets are predicted well, in general.
+But it misses maximum vales and local minimal.
+Overall the standard lasso shows here it can learn some meaningful connection.
+
+
+```{r pred-plot-full-lasso-og, fig.cap="Precipitation prediction and target values in the validation set. Predictions in red and target values in black. The model was fitted on the full CV data with the lambda value that minimised the average MSE"}
+full_preds <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-full.rds"))
+mse_full <- get_mse_from_pred_plot(full_preds)
+full_preds
+#mse_full
+```
+The predictions from the full model on the evaluation set indicate 
+that the model is capable of predicting the seasonal variation in the precipitation
+data (\@ref(fig:pred-plot-full-lasso-og)). But it constantly fails to predict
+the peaks during the seasonal cycles.
+
+```{r coef-plot-full-lasso-og, fig.cap=paste("Coefficient plot of the full lasso model with fitted intercept of", intercept)}
+coef_full <- readRDS(paste0(path_to_model_folder,
+                     "coef-plots/coef-plot-full.rds"))
+coef_full + theme(legend.position = "bottom")
+```
+Finally we plot the nonzero coefficients from the lasso directly
+on their locations on the map (\@ref(fig:coef-plot-full-lasso-og).
+As we can see from the coefficient value legend, the range of coefficient values
+is tilted towards negative values.
+Also maybe surprisingly, locations far away from the CAB are included in the model.
+We can observe negative and positive coefficients in the Atlantic ocean.
+Some but not of these regions can also be seen to be highly correlated from analysis
+done on the original and deseasonalised data, see \@ref{correlation-chapter}.
+
+
+<!--chapter:end:5s-lasso-results-summary.Rmd-->
+
+### Standardized lasso {#lasso-stand}
+```{r}
+library(patchwork)
+library(ggpubr)
+library(raster)
+library(glmnet)
+library(Hmisc)
+source("../code/R/helper-functions.R")
+```
+
+```{r}
+path_to_model_folder <- "../results/CV-lasso/test-lasso-stand/"
+```
+
+```{r}
+err_mat <- readRDS(paste0(path_to_model_folder, "/err-mat.rds"))
+lambdas <- readRDS(paste0(path_to_model_folder, "/lambda-vec.rds"))
+mm <- min(apply(err_mat, 1, mean))
+wm <- which.min(apply(err_mat, 1, mean))
+full_model <- readRDS(paste0(path_to_model_folder, "full-model.rds"))
+intercept <- round(full_model$a0[wm],2)
+lambda <- round(lambdas[wm],2)
+rm(full_model)
+```
+
+```{r err-bar-plot-lasso-stand, fig.cap="Mean squared error of the 5-fold blocked cross validation for a range of lambda values on the log scale. The points in the middle represent the average MSE for the respective lambda, the errorbars give the MSE +/- one standard deviation. The dotted line shows the lambda for which minimum MSE was obtained."}
+err_bars_plot <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-bars-plot.rds"))
+err_bars_plot
+# a <- ggplot_build(err_bars_plot)
+```
+The learning curve in \@ref(fig:err-bar-plot-lasso-stand) shows some 
+extreme behavior for $\lambda$ values around 0 on the logarithmic scale.
+For lower values the standard deviation of the MSE get extremely large.
+The minimum MSE is `r round(mm,2)`
+Inspecting the MSE lines separately for each fold gives more insight.
+
+
+```{r err-fold-lasso-stand, fig.cap="MSE of the CV for the different lambda values on the a log scale. The red dotted line shows the lambda for which minimum MSE was obtained."}
+p1 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-plot-fold-1.rds"))
+p2 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-plot-fold-2.rds"))
+p3 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-plot-fold-3.rds"))
+p4 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-plot-fold-4.rds"))
+p5 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-plot-fold-5.rds"))
+
+p1 + p2 + p3 + p4 + p5
+```
+The folds that drive the large MSE standard deviation are fold 4 and 5 (see \@ref(fig:err-fold-lasso-stand)). The range of the best $\lambda$ value
+chosen is larger than for the lasso without standardization. Fold 4 chooses
+very low regularization as optimal.
+
+
+```{r}
+pred_plot_1 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-1.rds"))
+pred_plot_1 <- pred_plot_1 + ylab("Precipitation fold 1")
+mse_1 <- get_mse_from_pred_plot(pred_plot_1)
+
+pred_plot_2 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-2.rds"))
+pred_plot_2 <- pred_plot_2 + ylab("Precipitation fold 2")
+mse_2 <- get_mse_from_pred_plot(pred_plot_2)
+
+pred_plot_3 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-3.rds"))
+pred_plot_3 <- pred_plot_3 + ylab("Precipitation fold 3")
+mse_3 <- get_mse_from_pred_plot(pred_plot_3)
+
+pred_plot_4 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-4.rds"))
+pred_plot_4 <- pred_plot_4 + ylab("Precipitation fold 4")
+mse_4 <- get_mse_from_pred_plot(pred_plot_4)
+
+pred_plot_5 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-5.rds"))
+pred_plot_5 <- pred_plot_5 + ylab("Precipitation fold 5")
+mse_5 <- get_mse_from_pred_plot(pred_plot_5)
+
+pred_plot_list <- list(pred_plot_1,pred_plot_2,pred_plot_3,pred_plot_4,pred_plot_5)
+```
+
+```{r pred-plot-fold-lasso-stand, fig.cap="Precipitation prediction and target values in the test set in each fold. Predictions in red and target values in black."}
+pred_plot_1 + pred_plot_2 + pred_plot_3 + pred_plot_4 +
+  pred_plot_5
+```
+The predictions on the test set are similar to those from the normal lasso,
+in fold 4 the peak is predicted exactly (\@ref(fig:pred-plot-fold-lasso-stand)). The Model from fold 2 underestimates 
+more than the respective fold model from the lasso without standardization (see \@ref(fig:pred-plot-fold-lasso-stand)).
+
+```{r pred-plot-full-lasso-stand, fi.cap="Precipitation prediction and target values in the validation set. Predictions in red and target values in black. The model was fitted on the full CV data with the lambda value that minimised the average MSE"}
+full_preds <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-full.rds"))
+full_preds
+#mse_full <- get_mse_from_pred_plot(full_preds)
+#mse_full
+```
+The predictions from the full model of the standardized lasso show
+the same behavior as the ones found in the lasso without standardization.
+Again seasonal patterns are predicted well but largest values are underestimated (\@ref(fig:coef-plot-full-lasso-stand)).
+
+```{r coef-plot-full-lasso-stand, fig.cap=paste("Coefficient plot of the full lasso model with fitted intercept of", intercept)}
+coef_full <- readRDS(paste0(path_to_model_folder,
+                     "coef-plots/coef-plot-full.rds"))
+coef_full + theme(legend.position = "bottom")
+```
+Figure \@ref(fig:coef-plot-full-lasso-stand) shows now the coefficient plot for the standardized lasso,
+the coefficient values are given on the standardized scale.
+The range of coefficient values is more symmetric around the 0 than for first lasso model
+and the locations differ as well. For example the two locations at pacific coast of
+South America are not included in the model here (compare \@ref(fig:coef-plot-full-lasso-og)).
+
+<!--chapter:end:5s-lasso-stand-summary.Rmd-->
+
+### De-seasonalized lasso {#lasso-deseas}
+```{r}
+library(patchwork)
+library(ggpubr)
+library(raster)
+library(glmnet)
+library(Hmisc)
+source("../code/R/helper-functions.R")
+```
+
+```{r}
+path_to_model_folder <- "../results/CV-lasso/test-deseas-lasso/"
+```
+
+```{r}
+err_mat <- readRDS(paste0(path_to_model_folder, "/err-mat.rds"))
+lambdas <- readRDS(paste0(path_to_model_folder, "/lambda-vec.rds"))
+mm <- min(apply(err_mat, 1, mean))
+wm <- which.min(apply(err_mat, 1, mean))
+full_model <- readRDS(paste0(path_to_model_folder, "full-model.rds"))
+intercept <- round(full_model$a0[wm],2)
+lambda <- round(lambdas[wm],2)
+rm(full_model)
+```
+
+```{r err-bar-plot-lasso-deseas, fig.cap="Mean squared error of the 5-fold blocked cross validation for a range of lambda values on the log scale. The points in the middle represent the average MSE for the respective lambda, the errorbars give the MSE +/- one standard deviation. The dotted line shows the lambda for which minimum MSE was obtained."}
+err_bars_plot <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-bars-plot.rds"))
+err_bars_plot
+# a <- ggplot_build(err_bars_plot)
+```
+
+Initially with decreasing regularization the MSE decreases as well
+before it reaches its minimum and stays fairly constant afterwards (\@ref(fig:err-bar-plot-lasso-deseas)). The minimum average MSE achieved is
+higher than in the lasso with and without standardization (minimum average MSE here `r round(mm,2)`).
+In the decreasing area from the start of the path
+until its minimum, the size of the error bar increases.
+We inspect this further in the error plots for each fold.
+
+```{r err-fold-lasso-deseas, fig.cap="MSE of the CV for the different lambda values on the a log scale. The red dotted line shows the lambda for which minimum MSE was obtained."}
+p1 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-plot-fold-1.rds"))
+p2 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-plot-fold-2.rds"))
+p3 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-plot-fold-3.rds"))
+p4 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-plot-fold-4.rds"))
+p5 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-plot-fold-5.rds"))
+
+p1 + p2 + p3 + p4 + p5
+```
+
+Fold 4 causes the errorbars to increase in range, since it has a local maximum
+around l$log(\lambda)$) 1.25. Fold 5 shows a similar behavior but the
+size of the local maximum is smaller relatively to the other MSE values for this fold. Apart from that folds 1,2,3,5 show similar trajectories although the range
+of their MSE values differ (\@ref(fig:err-fold-lasso-deseas)).
+
+```{r}
+pred_plot_1 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-1.rds"))
+pred_plot_1 <- pred_plot_1 + ylab("Precipitation fold 1")
+mse_1 <- get_mse_from_pred_plot(pred_plot_1)
+
+pred_plot_2 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-2.rds"))
+pred_plot_2 <- pred_plot_2 + ylab("Precipitation fold 2")
+mse_2 <- get_mse_from_pred_plot(pred_plot_2)
+
+pred_plot_3 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-3.rds"))
+pred_plot_3 <- pred_plot_3 + ylab("Precipitation fold 3")
+mse_3 <- get_mse_from_pred_plot(pred_plot_3)
+
+pred_plot_4 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-4.rds"))
+pred_plot_4 <- pred_plot_4 + ylab("Precipitation fold 4")
+mse_4 <- get_mse_from_pred_plot(pred_plot_4)
+
+pred_plot_5 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-5.rds"))
+pred_plot_5 <- pred_plot_5 + ylab("Precipitation fold 5")
+mse_5 <- get_mse_from_pred_plot(pred_plot_5)
+
+pred_plot_list <- list(pred_plot_1,pred_plot_2,pred_plot_3,pred_plot_4,pred_plot_5)
+```
+
+```{r pred-plot-fold-lasso-deseas, fig.cap="Precipitation prediction and target values in the test set in each fold. Predictions in red and target values in black."}
+pred_plot_1 + pred_plot_2 + pred_plot_3 + pred_plot_4 +
+  pred_plot_5
+```
+
+
+```{r pred-plot-full-lasso-deseas, fi.cap="Precipitation prediction and target values in the validation set. Predictions in red and target values in black. The model was fitted on the full CV data with the lambda value that minimised the average MSE"}
+full_preds <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-full.rds"))
+full_preds
+mse_full <- get_mse_from_pred_plot(full_preds)
+#mse_full
+```
+
+In \@ref(fig:pred-plot-fold-lasso-deseas) we observe that the predictions
+are quite different from the other models so far,
+Folds 1 and 2 are not predicted accurately and in general the predictions
+are less smooth and don't work as well as in the other two models,
+which is also reflected in the higher average MSE minimum in \@ref(fig:err-bar-plot-lasso-deseas)
+```{r coef-plot-full-lasso-deseas, fig.cap=paste("Coefficient plot of the full lasso model with fitted intercept of", intercept)}
+coef_full <- readRDS(paste0(path_to_model_folder,
+                     "coef-plots/coef-plot-full.rds"))
+coef_full + theme(legend.position = "bottom")
+```
+
+The final predictions appear to be less smooth than in the other models so far
+(lasso with and without standardization), but generally as well
+underestimate the higher values in the data and overestimate low values
+around month 415.
+We see somehow better predictions for the peak in the first month of the
+validation period.
+The amplitude in the seasonal patterns of the predictions decrease faster than for example
+in \@ref(fig:pred-plot-full-lasso-og).
+Note that in our forward validation setting, the seasonality used to de-seasonalize the validation data is the last year of the training set.
+While during the forward validation phase, when we search for the optimal $\lambda$ to refit the full model, the test sets are smaller hence relate to shorter time periods.
+For the validation data we actually have 5 years that are de-seasonalized
+by the year preceding the validation time period. This estimation of seasonality
+might not be acccurate any more if the seasonality in later years of the validation data is not the same as in the last year from the forward validation data.
+This might be an explanation why predicting the seasonal precipitation patterns in the later years become less reliable.
+
+
+
+The model using de-seasonalized SST data chooses many regions in the highest
+latitudes and few regions around the equator (\@ref(fig:pred-plot-full-lasso-og))).
+Many coefficients of opposite signs can appear quite close to another,
+espicially in the higher latitudes.
+
+<!--chapter:end:5s-lasso-deseas-summary.Rmd-->
+
+---
+output:
+  pdf_document: default
+  html_document: default
+---
+### Differentiated lasso {#lasso-diff1}
+
+```{r, include=FALSE}
+knitr::opts_chunk$set(echo=FALSE, warning = FALSE, message = FALSE, out.width = '50%', fig.align = 'center',
+                      results = FALSE)
+options(knitr.duplicate.label = "allow")
+```
+
+```{r}
+library(patchwork)
+library(ggpubr)
+library(raster)
+library(glmnet)
+library(Hmisc)
+source("../code/R/helper-functions.R")
+```
+```{r}
+path_to_model_folder <- "../results/CV-lasso/test-diff1-lasso/"
+```
+```{r}
+err_mat <- readRDS(paste0(path_to_model_folder, "/err-mat.rds"))
+lambdas <- readRDS(paste0(path_to_model_folder, "/lambda-vec.rds"))
+mm <- min(apply(err_mat, 1, mean))
+wm <- which.min(apply(err_mat, 1, mean))
+full_model <- readRDS(paste0(path_to_model_folder, "full-model.rds"))
+intercept <- round(full_model$a0[wm],2)
+lambda <- round(lambdas[wm],2)
+rm(full_model)
+```
+
+```{r err-bar-plot-lasso-diff1, fig.cap="Mean squared error of the 5-fold blocked cross validation for a range of lambda values on the log scale. The points in the middle represent the average MSE for the respective lambda, the errorbars give the MSE +/- one standard deviation. The dotted line shows the lambda for which minimum MSE was obtained."}
+err_bars_plot <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-bars-plot.rds"))
+err_bars_plot
+a <- ggplot_build(err_bars_plot)
+```
+
+The MSE learning curve in \@ref(fig:err-bar-plot-lasso-diff1) has
+its minimum at $\lambda=$ `r lambda`. And shows increasing standard
+deviation for the MSE values across folds when $\lambda$ decreases
+to the end of the path.
+
+```{r err-fold-lasso-diff1, fig.cap="MSE of the CV for the different lambda values on the a log scale. The red dotted line shows the lambda for which minimum MSE was obtained."}
+p1 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-plot-fold-1.rds"))
+p2 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-plot-fold-2.rds"))
+p3 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-plot-fold-3.rds"))
+p4 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-plot-fold-4.rds"))
+p5 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-plot-fold-5.rds"))
+
+p1 + p2 + p3 + p4 + p5
+
+```
+The range of MSE inside the different folds vary but overall
+the folds show similar trajectories and the optimal regularization
+chosen occurs at close values (on the log scale, \@ref(fig:err-fold-lasso-og).
+
+```{r}
+pred_plot_1 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-1.rds"))
+mse_1 <- get_mse_from_pred_plot(pred_plot_1)
+
+pred_plot_2 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-2.rds"))
+mse_2 <- get_mse_from_pred_plot(pred_plot_2)
+
+
+pred_plot_3 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-3.rds"))
+mse_3 <- get_mse_from_pred_plot(pred_plot_3)
+
+pred_plot_4 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-4.rds"))
+mse_4 <- get_mse_from_pred_plot(pred_plot_4)
+
+pred_plot_5 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-5.rds"))
+mse_5 <- get_mse_from_pred_plot(pred_plot_5)
+
+pred_plot_list <- list(pred_plot_1,pred_plot_2,pred_plot_3,pred_plot_4,pred_plot_5)
+```
+
+```{r pred-plot-fold-lasso-diff1, fig.cap="Precipitation prediction and target values in the test set in each fold. Predictions in red and target values in black."}
+pred_plot_1 + pred_plot_2 + pred_plot_3 + pred_plot_4 +
+  pred_plot_5
+```
+Here the prediction inside the folds show similar trajectories to  \@ref(fig:pred-plot-fold-lasso-og) or \@ref(fig:pred-plot-fold-lasso-stand),
+note that the prediction period is one month shorter because after differentiating
+the predictors we shorten the target variable by one month, too (\@ref(fig:pred-plot-fold-lasso-diff1)).
+
+```{r pred-plot-full-lasso-diff1, fi.cap="Precipitation prediction and target values in the validation set. Predictions in red and target values in black. The model was fitted on the full CV data with the lambda value that minimised the average MSE"}
+full_preds <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-full.rds"))
+full_preds
+mse_full <- get_mse_from_pred_plot(full_preds)
+#mse_full
+```
+
+As for the other models we looked at before, the amplitudes are underestimated
+in \@ref(fig:pred-plot-fold-lasso-diff1). But the amplitudes are not decreasing
+(which can be observed for the other models and most prominently for
+\@ref(fig:pred-plot-fold-lasso-deseas)). In the peak around month 420,
+the predictions actually spike to their maximum value, but at the same time
+they strongly overestimate the period of low precipitation directly preceding.
+
+
+```{r coef-plot-full-lasso-diff1, fig.cap=paste("Coefficient plot of the full lasso model with fitted intercept of", intercept)}
+coef_full <- readRDS(paste0(path_to_model_folder,
+                     "coef-plots/coef-plot-full.rds"))
+coef_full
+```
+Investigating the coefficient plot for this model (\@ref(fig:coef-plot-full-lasso-diff1)), we find that here a lot of coefficients
+have large positive values, for example below the equator in the Pacific and Atlantic.
+
+
+<!--chapter:end:5s-lasso-diff1-summary.Rmd-->
+
+### Lasso on clustered precipitation
+
+```{r, include=FALSE}
+knitr::opts_chunk$set(echo=FALSE, warning = FALSE, message = FALSE, out.width = '50%', fig.align = 'center')
+options(knitr.duplicate.label = "allow")
+```
+
+```{r}
+library(patchwork)
+library(ggpubr)
+library(raster)
+library(glmnet)
+library(Hmisc)
+library(patchwork)
+source("../code/R/helper-functions.R")
+```
+
+Recall that our cluster analysis proposes 5 clusters for the $k$-means algorithm. We came to this conclusion after applying a PCA and computing the gap statistic for different values of $k$.
+We apply the lasso now on each cluster and show for each cluster
+the learning curve, predictions and coefficient plot of the full model.
+
+#### Cluster 1
+```{r}
+path_to_model_folder <- "../results/CV-lasso/cluster-cv-lasso-og2/cluster-1/"
+err_bars_plot <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-bars-plot.rds"))
+p1 <- readRDS(paste0(path_to_model_folder, "err-mat-plots/err-plot-fold-1.rds"))
+p2 <- readRDS(paste0(path_to_model_folder, "err-mat-plots/err-plot-fold-2.rds"))
+p3 <- readRDS(paste0(path_to_model_folder, "err-mat-plots/err-plot-fold-3.rds"))
+p4 <- readRDS(paste0(path_to_model_folder, "err-mat-plots/err-plot-fold-4.rds"))
+p5 <- readRDS(paste0(path_to_model_folder, "err-mat-plots/err-plot-fold-5.rds"))
+pred_plot_1 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-1.rds"))
+pred_plot_2 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-2.rds"))
+pred_plot_3 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-3.rds"))
+pred_plot_4 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-4.rds"))
+pred_plot_5 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-5.rds"))
+full_preds <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-full.rds"))
+coef_plot_full <- readRDS(paste0(path_to_model_folder,
+               "coef-plots/coef-plot-full.rds"))
+full_model <- readRDS(paste0(path_to_model_folder, "full-model.rds"))
+intercept1 <- round(full_model$a0,2)
+lambda1 <- full_model$lambda
+mse1 <- get_mse_from_pred_plot(full_preds)
+```
+
+```{r cl1-err-bar, fig.cap="Model: Lasso on cluster 1. Mean squared error of the 5-fold blocked cross validation for a range of lambda values on the log scale. The points in the middle represent the average MSE for the respective lambda, the errorbars give the MSE +/- one standard deviation. The dotted line shows the lambda for which minimum MSE was obtained."}
+err_bars_plot + ggtitle("MSE for lasso on cluster 1")
+```
+
+\@ref(fig:cl1-err-bar) shows the MSE for the 5 folds
+when we fit the lasso on cluster 1 only.
+The learning curve has no steep increases or declines
+but increases steadily for less regularization after
+the minimum at `r round(log(lambda1),2)`. The minimum mean MSE
+is `r mse1`.
+
+
+```{r cl1-full-pred, fig.cap="Model: Lasso on cluster 1. Precipitation prediction and target values in the validation set. Predictions in red and target values in black. The model was fitted on the full CV data with the lambda value that minimised the average MSE"}
+full_preds + ggtitle("Predictions on evaluation set, lasso on cluster 1")
+```
+
+As we can see in the predictions on the evaluation set
+for cluster 1 (\@ref(fig:cl1-full-pred)),
+the model here as well can not predict the peaks in
+precipitations but catches well the lower values and the general seasonal trajectories.
+
+```{r cl1-coef-plot, fig.cap=paste("Model: Lasso on cluster 1. Coefficient plot of the full model. Fitted intercept of", intercept1)}
+coef_plot_full + ggtitle("Coefficient plot, lasso on cluster 1") + theme(legend.position = "bottom")
+```
+The nonzero coefficients chosen by the lasso 
+are all negative (\@ref(fig:cl1-coef-plot)), since the intercept of the model
+is relatively high (`r intercept1`), the coefficients only decrease the predictions and no predicted value
+is higher than the intercept.
+
+
+<!--chapter:end:lasso-summary-cluster-1.Rmd-->
+
+#### Cluster 2 {#cl2}
+
+```{r, include=FALSE}
+knitr::opts_chunk$set(echo=FALSE, warning = FALSE, message = FALSE, out.width = '50%', fig.align = 'center')
+options(knitr.duplicate.label = "allow")
+```
+
+```{r}
+library(patchwork)
+library(ggpubr)
+library(raster)
+library(glmnet)
+library(Hmisc)
+library(patchwork)
+source("../code/R/helper-functions.R")
+```
+
+```{r}
+path_to_model_folder <- "../results/CV-lasso/cluster-cv-lasso-og2/cluster-2/"
+err_bars_plot <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-bars-plot.rds"))
+p1 <- readRDS(paste0(path_to_model_folder, "err-mat-plots/err-plot-fold-1.rds"))
+p2 <- readRDS(paste0(path_to_model_folder, "err-mat-plots/err-plot-fold-2.rds"))
+p3 <- readRDS(paste0(path_to_model_folder, "err-mat-plots/err-plot-fold-3.rds"))
+p4 <- readRDS(paste0(path_to_model_folder, "err-mat-plots/err-plot-fold-4.rds"))
+p5 <- readRDS(paste0(path_to_model_folder, "err-mat-plots/err-plot-fold-5.rds"))
+pred_plot_1 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-1.rds"))
+pred_plot_2 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-2.rds"))
+pred_plot_3 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-3.rds"))
+pred_plot_4 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-4.rds"))
+pred_plot_5 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-5.rds"))
+full_preds <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-full.rds"))
+coef_plot_full <- readRDS(paste0(path_to_model_folder,
+                                 "coef-plots/coef-plot-full.rds"))
+full_model <- readRDS(paste0(path_to_model_folder, "full-model.rds"))
+intercept2 <- round(full_model$a0,2)
+lambda2 <- full_model$lambda
+mse2 <- get_mse_from_pred_plot(full_preds)
+```
+
+```{r cl2-err-bar, fig.cap="Model: Lasso on cluster 2. Mean squared error of the 5-fold blocked cross validation for a range of lambda values on the log scale. The points in the middle represent the average MSE for the respective lambda, the errorbars give the MSE +/- one standard deviation. The dotted line shows the lambda for which minimum MSE was obtained."}
+err_bars_plot + ggtitle("MSE for lasso on cluster 2")
+```
+
+\@ref(fig:cl2-err-bar) has more narrow error bars
+than the same plot for cluster 1. It has optimum at
+`r log(lambda2)` and a minimum mean MSE is `r mse2`.
+And regularization chosen here is lower and the resulting MSE as well.
+
+
+```{r cl2-full-pred, fig.cap="Model: Lasso on cluster 2. Precipitation prediction and target values in the validation set. Predictions in red and target values in black. The model was fitted on the full CV data with the lambda value that minimised the average MSE"}
+full_preds + ggtitle("Predictions on evaluation set, lasso on cluster 2")
+```
+
+The final predictions on cluster 2 catch the seasonality as well as high and low values 
+reasonably well (\@ref(fig:cl2-full-pred)). 
+But it still misses higher values in the 4th and 5th peak
+
+```{r cl2-coef-plot, fig.cap=paste("Model: Lasso on cluster 2. Coefficient plot of the full model. Fitted intercept of", intercept2)}
+coef_plot_full + ggtitle("Coefficient plot, lasso on cluster 2") + theme(legend.position = "bottom")
+```
+The lower $\lambda$ chosen in cluster 2 results
+in a higher number of non-zero coefficients
+than for example in cluster 1 (\@ref(fig:cl2-coef-plot)).
+Here the intercept is also higher (`r intercept2`) than
+the predicted values. So most of the coefficient values are negative.
+
+
+<!--chapter:end:lasso-summary-cluster-2.Rmd-->
+
+#### Cluster 3
+
+```{r, include=FALSE}
+knitr::opts_chunk$set(echo=FALSE, warning = FALSE, message = FALSE, out.width = '50%', fig.align = 'center')
+options(knitr.duplicate.label = "allow")
+```
+
+```{r}
+library(patchwork)
+library(ggpubr)
+library(raster)
+library(glmnet)
+library(Hmisc)
+library(patchwork)
+source("../code/R/helper-functions.R")
+```
+
+```{r}
+path_to_model_folder <- "../results/CV-lasso/cluster-cv-lasso-og2/cluster-3/"
+err_bars_plot <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-bars-plot.rds"))
+p1 <- readRDS(paste0(path_to_model_folder, "err-mat-plots/err-plot-fold-1.rds"))
+p2 <- readRDS(paste0(path_to_model_folder, "err-mat-plots/err-plot-fold-2.rds"))
+p3 <- readRDS(paste0(path_to_model_folder, "err-mat-plots/err-plot-fold-3.rds"))
+p4 <- readRDS(paste0(path_to_model_folder, "err-mat-plots/err-plot-fold-4.rds"))
+p5 <- readRDS(paste0(path_to_model_folder, "err-mat-plots/err-plot-fold-5.rds"))
+pred_plot_1 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-1.rds"))
+pred_plot_2 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-2.rds"))
+pred_plot_3 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-3.rds"))
+pred_plot_4 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-4.rds"))
+pred_plot_5 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-5.rds"))
+full_preds <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-full.rds"))
+coef_plot_full <- readRDS(paste0(path_to_model_folder,
+                                 "coef-plots/coef-plot-full.rds"))
+full_model <- readRDS(paste0(path_to_model_folder, "full-model.rds"))
+intercept3 <- round(full_model$a0,2)
+lambda3 <- full_model$lambda
+mse3 <- get_mse_from_pred_plot(full_preds)
+```
+
+```{r cl3-err-bar, fig.cap="Model: Lasso on cluster 3. Mean squared error of the 5-fold blocked cross validation for a range of lambda values on the log scale. The points in the middle represent the average MSE for the respective lambda, the errorbars give the MSE +/- one standard deviation. The dotted line shows the lambda for which minimum MSE was obtained."}
+err_bars_plot + ggtitle("MSE for lasso on cluster 3")
+```
+
+\@ref(fig:cl3-err-bar) has its optimum at
+`r log(lambda3)` and a minimum mean MSE is `r mse3`.
+The error bars change in size and increase
+for lower regularization values after the minimum
+MSE is reached.
+
+
+```{r cl3-full-pred, fig.cap="Model: Lasso on cluster 3. Precipitation prediction and target values in the validation set. Predictions in red and target values in black. The model was fitted on the full CV data with the lambda value that minimised the average MSE"}
+full_preds + ggtitle("Predictions on evaluation set, lasso on cluster 3")
+```
+
+The first two seasons of precipitation are predicted well for cluster 3(\@ref(fig:cl3-full-pred)).
+But as the values increase in later seasons again
+the model can not predict the peaks in the precipitation data.
+
+```{r cl3-coef-plot, fig.cap=paste("Model: Lasso on cluster 3. Coefficient plot of the full model. Fitted intercept of", intercept3)}
+coef_plot_full + ggtitle("Coefficient plot, lasso on cluster 3") + theme(legend.position = "bottom")
+```
+Again here the lower $\lambda$ value leads to a higher number of coefficients chosen (\@ref(fig:cl3-coef-plot)). Also the intercept this time is lower (`r intercept3`), there are also large positive coefficients included in the model and
+predictions are higher than the intercept, too.
+
+
+<!--chapter:end:lasso-summary-cluster-3.Rmd-->
+
+#### Cluster 4
+
+```{r, include=FALSE}
+knitr::opts_chunk$set(echo=FALSE, warning = FALSE, message = FALSE, out.width = '50%', fig.align = 'center')
+options(knitr.duplicate.label = "allow")
+```
+
+```{r}
+library(patchwork)
+library(ggpubr)
+library(raster)
+library(glmnet)
+library(Hmisc)
+library(patchwork)
+source("../code/R/helper-functions.R")
+```
+
+```{r}
+path_to_model_folder <- "../results/CV-lasso/cluster-cv-lasso-og2/cluster-4/"
+err_bars_plot <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-bars-plot.rds"))
+p1 <- readRDS(paste0(path_to_model_folder, "err-mat-plots/err-plot-fold-1.rds"))
+p2 <- readRDS(paste0(path_to_model_folder, "err-mat-plots/err-plot-fold-2.rds"))
+p3 <- readRDS(paste0(path_to_model_folder, "err-mat-plots/err-plot-fold-3.rds"))
+p4 <- readRDS(paste0(path_to_model_folder, "err-mat-plots/err-plot-fold-4.rds"))
+p5 <- readRDS(paste0(path_to_model_folder, "err-mat-plots/err-plot-fold-5.rds"))
+pred_plot_1 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-1.rds"))
+pred_plot_2 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-2.rds"))
+pred_plot_3 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-3.rds"))
+pred_plot_4 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-4.rds"))
+pred_plot_5 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-5.rds"))
+full_preds <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-full.rds"))
+coef_plot_full <- readRDS(paste0(path_to_model_folder,
+                                 "coef-plots/coef-plot-full.rds"))
+full_model <- readRDS(paste0(path_to_model_folder, "full-model.rds"))
+intercept4 <- round(full_model$a0,2)
+lambda4 <- full_model$lambda
+mse4 <- get_mse_from_pred_plot(full_preds)
+```
+
+```{r cl4-err-bar, fig.cap="Model: Lasso on cluster 4. Mean squared error of the 5-fold blocked cross validation for a range of lambda values on the log scale. The points in the middle represent the average MSE for the respective lambda, the errorbars give the MSE +/- one standard deviation. The dotted line shows the lambda for which minimum MSE was obtained."}
+err_bars_plot + ggtitle("MSE for lasso on cluster 4")
+```
+
+\@ref(fig:cl4-err-bar) indicates are higher optimal $\lambda$
+and the lowest mean MSE is also higher than in the preceeding clusters.
+
+
+```{r cl4-full-pred, fig.cap="Model: Lasso on cluster 4. Precipitation prediction and target values in the validation set. Predictions in red and target values in black. The model was fitted on the full CV data with the lambda value that minimised the average MSE"}
+full_preds + ggtitle("Predictions on evaluation set, lasso on cluster 4")
+```
+For cluster 4 we see that the precipitation values in the evaluation set
+are a lot more "wiggly" than in the other cluster.
+The higher regularization chosen from the forward validation 
+does not allow the model to predict these fast changing curves well.
+Again seasonality is predicted reasonably (\@ref(fig:cl4-full-pred)). 
+
+```{r cl4-coef-plot, fig.cap=paste("Model: Lasso on cluster 4. Coefficient plot of the full model. Fitted intercept of", intercept4)}
+coef_plot_full + ggtitle("Coefficient plot, lasso on cluster 4") + theme(legend.position = "bottom")
+```
+The nonzero coefficients for cluster 4 have quite large positive and
+negative values. The intercept is `r intercept4`(\@ref(fig:cl4-coef-plot)).
+No locations next to the south-american coast line is chosen.
+
+
+<!--chapter:end:lasso-summary-cluster-4.Rmd-->
+
+#### Cluster 5
+
+```{r, echo=FALSE}
+knitr::opts_chunk$set(echo=FALSE, warning = FALSE, message = FALSE, out.width = '50%', fig.align = 'center')
+options(knitr.duplicate.label = "allow")
+```
+
+```{r}
+library(patchwork)
+library(ggpubr)
+library(raster)
+library(glmnet)
+library(Hmisc)
+library(patchwork)
+source("../code/R/helper-functions.R")
+```
+
+```{r}
+path_to_model_folder <- "../results/CV-lasso/cluster-cv-lasso-og2/cluster-5/"
+err_bars_plot <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-bars-plot.rds"))
+p1 <- readRDS(paste0(path_to_model_folder, "err-mat-plots/err-plot-fold-1.rds"))
+p2 <- readRDS(paste0(path_to_model_folder, "err-mat-plots/err-plot-fold-2.rds"))
+p3 <- readRDS(paste0(path_to_model_folder, "err-mat-plots/err-plot-fold-3.rds"))
+p4 <- readRDS(paste0(path_to_model_folder, "err-mat-plots/err-plot-fold-4.rds"))
+p5 <- readRDS(paste0(path_to_model_folder, "err-mat-plots/err-plot-fold-5.rds"))
+pred_plot_1 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-1.rds"))
+pred_plot_2 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-2.rds"))
+pred_plot_3 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-3.rds"))
+pred_plot_4 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-4.rds"))
+pred_plot_5 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-5.rds"))
+full_preds <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-full.rds"))
+coef_plot_full <- readRDS(paste0(path_to_model_folder,
+                                 "coef-plots/coef-plot-full.rds"))
+full_model <- readRDS(paste0(path_to_model_folder, "full-model.rds"))
+intercept5 <- round(full_model$a0,2)
+lambda5 <- full_model$lambda
+mse5 <- get_mse_from_pred_plot(full_preds)
+```
+
+```{r cl5-err-bar, fig.cap="Model: Lasso on cluster 5. Mean squared error of the 5-fold blocked cross validation for a range of lambda values on the log scale. The points in the middle represent the average MSE for the respective lambda, the errorbars give the MSE +/- one standard deviation. The dotted line shows the lambda for which minimum MSE was obtained."}
+err_bars_plot + ggtitle("MSE for lasso on cluster 5")
+```
+
+\@ref(fig:cl5-err-bar) indicates again chooses a higher optimal $\lambda$.
+The range of the error bars increases with decreasing regularization
+
+```{r cl5-full-pred, fig.cap="Model: Lasso on cluster 5. Precipitation prediction and target values in the validation set. Predictions in red and target values in black. The model was fitted on the full CV data with the lambda value that minimised the average MSE"}
+full_preds + ggtitle("Predictions on evaluation set, lasso on cluster 5")
+```
+For cluster 5 we also notice that the precipitation values in the evaluation set
+are very "wiggly".
+The higher regularization chosen from the forward validation again 
+does not allow the model to predict these fast changing curves well.
+Here too seasonality is predicted reasonably (\@ref(fig:cl5-full-pred)). 
+
+```{r cl5-coef-plot, fig.cap=paste("Model: Lasso on cluster 5. Coefficient plot of the full model. Fitted intercept of", intercept5)}
+coef_plot_full + ggtitle("Coefficient plot, lasso on cluster 5") + theme(legend.position = "bottom")
+```
+A very large negative coefficient value is chosen for
+. The intercept is `r intercept5`(\@ref(fig:cl5-coef-plot)).
+No locations next to the south-american coast line are chosen.
+
+#### Cluster Summary
+Overall we did not improve MSE when fitting the lasso on each cluster and
+evaluated on the set, but in cluster 2.
+It seems that when the data has a lot of nonseasonal peaks and valleys,
+the regularization chosen from the forward validation
+only suffices for predicting the seasonality.
+In cluster 2 where the precipitation time series in the validation set
+is not very "wiggly" (see for example cluster 4 we predict the
+precipitation data quite well.
+The cluster analysis helped us finding the homogeneous cluster 2 which is also the largest
+cluster, recall \@ref(fig:cluster-map).
+
+<!-- Table \@ref(tab:mse-cluster) summarizes the MSE for each cluster. -->
+
+```{r}
+path_to_model_folder <- "../results/CV-lasso/cluster-cv-lasso-og2/cluster-1/"
+full_preds <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-full.rds"))
+mse1 <- get_mse_from_pred_plot(full_preds)
+path_to_model_folder <- "../results/CV-lasso/cluster-cv-lasso-og2/cluster-2/"
+full_preds <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-full.rds"))
+mse2 <- get_mse_from_pred_plot(full_preds)
+path_to_model_folder <- "../results/CV-lasso/cluster-cv-lasso-og2/cluster-3/"
+full_preds <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-full.rds"))
+mse3 <- get_mse_from_pred_plot(full_preds)
+path_to_model_folder <- "../results/CV-lasso/cluster-cv-lasso-og2/cluster-4/"
+full_preds <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-full.rds"))
+mse4 <- get_mse_from_pred_plot(full_preds)
+path_to_model_folder <- "../results/CV-lasso/cluster-cv-lasso-og2/cluster-5/"
+full_preds <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-full.rds"))
+mse5 <- get_mse_from_pred_plot(full_preds)
+```
+
+
+```{r mse-cluster, fig.cap="Table of the MSE prediction errors for each cluster"}
+knitr::kable(data.frame(c("1","2", "3", "4", "5"),
+             c(mse1,mse2,mse3,mse4,mse5)), col.names = c("Cluster", "MSE")
+             , format="latex", caption = "Table of the MSE prediction errors for each cluster")
+```
+
+## Lasso summary
+
+In this chapter we compared different settings for the lasso model to predict 
+the precipitation in the validation set.
+We chose a regularization level based on a 5-fold forward validation,
+meaning that time ordering was preserved during fitting and testing.
+The $\lambda$ that minimized the average MSE across all folds was selected
+and the model was refitted with this value on all training data.
+This full model was then used to predict precipitation on the validation set
+that was not used during the training phase.
+No observation was used for model fitting *and* testing, meaning
+there were no overlaps of fold time periods.
+We inspected the results of the lasso with and without standardization,
+after de-seasonalizing the SST data according to our validation scheme
+and after differentiating the SST data. We also used a cluster analysis
+to separate the CAB in 5 clusters and fit the lasso procedure on each cluster
+(see \@ref{cluster-methods} for details).
+If we solely compare MSE we find that standardizing the SST data improves the predictions results over the other lasso models. De-seasonalizing the predictors prior to model fitting did not yield competitive results,
+this might be due to the differences in SST seasonality between the data used for 
+forward validation (estimating optimal $\lambda$) and model evaluation.
+When differentiating the SST data we find that the obtained learning
+curves show similar trajectories and the dispersion at the optimal level of regularization is comparably small.
+When fitting the lasso on each of the clusters we found in \@ref{clustering-analyze-results.} we don't improve predictions on most clusters.
+But for one cluster (cluster 2, \@ref{cl2}) the lasso can actually predict the values in the validation set reasonably well since the precipitation values
+in this area don't disperse a lot from the seasonal signals.
+The regions that were included in the model varied greatly across models in general,
+which can also be explained by the different levels of regularization chosen.
+But some regions were included more often than others.
+Areas in the west Atlantic around the equator were included in all models but
+at different magnitudes. Also around the equator but in the east pacific coastal regions were included in almost all models but in the standardized lasso (see \@ref(fig:coef-plot-full-lasso-stand)). While we would expect these regions to
+be predictive, based on the paper by @ciemer2020early and our correlation analysis \@ref{correlation-chapter}. There also locations far away from the CAB that
+were included in all models. See for example that all models included a region
+in the Caspian sea. But in the de-seasonalized model this
+region has a very low coefficient value so for some larger levels of regularization
+it would probably not be included.
+Finally, the lasso can predict the seasonal patterns well, but when using the 
+precipitation averaged over the CAB, it fails to predict the higher values of seasonal amplitudes.
+
+```{r mse-lasso, fig.cap = 'Table of the MSE prediction errors for the different lasso models.'}
+knitr::kable(data.frame(c("lasso","standardized", "differentiated", "de-seasonalized"),
+             c(1314.92, 1214.49,1361.82,1809.46)), col.names = c("Model", "MSE"),
+             format="latex", caption = "Table of the MSE prediction errors for the different lasso models.")
+```
+
+
+
+
+
+<!--chapter:end:lasso-summary-cluster-5.Rmd-->
+
+# The fused lasso
+## Introduction
+```{r}
+# TODO
+# Intro name and motivation fused lasso
+# friedmann introduced name
+# hastie combination lasso and fusion therefore fused lasso
+# we use implementation from genlasso package 
+# then we describe the formula as given in the package description
+# omptimization as in paper
+```
+```{r}
+# TODO add statistical learning with sparsity to references.
+```
+```{r}
+# TODO add to summary of LASSO defaults, that characteristic 
+# of LASSO
+```
+```{r}
+# TODO make reference to achieved results here
+```
+
+```{r}
+# TODO cite general LASSO properties here
+# how it acts in situations where coefficients are grouped
+# or highly correlated.
+```
+
+```{r}
+# TODO add plot of the graph given by our helper functions.
+```
+
+```{r}
+# TODO add graphic of fig.2 fused lasso
+```
+
+```{r}
+#TODO note the fused lasso paper here are
+```
+
+```{r}
+# TODO add efficient implementations of hte generlaized lasso dual path
+# algorithm to references
+```
+
+```{r}
+# TODO ?check generalized dual path algorithm og paper?
+```
+
+```{r}
+# Efficient Implementations of the Generalized Lasso Dual Path
+# Algorithm
+```
+
+As expected and seen in the results, the different LASSO models choose single
+SST regions as predictors as opposed to whole regions.
+When predictors are highly correlated the lasso tends to
+choose only one of the variables and discard the others.
+Also the LASSO only regularizes the magnitude of coefficients
+but ignores their ordering.  
+We therefore use the so-called *fused lasso* as implemented in the *genlasso* package and the respective *fusedlasso* function. (@tibshirani2005sparsity, @genlassopackage)
+The fused lasso is a generalization of the lasso for problems with features
+that can be ordered in a meaningful way. It penalizes not only the coefficients'
+$L_1$-norm but also their differences given their ordering, introducing sparsity
+in both of them.
+In our case the fused lasso thus penalizes the differences of SST coefficients that are close to each other.
+
+The fused LASSO as implemented in *genlasso* package solves the problem:
+
+<!-- $$\min_{\beta} 1/2 \sum_{i=1}^n(y_i - x_i^T\beta_i)^2 + \lambda \sum_{i,j \in E} |\beta_i - \beta_j| + \gamma \cdot \lambda \sum_{i=1}^p|\beta_i|  ,$$ -->
+\begin{equation}
+\min_{\beta} 1/2 \sum_{i=1}^n(y_i - x_i^T\beta_i)^2 + \lambda \sum_{i,j \in E} |\beta_i - \beta_j| + \gamma \cdot \lambda \sum_{i=1}^p|\beta_i|,
+(\#eq:fused-lasso)
+\end{equation}
+
+
+with $x_i$ being the ith row of the predictor matrix and 
+E is the edge set of an underlying graph.
+Regularizing $|\beta_i-\beta_j|$, penalizes large differences in
+close coefficients. In our case "close" means small distances
+as defined on 2-dimensional longitude/latitude grid. This grid defines a graph that can be used to compute the distances for
+each location.
+The third term $\gamma \cdot \lambda \sum_{i=1}^p|\beta_i|$,
+controls the sparsity of the coefficients. $\gamma=0$ leads to complete fusion of the coefficients (no sparsity) and $\gamma$ > 0 introduces sparsity to the solution, with higher values placing more priority on sparsity. 
+$\hat{\beta}$ is computed as a function of $\lambda$, with fixed $\gamma$.
+
+
+## Implementation
+The summary of the algorithm is taken from the paper proposing
+the implementation, @arnold2016efficient and the original paper introducing 
+the algorithm @tibshirani2011solution.
+In the fused lasso setting the coefficients $\beta \in \mathbb{R}^p$ can be thought of
+as nodes of a given undirected Graph $G$, with edge set $E \subset {1,...,p}^2$.
+Now lets assume that $E$ has $m$ edges which are enumerated $e_1,...,e_m$.
+The fused lasso penalty matrix $D$ is then $m \times p$, where 
+each row corresponds to an edge in $E$.
+So when $e_l = (i,j)$, we write $l_{th}$ row of $D$ as 
+
+<!-- $$ D_l = (0,...-1,...1,...) \in \mathbb{R}^p, $$ -->
+\begin{equation}
+D_l = (0,...,-1,...,1,...) \in \mathbb{R}^p,
+(\#eq:pen-mat)
+\end{equation}
+
+meaning $D_l$ has all zeros except for the the $i_{th}$ and $j_{th}$
+location.
+
+\@ref(eq:fused-lasso) is solved by a dual path algorithm that was proposed
+by @arnold2016efficient for different use cases of the (sparse) fused lasso.
+They describe the dual path algorithm based on the notation of the generalized
+lasso problem @tibshirani2011solution:
+
+\begin{equation}
+\hat{\beta}=\underset{\beta \in \mathbb{R}^{p}}{\arg \min } \frac{1}{2}\|y-X \beta\|_{2}^{2}+\lambda\|D \beta\|_{1},
+(\#eq:gen-lasso)
+\end{equation}
+
+where $y \in \mathbb{R}^n$ is the vector of the outcome, 
+$X \in \mathbb{R}^{n \times p}$ a predictor matrix, $D \in \mathbb{R}^{m \times p}$
+denotes a penalty matrix, and $\lambda \geq 0$ is a regularization parameter.
+The dual path algorithm solves not the primal but the dual solution of the problem
+and computes the solution for a whole path instead of single values of $\lambda$.
+Hence the "dual" and "path" that make up the name.
+@arnold2016efficient argue that the strength of the original algorithm lays in the fact that it applies to a unified framework
+in which $D$ can be a general penalty matrix.
+Let's consider the case when $X=I$ and $rank(X)=p$ (this is called the "signal approximator" case),
+the dual problem of \@ref(eq:gen-lasso) is then:
+
+\begin{equation}
+\hat{u} \in \underset{\substack{u \in \mathbb{R}^{\omega}}}{\arg \min } \frac{1}{2}\left\|y-D^{T} u\right\|_{\frac{2}{2}} \text { subject to }\|u\|_{\infty} \leq \lambda.
+(\#eq:dual)
+\end{equation}
+
+The primal and dual solutions, $\hat{\beta}$ and $\hat{u}$ are related by:
+
+\begin{equation}
+\hat{\beta}=y-D^{T} \hat{u} .
+(\#eq:dual-relate)
+\end{equation}
+
+While the primal solution is unique, this does not need to be the case 
+for the dual solution (note the element notation in \@ref(eq:dual).
+The dual path algorithm starts at $\lambda = \infty$ and computes the
+path until $\lambda = 0$.
+Conceptually the algorithm keeps track of the coordinates of the dual
+solutions it computed for each lambda $\hat{u}(\lambda)$.
+The solutions are equal to $\pm\lambda$, meaning they lie on the boundary
+of the region $[-\lambda,\lambda]$. Along the path it computes
+the critical values of $\lambda$, $\lambda_1 \geq \lambda_2,...,$ 
+at which the coordinates of these solutions hit or leave the boundary.
+
+There are two algorithms described in the paper and the various specialized implementations
+that can increase efficiency depending on the use cases.
+This depends on $X$, and/or the special structure of $D$.
+Algorithm 1 handles the $X=I$ case and Algorithm 2 the general $X$ case.
+As we introduced the dual in \@ref(eq:dual), it assumed $X=I$, which is not satisfied 
+in our case.
+For the general $X$ case the problem formulation can be rewritten so that the
+formula only changes $D$ and $y$ to $\tilde{D}$ and $\tilde{y}$ and then the same algorithm can be applied. $\tilde{D}=DX^+$ and $\tilde{y}=XX^+y$, where $X^x$ is the 
+Moore-Penrose pseudoinverse of $X \in \mathbb{R}^{n \times p}$.
+Algorithm 2 therefore transforms $X$ and $y$ in a certain way and then applies Algorithm 1
+to the transformed problem.
+It's also easy to see that in our case $p > n$ and $X$ is column rank deficient.
+They solve this by adding a small fixed $l_2$ penalty to the original problem,which 
+leads to:
+
+
+\begin{equation}
+\operatorname{minimize}_{\beta \in \mathbb{R}^{p}} \frac{1}{2}\|y-X \beta\|_{2}^{2}+\lambda\|D \beta\|_{1}+\varepsilon\|\beta\|_{2}^{2},
+(\#eq:add-ridge)
+\end{equation}
+
+and this is the same as
+
+\begin{equation}
+\underset{\beta}{\operatorname{minimize}} \frac{1}{2}\left\|y^{*}-\left(X^{*}\right) \beta\right\|_{2}^{2}+\lambda\|D \beta\|_{1},
+(\#eq:add-ridge2)
+\end{equation}
+
+with $y^{*}=(y, 0)^{T}$ and $X^{*}=\left[\begin{array}{c}x \\ \varepsilon \cdot I\end{array}\right]$. Because $\operatorname{rank}\left(X^{*}\right)=p$,
+again it is possible to apply one of the algorithms.
+Instead of solving linear systems in each, we can apply a QR decomposition
+that can be updated in a neat way to avoid solving the complete 
+linear system in each step. See the appendix of @arnold2016efficient, for details.
+Special care has to be taken though for general X and certain $D$.
+"Blindly" applying the algorithms then would lead to a large drop in relative
+efficiency.
+Since $\tilde{D}= DX^+$ destroys the special structures that are present 
+in the penalty matrix,  special implementations are constructed including our case
+with general $X$ and $D$ coming from the sparse fused lasso.
+
+It can be shown that the computational costly steps in the algorithm reduce
+to solving linear systems of the form $DD^T = Dc$.
+When $D$ is the oriented incidence matrix of a graph, $D$ will be sparse
+but can also be rank deficient when the graph has more edges than nodes, 
+hence $m > p$. 
+For sparse undetermined systems it is possible
+to find an arbitrary solution (here called the *basic* solution), but computing the solution with minimum $l_2$
+norm is a lot more difficult in general @van1996matrix .
+It is possible though to derive the minimum $l_2$ norm solution from
+the basic solution.
+In the case of penalty matrices that come from a graph the structure of $D$
+can be used to improve efficiency when 
+When $D$ is the incidence matrix of a graph, then $D^TD$ is the Laplacian matrix of G.
+The Laplacian linear systems are then solved using a sparse Cholesky decomposition.
+For further details of the steps used in our case refer to Section 4 and 5 in @arnold2016efficient.
+
+<!--chapter:end:5t-method-fused-lasso.Rmd-->
+
+## Model evaluation
+
+```{r, echo=FALSE, include=FALSE}
+knitr::opts_chunk$set(echo=FALSE, warning = FALSE, message = FALSE, out.width = '50%', fig.align = 'center')
+options(knitr.duplicate.label = "allow")
+```
+
+In general we use the same evaluation methods for the fused lasso
+that we used for the lasso models.
+We define 5 folds with train and test, search for an optimal regularization
+value ($\lambda_{\min}$). Then we fit the model on the complete train and test
+data with $\lambda_{\min}$ and report the MSE on the evaluation set.
+But the difference for the lasso and the fused lasso is that we can
+define a $\lambda$ vector that we want to search for solutions for the
+lasso *before* starting the CV, in the fused lasso this is not possible.
+In the *fusedlasso* function we can define the number of steps 
+the model should take and a $\lambda$ that defines the end of
+the path (we will call it $\lambda_{end}$ here). The model terminates therefore if either the maximum number 
+of steps or the defined minimum $\lambda_{end}$ is reached (default is 0).
+This means that the first $\lambda_{start}$ for the fused lasso is different in 
+each fold and when the maximum number of steps is reached before
+the path reached $\lambda_{end}$ the last evaluated (or found) $\lambda_{last}$.
+Is not guaranteed to be the same across fold.
+So for the fused lasso we can not define the regularization values to evaluate,
+but must rather inspect the results for each fold.
+We solve this here rather pragmatically.
+We inspect MSE lines across the solution path for each fold.
+For the overlapping region we define the mean of all evaluated points
+and choose $\lambda_min$ as the amount of regularization that minimizes
+the MSE for common area of the solution path.
+The $\lambda$ values will not exactly be the same for the folds,
+so we have to interpolate the gaps between the actual $\lambda$, to create
+a common range we can compute the mean on.
+The interpolation is done via local polynomial regression fitting
+using the *loess* function in R with a span of 0.05 and degree 2 (@cleveland1992local).
+
+## Graph structure
+
+```{r graph-plot2, fig.cap='Graph of the SST and land areas used in fused lasso'}
+library(igraph)
+k <- readRDS("../data/processed/graph_sst.rds")
+cl <- clusters(k)
+#png(filename = "graph_plot.png")
+#jpeg("graph.jpg")
+plot(k, vertex.label = NA, vertex.size=0.00001,
+          edge.width= 0.0001,
+          vertex.color=cl$membership*10,
+     mark.expand = 15)
+#knitr::include_graphics("../figures/graph.jpg")
+#dev.off()
+#knitr::include_graphics("../figures/graph.jpg")
+
+```
+```{r}
+#knitr::include_graphics("../figures/graph.jpg")
+```
+
+The fused lasso function allows the user to specify a penalty matrix or a graph
+alongside the input matrix $X$.
+If a graph is given, the penalty matrix is computed as the incidence matrix
+from the graph. We will describe shortly how we defined the graph.
+The SST data is defined on a $89 \times 180$ 2-dimensional grid.
+We define a $89 \times 180$ lattice graph, identify those nodes 
+that correspond to land areas and delete those nodes.
+Because of its resolution and the inclusion of large lakes in the
+SST data, this leads to cluster structures in the graph (see \@ref(fig:graph-plot2))
+There are 7 clusters present in this graph colored according to their membership.
+The smallest cluster is the White Sea in Russia.
+The largest cluster are the connected SST nodes after deleting the land nodes.
+This separated the Mediterranean and the Red Sea and actually disconnected North and 
+South america. The large lake structures are clusters naturally.
+Some other structures like the Persian Gulf stay connected with the other SST regions
+but due to the original lattice of the graph, the only have few edges.
+Since the fused lasso penalizes only the difference of connected nodes,
+nodes with fewer edges and hence nodes to be compared to, 
+are less penalized in this graph.
+We fitted the fused lasso on graph \@ref(fig:graph-plot2) and a graph that has these smaller clusters removed.
+What we found is that, deleting the smaller clusters improved
+the MSE compared to the fused lasso including the clusters. But still
+we can observe that nodes with fewer edges obtain larger coefficient values
+in general.
+Following we will summarize these findings.
+
+
+
+```{r graph-plot, eval = FALSE,fig.cap='Graph of the SST and land areas used in fused lasso, colored vertices indicate sub-graphs'}
+knitr::include_graphics("../figures/graph_plot.png")
+```
+
+## Results
+
+Computing the fused lasso solution path is computationally very expensive.
+We therefore had to choose strategically which model variations we will
+investigate.
+From the lasso we found that apart from standardizing, neither de-seasonalizing,
+nor differentiating the coefficients improved predictive performance on the validation set.
+We therefore started with the fused lasso on the original data (without standardization).
+As we described earlier, the relation between graph structure, subgraphs (i.e cluster) and its influence on the results is not trivial.
+After fitting the fused lasso on the original data and graph, we also fitted
+the fused lasso with original data on the graph without clusters.
+Comparing these models already showed us a hint that removing the clusters
+can improve the predictions, but after all it's only a minor solution, because
+differences in connectivenes in the graph is still existing.
+For the sake of completeness we also tried standardizing the data for
+the normal and the graph without clusters, none of these two approaches was 
+better than the "plain" fused lasso version without clusters.
+Eventually we inspected the influence of sparsity on the results, with
+values $\gamma = 0.1$, which did not improve predictions on the validation set.
+The predictions seemed to underfit and therefore we choose lower regularization
+parameter $\gamma = 0.05$, again without improvement.
+We therefore only present the results of the best model and refer
+for the other models to the supplementary material.
+
+
+
+### Fused lasso without sub-graphs
+
+```{r, echo = FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE, echo = FALSE)
+```
+
+
+```{r}
+library(patchwork)
+library(ggpubr)
+library(raster)
+library(glmnet)
+library(Hmisc)
+source("../code/R/helper-functions.R")
+```
+
+```{r}
+path_to_model_folder <- "../results/CV-fused/noclust-large-fused-5k/"
+```
+
+```{r}
+# err_mat <- readRDS(paste0(path_to_model_folder, "/err-mat.rds"))
+#min(apply(err_mat, 1, mean))
+#lambdas <- readRDS(paste0(path_to_model_folder, "/lambda-vec.rds"))
+```
+
+
+The error lines in the different folds differ in their trajectories as well as in their starting points (Figure 6.2). Note that we cut off fold 3 for better readability of the plot
+(the MSE reaches until 3000). The black line indicates the mean, computed for the area
+that is covered by all error lines (after interpolation).
+
+```{r err-line-fused-noclust, out.width='45%', fig.cap="Error lines in the fused lasso forward validation. Each line represents one fold, the black line the mean for the common interval of the smoothed error lines. The red dashed-line shows the minimum of the mean."}
+
+best_l_res <- readRDS(paste0(path_to_model_folder, "best-lambda-res.rds"))
+# log(best_l_res$lambda_min)
+#best_l_res$err_plot + ylim(c(0,50000)) + xlim(3,6)
+best_l_res$err_plot$labels$colour <- "Fold"
+#best_l_res$err_plot
+p <- best_l_res$err_plot + geom_vline(xintercept=log(best_l_res$lambda_min),
+                        linetype="dashed",
+                color = "red", size=0.5)
+p
+# p2 <- p + ylim(0,2000)
+# ggsave(paste0(path_to_model_folder,"best-lambda-res.png"),
+#        p2)
+```
+
+
+```{r}
+pred_plot_1 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-1.rds"))
+pred_plot_1 <- pred_plot_1 + ylab("Precipitation fold 1")
+mse_1 <- get_mse_from_pred_plot(pred_plot_1)
+
+pred_plot_2 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-2.rds"))
+pred_plot_2 <- pred_plot_2 + ylab("Precipitation fold 2")
+mse_2 <- get_mse_from_pred_plot(pred_plot_2)
+
+pred_plot_3 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-3.rds"))
+pred_plot_3 <- pred_plot_3 + ylab("Precipitation fold 3")
+mse_3 <- get_mse_from_pred_plot(pred_plot_3)
+
+pred_plot_4 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-4.rds"))
+pred_plot_4 <- pred_plot_4 + ylab("Precipitation fold 4")
+mse_4 <- get_mse_from_pred_plot(pred_plot_4)
+
+pred_plot_5 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-5.rds"))
+pred_plot_5 <- pred_plot_5 + ylab("Precipitation fold 5")
+mse_5 <- get_mse_from_pred_plot(pred_plot_5)
+
+#pred_plot_list <- list(pred_plot_1,pred_plot_2,pred_plot_3,pred_plot_4,pred_plot_5)
+```
+```{r pred-fold-fused-noclust,fig.cap="Precipitation prediction and target values in the test set in each fold. Predictions in red and target values in black."}
+pred_plot_1 + pred_plot_2 + pred_plot_3 + pred_plot_4 +
+  pred_plot_5
+```
+The predictions inside the folds are very similar to lasso without fusion, the same holds for the predictions from
+the full model, but the MSE improves here.
+
+```{r pred-plot-full-fused-noclust, fig.cap="Precipitation prediction and target values in the validation set. Predictions in red and target values in black. The model was fitted on the full CV data with the lambda value that minimised the average MSE"}
+full_preds <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-full.rds"))
+mse_full <- get_mse_from_pred_plot(full_preds)
+full_preds
+#mse_full
+```
+On first sight the predictions don't change a lot compared to the lasso model,
+but the fused lasso here can predict the evaluation data best so far. (MSE is `r round(mse_full,2)`). 
+We can see that the low values at the end of season 2 and 5 (around month 1363 and 1400),
+are better predicted than in the standard lasso.
+Also the fused lasso predicts the seasonality amplitudes slightly better.
+The resulting coefficient plot is given in Figure \@ref(fig:coef-plot-full-fused-noclust).
+
+```{r coef-plot-full-fused-noclust, fig.cap="Coefficient plot of the full fused lasso model trained on the complete forward validation data.Sub-graphs were removed in this model", out.width='50%'}
+coef_plot <- readRDS(paste0(path_to_model_folder,
+                      "coef-plots/coef-plot-full.rds"))
+coef_plot$layers[[2]]$aes_params$size <- 0.75
+coef_plot
+#coef_plot$labels$colour <- "Coefficients"
+#coef_plot$data
+#coef_plot_now <- coef_plot
+#ggsave(paste0(path_to_model_folder, "coef-plots/coef-plot-full.png"), plot = coef_plot_now)
+
+# knitr::include_graphics(paste0(path_to_model_folder, "coef-plots/coef-plot-full.png"))
+```
+
+The coefficent plots for the fused lasso show now the regions that the fused lasso
+selected (Figure \@ref(fig:coef-plot-full-fused-noclust). 
+As expected the fused lasso assign the same coefficients for areas rather
+instead just for single points. 
+We can see from
+the legend that the coefficient values are skewed, note the large negative 
+coefficients in the Baltic sea.
+Due to the resulting coloring some regions are difficult to spot, for example
+the region before the south american coast of Chile and Peru.
+Coefficients with fewer edges, hence smaller regions are given higher values,
+as we already described earlier.
+We assume that in a fully connected graph, with weights according to distances
+these values would not be as large (relatively to other coefficient values) because they too would be more penalized than for the graph we created from the lattice structure.
+But regions that have many nodes will still be influential because
+their values summarize when used for predictions.
+When comparing to the coefficient plot from the lasso,
+we see that some areas are included in both models,
+for example the positive coefficients around the area Gulf of Guinea,
+as well as the negative values around Chile and Peru. In the fused lasso
+plot the latter values are smaller in relation to the large negative values 
+in the Baltic sea. 
+
+
+## Summary 
+After fitting different possible fused lasso models, we find that
+the using the graph without separated clusters on the standard SST data
+without regularization worked best.
+Regularization did not improve the performance on the validation set.
+Our interpretation of the findings is that on one hand the fused lasso
+chooses coefficients that are also apparent in the lasso results.
+The lasso chooses rather single points and discards the rest of a homogeneous area.
+The fused lasso chooses the whole area and distributes the coefficient value
+evenly. But the fused lasso does so by penalizing the differences of neighboring
+coefficients. How strongly these are penalized depends on their distance that
+is defined by a graph (but could also be defined by a penalty matrix directly).
+We chose to represent the SST structure as lattice and removed nodes that 
+correspond to land.
+Locations that contain mainly land and a relatively small area of water,
+may be represented as land area as a whole (the opposite is true when
+the region contains mainly SST.).
+When there is only a small connection between sea areas the connecting region
+is therefore represented as land and the corresponding node is deleted
+when the graph is created. This creates sub-graphs as we discussed earlier
+and showed in Figure \@ref(fig:graph-plot2).
+This gives the impression that the sub-graphs are not connected at all to the larger SST
+cluster. The Caspian Sea for example occurred as separated cluster, it could have also been
+a cluster in the Arctic, the fused lasso has no information anymore about its location
+if its a sub-graph. From a physical perspective this makes of course little sense.
+One possible solution for this might be to define fully connected graph with
+weights according to geographical distance.
+If the square root of weights are used in defining the penalty matrix,
+$D^TD$ is still the Laplacian and could be used to fit the fused lasso model.
+One caveat here is that the runtime of the *fusedlasso* increases with the number of edges,
+which would increase runtime here drastically.
+Another possible solution would be to minimize the SST "window" under study (for
+example as in @ciemer2020early.)
+Our initial motivation was to investigate the global connections between
+SST and precipitation, but to reduce computational costs for the fused lasso
+it would be practical and investigate the behavior of weighted fully connected
+graphs it would be an interesting point of future research.
+
+```{r mse-fused, fig.cap = 'Table of the MSE prediction errors for the different fused lasso models.', fig.align='center'}
+knitr::kable(data.frame(c("fused lasso", "sub-graphs removed", "sub-graphs removed, gamma = 0.1", "sub-graphs removed, gamma = 0.05"),
+                        c(1131.709,1070.042,1840.589, 1836.632)), 
+                        col.names = c("Model", "MSE"),
+                        format="latex", caption = "Table of the MSE prediction errors for the different fused lasso models.")
+```
+
+
+
+<!--chapter:end:5tt-results-fused-lasso.Rmd-->
+
+# Conclusion
+
+Studying the precipitation in the Amazon rain forest is a highly complex 
+and relevant problem. Predicting future precipitation
+may help to better anticipate the effects of droughts and floods, as well
+as improve projections of future climate change.
+In this work we tackled the problem from various angles.
+Our initial analysis of SST and precipitation revealed
+spatial patterns in the variables alone as well as their correlations.
+These findings further motivated the cluster analysis in chapter 4.
+Using a $k$-means with 5 centers we find spatially coherent cluster in the
+central Amazon basin.
+Although applying the lasso on each cluster separately did not improve the prediction
+results overall we find that for one cluster the predictions work especially well.
+For the lasso and the fused lasso, we used a blocked forward validation,
+since classic k-fold cross-validation is not applicable here.
+We implement the forward validation for the lasso and the fused lasso.
+For the fused lasso finding the optimal $\lambda$ after forward validation 
+is not straightforward, since the regularization path differs for the folds.
+Different preprocessing variants were investigated for the lasso.
+We compared the lasso, lasso with standardization, after de-seasonalizing and differentiation.
+Compared to the lasso without preprocessing only standardizing showed improvements.
+The fused lasso posed a challenge in from an algorithmic perspective,
+since in preparing the graph we introduced sub-graphs that distorted the
+real conditions underlying the data.
+By removing the sub-graphs we can mitigate some of these effects but
+find that a more worthwhile solution will be to use a weighted graph.
+This will make the computation eventually a lot more expensive as computation time
+in the dual path algorithm increases with the number of edges.
+Nevertheless, applying the fused lasso improved performance on the validation data
+and revealed predictive regions in the SST.
+Additionally it showed that when the graph structure does not represent
+the SST appropriately, introducing sparsity did not improve the model's performance.
+Overall we find that predicting the precipitation in the CAB
+is a challenging task, with interesting results for future research.
+As already mentioned the fused lasso approach could be improved with a weighted 
+graph. To reduce the computational cost one could use a cutoff value for smaller
+weights or use the SST window from @ciemer2020early instead of the global SST.
+For the central Amazon basin, the fused lasso could be applied solely to best performing 
+cluster. Other clustering approaches that take into account the spatial dependencies
+in the CAB, can be considered as well.
+Finally, the choice of evaluation method leaves space for many other possibilities
+and is a trade-off between efficient use of available data and computational cost,
+especially for the fused lasso.
+
+<!--chapter:end:conclusion.Rmd-->
+
+# Appendix {-}
+
+```{r, eval=TRUE,include=TRUE,echo=TRUE,message=TRUE}
+devtools::session_Info()
+```
+
+
+<!--chapter:end:appendix.Rmd-->
+
+# References {-}
+
+<!--chapter:end:references.Rmd-->
+

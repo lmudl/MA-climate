@@ -112,7 +112,7 @@ Overall the standard lasso shows here it can learn some meaningful connection.
 full_preds <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-full.rds"))
 mse_full <- get_mse_from_pred_plot(full_preds)
 full_preds
-mse_full
+#mse_full
 ```
 The predictions from the full model on the evaluation set indicate 
 that the model is capable of predicting the seasonal variation in the precipitation
