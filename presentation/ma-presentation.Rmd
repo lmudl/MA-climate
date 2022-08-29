@@ -25,6 +25,10 @@ bibliography: "../thesis/0-ref-lib.bib"
 ```{r, echo = FALSE}
 knitr::opts_chunk$set(echo = FALSE)
 ```
+```{r}
+source("../code/R/helper-functions.R")
+```
+
 
 ```{r}
 # 25-30 minuten, also wsl maximal 40 slides
@@ -184,7 +188,7 @@ Gap(k) \geq Gap(k+1) - s_{k+1}
 - $s_{k+1}$ is $sd_k\sqrt{1+1/B}$, and sd the standard deviation of log(W*_k)
 
 ## PCA
-- Before running k-means we apply a PCA to reduce the large number of correlated variables to a few
+- Before running k-means we center the precipitation data and apply a PCA to reduce the large number of correlated variables to a few
 - The new variables are linear combinations of the original variables
 - Here: Each variable is a month of precipitation data in the CAB
 
@@ -194,7 +198,13 @@ scree <-readRDS("../results/clustering/scree_plot_pca_centered.rds")
 scree + ylim(c(0,0.5))
 ```
 
+## Screeplot
 
+- The "elbow" be observe in the screeplot suggest 3 or 4 principal components
+- The first 3 and 4 first PC explain 67.77 and 70.79 of the variance respectively.
+- We compare the gap statistic results for 3 and 4 PC
+ 
+## Gap statistic results
 ```{r}
 library(patchwork)
 p3 <- readRDS("../results/clustering/replotted_gap_pc3_centered_kmeans_plot.rds")
@@ -202,13 +212,212 @@ p4 <- readRDS("../results/clustering/replotted_gap_pc4_centered_kmeans_plot.rds"
 p3 + p4
 ```
 
+- The k-means gap statistic on the first 3 PC proposes 5 clusters - For 4 PC, 13 clusters are chosen
+- We chose 5 clusters since the result on 3 PC appears to be clearer and 5 clusters are more applicable than fitting the model evaluation on 13 clusters
 
+## Clustering results
 
-## Results
+```{r cluster-map, echo = FALSE, out.width= '50%',fig.cap= "Spatial distribution of the found clusters in the CAB. We applied a centered PCA on the data and used 3 principal components before applying the k-means algorithm"}
+km_pca_map_plot <- readRDS(paste0("../results/clustering/km_pca_map_plot.rds"))
+km_pca_map_plot + 
+ggtitle("Precipitation clusters in the CAB,
+after centered PCA, using 3 PC's and applying k-means")
+```
+
+- We find 5 clusters of different sizes
+- The found clusters are almost completely spatially coherent
+although we did not include any spatial dependencies in the clustering
+- Small exception is the "island" of cluster 1 (orange) inside cluster 4 (blue) and on the edge on cluster 3 (green)
+- Usefulness of clustering can only be determined after model fitting on each cluster
 
 # The lasso
 
+## Definition of the lasso
+- We now consider the lasso regression problem
+
+\begin{equation}
+\min_{\beta_0, \beta} \frac{1}{N} \sum_{i=1}^N w_il(y_i,\beta_0 + \beta^Tx_i) + \lambda [(1-\alpha)||\beta||_2^2/2 + \alpha||\beta||_1] (\#eq:glmnet)
+\end{equation}
+
+- In our setting n << p, so lasso is natural choice
+- The problem is solved using coordinate descent
+- Due to the time dependencies in our data normal Cross Validation may be unjustified
+
+
+## Model evaluation
+
+- Our goal is to train a model that can also predict well on new, unseen data
+- We simulate the situation of unseen data by splitting our data into one part  for model selection and another part for model evaluation
+- Model evaluation is usually done via Cross Validation, but classic Cross Validation does not take into account the time dependency in our data
+
+## Forward selection
+
+
+```{r}
+knitr::include_graphics("../thesis/validation-schemes.png")
+```
+```{r}
+knitr::include_graphics("../thesis/blocked-cv.png")
+```
+
+
+## Forward selection
+- We compute a $\lambda$-vector for the complete training set
+- For each fold we fit a model with this $\lambda$-vector
+- We compute the prediction error for the cv-test set of each fold
+- Choose $\lambda_{\min}$, $\lambda$ that minimizes average MSE
+over all folds
+- Fit model on complete selection data with $\lambda_{\min}$ and compute MSE on evaluation data
+
+
+## lasso settings
+
+- lasso
+- lasso with standardized features
+- lasso with de-seasonalized SST
+- lasso with differentiated SST
+- lasso on clusters
+
+## lasso results TODO
+
+- Show only best model results
+- lasso with standardized features
+- show MSE in plots
+- show predictions in plots
+- show predictions
+- show coefficients
+- display table
+
+## lasso results
+
+```{r err-fold-lasso-stand, fig.cap="MSE of the CV for the different lambda values on the a log scale. The red dotted line shows the lambda for which minimum MSE was obtained."}
+library(patchwork)
+library(ggplot2)
+path_to_model_folder <- "../results/CV-lasso/test-lasso-stand/"
+p1 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-plot-fold-1.rds"))
+p2 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-plot-fold-2.rds"))
+p3 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-plot-fold-3.rds"))
+p4 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-plot-fold-4.rds"))
+p5 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-plot-fold-5.rds"))
+# p1 + ylim(0,10000) + p2 + ylim(0,10000) + p3 + ylim(0,10000) + p4 + ylim(0,10000) + p5 + ylim(0,10000)
+
+```
+```{r}
+#p1 + p2 + p3 + p4 + p5 + gridExtra::tableGrob()
+```
+
+```{r}
+get_min_err_from_plot <- function(plot) {
+  return(min(plot$data$err))
+}
+
+get_minl_from_plot <- function(plot) {
+  return(plot$data$loglambdas[which.min(plot$data$err)])
+}
+a <- unlist((lapply(list(p1,p2,p3,p4,p5), get_min_err_from_plot)))
+b <- unlist((lapply(list(p1,p2,p3,p4,p5), get_minl_from_plot)))
+d <- cbind("min err" = a, "log lambda" = b)
+d <- round(d, 2)
+```
+
+## MSE in each fold
+
+```{r}
+# round(mm,2), 917.28
+# lambda 3.52, 1.26
+library(gridExtra)
+d <- rbind(d, c(917.28, 1.26))
+d <- cbind(c("Fold 1", "Fold 2", "Fold 3", "Fold 4", "Fold 5", "Best"), d)
+p1 + p2 + p3 + p4 + p5 + gridExtra::tableGrob(d, theme = ttheme_default(base_size = 6))
+```
+
+## Predictions on test set, for each Fold
+```{r}
+pred_plot_1 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-1.rds"))
+pred_plot_1 <- pred_plot_1 + ylab("Precipitation fold 1")
+mse_1 <- get_mse_from_pred_plot(pred_plot_1)
+
+pred_plot_2 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-2.rds"))
+pred_plot_2 <- pred_plot_2 + ylab("Precipitation fold 2")
+mse_2 <- get_mse_from_pred_plot(pred_plot_2)
+
+pred_plot_3 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-3.rds"))
+pred_plot_3 <- pred_plot_3 + ylab("Precipitation fold 3")
+mse_3 <- get_mse_from_pred_plot(pred_plot_3)
+
+pred_plot_4 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-4.rds"))
+pred_plot_4 <- pred_plot_4 + ylab("Precipitation fold 4")
+mse_4 <- get_mse_from_pred_plot(pred_plot_4)
+
+pred_plot_5 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-5.rds"))
+pred_plot_5 <- pred_plot_5 + ylab("Precipitation fold 5")
+mse_5 <- get_mse_from_pred_plot(pred_plot_5)
+
+pred_plot_list <- list(pred_plot_1,pred_plot_2,pred_plot_3,pred_plot_4,pred_plot_5)
+```
+
+```{r pred-plot-fold-lasso-stand, fig.cap="Precipitation prediction and target values in the test set in each fold. Predictions in red and target values in black."}
+pred_plot_1 + pred_plot_2 + pred_plot_3 + pred_plot_4 +
+  pred_plot_5
+```
+
+# Predictions on External Test Set
+
+```{r pred-plot-full-lasso-stand, fi.cap="Precipitation prediction and target values in the validation set. Predictions in red and target values in black. The model was fitted on the full CV data with the lambda value that minimised the average MSE"}
+full_preds <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-full.rds"))
+full_preds
+mse_full <- get_mse_from_pred_plot(full_preds)
+mse_full
+```
+
+## SST Regions chosen by the lasso
+
+```{r coef-plot-full-lasso-stand, fig.cap=paste("Coefficient plot of the full lasso model with fitted intercept of", intercept)}
+coef_full <- readRDS(paste0(path_to_model_folder,
+                     "coef-plots/coef-plot-full.rds"))
+coef_full 
+
+```
+
+# Lasso results all models 
+
+```{r}
+mse_og <- readRDS("../results/CV-lasso/test-lasso-og/mse-list.rds")
+mse_og <- round(unlist(mse_og),2)
+mse_stand <- readRDS("../results/CV-lasso/test-lasso-stand/mse-list.rds")
+mse_stand <- round(unlist(mse_stand),2)
+mse_deseas <- readRDS("../results/CV-lasso/test-deseas-lasso/mse-list.rds")
+mse_deseas <- round(unlist(mse_deseas),2)
+mse_diff <- readRDS("../results/CV-lasso/test-diff1-lasso/mse-list.rds")
+mse_diff <- round(unlist(mse_diff),2)
+
+d2 <- rbind(mse_stand, mse_og, mse_diff, mse_deseas)
+colnames(d2) <- c("mse min", "lambda min")
+rownames(d2) <- c("stand", "original", "diff", "deseas")
+d2
+```
+## Clustering results
+
+```{r}
+full_preds1 <- readRDS("../results/CV-lasso/cluster-cv-lasso-og2/cluster-1/pred-plots/pred-plot-full.rds")
+full_preds2 <- readRDS("../results/CV-lasso/cluster-cv-lasso-og2/cluster-2/pred-plots/pred-plot-full.rds")
+full_preds3 <- readRDS("../results/CV-lasso/cluster-cv-lasso-og2/cluster-3/pred-plots/pred-plot-full.rds")
+full_preds4 <- readRDS("../results/CV-lasso/cluster-cv-lasso-og2/cluster-4/pred-plots/pred-plot-full.rds")
+full_preds5 <- readRDS("../results/CV-lasso/cluster-cv-lasso-og2/cluster-5/pred-plots/pred-plot-full.rds")
+full_preds1 + full_preds2 + full_preds3 + full_preds4 + full_preds5
+```
+
 # The fused lasso
+
+- why fused
+- what is fused
+- optimization
+
+# fused evaluation
+
+# fused settings
+
+# fused results
 
 # Summary
 

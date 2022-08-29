@@ -40,7 +40,6 @@ The first three and four PC`s used explain 67.77 and 70.69% of the variance resp
 
 #### $k$-means and PAM gap statistics after applying PCA
 
-
 ```{r gap-pam, echo = FALSE, fig.cap= "Gap statistic plots for k-means and PAM when using 3 and 4 PC's respectively."}
 replotted_summary_plot_pca_centered <- readRDS("../results/clustering/replotted_summary_plot_pca_centered.rds")
 replotted_summary_plot_pca_centered

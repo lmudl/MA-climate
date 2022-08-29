@@ -43,6 +43,7 @@ Elastic net with $\alpha=0.5$ tends to either include or drop the entire group t
 To specifically choose a group of predictors, variations of the lasso or other models have to be considered.
 
 ## Implementation
+
 The glmnet function finds a solution path for the lasso problem
 via coordinate descent.
 The implemented algorithm was suggested by @van2007prediction.
