@@ -3,22 +3,25 @@ title: "Predicting Droughts in the Amazon Basin based on Global Sea Surface Temp
 author: Dario Lepke
 date: September 09, 2022
 output: 
+  beamer_presentation:
+    theme: "metropolis"
+    slide_level: 3
+    toc: true
+    # toc_depth: 2
+    number_sections: true
+    # includes:
+    #   in_header: head.tex
+  ioslides_presentation:
+    logo: "../thesis/sigillum.png"
   bookdown::pdf_book:
+    latex_engine: lualatex
     toc: true
     base_format: "function(..., number_sections) rmarkdown::beamer_presentation(...)"
     number_sections: true
     theme: "metropolis"
     includes:
       in_header: head.tex
-    slide_level: 2
-  ioslides_presentation:
-    logo: "../thesis/sigillum.png"
-  beamer_presentation:
-    theme: "metropolis"
     slide_level: 3
-    toc: true
-    includes:
-      in_header: head.tex
 bibliography: "../thesis/0-ref-lib.bib"
 ---
 
@@ -27,6 +30,11 @@ knitr::opts_chunk$set(echo = FALSE)
 ```
 ```{r}
 source("../code/R/helper-functions.R")
+```
+```{r}
+library(ggplot2)
+library(patchwork)
+library(gridExtra)
 ```
 
 
@@ -192,8 +200,9 @@ Gap(k) \geq Gap(k+1) - s_{k+1}
 - The new variables are linear combinations of the original variables
 - Here: Each variable is a month of precipitation data in the CAB
 
+
+## Scree Plot, PCA after centering
 ```{r}
-library(ggplot2)
 scree <-readRDS("../results/clustering/scree_plot_pca_centered.rds")
 scree + ylim(c(0,0.5))
 ```
@@ -203,10 +212,9 @@ scree + ylim(c(0,0.5))
 - The "elbow" be observe in the screeplot suggest 3 or 4 principal components
 - The first 3 and 4 first PC explain 67.77 and 70.79 of the variance respectively.
 - We compare the gap statistic results for 3 and 4 PC
- 
+
 ## Gap statistic results
 ```{r}
-library(patchwork)
 p3 <- readRDS("../results/clustering/replotted_gap_pc3_centered_kmeans_plot.rds")
 p4 <- readRDS("../results/clustering/replotted_gap_pc4_centered_kmeans_plot.rds")
 p3 + p4
@@ -220,7 +228,7 @@ p3 + p4
 ```{r cluster-map, echo = FALSE, out.width= '50%',fig.cap= "Spatial distribution of the found clusters in the CAB. We applied a centered PCA on the data and used 3 principal components before applying the k-means algorithm"}
 km_pca_map_plot <- readRDS(paste0("../results/clustering/km_pca_map_plot.rds"))
 km_pca_map_plot + 
-ggtitle("Precipitation clusters in the CAB,
+  ggtitle("Precipitation clusters in the CAB,
 after centered PCA, using 3 PC's and applying k-means")
 ```
 
@@ -291,8 +299,6 @@ over all folds
 ## lasso results
 
 ```{r err-fold-lasso-stand, fig.cap="MSE of the CV for the different lambda values on the a log scale. The red dotted line shows the lambda for which minimum MSE was obtained."}
-library(patchwork)
-library(ggplot2)
 path_to_model_folder <- "../results/CV-lasso/test-lasso-stand/"
 p1 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-plot-fold-1.rds"))
 p2 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-plot-fold-2.rds"))
@@ -325,7 +331,6 @@ d <- round(d, 2)
 ```{r}
 # round(mm,2), 917.28
 # lambda 3.52, 1.26
-library(gridExtra)
 d <- rbind(d, c(917.28, 1.26))
 d <- cbind(c("Fold 1", "Fold 2", "Fold 3", "Fold 4", "Fold 5", "Best"), d)
 p1 + p2 + p3 + p4 + p5 + gridExtra::tableGrob(d, theme = ttheme_default(base_size = 6))
@@ -372,9 +377,9 @@ mse_full
 
 ## SST Regions chosen by the lasso
 
-```{r coef-plot-full-lasso-stand, fig.cap=paste("Coefficient plot of the full lasso model with fitted intercept of", intercept)}
+```{r coef-plot-full-lasso-stand, fig.cap=paste("Coefficient plot of the full lasso model.")}
 coef_full <- readRDS(paste0(path_to_model_folder,
-                     "coef-plots/coef-plot-full.rds"))
+                            "coef-plots/coef-plot-full.rds"))
 coef_full 
 
 ```
@@ -396,28 +401,317 @@ colnames(d2) <- c("mse min", "lambda min")
 rownames(d2) <- c("stand", "original", "diff", "deseas")
 d2
 ```
-## Clustering results
+## Lasso on clusters results
+
+```{r cluster-map2, echo = FALSE, out.width= '50%',fig.cap= "Spatial distribution of the found clusters in the CAB. We applied a centered PCA on the data and used 3 principal components before applying the k-means algorithm"}
+km_pca_map_plot <- readRDS(paste0("../results/clustering/km_pca_map_plot.rds"))
+km_pca_map_plot + 
+  ggtitle("Precipitation clusters in the CAB,
+after centered PCA, using 3 PC's and applying k-means")
+```
 
 ```{r}
+library(ggplot2)
+s <- 8
 full_preds1 <- readRDS("../results/CV-lasso/cluster-cv-lasso-og2/cluster-1/pred-plots/pred-plot-full.rds")
+full_preds1 <- full_preds1 + ggtitle("Cluster 1") +
+  theme(plot.title = element_text(size = s))
+m1 <- get_mse_from_pred_plot(full_preds1)
+
 full_preds2 <- readRDS("../results/CV-lasso/cluster-cv-lasso-og2/cluster-2/pred-plots/pred-plot-full.rds")
+full_preds2 <- full_preds2 + ggtitle("Cluster 2")  +
+  theme(plot.title = element_text(size = s))
+m2 <- get_mse_from_pred_plot(full_preds2)
+
 full_preds3 <- readRDS("../results/CV-lasso/cluster-cv-lasso-og2/cluster-3/pred-plots/pred-plot-full.rds")
+full_preds3 <- full_preds3 + ggtitle("Cluster 3") +
+  theme(plot.title = element_text(size = s))
+m3 <- get_mse_from_pred_plot(full_preds3)
+
 full_preds4 <- readRDS("../results/CV-lasso/cluster-cv-lasso-og2/cluster-4/pred-plots/pred-plot-full.rds")
+full_preds4 <- full_preds4 + ggtitle("Cluster 4") +                theme(plot.title = element_text(size = s))
+m4 <- get_mse_from_pred_plot(full_preds4)
+
+
 full_preds5 <- readRDS("../results/CV-lasso/cluster-cv-lasso-og2/cluster-5/pred-plots/pred-plot-full.rds")
-full_preds1 + full_preds2 + full_preds3 + full_preds4 + full_preds5
-```
+full_preds5 <- full_preds5 + ggtitle("Cluster 5")+
+  theme(plot.title = element_text(size = s))
+m5 <- get_mse_from_pred_plot(full_preds5)
+
+m <- rbind(m1,m2,m3,m4,m5,1314.93)
+m <- cbind(c("Cluster 1", "Cluster 2", "Cluster 3", "Cluster 4", "Cluster 5", "No clustering"),m)
+rownames(m) <- NULL
+#rownames(m) <- c("Cluster 1", "Cluster 2", "Cluster 3", "Cluster 4", "Cluster 5", "No clustering")
+colnames(m) <- c("", "MSE, Lasso")
+
+library(gridExtra)
+full_preds1 + full_preds2 + full_preds3 + full_preds4 + full_preds5 + gridExtra::tableGrob(m, theme = ttheme_default(base_size = 6))
+``` 
+
+## Summary lasso results 
+
+- We compared different settings for the lasso
+- Lasso, lasso with standardization, de-seasonalizing, differentiation and on clusters
+- Lasso with standardized SST worked best
+- Can predict general seasonality, but still fails to predict peaks in precipitation
+- Clustering the CAB improves only on one cluster, but on this cluster peaks can be predicted better than in the unclustered model
+- Lasso chooses single "points" and not whole areas
+- The points chosen as coefficients differ in the models, and can be very far away from the CAB
+
+
+## Discussion Validation approach (maybe discuss this at the end)
+
+- For the CAB we can not predict large values in the hold-out set, on cluster 2 it works a little better
+- Possible explanations:
+- Our validation approach works better when train and test set are similar in terms of seasonality and trend
+- When train and test differ, predictions might not work so well
+(test of stationarity in folds)
+- Differentiating and de-seasonalizing could not solve this problem
+- Predictions work better when the precipitation remains fairly stable over time, see Cluster 2
+- Final model uses complete model selection data,
+		possibly some of that information is not useful anymore if         it's toocfar away from hold-out time frame
+- Our validation approach is a trade-off between efficient use of data and acknowledging the time-dependence in the data
+- Possible challenges are non-stationarity and spurious correlations
+- Lasso chooses single points, if the predictive area changes, its coefficient is 0
 
 # The fused lasso
 
-- why fused
-- what is fused
-- optimization
+```{r}
+path_to_model_folder <- "../results/CV-fused/noclust-large-fused-5k/"
 
-# fused evaluation
+```
 
-# fused settings
+## Definition of the fused lasso
 
-# fused results
+- Fused lasso, "fuses" predictors together
+- It penalizes the difference of close predictores
+- Therefore close predictors should be similar
+
+\begin{equation}
+\min_{\beta} 1/2 \sum_{i=1}^n(y_i - x_i^T\beta_i)^2 + \lambda \sum_{i,j \in E} |\beta_i - \beta_j| + \gamma \cdot \lambda \sum_{i=1}^p|\beta_i|,
+(\#eq:fused-lasso)
+\end{equation}
+
+- with $x_i$ being the ith row of the predictor matrix and 
+E is the edge set of an underlying graph.
+- The third term $\gamma \cdot \lambda \sum_{i=1}^p|\beta_i|$,
+controls the sparsity of the coefficients.
+- $\gamma=0$ leads to complete fusion of the coefficients (no sparsity) and $\gamma$ > 0 introduces sparsity to the solution, with higher values placing more priority on sparsity. 
+
+## Fused lasso optimization
+
+- Lets consider the problem in the notation of the generalizes lasso problem
+
+\begin{equation}
+\hat{\beta}=\underset{\beta \in \mathbb{R}^{p}}{\arg \min } \frac{1}{2}\|y-X \beta\|_{2}^{2}+\lambda\|D \beta\|_{1},
+(\#eq:gen-lasso)
+\end{equation}
+
+- where $y \in \mathbb{R}^n$ is the vector of the outcome, 
+$X \in \mathbb{R}^{n \times p}$ a predictor matrix, $D \in \mathbb{R}^{m \times p}$
+denotes a penalty matrix, and $\lambda \geq 0$ is a regularization parameter.
+- The dual path algorithm solves not the primal but the dual solution of the problem
+and computes the solution for a whole path instead of single values of $\lambda$.
+
+## 
+
+- Let's consider the case when $X=I$ and $rank(X)=p$ (this is called the "signal approximator" case),
+the dual problem of \@ref(eq:gen-lasso) is then:
+
+\begin{equation}
+\hat{u} \in \underset{\substack{u \in \mathbb{R}^{\omega}}}{\arg \min } \frac{1}{2}\left\|y-D^{T} u\right\|_{\frac{2}{2}} \text { subject to }\|u\|_{\infty} \leq \lambda.
+(\#eq:dual)
+\end{equation}
+
+- The primal and dual solutions, $\hat{\beta}$ and $\hat{u}$ are related by:
+
+\begin{equation}
+\hat{\beta}=y-D^{T} \hat{u} .
+(\#eq:dual-relate)
+\end{equation}
+
+- For general X and D with exploitable structure (as in our case), specialized implementations exist
+
+
+## Graph structure
+
+- We can use a graph as input in the fusedlasso function
+- We created a grid and deleted all nodes that were land regions
+- This induced subgraphs
+
+```{r graph-plot2, fig.cap='Graph of the SST and land areas used in fused lasso', message=FALSE, warning=FALSE}
+library(igraph)
+k <- readRDS("../data/processed/graph_sst.rds")
+cl <- clusters(k)
+
+#png(filename = "graph_plot.png")
+#jpeg("graph.jpg")
+
+print(plot(k, vertex.label = NA, vertex.size=0.00001,
+          edge.width= 0.0001,
+          vertex.color=cl$membership*10,
+     mark.expand = 15))
+
+# dev.off()
+# knitr::include_graphics("../figures/graph.jpg")
+# dev.off()
+# knitr::include_graphics("../figures/graph.jpg")
+
+
+```
+
+## Graph structure and implications
+
+- Results showed that removing the sub-graphs improved performance,
+although some of the regions were included in the final lasso models
+- If we don't remove the clusters and also add sparsity (i.e $\gamma > 0$) the clusters dominate the results even more
+- Possible explanations: Sub-graphs are less penalized, because they have fewer edges.
+- Removing the clusters improved results more than f.e standardization
+
+
+## Fused lasso settings
+
+- The considered fused lasso settings are: Fused lasso with clusters, fused lasso without clusters, fused lasso without clusters and sparsity (gamma: 0.01, 0.05, 0.1)
+- Fused lasso without clusters and no sparsity showed best results
+
+## Fused lasso results, clusters removed
+
+```{r}
+# k <- readRDS("../results/CV-fused/noclust-large-fused-5k/err-mat-plots/err-line-plot.rds")
+# k <- k + geom_point(aes(x=loglambda, y=err, colour=factor(fold))) 
+# k$labels$colour <- "Fold"
+# k
+# ggsave("err-line-plot-noclust.png")
+```
+
+
+
+```{r}
+knitr::include_graphics("err-line-plot-noclust.png")
+```
+
+
+
+## Fused lasso results, clusters removed
+
+
+```{r}
+# k <- readRDS("../results/CV-fused/noclust-large-fused-5k/best-lambda-res.rds")
+# log(k$lambda_min) # 2.65, after exp(14.28345)
+# k <- k$err_plot
+# a <- ggplot_build(k)
+# a$data
+# k <- k + geom_point(aes(x=loglambda, y=err, colour=factor(fold))) k$labels$colour <- "Fold"
+# k
+# ggsave("best-lambda-res-noclust.png")
+# k$data
+# k$labels
+# k$labels$colour <- "Folds"
+# k + geom_point(aes(colour = factor(folds)))
+```
+
+```{r}
+knitr::include_graphics("../results/CV-fused/noclust-large-fused-5k/best-lambda-res-noclust.png")
+```
+
+## Prediction plots
+
+```{r}
+pred_plot_1 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-1.rds"))
+pred_plot_1 <- pred_plot_1 + ylab("Precipitation fold 1")
+mse_1 <- get_mse_from_pred_plot(pred_plot_1)
+
+pred_plot_2 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-2.rds"))
+pred_plot_2 <- pred_plot_2 + ylab("Precipitation fold 2")
+mse_2 <- get_mse_from_pred_plot(pred_plot_2)
+
+pred_plot_3 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-3.rds"))
+pred_plot_3 <- pred_plot_3 + ylab("Precipitation fold 3")
+mse_3 <- get_mse_from_pred_plot(pred_plot_3)
+
+pred_plot_4 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-4.rds"))
+pred_plot_4 <- pred_plot_4 + ylab("Precipitation fold 4")
+mse_4 <- get_mse_from_pred_plot(pred_plot_4)
+
+pred_plot_5 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-5.rds"))
+pred_plot_5 <- pred_plot_5 + ylab("Precipitation fold 5")
+mse_5 <- get_mse_from_pred_plot(pred_plot_5)
+
+#pred_plot_list <- list(pred_plot_1,pred_plot_2,pred_plot_3,pred_plot_4,pred_plot_5)
+```
+```{r pred-fold-fused-og,fig.cap="Precipitation prediction and target values in the test set in each fold. Predictions in red and target values in black."}
+pred_plot_1 + pred_plot_2 + pred_plot_3 + pred_plot_4 +
+  pred_plot_5
+```
+
+## Prediction plot
+
+The predictions inside the folds are very similar to lasso without standardization, the same holds for the predictions from
+the full model, but the MSE improves here.
+
+
+## Full predictions
+
+```{r pred-plot-full-fused-og, fig.cap="Precipitation prediction and target values in the validation set. Predictions in red and target values in black. The model was fitted on the full CV data with the lambda value that minimised the average MSE"}
+full_preds <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-full.rds"))
+mse_full <- get_mse_from_pred_plot(full_preds)
+full_preds
+mse_full
+```
+
+
+## Coefficient plot
+
+```{r coef-plot-full-fused-og, eval=FALSE, fig.cap="Coefficient plot of the full fused lasso model."}
+coef_plot <- readRDS(paste0(path_to_model_folder,                "coef-plots/coef-plot-full.rds"))
+#coef_plot <- coef_plot + theme(legend.position = "bottom", text = element_text(size = 8))
+coef_plot$labels$colour <- "Coefficients"
+coef_plot$layers[[2]]$aes_params$size <- 0.75
+coef_plot_now <- coef_plot
+# coef_plot_now <- coef_plot_now + scale_colour_gradient2(name="Coefficients")
+ggsave(paste0(path_to_model_folder, "coef-plots/coef-plot-full.png"), plot = coef_plot_now)
+```
+
+```{r}
+knitr::include_graphics(paste0(path_to_model_folder, "coef-plots/coef-plot-full.png"))
+```
+
+## Coefficient plot, highest values only
+
+```{r}
+# coef_plot2 <- readRDS(paste0(path_to_model_folder,
+#                      "coef-plots/coef-plot-drop-out-full.rds"))
+#coef_plot <- coef_plot + theme(legend.position = "bottom", text = element_text(size = 8))
+# coef_plot2$layers[[2]]$aes_params$size <- 0.75
+# coef_plot_now2 <- coef_plot2
+# coef_plot_now2 <- coef_plot_now2 + scale_colour_gradient2(name="Coefficients")
+#ggsave(paste0(path_to_model_folder, "coef-plots/coef-plot-drop-out-full.png"), plot = coef_plot_now2)
+knitr::include_graphics(paste0(path_to_model_folder, "coef-plots/coef-plot-drop-out-full1.png"))
+
+```
+
+## Coefficient plot, lowest values only
+
+```{r}
+knitr::include_graphics(paste0(path_to_model_folder, "coef-plots/coef-plot-drop-out-full2.png"))
+```
+
+
+## Fused evaluation (maybe explain this when showing resutls)
+
+- Generally same setting as for lasso, 5 folds with train and test, choose $\lambda_{\min}$, refit with $\lambda_{\min}$, get MSE on hold-out test set.
+- But for the fused lasso we can not define the $\lambda$ vector
+beforehand.
+- $\lambda$-path is found by dual path algorithm and the range of the paths can vary a lot!
+- So to find $\lambda_{\min}$ we search over the common range of all folds and interpolate to lines
+- $\lambda_{\min}$ is then the $\lambda$ that minimize MSE over all $\lambda$ of that common range
+
+## Fusedlasso results
+
+
+
+# Graph structure
+# Fused results
 
 # Summary
 

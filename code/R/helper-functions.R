@@ -2180,6 +2180,7 @@ get_mse_from_pred_plot <- function(pred_plot) {
   a <- ggplot_build(pred_plot)$data[[1]]$y
   b <- ggplot_build(pred_plot)$data[[2]]$y
   mse <- comp_mse(a,b)
+  mse <- round(mse,2)
   return(mse)
 }
 

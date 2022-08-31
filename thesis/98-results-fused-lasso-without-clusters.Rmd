@@ -39,7 +39,7 @@ path_to_model_folder <- "../results/CV-fused/noclust-large-fused-5k/"
 ```
 
 ```{r err-line-fused-og, out.width='45%'}
-knitr::include_graphics(paste0(path_to_model_folder, "best-lambda-res.png"))
+knitr::include_graphics(paste0(path_to_model_folder, "best-lambda-res-noclust.png"))
 ```
 
 The error lines in the different folds differ in their trajectories as well
