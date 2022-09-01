@@ -67,6 +67,7 @@ some locations with very high precipitation values in general.
 ```{r precip-dens, out.width='50%', fig.cap="Density of the raw precipitation values without time or spatial dependency.", fig.align='center'}
 (precip_dens_plot + ylab("Precipitation") + xlab("Density") + ggtitle("Density of raw precipitation values"))
 ```
+
 ```{r , fig.cap="Precipitation mean at each location. The mean was computed over the whole time period"}
 precip_means_loc_plot <- readRDS("../results/eda/precip_means_loc_plot.rds")
 precip_means_loc_plot$labels$title <- NULL

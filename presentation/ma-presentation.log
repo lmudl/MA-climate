@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.24 (TeX Live 2022) (preloaded format=pdflatex 2022.8.31)  31 AUG 2022 20:15
+This is pdfTeX, Version 3.141592653-2.6-1.40.24 (TeX Live 2022) (preloaded format=pdflatex 2022.8.31)  1 SEP 2022 19:11
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -881,12 +881,12 @@ File: ts1lmss.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 ) [6
 
 ]
-<../figures/cross-degree.jpg, id=293, 343.2825pt x 367.6134pt>
+<../figures/cross-degree.jpg, id=301, 343.2825pt x 367.6134pt>
 File: ../figures/cross-degree.jpg Graphic file (type jpg)
 <use ../figures/cross-degree.jpg>
 Package pdftex.def Info: ../figures/cross-degree.jpg  used on input line 214.
 (pdftex.def)             Requested size: 153.64284pt x 164.53261pt.
-<../figures/early-warning-signals.jpg, id=294, 343.0416pt x 125.268pt>
+<../figures/early-warning-signals.jpg, id=302, 343.0416pt x 125.268pt>
 File: ../figures/early-warning-signals.jpg Graphic file (type jpg)
 <use ../figures/early-warning-signals.jpg>
 Package pdftex.def Info: ../figures/early-warning-signals.jpg  used on input line 214.
@@ -950,7 +950,7 @@ Overfull \hbox (135.36261pt too wide) in paragraph at lines 5--5
 []\T1/lmtt/m/n/10.95 ## Scale for 'y' is already present. Adding another scale for 'y', which will[] 
  []
 
-<ma-presentation_files/figure-beamer/unnamed-chunk-5-1.pdf, id=375, 722.7pt x 505.89pt>
+<ma-presentation_files/figure-beamer/unnamed-chunk-5-1.pdf, id=383, 722.7pt x 505.89pt>
 File: ma-presentation_files/figure-beamer/unnamed-chunk-5-1.pdf Graphic file (type pdf)
 <use ma-presentation_files/figure-beamer/unnamed-chunk-5-1.pdf>
 Package pdftex.def Info: ma-presentation_files/figure-beamer/unnamed-chunk-5-1.pdf  used on input line 7.
@@ -964,7 +964,7 @@ Overfull \vbox (43.87196pt too high) detected at line 433
  <./ma-presentation_files/figure-beamer/unnamed-chunk-5-1.pdf>] [21
 
 ]
-<ma-presentation_files/figure-beamer/unnamed-chunk-6-1.pdf, id=391, 722.7pt x 505.89pt>
+<ma-presentation_files/figure-beamer/unnamed-chunk-6-1.pdf, id=399, 722.7pt x 505.89pt>
 File: ma-presentation_files/figure-beamer/unnamed-chunk-6-1.pdf Graphic file (type pdf)
 <use ma-presentation_files/figure-beamer/unnamed-chunk-6-1.pdf>
 Package pdftex.def Info: ma-presentation_files/figure-beamer/unnamed-chunk-6-1.pdf  used on input line 468.
@@ -976,7 +976,7 @@ Overfull \vbox (88.35838pt too high) detected at line 468
 [22
 
  <./ma-presentation_files/figure-beamer/unnamed-chunk-6-1.pdf>]
-<ma-presentation_files/figure-beamer/cluster-map-1.pdf, id=402, 722.7pt x 505.89pt>
+<ma-presentation_files/figure-beamer/cluster-map-1.pdf, id=410, 722.7pt x 505.89pt>
 File: ma-presentation_files/figure-beamer/cluster-map-1.pdf Graphic file (type pdf)
 <use ma-presentation_files/figure-beamer/cluster-map-1.pdf>
 Package pdftex.def Info: ma-presentation_files/figure-beamer/cluster-map-1.pdf  used on input line 492.
@@ -999,7 +999,7 @@ Overfull \hbox (13.2279pt too wide) detected at line 521
 ] [26
 
 ]
-<../thesis/validation-schemes.png, id=432, 931.48pt x 710.655pt>
+<../thesis/validation-schemes.png, id=440, 931.48pt x 710.655pt>
 File: ../thesis/validation-schemes.png Graphic file (type png)
 <use ../thesis/validation-schemes.png>
 Package pdftex.def Info: ../thesis/validation-schemes.png  used on input line 549.
@@ -1009,7 +1009,7 @@ Overfull \hbox (14.14214pt too wide) in paragraph at lines 549--549
 [][]  
  []
 
-<../thesis/blocked-cv.png, id=434, 455.45157pt x 289.08pt>
+<../thesis/blocked-cv.png, id=442, 455.45157pt x 289.08pt>
 File: ../thesis/blocked-cv.png Graphic file (type png)
 <use ../thesis/blocked-cv.png>
 Package pdftex.def Info: ../thesis/blocked-cv.png  used on input line 549.
@@ -1032,7 +1032,7 @@ Overfull \vbox (286.51414pt too high) detected at line 549
 ] [30
 
 ]
-<ma-presentation_files/figure-beamer/unnamed-chunk-11-1.pdf, id=456, 722.7pt x 505.89pt>
+<ma-presentation_files/figure-beamer/unnamed-chunk-11-1.pdf, id=464, 722.7pt x 505.89pt>
 File: ma-presentation_files/figure-beamer/unnamed-chunk-11-1.pdf Graphic file (type pdf)
 <use ma-presentation_files/figure-beamer/unnamed-chunk-11-1.pdf>
 Package pdftex.def Info: ma-presentation_files/figure-beamer/unnamed-chunk-11-1.pdf  used on input line 622.
@@ -1044,7 +1044,7 @@ Overfull \vbox (3.35876pt too high) detected at line 622
 [31
 
  <./ma-presentation_files/figure-beamer/unnamed-chunk-11-1.pdf>]
-<ma-presentation_files/figure-beamer/pred-plot-fold-lasso-stand-1.pdf, id=471, 722.7pt x 505.89pt>
+<ma-presentation_files/figure-beamer/pred-plot-fold-lasso-stand-1.pdf, id=479, 722.7pt x 505.89pt>
 File: ma-presentation_files/figure-beamer/pred-plot-fold-lasso-stand-1.pdf Graphic file (type pdf)
 <use ma-presentation_files/figure-beamer/pred-plot-fold-lasso-stand-1.pdf>
 Package pdftex.def Info: ma-presentation_files/figure-beamer/pred-plot-fold-lasso-stand-1.pdf  used on input line 635.
@@ -1061,7 +1061,7 @@ Overfull \vbox (62.54297pt too high) detected at line 635
 \openout4 = `ma-presentation.vrb'.
 
 (./ma-presentation.vrb
-<ma-presentation_files/figure-beamer/pred-plot-full-lasso-stand-1.pdf, id=487, 722.7pt x 505.89pt>
+<ma-presentation_files/figure-beamer/pred-plot-full-lasso-stand-1.pdf, id=495, 722.7pt x 505.89pt>
 File: ma-presentation_files/figure-beamer/pred-plot-full-lasso-stand-1.pdf Graphic file (type pdf)
 <use ma-presentation_files/figure-beamer/pred-plot-full-lasso-stand-1.pdf>
 Package pdftex.def Info: ma-presentation_files/figure-beamer/pred-plot-full-lasso-stand-1.pdf  used on input line 2.
@@ -1073,7 +1073,7 @@ Overfull \vbox (26.71118pt too high) detected at line 647
 [34
 
  <./ma-presentation_files/figure-beamer/pred-plot-full-lasso-stand-1.pdf>]
-<ma-presentation_files/figure-beamer/coef-plot-full-lasso-stand-1.pdf, id=498, 722.7pt x 505.89pt>
+<ma-presentation_files/figure-beamer/coef-plot-full-lasso-stand-1.pdf, id=506, 722.7pt x 505.89pt>
 File: ma-presentation_files/figure-beamer/coef-plot-full-lasso-stand-1.pdf Graphic file (type pdf)
 <use ma-presentation_files/figure-beamer/coef-plot-full-lasso-stand-1.pdf>
 Package pdftex.def Info: ma-presentation_files/figure-beamer/coef-plot-full-lasso-stand-1.pdf  used on input line 659.
@@ -1092,12 +1092,12 @@ Overfull \vbox (50.58304pt too high) detected at line 659
 (./ma-presentation.vrb) [37
 
 ]
-<ma-presentation_files/figure-beamer/cluster-map2-1.pdf, id=521, 722.7pt x 505.89pt>
+<ma-presentation_files/figure-beamer/cluster-map2-1.pdf, id=529, 722.7pt x 505.89pt>
 File: ma-presentation_files/figure-beamer/cluster-map2-1.pdf Graphic file (type pdf)
 <use ma-presentation_files/figure-beamer/cluster-map2-1.pdf>
 Package pdftex.def Info: ma-presentation_files/figure-beamer/cluster-map2-1.pdf  used on input line 683.
 (pdftex.def)             Requested size: 153.64615pt x 107.55229pt.
-<ma-presentation_files/figure-beamer/unnamed-chunk-14-1.pdf, id=522, 722.7pt x 505.89pt>
+<ma-presentation_files/figure-beamer/unnamed-chunk-14-1.pdf, id=530, 722.7pt x 505.89pt>
 File: ma-presentation_files/figure-beamer/unnamed-chunk-14-1.pdf Graphic file (type pdf)
 <use ma-presentation_files/figure-beamer/unnamed-chunk-14-1.pdf>
 Package pdftex.def Info: ma-presentation_files/figure-beamer/unnamed-chunk-14-1.pdf  used on input line 683.
@@ -1137,7 +1137,7 @@ Overfull \vbox (23.0593pt too high) detected at line 787
 \openout4 = `ma-presentation.vrb'.
 
 (./ma-presentation.vrb
-<ma-presentation_files/figure-beamer/graph-plot2-1.pdf, id=574, 722.7pt x 505.89pt>
+<ma-presentation_files/figure-beamer/graph-plot2-1.pdf, id=582, 722.7pt x 505.89pt>
 File: ma-presentation_files/figure-beamer/graph-plot2-1.pdf Graphic file (type pdf)
 <use ma-presentation_files/figure-beamer/graph-plot2-1.pdf>
 Package pdftex.def Info: ma-presentation_files/figure-beamer/graph-plot2-1.pdf  used on input line 14.
@@ -1153,7 +1153,7 @@ Overfull \vbox (124.79831pt too high) detected at line 879
 ] [47
 
 ]
-<err-line-plot-noclust.png, id=594, 505.89pt x 505.89pt>
+<err-line-plot-noclust.png, id=602, 505.89pt x 505.89pt>
 File: err-line-plot-noclust.png Graphic file (type png)
 <use err-line-plot-noclust.png>
 Package pdftex.def Info: err-line-plot-noclust.png  used on input line 923.
@@ -1165,7 +1165,7 @@ Overfull \vbox (33.487pt too high) detected at line 923
 [48
 
  <./err-line-plot-noclust.png>]
-<../results/CV-fused/noclust-large-fused-5k/best-lambda-res-noclust.png, id=600, 505.89pt x 505.89pt>
+<../results/CV-fused/noclust-large-fused-5k/best-lambda-res-noclust.png, id=608, 505.89pt x 505.89pt>
 File: ../results/CV-fused/noclust-large-fused-5k/best-lambda-res-noclust.png Graphic file (type png)
 <use ../results/CV-fused/noclust-large-fused-5k/best-lambda-res-noclust.png>
 Package pdftex.def Info: ../results/CV-fused/noclust-large-fused-5k/best-lambda-res-noclust.png  used on input line 931.
@@ -1177,7 +1177,7 @@ Overfull \vbox (33.487pt too high) detected at line 931
 [49
 
  <../results/CV-fused/noclust-large-fused-5k/best-lambda-res-noclust.png>]
-<ma-presentation_files/figure-beamer/pred-fold-fused-og-1.pdf, id=607, 722.7pt x 505.89pt>
+<ma-presentation_files/figure-beamer/pred-fold-fused-og-1.pdf, id=615, 722.7pt x 505.89pt>
 File: ma-presentation_files/figure-beamer/pred-fold-fused-og-1.pdf Graphic file (type pdf)
 <use ma-presentation_files/figure-beamer/pred-fold-fused-og-1.pdf>
 Package pdftex.def Info: ma-presentation_files/figure-beamer/pred-fold-fused-og-1.pdf  used on input line 943.
@@ -1194,7 +1194,7 @@ Overfull \vbox (62.54297pt too high) detected at line 943
 \openout4 = `ma-presentation.vrb'.
 
 (./ma-presentation.vrb
-<ma-presentation_files/figure-beamer/pred-plot-full-fused-og-1.pdf, id=623, 722.7pt x 505.89pt>
+<ma-presentation_files/figure-beamer/pred-plot-full-fused-og-1.pdf, id=631, 722.7pt x 505.89pt>
 File: ma-presentation_files/figure-beamer/pred-plot-full-fused-og-1.pdf Graphic file (type pdf)
 <use ma-presentation_files/figure-beamer/pred-plot-full-fused-og-1.pdf>
 Package pdftex.def Info: ma-presentation_files/figure-beamer/pred-plot-full-fused-og-1.pdf  used on input line 4.
@@ -1206,7 +1206,7 @@ Overfull \vbox (97.75089pt too high) detected at line 970
 [52
 
  <./ma-presentation_files/figure-beamer/pred-plot-full-fused-og-1.pdf>]
-<../results/CV-fused/noclust-large-fused-5k/coef-plots/coef-plot-full.png, id=634, 505.89pt x 505.89pt>
+<../results/CV-fused/noclust-large-fused-5k/coef-plots/coef-plot-full.png, id=642, 505.89pt x 505.89pt>
 File: ../results/CV-fused/noclust-large-fused-5k/coef-plots/coef-plot-full.png Graphic file (type png)
 <use ../results/CV-fused/noclust-large-fused-5k/coef-plots/coef-plot-full.png>
 Package pdftex.def Info: ../results/CV-fused/noclust-large-fused-5k/coef-plots/coef-plot-full.png  used on input line 977.
@@ -1218,7 +1218,7 @@ Overfull \vbox (33.487pt too high) detected at line 977
 [53
 
  <../results/CV-fused/noclust-large-fused-5k/coef-plots/coef-plot-full.png>]
-<../results/CV-fused/noclust-large-fused-5k/coef-plots/coef-plot-drop-out-full1.png, id=640, 505.89pt x 505.89pt>
+<../results/CV-fused/noclust-large-fused-5k/coef-plots/coef-plot-drop-out-full1.png, id=648, 505.89pt x 505.89pt>
 File: ../results/CV-fused/noclust-large-fused-5k/coef-plots/coef-plot-drop-out-full1.png Graphic file (type png)
 <use ../results/CV-fused/noclust-large-fused-5k/coef-plots/coef-plot-drop-out-full1.png>
 Package pdftex.def Info: ../results/CV-fused/noclust-large-fused-5k/coef-plots/coef-plot-drop-out-full1.png  used on input line 985.
@@ -1230,7 +1230,7 @@ Overfull \vbox (33.487pt too high) detected at line 985
 [54
 
  <../results/CV-fused/noclust-large-fused-5k/coef-plots/coef-plot-drop-out-full1.png>]
-<../results/CV-fused/noclust-large-fused-5k/coef-plots/coef-plot-drop-out-full2.png, id=646, 505.89pt x 505.89pt>
+<../results/CV-fused/noclust-large-fused-5k/coef-plots/coef-plot-drop-out-full2.png, id=654, 505.89pt x 505.89pt>
 File: ../results/CV-fused/noclust-large-fused-5k/coef-plots/coef-plot-drop-out-full2.png Graphic file (type png)
 <use ../results/CV-fused/noclust-large-fused-5k/coef-plots/coef-plot-drop-out-full2.png>
 Package pdftex.def Info: ../results/CV-fused/noclust-large-fused-5k/coef-plots/coef-plot-drop-out-full2.png  used on input line 993.
@@ -1241,7 +1241,11 @@ Overfull \vbox (33.487pt too high) detected at line 993
 
 [55
 
- <../results/CV-fused/noclust-large-fused-5k/coef-plots/coef-plot-drop-out-full2.png>] [56
+ <../results/CV-fused/noclust-large-fused-5k/coef-plots/coef-plot-drop-out-full2.png>]
+Overfull \vbox (6.21309pt too high) detected at line 1021
+ []
+
+[56
 
 ] [57
 
@@ -1249,9 +1253,25 @@ Overfull \vbox (33.487pt too high) detected at line 993
 
 ] [59
 
-] [60
+]
+Overfull \vbox (149.10153pt too high) detected at line 1092
+ []
 
-] [61
+[60
+
+]
+Overfull \vbox (100.05263pt too high) detected at line 1130
+ []
+
+[61
+
+] [62
+
+]
+Overfull \vbox (24.5905pt too high) detected at line 1170
+ []
+
+[63
 
 ]
 \tf@nav=\write6
@@ -1265,21 +1285,21 @@ Overfull \vbox (33.487pt too high) detected at line 993
 
 (./ma-presentation.aux)
 Package rerunfilecheck Info: File `ma-presentation.out' has not changed.
-(rerunfilecheck)             Checksum: F30445D5CBD0A5DF11BC6303F60BA5EC;8996.
+(rerunfilecheck)             Checksum: 2974FFFD46D7C6686304AE07CBA9F545;9368.
  ) 
 Here is how much of TeX's memory you used:
- 26093 strings out of 479489
- 542187 string characters out of 5873243
- 776557 words of memory out of 5000000
- 44014 multiletter control sequences out of 15000+600000
+ 26108 strings out of 479489
+ 542366 string characters out of 5873243
+ 776814 words of memory out of 5000000
+ 44023 multiletter control sequences out of 15000+600000
  524902 words of font info for 67 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
  101i,13n,111p,1884b,753s stack positions out of 10000i,1000n,20000p,200000b,200000s
 {c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-mathit.enc}{c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-mathsy.enc}{c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-rm.enc}{c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-mathex.enc}{c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-ec.enc}{c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-ts1.enc}<c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmex10.pfb><c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmmi10.pfb><c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmmi6.pfb><c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmmi8.pfb><c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmss10.pfb><c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmss8.pfb><c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmssbx10.pfb><c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmsso10.pfb><c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmsso12.pfb><c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmsso8.pfb><c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmsy10.pfb><c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmsy6.pfb><c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmsy8.pfb><c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmtt10.pfb><c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
-Output written on ma-presentation.pdf (61 pages, 3534635 bytes).
+Output written on ma-presentation.pdf (63 pages, 3538523 bytes).
 PDF statistics:
- 806 PDF objects out of 1000 (max. 8388607)
- 660 compressed objects within 7 object streams
- 184 named destinations out of 1000 (max. 500000)
- 588 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 824 PDF objects out of 1000 (max. 8388607)
+ 676 compressed objects within 7 object streams
+ 190 named destinations out of 1000 (max. 500000)
+ 604 words of extra memory for PDF output out of 10000 (max. 10000000)
 
