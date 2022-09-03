@@ -1,16 +1,18 @@
 ---
 title: "Predicting Droughts in the Amazon Basin based on Global Sea Surface Temperatures"
-author: Dario Lepke
-date: September 09, 2022
+author:
+  - Dario Lepke\newline Dr. Fabian Scheipl (Ludwig-Maximilians-University Munich)\newline Dr. Niklas Boers (Potsdam Institute for Climate Impact Research)
+date: September 08, 2022
 output: 
   beamer_presentation:
     theme: "metropolis"
-    slide_level: 3
+    slide_level: 2
     toc: true
     # toc_depth: 2
     number_sections: true
     # includes:
     #   in_header: head.tex
+    keep_tex: yes
   ioslides_presentation:
     logo: "../thesis/sigillum.png"
   bookdown::pdf_book:
@@ -26,8 +28,9 @@ bibliography: "../thesis/0-ref-lib.bib"
 ---
 
 ```{r, echo = FALSE}
-knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(warning = FALSE, message = FALSE, echo = FALSE)
 ```
+
 ```{r}
 source("../code/R/helper-functions.R")
 ```
@@ -110,7 +113,7 @@ and its relationship to droughts in the  CAB
 knitr::include_graphics("../figures/early-warning-signals.jpg")
 ```
 
-## Our approach
+## Our Approach
 
 - Inspect spatial and temporal characteristics in raw data
 - Directly predict rain from SST
@@ -120,14 +123,15 @@ knitr::include_graphics("../figures/early-warning-signals.jpg")
 
 # Explorative analysis
 
-## The data
+## The Data
+
 - Rain data from CHIRPS (Climate Hazards Group InfraRed Precipitation woth Station data)
 - CHIRPS contains in-situ and satellite data
 - SST data from ERSST (Extended Reconstructed Sea Surface Temperature)
 - ERSST is reanalysis of observation data (made by ships and buoys for example), missing data filled by interpolation techniques
 - These are the same data sets as in @ciemer2020early
 
-## Explorative analysis Rain
+## Explorative Analysis Rain
 
 ```{r CAB, echo=FALSE, fig.cap="Location of the area under study. The central amazon basin (CAB) spanning across 0,-10 latitude and -70,-55 longitude", fig.align='center',out.width='50%'}
 cab_square_plot <- readRDS("../results/eda/cab_square_plot.rds")
@@ -199,19 +203,40 @@ sst_means_loc_plot + sst_sds_loc_plot +
 
 # Correlation analysis
 
+## Correlation analysis
+
+- Here we get an overview over the general correlation structure of the complete data
+- We show correlation data for the original as well as the seasonally adjusted data
+- The seasonal component was removed by using the stl algorithm that separates the time series into
+
+$$ Monthly \textit{ } Data = Seasonal + Trend + Remainder$$
+- Two time series can appear correlated but after removing the seasonal component the correlation vanishes
+
 ## Correlation plot original SST
 
 ```{r corr-0, echo = FALSE, out.width='65%', out.height='65%',fig.show='hold',fig.align='center', fig.cap='Correlation plot between SST and mean precipitation in the CAB for timelag 0'}
-knitr::include_graphics("../code/Rmarkdown/plots-markdown/og-data/corr-0.jpg")
+knitr::include_graphics("../pres-plots/og-data/corr-0.jpg")
 ```
 
+## Correlation plot original SST
+
+```{r corr-0q, echo = FALSE, out.width='65%', out.height='65%',fig.show='hold',fig.align='center', fig.cap='Correlation plot between SST and mean precipitation in the CAB for timelag 0'}
+knitr::include_graphics("../pres-plots/og-data/q-corr-0.jpg")
+```
 
 ## Correlation plot de-seasonalized SST
-```{r corr-0q, echo = FALSE, out.width='65%', out.height='65%',fig.show='hold',fig.align='center', fig.cap='Correlation plot between des-seasonalized SST and mean precipitation in the CAB for timelag 0'}
-knitr::include_graphics("../code/Rmarkdown/plots-markdown/des-data/corr-0.jpg")
+```{r des-corr-0, echo = FALSE, out.width='65%', out.height='65%',fig.show='hold',fig.align='center', fig.cap='Correlation plot between de-seasonalized SST and de-seasonalized mean precipitation in the CAB for timelag 0'}
+knitr::include_graphics("../pres-plots/des-data/corr-0.jpg")
+```
+
+## Correlation plot de-seasonalized SST
+
+```{r des-corr-0q, echo = FALSE, out.width='65%', out.height='65%',fig.show='hold',fig.align='center', fig.cap='Correlation plot between de-seasonalized SST and de-seasonalized mean precipitation in the CAB for timelag 0'}
+knitr::include_graphics("../pres-plots/des-data/q-corr-0.jpg")
 ```
 
 # Clustering
+
 ## Motivation/ Overview 
 - explorative analysis has shown spatial and temporal differences in the precipitation data
 - we explored this further using k-means clustering
@@ -369,7 +394,7 @@ over all folds
 - show coefficients
 - display table
 
-## lasso results
+## Lasso results
 
 ```{r err-fold-lasso-stand, fig.cap="MSE of the CV for the different lambda values on the a log scale. The red dotted line shows the lambda for which minimum MSE was obtained."}
 path_to_model_folder <- "../results/CV-lasso/test-lasso-stand/"
@@ -441,7 +466,7 @@ pred_plot_1 + pred_plot_2 + pred_plot_3 + pred_plot_4 +
 
 # Predictions on External Test Set
 
-```{r pred-plot-full-lasso-stand, fi.cap="Precipitation prediction and target values in the validation set. Predictions in red and target values in black. The model was fitted on the full CV data with the lambda value that minimised the average MSE"}
+```{r pred-plot-full-lasso-stand, fig.cap="Precipitation prediction and target values in the validation set. Predictions in red and target values in black. The model was fitted on the full CV data with the lambda value that minimised the average MSE"}
 full_preds <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-full.rds"))
 full_preds
 mse_full <- get_mse_from_pred_plot(full_preds)
@@ -470,13 +495,13 @@ mse_diff <- readRDS("../results/CV-lasso/test-diff1-lasso/mse-list.rds")
 mse_diff <- round(unlist(mse_diff),2)
 
 d2 <- rbind(mse_stand, mse_og, mse_diff, mse_deseas)
-colnames(d2) <- c("mse min", "lambda min")
-rownames(d2) <- c("stand", "original", "diff", "deseas")
-d2
+colnames(d2) <- c("MSE", "Lambda")
+rownames(d2) <- c("Standardized", "Original", "Differentiated", "De-seasonalized")
+knitr::kable(d2)
 ```
 ## Lasso on clusters results
 
-```{r cluster-map2, echo = FALSE, out.width= '50%',fig.cap= "Spatial distribution of the found clusters in the CAB. We applied a centered PCA on the data and used 3 principal components before applying the k-means algorithm"}
+```{r cluster-map2, echo = FALSE, out.width= '50%'}
 km_pca_map_plot <- readRDS(paste0("../results/clustering/km_pca_map_plot.rds"))
 km_pca_map_plot + 
   ggtitle("Precipitation clusters in the CAB,
@@ -517,9 +542,14 @@ rownames(m) <- NULL
 #rownames(m) <- c("Cluster 1", "Cluster 2", "Cluster 3", "Cluster 4", "Cluster 5", "No clustering")
 colnames(m) <- c("", "MSE, Lasso")
 
+```
+
+## MSE clustered results
+
+```{r}
 library(gridExtra)
 full_preds1 + full_preds2 + full_preds3 + full_preds4 + full_preds5 + gridExtra::tableGrob(m, theme = ttheme_default(base_size = 6))
-``` 
+```
 
 ## Summary lasso results 
 
@@ -551,7 +581,6 @@ full_preds1 + full_preds2 + full_preds3 + full_preds4 + full_preds5 + gridExtra:
 
 ```{r}
 path_to_model_folder <- "../results/CV-fused/noclust-large-fused-5k/"
-
 ```
 
 ## Definition of the fused lasso
@@ -769,6 +798,39 @@ knitr::include_graphics(paste0(path_to_model_folder, "coef-plots/coef-plot-drop-
 knitr::include_graphics(paste0(path_to_model_folder, "coef-plots/coef-plot-drop-out-full2.png"))
 ```
 
+## Fused lasso results MSE
+
+```{r}
+# with clusters, without cluster and gamma, also best lambda
+# mse from the sup material in thesis
+mp <- "../results/CV-fused/large-fused-5k/"
+mse_wc <- 1131.71
+bl_wc <- round(readRDS(paste0(mp,"best_l_chosen.rds")),2)
+
+mp <- "../results/CV-fused/noclust-large-fused-5k/"
+mse_woc <- 1070.04
+bl_woc <- round(readRDS(paste0(mp,"best_l_chosen.rds")),2)
+
+mp <- "../results/CV-fused/noclust-large-fused-5k-gamma-01/"
+mse_woc01 <- 1840.59
+bl_woc01 <- round(readRDS(paste0(mp,"best_l_chosen.rds")),2)
+
+mp <- "../results/CV-fused/noclust-large-fused-5k-gamma-005/"
+mse_woc005 <- 1836.63
+bl_woc005 <- round(readRDS(paste0(mp,"best_l_chosen.rds")),2)
+
+
+d <- data.frame(row.names = c("No sub-graphs", "With sub-graphs",
+                       "No sub-graphs, gamma 0.05",
+                       "No sub-graphs, gamma 0.1"),
+                "MSE" = c(mse_woc, mse_wc, mse_woc005, mse_woc01),
+                "Lambda" = c(bl_woc, bl_wc, bl_woc005, bl_woc01))
+
+knitr::kable(d)
+
+```
+
+
 
 ## Fused lasso results summary
 
@@ -826,6 +888,202 @@ knitr::include_graphics(paste0(path_to_model_folder, "coef-plots/coef-plot-drop-
 
 # Appendix
 
+# Lasso on original SST
+## MSE in each fold (Lasso on original SST)
+
+```{r err-fold-lasso-og, fig.cap="MSE of the CV for the different lambda values on the a log scale. The red dotted line shows the lambda for which minimum MSE was obtained."}
+path_to_model_folder <- "../results/CV-lasso/test-lasso-og/"
+p1 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-plot-fold-1.rds"))
+p2 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-plot-fold-2.rds"))
+p3 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-plot-fold-3.rds"))
+p4 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-plot-fold-4.rds"))
+p5 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-plot-fold-5.rds"))
+# p1 + ylim(0,10000) + p2 + ylim(0,10000) + p3 + ylim(0,10000) + p4 + ylim(0,10000) + p5 + ylim(0,10000)
+
+```
+```{r}
+#p1 + p2 + p3 + p4 + p5 + gridExtra::tableGrob()
+```
+
+```{r}
+a <- unlist((lapply(list(p1,p2,p3,p4,p5), get_min_err_from_plot)))
+b <- unlist((lapply(list(p1,p2,p3,p4,p5), get_minl_from_plot)))
+d <- cbind("min err" = a, "log lambda" = b)
+d <- round(d, 2)
+```
+
+```{r}
+err_mat <- readRDS(paste0(path_to_model_folder, "/err-mat.rds"))
+lambdas <- readRDS(paste0(path_to_model_folder, "/lambda-vec.rds"))
+wm <- which.min(apply(err_mat, 1, mean))
+full_model <- readRDS(paste0(path_to_model_folder, "full-model.rds"))
+intercept <- round(full_model$a0[wm],2)
+lambda <- round(lambdas[wm],2)
+rm(full_model)
+```
+
+
+```{r}
+# round(mm,2), 917.28
+# lambda 3.52, 1.26
+mm <- min(round(apply(err_mat, 1, mean),2))
+d <- rbind(d, c(mm, round(log(lambda),2)))
+d <- cbind(c("Fold 1", "Fold 2", "Fold 3", "Fold 4", "Fold 5", "Best"), d)
+p1 + p2 + p3 + p4 + p5 + gridExtra::tableGrob(d, theme = ttheme_default(base_size = 6))
+```
+
+## Predictions on test set, for each Fold (Lasso original SST)
+```{r}
+pred_plot_1 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-1.rds"))
+pred_plot_1 <- pred_plot_1 + ylab("Precipitation fold 1")
+mse_1 <- get_mse_from_pred_plot(pred_plot_1)
+
+pred_plot_2 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-2.rds"))
+pred_plot_2 <- pred_plot_2 + ylab("Precipitation fold 2")
+mse_2 <- get_mse_from_pred_plot(pred_plot_2)
+
+pred_plot_3 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-3.rds"))
+pred_plot_3 <- pred_plot_3 + ylab("Precipitation fold 3")
+mse_3 <- get_mse_from_pred_plot(pred_plot_3)
+
+pred_plot_4 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-4.rds"))
+pred_plot_4 <- pred_plot_4 + ylab("Precipitation fold 4")
+mse_4 <- get_mse_from_pred_plot(pred_plot_4)
+
+pred_plot_5 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-5.rds"))
+pred_plot_5 <- pred_plot_5 + ylab("Precipitation fold 5")
+mse_5 <- get_mse_from_pred_plot(pred_plot_5)
+
+pred_plot_list <- list(pred_plot_1,pred_plot_2,pred_plot_3,pred_plot_4,pred_plot_5)
+```
+
+```{r pred-plot-fold-lasso-og, fig.cap="Precipitation prediction and target values in the test set in each fold. Predictions in red and target values in black."}
+pred_plot_1 + pred_plot_2 + pred_plot_3 + pred_plot_4 +
+  pred_plot_5
+```
+
+## Predictions on External Test Set (Lasso on original SST)
+
+```{r pred-plot-full-lasso-og, fig.cap="Precipitation prediction and target values in the validation set. Predictions in red and target values in black. The model was fitted on the full CV data with the lambda value that minimised the average MSE"}
+full_preds <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-full.rds"))
+full_preds
+mse_full <- get_mse_from_pred_plot(full_preds)
+mse_full
+```
+
+## SST Regions chosen by the lasso (Lasso on original SST)
+
+```{r coef-plot-full-lasso-og, fig.cap=paste("Coefficient plot of the full lasso model.")}
+coef_full <- readRDS(paste0(path_to_model_folder,
+                            "coef-plots/coef-plot-full.rds"))
+coef_full 
+```
+
+
+
+
+
+
+
+
+# Lasso on differentiated SST
+
+## MSE in each fold (Lasso differentiated)
+
+```{r err-fold-lasso-diff, fig.cap="MSE of the CV for the different lambda values on the a log scale. The red dotted line shows the lambda for which minimum MSE was obtained."}
+path_to_model_folder <- "../results/CV-lasso/test-diff1-lasso/"
+p1 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-plot-fold-1.rds"))
+p2 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-plot-fold-2.rds"))
+p3 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-plot-fold-3.rds"))
+p4 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-plot-fold-4.rds"))
+p5 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-plot-fold-5.rds"))
+# p1 + ylim(0,10000) + p2 + ylim(0,10000) + p3 + ylim(0,10000) + p4 + ylim(0,10000) + p5 + ylim(0,10000)
+
+```
+
+```{r}
+a <- unlist((lapply(list(p1,p2,p3,p4,p5), get_min_err_from_plot)))
+b <- unlist((lapply(list(p1,p2,p3,p4,p5), get_minl_from_plot)))
+d <- cbind("min err" = a, "log lambda" = b)
+d <- round(d, 2)
+```
+
+```{r}
+err_mat <- readRDS(paste0(path_to_model_folder, "/err-mat.rds"))
+lambdas <- readRDS(paste0(path_to_model_folder, "/lambda-vec.rds"))
+wm <- which.min(apply(err_mat, 1, mean))
+full_model <- readRDS(paste0(path_to_model_folder, "full-model.rds"))
+intercept <- round(full_model$a0[wm],2)
+lambda <- round(lambdas[wm],2)
+rm(full_model)
+```
+
+```{r}
+# round(mm,2), 917.28
+# lambda 3.52, 1.26
+mm <- min(round(apply(err_mat, 1, mean),2))
+d <- rbind(d, c(mm, round(log(lambda),2)))
+d <- cbind(c("Fold 1", "Fold 2", "Fold 3", "Fold 4", "Fold 5", "Best"), d)
+p1 + p2 + p3 + p4 + p5 + gridExtra::tableGrob(d, theme = ttheme_default(base_size = 6))
+```
+
+## Predictions on test set, for each Fold (Lasso differentiated)
+```{r}
+pred_plot_1 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-1.rds"))
+pred_plot_1 <- pred_plot_1 + ylab("Precipitation fold 1")
+mse_1 <- get_mse_from_pred_plot(pred_plot_1)
+
+pred_plot_2 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-2.rds"))
+pred_plot_2 <- pred_plot_2 + ylab("Precipitation fold 2")
+mse_2 <- get_mse_from_pred_plot(pred_plot_2)
+
+pred_plot_3 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-3.rds"))
+pred_plot_3 <- pred_plot_3 + ylab("Precipitation fold 3")
+mse_3 <- get_mse_from_pred_plot(pred_plot_3)
+
+pred_plot_4 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-4.rds"))
+pred_plot_4 <- pred_plot_4 + ylab("Precipitation fold 4")
+mse_4 <- get_mse_from_pred_plot(pred_plot_4)
+
+pred_plot_5 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-5.rds"))
+pred_plot_5 <- pred_plot_5 + ylab("Precipitation fold 5")
+mse_5 <- get_mse_from_pred_plot(pred_plot_5)
+
+pred_plot_list <- list(pred_plot_1,pred_plot_2,pred_plot_3,pred_plot_4,pred_plot_5)
+```
+
+```{r pred-plot-fold-lasso-diff, fig.cap="Precipitation prediction and target values in the test set in each fold. Predictions in red and target values in black."}
+pred_plot_1 + pred_plot_2 + pred_plot_3 + pred_plot_4 +
+  pred_plot_5
+```
+
+## Predictions on External Test Set (Lasso differentiated)
+
+```{r pred-plot-full-lasso-diff, fig.cap="Precipitation prediction and target values in the validation set. Predictions in red and target values in black. The model was fitted on the full CV data with the lambda value that minimised the average MSE"}
+full_preds <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-full.rds"))
+full_preds
+mse_full <- get_mse_from_pred_plot(full_preds)
+mse_full
+```
+
+## SST Regions chosen by the lasso (Lasso differentiated)
+
+```{r coef-plot-full-lasso-diff, fig.cap=paste("Coefficient plot of the full lasso model.")}
+coef_full <- readRDS(paste0(path_to_model_folder,
+                            "coef-plots/coef-plot-full.rds"))
+coef_full 
+```
+
+
+
+
+
+
+
+
+
+
+
 
 ## Fused evaluation (maybe explain this when showing resutls)
 
@@ -835,5 +1093,364 @@ beforehand.
 - $\lambda$-path is found by dual path algorithm and the range of the paths can vary a lot!
 - So to find $\lambda_{\min}$ we search over the common range of all folds and interpolate to lines
 - $\lambda_{\min}$ is then the $\lambda$ that minimize MSE over all $\lambda$ of that common range
+
+
+
+
+# Lasso on de-seasonalized SST
+
+## MSE in each fold (Lasso de-seasonalized)
+
+```{r err-fold-lasso-des, fig.cap="MSE of the CV for the different lambda values on the a log scale. The red dotted line shows the lambda for which minimum MSE was obtained."}
+path_to_model_folder <- "../results/CV-lasso/test-deseas-lasso/"
+p1 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-plot-fold-1.rds"))
+p2 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-plot-fold-2.rds"))
+p3 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-plot-fold-3.rds"))
+p4 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-plot-fold-4.rds"))
+p5 <- readRDS(paste0(path_to_model_folder, "/err-mat-plots/err-plot-fold-5.rds"))
+# p1 + ylim(0,10000) + p2 + ylim(0,10000) + p3 + ylim(0,10000) + p4 + ylim(0,10000) + p5 + ylim(0,10000)
+
+```
+
+```{r}
+a <- unlist((lapply(list(p1,p2,p3,p4,p5), get_min_err_from_plot)))
+b <- unlist((lapply(list(p1,p2,p3,p4,p5), get_minl_from_plot)))
+d <- cbind("min err" = a, "log lambda" = b)
+d <- round(d, 2)
+```
+
+```{r}
+err_mat <- readRDS(paste0(path_to_model_folder, "/err-mat.rds"))
+lambdas <- readRDS(paste0(path_to_model_folder, "/lambda-vec.rds"))
+wm <- which.min(apply(err_mat, 1, mean))
+full_model <- readRDS(paste0(path_to_model_folder, "full-model.rds"))
+intercept <- round(full_model$a0[wm],2)
+lambda <- round(lambdas[wm],2)
+rm(full_model)
+```
+
+```{r}
+# round(mm,2), 917.28
+# lambda 3.52, 1.26
+mm <- min(round(apply(err_mat, 1, mean),2))
+d <- rbind(d, c(mm, round(log(lambda),2)))
+d <- cbind(c("Fold 1", "Fold 2", "Fold 3", "Fold 4", "Fold 5", "Best"), d)
+p1 + p2 + p3 + p4 + p5 + gridExtra::tableGrob(d, theme = ttheme_default(base_size = 6))
+```
+
+## Predictions on test set, for each Fold (Lasso de-seasonalized)
+```{r}
+pred_plot_1 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-1.rds"))
+pred_plot_1 <- pred_plot_1 + ylab("Precipitation fold 1")
+mse_1 <- get_mse_from_pred_plot(pred_plot_1)
+
+pred_plot_2 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-2.rds"))
+pred_plot_2 <- pred_plot_2 + ylab("Precipitation fold 2")
+mse_2 <- get_mse_from_pred_plot(pred_plot_2)
+
+pred_plot_3 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-3.rds"))
+pred_plot_3 <- pred_plot_3 + ylab("Precipitation fold 3")
+mse_3 <- get_mse_from_pred_plot(pred_plot_3)
+
+pred_plot_4 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-4.rds"))
+pred_plot_4 <- pred_plot_4 + ylab("Precipitation fold 4")
+mse_4 <- get_mse_from_pred_plot(pred_plot_4)
+
+pred_plot_5 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-5.rds"))
+pred_plot_5 <- pred_plot_5 + ylab("Precipitation fold 5")
+mse_5 <- get_mse_from_pred_plot(pred_plot_5)
+
+pred_plot_list <- list(pred_plot_1,pred_plot_2,pred_plot_3,pred_plot_4,pred_plot_5)
+```
+
+```{r pred-plot-fold-lasso-des, fig.cap="Precipitation prediction and target values in the test set in each fold. Predictions in red and target values in black."}
+pred_plot_1 + pred_plot_2 + pred_plot_3 + pred_plot_4 +
+  pred_plot_5
+```
+
+## Predictions on External Test Set (Lasso differentiated)
+
+```{r pred-plot-full-lasso-des, fig.cap="Precipitation prediction and target values in the validation set. Predictions in red and target values in black. The model was fitted on the full CV data with the lambda value that minimised the average MSE"}
+full_preds <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-full.rds"))
+full_preds
+mse_full <- get_mse_from_pred_plot(full_preds)
+mse_full
+```
+
+## SST Regions chosen by the lasso (Lasso de-seasonalized)
+
+```{r coef-plot-full-lasso-des, fig.cap=paste("Coefficient plot of the full lasso model.")}
+coef_full <- readRDS(paste0(path_to_model_folder,
+                            "coef-plots/coef-plot-full.rds"))
+coef_full 
+```
+
+# Fused lasso with sub-graphs
+
+```{r}
+path_to_model_folder <- "../results/CV-fused/large-fused-5k/"
+# h is here 5000
+```
+
+## Error lines (Fused lasso with sub-graphs)
+
+```{r err-line-fused-sub, out.width='45%'}
+knitr::include_graphics(paste0(path_to_model_folder, "best-lambda-res.png"))
+```
+
+## Prediction plots for each fold (Fused lasso with sub-graphs)
+```{r}
+pred_plot_1 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-1.rds"))
+pred_plot_1 <- pred_plot_1 + ylab("Precipitation fold 1")
+mse_1 <- get_mse_from_pred_plot(pred_plot_1)
+
+pred_plot_2 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-2.rds"))
+pred_plot_2 <- pred_plot_2 + ylab("Precipitation fold 2")
+mse_2 <- get_mse_from_pred_plot(pred_plot_2)
+
+pred_plot_3 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-3.rds"))
+pred_plot_3 <- pred_plot_3 + ylab("Precipitation fold 3")
+mse_3 <- get_mse_from_pred_plot(pred_plot_3)
+
+pred_plot_4 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-4.rds"))
+pred_plot_4 <- pred_plot_4 + ylab("Precipitation fold 4")
+mse_4 <- get_mse_from_pred_plot(pred_plot_4)
+
+pred_plot_5 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-5.rds"))
+pred_plot_5 <- pred_plot_5 + ylab("Precipitation fold 5")
+mse_5 <- get_mse_from_pred_plot(pred_plot_5)
+
+#pred_plot_list <- list(pred_plot_1,pred_plot_2,pred_plot_3,pred_plot_4,pred_plot_5)
+```
+```{r pred-fold-fused-sub,fig.cap="Precipitation prediction and target values in the test set in each fold. Predictions in red and target values in black."}
+pred_plot_1 + pred_plot_2 + pred_plot_3 + pred_plot_4 +
+  pred_plot_5
+```
+The predictions inside the folds are very similar to lasso without standardization
+(see \@ref(fig:pred-plot-fold-lasso-og)), the same holds for the predictions from
+the full model, but the MSE improves here (@\ref(fig:pred-plot-full-fused-og).
+
+
+## Predictions on hold-out set (Fused lasso with sub-graphs)
+```{r pred-plot-full-fused-sub, fig.cap="Precipitation prediction and target values in the validation set. Predictions in red and target values in black. The model was fitted on the full CV data with the lambda value that minimised the average MSE"}
+full_preds <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-full.rds"))
+mse_full <- get_mse_from_pred_plot(full_preds)
+full_preds
+mse_full
+```
+
+## Coefficient plot of the final model (Fused lasso with sub-graphs)
+```{r coef-plot-full-fused-sub, eval=FALSE, fig.cap="Coefficient plot of the full fused lasso model."}
+coef_plot <- readRDS(paste0(path_to_model_folder,
+                            "coef-plots/coef-plot-full.rds"))
+#coef_plot <- coef_plot + theme(legend.position = "bottom", text = element_text(size = 8))
+coef_plot$layers[[2]]$aes_params$size <- 0.75
+coef_plot_now <- coef_plot
+coef_plot_now <- coef_plot_now + scale_colour_gradient2(name="Coefficients")
+ggsave(paste0(path_to_model_folder, "coef-plots/coef-plot-full.png"), plot = coef_plot_now)
+```
+
+```{r}
+knitr::include_graphics(paste0(path_to_model_folder, "coef-plots/coef-plot-full.png"))
+```
+
+```{r}
+# coef_plot2 <- readRDS(paste0(path_to_model_folder,
+#                      "coef-plots/coef-plot-drop-out-full.rds"))
+#coef_plot <- coef_plot + theme(legend.position = "bottom", text = element_text(size = 8))
+# coef_plot2$layers[[2]]$aes_params$size <- 0.75
+# coef_plot_now2 <- coef_plot2
+# coef_plot_now2 <- coef_plot_now2 + scale_colour_gradient2(name="Coefficients")
+#ggsave(paste0(path_to_model_folder, "coef-plots/coef-plot-drop-out-full.png"), plot = coef_plot_now2)
+knitr::include_graphics(paste0(path_to_model_folder, "coef-plots/coef-plot-drop-out-full1.png"))
+
+```
+```{r}
+knitr::include_graphics(paste0(path_to_model_folder, "coef-plots/coef-plot-drop-out-full2.png"))
+```
+
+
+# Fused lasso without sub-graphs, gamma 0.1
+
+
+```{r}
+path_to_model_folder <- "../results/CV-fused/noclust-large-fused-5k-gamma-01/"
+```
+
+## Error lines (Fused lasso without sub-graphs, gamma 0.1)
+
+```{r err-line-fused-noclust-01, out.width='45%'}
+knitr::include_graphics(paste0(path_to_model_folder, "best-lambda-res.png"))
+```
+
+## Prediction plots for each fold (Fused lasso without sub-graphs, gamma 0.1)
+```{r}
+pred_plot_1 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-1.rds"))
+pred_plot_1 <- pred_plot_1 + ylab("Precipitation fold 1")
+mse_1 <- get_mse_from_pred_plot(pred_plot_1)
+
+pred_plot_2 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-2.rds"))
+pred_plot_2 <- pred_plot_2 + ylab("Precipitation fold 2")
+mse_2 <- get_mse_from_pred_plot(pred_plot_2)
+
+pred_plot_3 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-3.rds"))
+pred_plot_3 <- pred_plot_3 + ylab("Precipitation fold 3")
+mse_3 <- get_mse_from_pred_plot(pred_plot_3)
+
+pred_plot_4 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-4.rds"))
+pred_plot_4 <- pred_plot_4 + ylab("Precipitation fold 4")
+mse_4 <- get_mse_from_pred_plot(pred_plot_4)
+
+pred_plot_5 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-5.rds"))
+pred_plot_5 <- pred_plot_5 + ylab("Precipitation fold 5")
+mse_5 <- get_mse_from_pred_plot(pred_plot_5)
+
+#pred_plot_list <- list(pred_plot_1,pred_plot_2,pred_plot_3,pred_plot_4,pred_plot_5)
+```
+```{r pred-fold-fused-nolcust-01,fig.cap="Precipitation prediction and target values in the test set in each fold. Predictions in red and target values in black."}
+pred_plot_1 + pred_plot_2 + pred_plot_3 + pred_plot_4 +
+  pred_plot_5
+```
+The predictions inside the folds are very similar to lasso without standardization
+(see \@ref(fig:pred-plot-fold-lasso-og)), the same holds for the predictions from
+the full model, but the MSE improves here (@\ref(fig:pred-plot-full-fused-og).
+
+
+## Predictions on hold-out set (Fused lasso without sub-graphs, gamma 0.1)
+```{r pred-plot-full-fused-noclust-01, fig.cap="Precipitation prediction and target values in the validation set. Predictions in red and target values in black. The model was fitted on the full CV data with the lambda value that minimised the average MSE"}
+full_preds <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-full.rds"))
+mse_full <- get_mse_from_pred_plot(full_preds)
+full_preds
+mse_full
+```
+
+## Coefficient plot of the final model (Fused lasso without sub-graphs, gamma 0.1)
+```{r coef-plot-full-fused-noclust-01, eval=FALSE, fig.cap="Coefficient plot of the full fused lasso model."}
+coef_plot <- readRDS(paste0(path_to_model_folder,
+                            "coef-plots/coef-plot-full.rds"))
+#coef_plot <- coef_plot + theme(legend.position = "bottom", text = element_text(size = 8))
+coef_plot$layers[[2]]$aes_params$size <- 0.75
+coef_plot_now <- coef_plot
+coef_plot_now <- coef_plot_now + scale_colour_gradient2(name="Coefficients")
+ggsave(paste0(path_to_model_folder, "coef-plots/coef-plot-full.png"), plot = coef_plot_now)
+```
+
+```{r}
+knitr::include_graphics(paste0(path_to_model_folder, "coef-plots/coef-plot-full.png"))
+```
+
+```{r}
+# coef_plot2 <- readRDS(paste0(path_to_model_folder,
+#                      "coef-plots/coef-plot-drop-out-full.rds"))
+#coef_plot <- coef_plot + theme(legend.position = "bottom", text = element_text(size = 8))
+# coef_plot2$layers[[2]]$aes_params$size <- 0.75
+# coef_plot_now2 <- coef_plot2
+# coef_plot_now2 <- coef_plot_now2 + scale_colour_gradient2(name="Coefficients")
+#ggsave(paste0(path_to_model_folder, "coef-plots/coef-plot-drop-out-full.png"), plot = coef_plot_now2)
+knitr::include_graphics(paste0(path_to_model_folder, "coef-plots/coef-plot-drop-out-full1.png"))
+
+```
+```{r}
+knitr::include_graphics(paste0(path_to_model_folder, "coef-plots/coef-plot-drop-out-full2.png"))
+```
+
+
+# Fused lasso without sub-graphs, gamma 0.05
+
+```{r}
+path_to_model_folder <- "../results/CV-fused/noclust-large-fused-5k-gamma-005/"
+```
+
+## Error lines (Fused lasso without sub-graphs, gamma 0.05)
+
+```{r err-line-fused-noclust, out.width='45%'}
+knitr::include_graphics(paste0(path_to_model_folder, "best-lambda-res.png"))
+```
+
+## Prediction plots for each fold (Fused lasso without sub-graphs, gamma 0.05)
+```{r}
+pred_plot_1 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-1.rds"))
+pred_plot_1 <- pred_plot_1 + ylab("Precipitation fold 1")
+mse_1 <- get_mse_from_pred_plot(pred_plot_1)
+
+pred_plot_2 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-2.rds"))
+pred_plot_2 <- pred_plot_2 + ylab("Precipitation fold 2")
+mse_2 <- get_mse_from_pred_plot(pred_plot_2)
+
+pred_plot_3 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-3.rds"))
+pred_plot_3 <- pred_plot_3 + ylab("Precipitation fold 3")
+mse_3 <- get_mse_from_pred_plot(pred_plot_3)
+
+pred_plot_4 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-4.rds"))
+pred_plot_4 <- pred_plot_4 + ylab("Precipitation fold 4")
+mse_4 <- get_mse_from_pred_plot(pred_plot_4)
+
+pred_plot_5 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-5.rds"))
+pred_plot_5 <- pred_plot_5 + ylab("Precipitation fold 5")
+mse_5 <- get_mse_from_pred_plot(pred_plot_5)
+
+#pred_plot_list <- list(pred_plot_1,pred_plot_2,pred_plot_3,pred_plot_4,pred_plot_5)
+```
+```{r pred-fold-fused-noclust-005,fig.cap="Precipitation prediction and target values in the test set in each fold. Predictions in red and target values in black."}
+pred_plot_1 + pred_plot_2 + pred_plot_3 + pred_plot_4 +
+  pred_plot_5
+```
+The predictions inside the folds are very similar to lasso without standardization
+(see \@ref(fig:pred-plot-fold-lasso-og)), the same holds for the predictions from
+the full model, but the MSE improves here (@\ref(fig:pred-plot-full-fused-og).
+
+
+## Predictions on hold-out set (Fused lasso without sub-graphs, gamma 0.1)
+```{r pred-plot-full-fused-noclust-05, fig.cap="Precipitation prediction and target values in the validation set. Predictions in red and target values in black. The model was fitted on the full CV data with the lambda value that minimised the average MSE"}
+full_preds <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-full.rds"))
+mse_full <- get_mse_from_pred_plot(full_preds)
+full_preds
+mse_full
+```
+
+## Coefficient plot of the final model (Fused lasso without sub-graphs, gamma 0.05)
+```{r coef-plot-full-fused-noclust-005, eval=FALSE, fig.cap="Coefficient plot of the full fused lasso model."}
+coef_plot <- readRDS(paste0(path_to_model_folder,
+                            "coef-plots/coef-plot-full.rds"))
+#coef_plot <- coef_plot + theme(legend.position = "bottom", text = element_text(size = 8))
+coef_plot$layers[[2]]$aes_params$size <- 0.75
+coef_plot_now <- coef_plot
+coef_plot_now <- coef_plot_now + scale_colour_gradient2(name="Coefficients")
+ggsave(paste0(path_to_model_folder, "coef-plots/coef-plot-full.png"), plot = coef_plot_now)
+```
+
+```{r}
+knitr::include_graphics(paste0(path_to_model_folder, "coef-plots/coef-plot-full.png"))
+```
+
+```{r}
+# coef_plot2 <- readRDS(paste0(path_to_model_folder,
+#                      "coef-plots/coef-plot-drop-out-full.rds"))
+#coef_plot <- coef_plot + theme(legend.position = "bottom", text = element_text(size = 8))
+# coef_plot2$layers[[2]]$aes_params$size <- 0.75
+# coef_plot_now2 <- coef_plot2
+# coef_plot_now2 <- coef_plot_now2 + scale_colour_gradient2(name="Coefficients")
+#ggsave(paste0(path_to_model_folder, "coef-plots/coef-plot-drop-out-full.png"), plot = coef_plot_now2)
+knitr::include_graphics(paste0(path_to_model_folder, "coef-plots/coef-plot-drop-out-full1.png"))
+
+```
+```{r}
+knitr::include_graphics(paste0(path_to_model_folder, "coef-plots/coef-plot-drop-out-full2.png"))
+```
+
+
+
+
+
+
+# Fused evaluation (maybe explain this when showing resutls)
+
+- Generally same setting as for lasso, 5 folds with train and test, choose $\lambda_{\min}$, refit with $\lambda_{\min}$, get MSE on hold-out test set.
+- But for the fused lasso we can not define the $\lambda$ vector
+beforehand.
+- $\lambda$-path is found by dual path algorithm and the range of the paths can vary a lot!
+- So to find $\lambda_{\min}$ we search over the common range of all folds and interpolate to lines
+- $\lambda_{\min}$ is then the $\lambda$ that minimize MSE over all $\lambda$ of that common range
+
 
 

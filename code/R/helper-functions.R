@@ -95,13 +95,19 @@ plot_corr <- function(corr_vec, old_sst, timelag,
   df <- cbind(xyFromCell(corr_raster, 1:ncell(corr_raster)), values(corr_raster))
   df <- base::as.data.frame(df)
   colnames(df) <- c("Longitude","Latitude", "Correlation")
+  df <- na.omit(df)
   if(quantiles) {
     q <- quantile(df[,"Correlation"],probs=c(0.025,0.975), na.rm = TRUE)
     df$Correlation[df$Correlation>q["2.5%"] & df$Correlation<q["97.5%"]] <- 0
+    df <- na.omit(df)
   }
+  mp <- map_data("world")
+  mp <- mp[mp$long<=old_sst@extent@xmax,]
+  mp <- mp[mp$lat>=old_sst@extent@ymin,]
   plt <- ggplot(data = df, aes(x = Longitude, y = Latitude, fill = Correlation)) +
-    annotation_map(map_data("world")) +
-    geom_raster(interpolate = TRUE)
+    geom_raster(interpolate = TRUE) +
+    annotation_map(mp, fill = "grey") 
+    #coord_sf(crs = old_sst@crs)
   if(!quantiles) {
     plt <- plt +
       ggtitle(paste("Correlation of Sea Surface Temperature and Precipitation for Timelag",timelag))
@@ -113,9 +119,10 @@ plot_corr <- function(corr_vec, old_sst, timelag,
     
   }
   plt <- plt +
-    scale_fill_gradient2() +
+    scale_fill_gradient2(name="Correlation", low = "blue", high = "red",
+                           midpoint=mean(df$Correlation, na.rm=TRUE)) # +
     theme_bw() +
-    coord_quickmap() 
+    # coord_quickmap() 
   return(plt)
 }
 
