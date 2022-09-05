@@ -1,4 +1,4 @@
-This is LuaHBTeX, Version 1.15.0 (TeX Live 2022)  (format=lualatex 2022.9.2)  4 SEP 2022 20:42
+This is LuaHBTeX, Version 1.15.0 (TeX Live 2022)  (format=lualatex 2022.9.2)  5 SEP 2022 17:05
  restricted system commands enabled.
 **ma-presentation.tex
 (./ma-presentation.tex
@@ -1259,7 +1259,7 @@ LaTeX Font Info:    Font shape `TU/lmss/m/it' in size <10.95> not available
 [4
 
 ]
-<../figures/cross-degree.jpg, id=122, 343.2825pt x 367.6134pt>
+<../figures/cross-degree.jpg, id=118, 343.2825pt x 367.6134pt>
 File: ../figures/cross-degree.jpg Graphic file (type jpg)
 <use ../figures/cross-degree.jpg>
 Package luatex.def Info: ../figures/cross-degree.jpg  used on input line 176.
@@ -1271,7 +1271,7 @@ Overfull \vbox (77.86803pt too high) detected at line 176
 [5
 
 <../figures/cross-degree.jpg>]
-<../figures/early-warning-signals.jpg, id=130, 343.0416pt x 125.268pt>
+<../figures/early-warning-signals.jpg, id=126, 343.0416pt x 125.268pt>
 File: ../figures/early-warning-signals.jpg Graphic file (type jpg)
 <use ../figures/early-warning-signals.jpg>
 Package luatex.def Info: ../figures/early-warning-signals.jpg  used on input line 188.
@@ -1285,7 +1285,7 @@ Package luatex.def Info: ../figures/early-warning-signals.jpg  used on input lin
 ] [9
 
 ]
-<ma-presentation_files/figure-beamer/CAB-1.pdf, id=156, 722.7pt x 505.89pt>
+<ma-presentation_files/figure-beamer/CAB-1.pdf, id=152, 722.7pt x 505.89pt>
 File: ma-presentation_files/figure-beamer/CAB-1.pdf Graphic file (type pdf)
 <use ma-presentation_files/figure-beamer/CAB-1.pdf>
 Package luatex.def Info: ma-presentation_files/figure-beamer/CAB-1.pdf  used on input line 235.
@@ -1293,7 +1293,7 @@ Package luatex.def Info: ma-presentation_files/figure-beamer/CAB-1.pdf  used on 
 [10
 
 <./ma-presentation_files/figure-beamer/CAB-1.pdf>]
-<ma-presentation_files/figure-beamer/mean-sd-precip-1.pdf, id=170, 722.7pt x 505.89pt>
+<ma-presentation_files/figure-beamer/mean-sd-precip-1.pdf, id=165, 722.7pt x 505.89pt>
 File: ma-presentation_files/figure-beamer/mean-sd-precip-1.pdf Graphic file (type pdf)
 <use ma-presentation_files/figure-beamer/mean-sd-precip-1.pdf>
 Package luatex.def Info: ma-presentation_files/figure-beamer/mean-sd-precip-1.pdf  used on input line 247.
@@ -1301,7 +1301,7 @@ Package luatex.def Info: ma-presentation_files/figure-beamer/mean-sd-precip-1.pd
 [11
 
 <./ma-presentation_files/figure-beamer/mean-sd-precip-1.pdf>]
-<ma-presentation_files/figure-beamer/glyph-scale-1.pdf, id=187, 722.7pt x 505.89pt>
+<ma-presentation_files/figure-beamer/glyph-scale-1.pdf, id=183, 722.7pt x 505.89pt>
 File: ma-presentation_files/figure-beamer/glyph-scale-1.pdf Graphic file (type pdf)
 <use ma-presentation_files/figure-beamer/glyph-scale-1.pdf>
 Package luatex.def Info: ma-presentation_files/figure-beamer/glyph-scale-1.pdf  used on input line 259.
@@ -1313,7 +1313,7 @@ Overfull \vbox (19.06703pt too high) detected at line 259
 [12
 
 <./ma-presentation_files/figure-beamer/glyph-scale-1.pdf>]
-<ma-presentation_files/figure-beamer/mean-and-sd-sst-og-1.pdf, id=203, 722.7pt x 505.89pt>
+<ma-presentation_files/figure-beamer/mean-and-sd-sst-og-1.pdf, id=199, 722.7pt x 505.89pt>
 File: ma-presentation_files/figure-beamer/mean-and-sd-sst-og-1.pdf Graphic file (type pdf)
 <use ma-presentation_files/figure-beamer/mean-and-sd-sst-og-1.pdf>
 Package luatex.def Info: ma-presentation_files/figure-beamer/mean-and-sd-sst-og-1.pdf  used on input line 271.
@@ -1325,7 +1325,7 @@ Package luatex.def Info: ma-presentation_files/figure-beamer/mean-and-sd-sst-og-
 ] [15
 
 ]
-<../pres-plots/og-data/corr-0.jpg, id=231, 1994.45125pt x 971.63pt>
+<../pres-plots/og-data/corr-0.jpg, id=227, 1994.45125pt x 971.63pt>
 File: ../pres-plots/og-data/corr-0.jpg Graphic file (type jpg)
 <use ../pres-plots/og-data/corr-0.jpg>
 Package luatex.def Info: ../pres-plots/og-data/corr-0.jpg  used on input line 302.
@@ -1333,7 +1333,7 @@ Package luatex.def Info: ../pres-plots/og-data/corr-0.jpg  used on input line 30
 [16
 
 <../pres-plots/og-data/corr-0.jpg>]
-<../pres-plots/og-data/q-corr-0.jpg, id=239, 1994.45125pt x 971.63pt>
+<../pres-plots/og-data/q-corr-0.jpg, id=235, 1994.45125pt x 971.63pt>
 File: ../pres-plots/og-data/q-corr-0.jpg Graphic file (type jpg)
 <use ../pres-plots/og-data/q-corr-0.jpg>
 Package luatex.def Info: ../pres-plots/og-data/q-corr-0.jpg  used on input line 314.
@@ -1341,7 +1341,7 @@ Package luatex.def Info: ../pres-plots/og-data/q-corr-0.jpg  used on input line 
 [17
 
 <../pres-plots/og-data/q-corr-0.jpg>]
-<../pres-plots/des-data/corr-0.jpg, id=247, 1994.45125pt x 971.63pt>
+<../pres-plots/des-data/corr-0.jpg, id=243, 1994.45125pt x 971.63pt>
 File: ../pres-plots/des-data/corr-0.jpg Graphic file (type jpg)
 <use ../pres-plots/des-data/corr-0.jpg>
 Package luatex.def Info: ../pres-plots/des-data/corr-0.jpg  used on input line 326.
@@ -1349,7 +1349,7 @@ Package luatex.def Info: ../pres-plots/des-data/corr-0.jpg  used on input line 3
 [18
 
 <../pres-plots/des-data/corr-0.jpg>]
-<../pres-plots/des-data/q-corr-0.jpg, id=255, 1994.45125pt x 971.63pt>
+<../pres-plots/des-data/q-corr-0.jpg, id=251, 1994.45125pt x 971.63pt>
 File: ../pres-plots/des-data/q-corr-0.jpg Graphic file (type jpg)
 <use ../pres-plots/des-data/q-corr-0.jpg>
 Package luatex.def Info: ../pres-plots/des-data/q-corr-0.jpg  used on input line 338.
@@ -1416,7 +1416,7 @@ Overfull \vbox (0.59926pt too high) detected at line 436
 ] [25
 
 ]
-<ma-presentation_files/figure-beamer/unnamed-chunk-10-1.pdf, id=305, 722.7pt x 505.89pt>
+<ma-presentation_files/figure-beamer/unnamed-chunk-10-1.pdf, id=301, 722.7pt x 505.89pt>
 File: ma-presentation_files/figure-beamer/unnamed-chunk-10-1.pdf Graphic file (type pdf)
 <use ma-presentation_files/figure-beamer/unnamed-chunk-10-1.pdf>
 Package luatex.def Info: ma-presentation_files/figure-beamer/unnamed-chunk-10-1.pdf  used on input line 461.
@@ -1426,7 +1426,7 @@ Package luatex.def Info: ma-presentation_files/figure-beamer/unnamed-chunk-10-1.
 <./ma-presentation_files/figure-beamer/unnamed-chunk-10-1.pdf>] [27
 
 ]
-<ma-presentation_files/figure-beamer/unnamed-chunk-11-1.pdf, id=323, 722.7pt x 505.89pt>
+<ma-presentation_files/figure-beamer/unnamed-chunk-11-1.pdf, id=319, 722.7pt x 505.89pt>
 File: ma-presentation_files/figure-beamer/unnamed-chunk-11-1.pdf Graphic file (type pdf)
 <use ma-presentation_files/figure-beamer/unnamed-chunk-11-1.pdf>
 Package luatex.def Info: ma-presentation_files/figure-beamer/unnamed-chunk-11-1.pdf  used on input line 486.
@@ -1436,15 +1436,11 @@ Package luatex.def Info: ma-presentation_files/figure-beamer/unnamed-chunk-11-1.
 <./ma-presentation_files/figure-beamer/unnamed-chunk-11-1.pdf>] [29
 
 ]
-<ma-presentation_files/figure-beamer/cluster-map-1.pdf, id=341, 722.7pt x 505.89pt>
+<ma-presentation_files/figure-beamer/cluster-map-1.pdf, id=337, 722.7pt x 505.89pt>
 File: ma-presentation_files/figure-beamer/cluster-map-1.pdf Graphic file (type pdf)
 <use ma-presentation_files/figure-beamer/cluster-map-1.pdf>
-Package luatex.def Info: ma-presentation_files/figure-beamer/cluster-map-1.pdf  used on input line 520.
+Package luatex.def Info: ma-presentation_files/figure-beamer/cluster-map-1.pdf  used on input line 511.
 (luatex.def)             Requested size: 153.64493pt x 107.55229pt.
-
-Overfull \vbox (24.13017pt too high) detected at line 520
- []
-
 [30
 
 <./ma-presentation_files/figure-beamer/cluster-map-1.pdf>] [31
@@ -1455,89 +1451,92 @@ Overfull \vbox (24.13017pt too high) detected at line 520
 
 ] [34
 
+] [35
+
 ]
-<../thesis/validation-schemes.png, id=381, 931.48pt x 710.655pt>
+<../thesis/validation-schemes.png, id=383, 931.48pt x 710.655pt>
 File: ../thesis/validation-schemes.png Graphic file (type png)
 <use ../thesis/validation-schemes.png>
-Package luatex.def Info: ../thesis/validation-schemes.png  used on input line 575.
+Package luatex.def Info: ../thesis/validation-schemes.png  used on input line 589.
 (luatex.def)             Requested size: 230.46739pt x 175.83072pt.
-[35
 
-<../thesis/validation-schemes.png>] [36
+Overfull \vbox (5.97331pt too high) detected at line 589
+ []
 
-] [37
+[36
+
+<../thesis/validation-schemes.png>] [37
 
 ] [38
 
-]
-<ma-presentation_files/figure-beamer/unnamed-chunk-15-1.pdf, id=408, 722.7pt x 505.89pt>
-File: ma-presentation_files/figure-beamer/unnamed-chunk-15-1.pdf Graphic file (type pdf)
-<use ma-presentation_files/figure-beamer/unnamed-chunk-15-1.pdf>
-Package luatex.def Info: ma-presentation_files/figure-beamer/unnamed-chunk-15-1.pdf  used on input line 620.
-(luatex.def)             Requested size: 230.46739pt x 161.32458pt.
-[39
+] [39
 
-<./ma-presentation_files/figure-beamer/unnamed-chunk-15-1.pdf>]
-<ma-presentation_files/figure-beamer/pred-plot-fold-lasso-stand-1.pdf, id=421, 722.7pt x 505.89pt>
+]
+<ma-presentation_files/figure-beamer/err-fold-lasso-stand-1.pdf, id=411, 722.7pt x 505.89pt>
+File: ma-presentation_files/figure-beamer/err-fold-lasso-stand-1.pdf Graphic file (type pdf)
+<use ma-presentation_files/figure-beamer/err-fold-lasso-stand-1.pdf>
+Package luatex.def Info: ma-presentation_files/figure-beamer/err-fold-lasso-stand-1.pdf  used on input line 665.
+(luatex.def)             Requested size: 230.46739pt x 161.32458pt.
+
+Overfull \vbox (5.2671pt too high) detected at line 665
+ []
+
+[40
+
+<./ma-presentation_files/figure-beamer/err-fold-lasso-stand-1.pdf>]
+<ma-presentation_files/figure-beamer/pred-plot-fold-lasso-stand-1.pdf, id=425, 722.7pt x 505.89pt>
 File: ma-presentation_files/figure-beamer/pred-plot-fold-lasso-stand-1.pdf Graphic file (type pdf)
 <use ma-presentation_files/figure-beamer/pred-plot-fold-lasso-stand-1.pdf>
-Package luatex.def Info: ma-presentation_files/figure-beamer/pred-plot-fold-lasso-stand-1.pdf  used on input line 632.
+Package luatex.def Info: ma-presentation_files/figure-beamer/pred-plot-fold-lasso-stand-1.pdf  used on input line 677.
 (luatex.def)             Requested size: 230.46739pt x 161.32458pt.
-[40
+[41
 
 <./ma-presentation_files/figure-beamer/pred-plot-fold-lasso-stand-1.pdf>]
 \openout4 = ma-presentation.vrb
  (./ma-presentation.vrb
-<ma-presentation_files/figure-beamer/pred-plot-full-lasso-stand-1.pdf, id=434, 722.7pt x 505.89pt>
+<ma-presentation_files/figure-beamer/pred-plot-full-lasso-stand-1.pdf, id=439, 722.7pt x 505.89pt>
 File: ma-presentation_files/figure-beamer/pred-plot-full-lasso-stand-1.pdf Graphic file (type pdf)
 <use ma-presentation_files/figure-beamer/pred-plot-full-lasso-stand-1.pdf>
 Package luatex.def Info: ma-presentation_files/figure-beamer/pred-plot-full-lasso-stand-1.pdf  used on input line 5.
 (luatex.def)             Requested size: 230.46739pt x 161.32458pt.
 )
-Overfull \vbox (43.43576pt too high) detected at line 648
+Overfull \vbox (43.43576pt too high) detected at line 693
  []
 
-[41
-
-<./ma-presentation_files/figure-beamer/pred-plot-full-lasso-stand-1.pdf>]
-<ma-presentation_files/figure-beamer/coef-plot-full-lasso-stand-1.pdf, id=448, 722.7pt x 505.89pt>
-File: ma-presentation_files/figure-beamer/coef-plot-full-lasso-stand-1.pdf Graphic file (type pdf)
-<use ma-presentation_files/figure-beamer/coef-plot-full-lasso-stand-1.pdf>
-Package luatex.def Info: ma-presentation_files/figure-beamer/coef-plot-full-lasso-stand-1.pdf  used on input line 660.
-(luatex.def)             Requested size: 230.46739pt x 161.32458pt.
 [42
 
-<./ma-presentation_files/figure-beamer/coef-plot-full-lasso-stand-1.pdf>]
-
-Package fontspec Warning: \addfontfeature(s) ignored on line 677; it cannot be
-(fontspec)                used with a font that wasn't selected by a fontspec
-(fontspec)                command.
-(fontspec)                 
-(fontspec)                 The current font is "\TU/lmss/m/n/8 ".
-(fontspec)                  The requested feature is "Numbers={Monospaced}". 
-
+<./ma-presentation_files/figure-beamer/pred-plot-full-lasso-stand-1.pdf>]
+<ma-presentation_files/figure-beamer/coef-plot-full-lasso-stand-1.pdf, id=452, 722.7pt x 505.89pt>
+File: ma-presentation_files/figure-beamer/coef-plot-full-lasso-stand-1.pdf Graphic file (type pdf)
+<use ma-presentation_files/figure-beamer/coef-plot-full-lasso-stand-1.pdf>
+Package luatex.def Info: ma-presentation_files/figure-beamer/coef-plot-full-lasso-stand-1.pdf  used on input line 705.
+(luatex.def)             Requested size: 230.46739pt x 161.32458pt.
 [43
 
+<./ma-presentation_files/figure-beamer/coef-plot-full-lasso-stand-1.pdf>] [44
+
 ]
-<ma-presentation_files/figure-beamer/cluster-map2-1.pdf, id=467, 722.7pt x 505.89pt>
+<ma-presentation_files/figure-beamer/cluster-map2-1.pdf, id=472, 722.7pt x 505.89pt>
 File: ma-presentation_files/figure-beamer/cluster-map2-1.pdf Graphic file (type pdf)
 <use ma-presentation_files/figure-beamer/cluster-map2-1.pdf>
-Package luatex.def Info: ma-presentation_files/figure-beamer/cluster-map2-1.pdf  used on input line 682.
+Package luatex.def Info: ma-presentation_files/figure-beamer/cluster-map2-1.pdf  used on input line 737.
 (luatex.def)             Requested size: 153.64493pt x 107.55229pt.
-[44
-
-<./ma-presentation_files/figure-beamer/cluster-map2-1.pdf>]
-<ma-presentation_files/figure-beamer/unnamed-chunk-19-1.pdf, id=479, 722.7pt x 505.89pt>
-File: ma-presentation_files/figure-beamer/unnamed-chunk-19-1.pdf Graphic file (type pdf)
-<use ma-presentation_files/figure-beamer/unnamed-chunk-19-1.pdf>
-Package luatex.def Info: ma-presentation_files/figure-beamer/unnamed-chunk-19-1.pdf  used on input line 687.
-(luatex.def)             Requested size: 230.46739pt x 161.32458pt.
 [45
 
-<./ma-presentation_files/figure-beamer/unnamed-chunk-19-1.pdf>] [46
+<./ma-presentation_files/figure-beamer/cluster-map2-1.pdf>]
+<ma-presentation_files/figure-beamer/unnamed-chunk-19-1.pdf, id=485, 722.7pt x 505.89pt>
+File: ma-presentation_files/figure-beamer/unnamed-chunk-19-1.pdf Graphic file (type pdf)
+<use ma-presentation_files/figure-beamer/unnamed-chunk-19-1.pdf>
+Package luatex.def Info: ma-presentation_files/figure-beamer/unnamed-chunk-19-1.pdf  used on input line 749.
+(luatex.def)             Requested size: 230.46739pt x 161.32458pt.
 
-]
-Overfull \vbox (100.58212pt too high) detected at line 737
+Overfull \vbox (19.06703pt too high) detected at line 749
+ []
+
+[46
+
+<./ma-presentation_files/figure-beamer/unnamed-chunk-19-1.pdf>]
+Overfull \vbox (15.18637pt too high) detected at line 782
  []
 
 [47
@@ -1545,25 +1544,29 @@ Overfull \vbox (100.58212pt too high) detected at line 737
 ] [48
 
 ]
-Overfull \vbox (13.4753pt too high) detected at line 770
+Overfull \vbox (29.11522pt too high) detected at line 815
  []
 
 [49
 
-] [50
+]
+Overfull \vbox (25.13635pt too high) detected at line 848
+ []
+
+[50
 
 ] [51
 
 ]
 \openout4 = ma-presentation.vrb
  (./ma-presentation.vrb
-<ma-presentation_files/figure-beamer/graph-plot2-1.pdf, id=534, 722.7pt x 505.89pt>
+<ma-presentation_files/figure-beamer/graph-plot2-1.pdf, id=535, 722.7pt x 505.89pt>
 File: ma-presentation_files/figure-beamer/graph-plot2-1.pdf Graphic file (type pdf)
 <use ma-presentation_files/figure-beamer/graph-plot2-1.pdf>
 Package luatex.def Info: ma-presentation_files/figure-beamer/graph-plot2-1.pdf  used on input line 15.
 (luatex.def)             Requested size: 230.46739pt x 161.32458pt.
 )
-Overfull \vbox (58.24303pt too high) detected at line 853
+Overfull \vbox (58.24303pt too high) detected at line 908
  []
 
 [52
@@ -1573,34 +1576,26 @@ Overfull \vbox (58.24303pt too high) detected at line 853
 ] [54
 
 ]
-<err-line-plot-noclust.png, id=556, 505.89pt x 505.89pt>
+<err-line-plot-noclust.png, id=557, 505.89pt x 505.89pt>
 File: err-line-plot-noclust.png Graphic file (type png)
 <use err-line-plot-noclust.png>
-Package luatex.def Info: err-line-plot-noclust.png  used on input line 885.
-(luatex.def)             Requested size: 230.46739pt x 230.47363pt.
-
-Overfull \vbox (19.01639pt too high) detected at line 885
- []
-
+Package luatex.def Info: err-line-plot-noclust.png  used on input line 957.
+(luatex.def)             Requested size: 138.2795pt x 138.28264pt.
 [55
 
 <./err-line-plot-noclust.png>]
-<../results/CV-fused/noclust-large-fused-5k/best-lambda-res-noclust.png, id=564, 505.89pt x 505.89pt>
+<../results/CV-fused/noclust-large-fused-5k/best-lambda-res-noclust.png, id=566, 505.89pt x 505.89pt>
 File: ../results/CV-fused/noclust-large-fused-5k/best-lambda-res-noclust.png Graphic file (type png)
 <use ../results/CV-fused/noclust-large-fused-5k/best-lambda-res-noclust.png>
-Package luatex.def Info: ../results/CV-fused/noclust-large-fused-5k/best-lambda-res-noclust.png  used on input line 890.
-(luatex.def)             Requested size: 230.46739pt x 230.47363pt.
-
-Overfull \vbox (19.01639pt too high) detected at line 890
- []
-
+Package luatex.def Info: ../results/CV-fused/noclust-large-fused-5k/best-lambda-res-noclust.png  used on input line 969.
+(luatex.def)             Requested size: 138.2795pt x 138.28264pt.
 [56
 
 <../results/CV-fused/noclust-large-fused-5k/best-lambda-res-noclust.png>]
-<ma-presentation_files/figure-beamer/pred-fold-fused-og-1.pdf, id=571, 722.7pt x 505.89pt>
+<ma-presentation_files/figure-beamer/pred-fold-fused-og-1.pdf, id=574, 722.7pt x 505.89pt>
 File: ma-presentation_files/figure-beamer/pred-fold-fused-og-1.pdf Graphic file (type pdf)
 <use ma-presentation_files/figure-beamer/pred-fold-fused-og-1.pdf>
-Package luatex.def Info: ma-presentation_files/figure-beamer/pred-fold-fused-og-1.pdf  used on input line 902.
+Package luatex.def Info: ma-presentation_files/figure-beamer/pred-fold-fused-og-1.pdf  used on input line 981.
 (luatex.def)             Requested size: 230.46739pt x 161.32458pt.
 [57
 
@@ -1609,66 +1604,53 @@ Package luatex.def Info: ma-presentation_files/figure-beamer/pred-fold-fused-og-
 ]
 \openout4 = ma-presentation.vrb
  (./ma-presentation.vrb
-<ma-presentation_files/figure-beamer/pred-plot-full-fused-og-1.pdf, id=589, 722.7pt x 505.89pt>
+<ma-presentation_files/figure-beamer/pred-plot-full-fused-og-1.pdf, id=592, 722.7pt x 505.89pt>
 File: ma-presentation_files/figure-beamer/pred-plot-full-fused-og-1.pdf Graphic file (type pdf)
 <use ma-presentation_files/figure-beamer/pred-plot-full-fused-og-1.pdf>
 Package luatex.def Info: ma-presentation_files/figure-beamer/pred-plot-full-fused-og-1.pdf  used on input line 5.
 (luatex.def)             Requested size: 230.46739pt x 161.32458pt.
 )
-Overfull \vbox (43.43576pt too high) detected at line 924
+Overfull \vbox (43.43576pt too high) detected at line 1003
  []
 
 [59
 
 <./ma-presentation_files/figure-beamer/pred-plot-full-fused-og-1.pdf>]
-<../results/CV-fused/noclust-large-fused-5k/coef-plots/coef-plot-full.png, id=601, 505.89pt x 505.89pt>
+<../results/CV-fused/noclust-large-fused-5k/coef-plots/coef-plot-full.png, id=604, 505.89pt x 505.89pt>
 File: ../results/CV-fused/noclust-large-fused-5k/coef-plots/coef-plot-full.png Graphic file (type png)
 <use ../results/CV-fused/noclust-large-fused-5k/coef-plots/coef-plot-full.png>
-Package luatex.def Info: ../results/CV-fused/noclust-large-fused-5k/coef-plots/coef-plot-full.png  used on input line 929.
-(luatex.def)             Requested size: 230.46739pt x 230.47363pt.
-
-Overfull \vbox (19.01639pt too high) detected at line 929
- []
-
+Package luatex.def Info: ../results/CV-fused/noclust-large-fused-5k/coef-plots/coef-plot-full.png  used on input line 1015.
+(luatex.def)             Requested size: 169.01036pt x 169.01297pt.
 [60
 
 <../results/CV-fused/noclust-large-fused-5k/coef-plots/coef-plot-full.png>]
-<../results/CV-fused/noclust-large-fused-5k/coef-plots/coef-plot-drop-out-full1.png, id=608, 505.89pt x 505.89pt>
+<../results/CV-fused/noclust-large-fused-5k/coef-plots/coef-plot-drop-out-full1.png, id=612, 505.89pt x 505.89pt>
 File: ../results/CV-fused/noclust-large-fused-5k/coef-plots/coef-plot-drop-out-full1.png Graphic file (type png)
 <use ../results/CV-fused/noclust-large-fused-5k/coef-plots/coef-plot-drop-out-full1.png>
-Package luatex.def Info: ../results/CV-fused/noclust-large-fused-5k/coef-plots/coef-plot-drop-out-full1.png  used on input line 934.
-(luatex.def)             Requested size: 230.46739pt x 230.47363pt.
+Package luatex.def Info: ../results/CV-fused/noclust-large-fused-5k/coef-plots/coef-plot-drop-out-full1.png  used on input line 1027.
+(luatex.def)             Requested size: 169.01036pt x 169.01297pt.
 
-Overfull \vbox (19.01639pt too high) detected at line 934
+Overfull \vbox (12.95549pt too high) detected at line 1027
  []
 
 [61
 
 <../results/CV-fused/noclust-large-fused-5k/coef-plots/coef-plot-drop-out-full1.png>]
-<../results/CV-fused/noclust-large-fused-5k/coef-plots/coef-plot-drop-out-full2.png, id=616, 505.89pt x 505.89pt>
+<../results/CV-fused/noclust-large-fused-5k/coef-plots/coef-plot-drop-out-full2.png, id=621, 505.89pt x 505.89pt>
 File: ../results/CV-fused/noclust-large-fused-5k/coef-plots/coef-plot-drop-out-full2.png Graphic file (type png)
 <use ../results/CV-fused/noclust-large-fused-5k/coef-plots/coef-plot-drop-out-full2.png>
-Package luatex.def Info: ../results/CV-fused/noclust-large-fused-5k/coef-plots/coef-plot-drop-out-full2.png  used on input line 939.
-(luatex.def)             Requested size: 230.46739pt x 230.47363pt.
+Package luatex.def Info: ../results/CV-fused/noclust-large-fused-5k/coef-plots/coef-plot-drop-out-full2.png  used on input line 1039.
+(luatex.def)             Requested size: 169.01036pt x 169.01297pt.
 
-Overfull \vbox (19.01639pt too high) detected at line 939
+Overfull \vbox (12.95549pt too high) detected at line 1039
  []
 
 [62
 
-<../results/CV-fused/noclust-large-fused-5k/coef-plots/coef-plot-drop-out-full2.png>]
-
-Package fontspec Warning: \addfontfeature(s) ignored on line 956; it cannot be
-(fontspec)                used with a font that wasn't selected by a fontspec
-(fontspec)                command.
-(fontspec)                 
-(fontspec)                 The current font is "\TU/lmss/m/n/8 ".
-(fontspec)                  The requested feature is "Numbers={Monospaced}". 
-
-[63
+<../results/CV-fused/noclust-large-fused-5k/coef-plots/coef-plot-drop-out-full2.png>] [63
 
 ]
-Overfull \vbox (6.62213pt too high) detected at line 975
+Overfull \vbox (6.62213pt too high) detected at line 1078
  []
 
 [64
@@ -1681,328 +1663,333 @@ Overfull \vbox (6.62213pt too high) detected at line 975
 
 ] [68
 
-] [69
+]
+Overfull \vbox (100.58212pt too high) detected at line 1163
+ []
+
+[69
 
 ] [70
 
 ] [71
 
-]
-Overfull \vbox (0.92647pt too high) detected at line 1087
- []
-
-[72
+] [72
 
 ] [73
 
 ] [74
 
-]
-<ma-presentation_files/figure-beamer/unnamed-chunk-33-1.pdf, id=704, 722.7pt x 505.89pt>
-File: ma-presentation_files/figure-beamer/unnamed-chunk-33-1.pdf Graphic file (type pdf)
-<use ma-presentation_files/figure-beamer/unnamed-chunk-33-1.pdf>
-Package luatex.def Info: ma-presentation_files/figure-beamer/unnamed-chunk-33-1.pdf  used on input line 1100.
-(luatex.def)             Requested size: 230.46739pt x 161.32458pt.
-[75
 
-<./ma-presentation_files/figure-beamer/unnamed-chunk-33-1.pdf>]
-<ma-presentation_files/figure-beamer/pred-plot-fold-lasso-og-1.pdf, id=717, 722.7pt x 505.89pt>
+] [75
+
+
+] [76
+
+] [77
+
+]
+<ma-presentation_files/figure-beamer/unnamed-chunk-31-1.pdf, id=734, 722.7pt x 505.89pt>
+File: ma-presentation_files/figure-beamer/unnamed-chunk-31-1.pdf Graphic file (type pdf)
+<use ma-presentation_files/figure-beamer/unnamed-chunk-31-1.pdf>
+Package luatex.def Info: ma-presentation_files/figure-beamer/unnamed-chunk-31-1.pdf  used on input line 1249.
+(luatex.def)             Requested size: 230.46739pt x 161.32458pt.
+[78
+
+<./ma-presentation_files/figure-beamer/unnamed-chunk-31-1.pdf>]
+<ma-presentation_files/figure-beamer/pred-plot-fold-lasso-og-1.pdf, id=747, 722.7pt x 505.89pt>
 File: ma-presentation_files/figure-beamer/pred-plot-fold-lasso-og-1.pdf Graphic file (type pdf)
 <use ma-presentation_files/figure-beamer/pred-plot-fold-lasso-og-1.pdf>
-Package luatex.def Info: ma-presentation_files/figure-beamer/pred-plot-fold-lasso-og-1.pdf  used on input line 1112.
+Package luatex.def Info: ma-presentation_files/figure-beamer/pred-plot-fold-lasso-og-1.pdf  used on input line 1261.
 (luatex.def)             Requested size: 230.46739pt x 161.32458pt.
-[76
+[79
 
 <./ma-presentation_files/figure-beamer/pred-plot-fold-lasso-og-1.pdf>]
 \openout4 = ma-presentation.vrb
  (./ma-presentation.vrb
-<ma-presentation_files/figure-beamer/pred-plot-full-lasso-og-1.pdf, id=729, 722.7pt x 505.89pt>
+<ma-presentation_files/figure-beamer/pred-plot-full-lasso-og-1.pdf, id=759, 722.7pt x 505.89pt>
 File: ma-presentation_files/figure-beamer/pred-plot-full-lasso-og-1.pdf Graphic file (type pdf)
 <use ma-presentation_files/figure-beamer/pred-plot-full-lasso-og-1.pdf>
 Package luatex.def Info: ma-presentation_files/figure-beamer/pred-plot-full-lasso-og-1.pdf  used on input line 5.
 (luatex.def)             Requested size: 230.46739pt x 161.32458pt.
 )
-Overfull \vbox (43.43576pt too high) detected at line 1128
+Overfull \vbox (43.43576pt too high) detected at line 1277
  []
 
-[77
-
-<./ma-presentation_files/figure-beamer/pred-plot-full-lasso-og-1.pdf>]
-<ma-presentation_files/figure-beamer/coef-plot-full-lasso-og-1.pdf, id=741, 722.7pt x 505.89pt>
-File: ma-presentation_files/figure-beamer/coef-plot-full-lasso-og-1.pdf Graphic file (type pdf)
-<use ma-presentation_files/figure-beamer/coef-plot-full-lasso-og-1.pdf>
-Package luatex.def Info: ma-presentation_files/figure-beamer/coef-plot-full-lasso-og-1.pdf  used on input line 1140.
-(luatex.def)             Requested size: 230.46739pt x 161.32458pt.
-[78
-
-<./ma-presentation_files/figure-beamer/coef-plot-full-lasso-og-1.pdf>] [79
-
-]
-<ma-presentation_files/figure-beamer/unnamed-chunk-37-1.pdf, id=761, 722.7pt x 505.89pt>
-File: ma-presentation_files/figure-beamer/unnamed-chunk-37-1.pdf Graphic file (type pdf)
-<use ma-presentation_files/figure-beamer/unnamed-chunk-37-1.pdf>
-Package luatex.def Info: ma-presentation_files/figure-beamer/unnamed-chunk-37-1.pdf  used on input line 1149.
-(luatex.def)             Requested size: 230.46739pt x 161.32458pt.
 [80
 
-<./ma-presentation_files/figure-beamer/unnamed-chunk-37-1.pdf>]
-<ma-presentation_files/figure-beamer/pred-plot-fold-lasso-diff-1.pdf, id=774, 722.7pt x 505.89pt>
-File: ma-presentation_files/figure-beamer/pred-plot-fold-lasso-diff-1.pdf Graphic file (type pdf)
-<use ma-presentation_files/figure-beamer/pred-plot-fold-lasso-diff-1.pdf>
-Package luatex.def Info: ma-presentation_files/figure-beamer/pred-plot-fold-lasso-diff-1.pdf  used on input line 1161.
+<./ma-presentation_files/figure-beamer/pred-plot-full-lasso-og-1.pdf>]
+<ma-presentation_files/figure-beamer/coef-plot-full-lasso-og-1.pdf, id=771, 722.7pt x 505.89pt>
+File: ma-presentation_files/figure-beamer/coef-plot-full-lasso-og-1.pdf Graphic file (type pdf)
+<use ma-presentation_files/figure-beamer/coef-plot-full-lasso-og-1.pdf>
+Package luatex.def Info: ma-presentation_files/figure-beamer/coef-plot-full-lasso-og-1.pdf  used on input line 1289.
 (luatex.def)             Requested size: 230.46739pt x 161.32458pt.
 [81
+
+<./ma-presentation_files/figure-beamer/coef-plot-full-lasso-og-1.pdf>] [82
+
+]
+<ma-presentation_files/figure-beamer/unnamed-chunk-35-1.pdf, id=792, 722.7pt x 505.89pt>
+File: ma-presentation_files/figure-beamer/unnamed-chunk-35-1.pdf Graphic file (type pdf)
+<use ma-presentation_files/figure-beamer/unnamed-chunk-35-1.pdf>
+Package luatex.def Info: ma-presentation_files/figure-beamer/unnamed-chunk-35-1.pdf  used on input line 1298.
+(luatex.def)             Requested size: 230.46739pt x 161.32458pt.
+[83
+
+<./ma-presentation_files/figure-beamer/unnamed-chunk-35-1.pdf>]
+<ma-presentation_files/figure-beamer/pred-plot-fold-lasso-diff-1.pdf, id=805, 722.7pt x 505.89pt>
+File: ma-presentation_files/figure-beamer/pred-plot-fold-lasso-diff-1.pdf Graphic file (type pdf)
+<use ma-presentation_files/figure-beamer/pred-plot-fold-lasso-diff-1.pdf>
+Package luatex.def Info: ma-presentation_files/figure-beamer/pred-plot-fold-lasso-diff-1.pdf  used on input line 1310.
+(luatex.def)             Requested size: 230.46739pt x 161.32458pt.
+[84
 
 <./ma-presentation_files/figure-beamer/pred-plot-fold-lasso-diff-1.pdf>]
 \openout4 = ma-presentation.vrb
  (./ma-presentation.vrb
-<ma-presentation_files/figure-beamer/pred-plot-full-lasso-diff-1.pdf, id=787, 722.7pt x 505.89pt>
+<ma-presentation_files/figure-beamer/pred-plot-full-lasso-diff-1.pdf, id=818, 722.7pt x 505.89pt>
 File: ma-presentation_files/figure-beamer/pred-plot-full-lasso-diff-1.pdf Graphic file (type pdf)
 <use ma-presentation_files/figure-beamer/pred-plot-full-lasso-diff-1.pdf>
 Package luatex.def Info: ma-presentation_files/figure-beamer/pred-plot-full-lasso-diff-1.pdf  used on input line 5.
 (luatex.def)             Requested size: 230.46739pt x 161.32458pt.
 )
-Overfull \vbox (43.43576pt too high) detected at line 1177
+Overfull \vbox (43.43576pt too high) detected at line 1326
  []
 
-[82
+[85
 
 <./ma-presentation_files/figure-beamer/pred-plot-full-lasso-diff-1.pdf>]
-<ma-presentation_files/figure-beamer/coef-plot-full-lasso-diff-1.pdf, id=799, 722.7pt x 505.89pt>
+<ma-presentation_files/figure-beamer/coef-plot-full-lasso-diff-1.pdf, id=830, 722.7pt x 505.89pt>
 File: ma-presentation_files/figure-beamer/coef-plot-full-lasso-diff-1.pdf Graphic file (type pdf)
 <use ma-presentation_files/figure-beamer/coef-plot-full-lasso-diff-1.pdf>
-Package luatex.def Info: ma-presentation_files/figure-beamer/coef-plot-full-lasso-diff-1.pdf  used on input line 1189.
-(luatex.def)             Requested size: 230.46739pt x 161.32458pt.
-[83
-
-<./ma-presentation_files/figure-beamer/coef-plot-full-lasso-diff-1.pdf>] [84
-
-] [85
-
-]
-<ma-presentation_files/figure-beamer/unnamed-chunk-41-1.pdf, id=826, 722.7pt x 505.89pt>
-File: ma-presentation_files/figure-beamer/unnamed-chunk-41-1.pdf Graphic file (type pdf)
-<use ma-presentation_files/figure-beamer/unnamed-chunk-41-1.pdf>
-Package luatex.def Info: ma-presentation_files/figure-beamer/unnamed-chunk-41-1.pdf  used on input line 1216.
+Package luatex.def Info: ma-presentation_files/figure-beamer/coef-plot-full-lasso-diff-1.pdf  used on input line 1338.
 (luatex.def)             Requested size: 230.46739pt x 161.32458pt.
 [86
 
-<./ma-presentation_files/figure-beamer/unnamed-chunk-41-1.pdf>]
-<ma-presentation_files/figure-beamer/pred-plot-fold-lasso-des-1.pdf, id=839, 722.7pt x 505.89pt>
+<./ma-presentation_files/figure-beamer/coef-plot-full-lasso-diff-1.pdf>] [87
+
+] [88
+
+]
+<ma-presentation_files/figure-beamer/unnamed-chunk-39-1.pdf, id=856, 722.7pt x 505.89pt>
+File: ma-presentation_files/figure-beamer/unnamed-chunk-39-1.pdf Graphic file (type pdf)
+<use ma-presentation_files/figure-beamer/unnamed-chunk-39-1.pdf>
+Package luatex.def Info: ma-presentation_files/figure-beamer/unnamed-chunk-39-1.pdf  used on input line 1365.
+(luatex.def)             Requested size: 230.46739pt x 161.32458pt.
+[89
+
+<./ma-presentation_files/figure-beamer/unnamed-chunk-39-1.pdf>]
+<ma-presentation_files/figure-beamer/pred-plot-fold-lasso-des-1.pdf, id=869, 722.7pt x 505.89pt>
 File: ma-presentation_files/figure-beamer/pred-plot-fold-lasso-des-1.pdf Graphic file (type pdf)
 <use ma-presentation_files/figure-beamer/pred-plot-fold-lasso-des-1.pdf>
-Package luatex.def Info: ma-presentation_files/figure-beamer/pred-plot-fold-lasso-des-1.pdf  used on input line 1228.
+Package luatex.def Info: ma-presentation_files/figure-beamer/pred-plot-fold-lasso-des-1.pdf  used on input line 1377.
 (luatex.def)             Requested size: 230.46739pt x 161.32458pt.
-[87
+[90
 
 <./ma-presentation_files/figure-beamer/pred-plot-fold-lasso-des-1.pdf>]
 \openout4 = ma-presentation.vrb
  (./ma-presentation.vrb
-<ma-presentation_files/figure-beamer/pred-plot-full-lasso-des-1.pdf, id=851, 722.7pt x 505.89pt>
+<ma-presentation_files/figure-beamer/pred-plot-full-lasso-des-1.pdf, id=881, 722.7pt x 505.89pt>
 File: ma-presentation_files/figure-beamer/pred-plot-full-lasso-des-1.pdf Graphic file (type pdf)
 <use ma-presentation_files/figure-beamer/pred-plot-full-lasso-des-1.pdf>
 Package luatex.def Info: ma-presentation_files/figure-beamer/pred-plot-full-lasso-des-1.pdf  used on input line 5.
 (luatex.def)             Requested size: 230.46739pt x 161.32458pt.
 )
-Overfull \vbox (43.43576pt too high) detected at line 1244
+Overfull \vbox (43.43576pt too high) detected at line 1393
  []
 
-[88
-
-<./ma-presentation_files/figure-beamer/pred-plot-full-lasso-des-1.pdf>]
-<ma-presentation_files/figure-beamer/coef-plot-full-lasso-des-1.pdf, id=863, 722.7pt x 505.89pt>
-File: ma-presentation_files/figure-beamer/coef-plot-full-lasso-des-1.pdf Graphic file (type pdf)
-<use ma-presentation_files/figure-beamer/coef-plot-full-lasso-des-1.pdf>
-Package luatex.def Info: ma-presentation_files/figure-beamer/coef-plot-full-lasso-des-1.pdf  used on input line 1256.
-(luatex.def)             Requested size: 230.46739pt x 161.32458pt.
-[89
-
-<./ma-presentation_files/figure-beamer/coef-plot-full-lasso-des-1.pdf>] [90
-
-]
-<../results/CV-fused/large-fused-5k/best-lambda-res.png, id=883, 505.89pt x 505.89pt>
-File: ../results/CV-fused/large-fused-5k/best-lambda-res.png Graphic file (type png)
-<use ../results/CV-fused/large-fused-5k/best-lambda-res.png>
-Package luatex.def Info: ../results/CV-fused/large-fused-5k/best-lambda-res.png  used on input line 1265.
-(luatex.def)             Requested size: 138.2795pt x 138.28264pt.
 [91
 
+<./ma-presentation_files/figure-beamer/pred-plot-full-lasso-des-1.pdf>]
+<ma-presentation_files/figure-beamer/coef-plot-full-lasso-des-1.pdf, id=894, 722.7pt x 505.89pt>
+File: ma-presentation_files/figure-beamer/coef-plot-full-lasso-des-1.pdf Graphic file (type pdf)
+<use ma-presentation_files/figure-beamer/coef-plot-full-lasso-des-1.pdf>
+Package luatex.def Info: ma-presentation_files/figure-beamer/coef-plot-full-lasso-des-1.pdf  used on input line 1405.
+(luatex.def)             Requested size: 230.46739pt x 161.32458pt.
+[92
+
+<./ma-presentation_files/figure-beamer/coef-plot-full-lasso-des-1.pdf>] [93
+
+]
+<../results/CV-fused/large-fused-5k/best-lambda-res.png, id=914, 505.89pt x 505.89pt>
+File: ../results/CV-fused/large-fused-5k/best-lambda-res.png Graphic file (type png)
+<use ../results/CV-fused/large-fused-5k/best-lambda-res.png>
+Package luatex.def Info: ../results/CV-fused/large-fused-5k/best-lambda-res.png  used on input line 1421.
+(luatex.def)             Requested size: 138.2795pt x 138.28264pt.
+[94
+
 <../results/CV-fused/large-fused-5k/best-lambda-res.png>]
-<ma-presentation_files/figure-beamer/pred-fold-fused-sub-1.pdf, id=891, 722.7pt x 505.89pt>
+<ma-presentation_files/figure-beamer/pred-fold-fused-sub-1.pdf, id=922, 722.7pt x 505.89pt>
 File: ma-presentation_files/figure-beamer/pred-fold-fused-sub-1.pdf Graphic file (type pdf)
 <use ma-presentation_files/figure-beamer/pred-fold-fused-sub-1.pdf>
-Package luatex.def Info: ma-presentation_files/figure-beamer/pred-fold-fused-sub-1.pdf  used on input line 1281.
+Package luatex.def Info: ma-presentation_files/figure-beamer/pred-fold-fused-sub-1.pdf  used on input line 1437.
 (luatex.def)             Requested size: 230.46739pt x 161.32458pt.
 
-LaTeX Warning: Reference `(' on page 92 undefined on input line 1281.
+LaTeX Warning: Reference `(' on page 95 undefined on input line 1437.
 
 
-Overfull \vbox (64.58434pt too high) detected at line 1281
+Overfull \vbox (64.58434pt too high) detected at line 1437
  []
 
-[92
+[95
 
 <./ma-presentation_files/figure-beamer/pred-fold-fused-sub-1.pdf>]
 \openout4 = ma-presentation.vrb
  (./ma-presentation.vrb
-<ma-presentation_files/figure-beamer/pred-plot-full-fused-sub-1.pdf, id=907, 722.7pt x 505.89pt>
+<ma-presentation_files/figure-beamer/pred-plot-full-fused-sub-1.pdf, id=938, 722.7pt x 505.89pt>
 File: ma-presentation_files/figure-beamer/pred-plot-full-fused-sub-1.pdf Graphic file (type pdf)
 <use ma-presentation_files/figure-beamer/pred-plot-full-fused-sub-1.pdf>
 Package luatex.def Info: ma-presentation_files/figure-beamer/pred-plot-full-fused-sub-1.pdf  used on input line 5.
 (luatex.def)             Requested size: 230.46739pt x 161.32458pt.
 )
-Overfull \vbox (43.43576pt too high) detected at line 1297
+Overfull \vbox (43.43576pt too high) detected at line 1453
  []
 
-[93
-
-<./ma-presentation_files/figure-beamer/pred-plot-full-fused-sub-1.pdf>]
-<../results/CV-fused/large-fused-5k/coef-plots/coef-plot-full.png, id=919, 505.89pt x 505.89pt>
-File: ../results/CV-fused/large-fused-5k/coef-plots/coef-plot-full.png Graphic file (type png)
-<use ../results/CV-fused/large-fused-5k/coef-plots/coef-plot-full.png>
-Package luatex.def Info: ../results/CV-fused/large-fused-5k/coef-plots/coef-plot-full.png  used on input line 1306.
-(luatex.def)             Requested size: 230.46739pt x 230.47363pt.
-<../results/CV-fused/large-fused-5k/coef-plots/coef-plot-drop-out-full1.png, id=920, 505.89pt x 505.89pt>
-File: ../results/CV-fused/large-fused-5k/coef-plots/coef-plot-drop-out-full1.png Graphic file (type png)
-<use ../results/CV-fused/large-fused-5k/coef-plots/coef-plot-drop-out-full1.png>
-Package luatex.def Info: ../results/CV-fused/large-fused-5k/coef-plots/coef-plot-drop-out-full1.png  used on input line 1306.
-(luatex.def)             Requested size: 230.46739pt x 230.47363pt.
-<../results/CV-fused/large-fused-5k/coef-plots/coef-plot-drop-out-full2.png, id=921, 505.89pt x 505.89pt>
-File: ../results/CV-fused/large-fused-5k/coef-plots/coef-plot-drop-out-full2.png Graphic file (type png)
-<use ../results/CV-fused/large-fused-5k/coef-plots/coef-plot-drop-out-full2.png>
-Package luatex.def Info: ../results/CV-fused/large-fused-5k/coef-plots/coef-plot-drop-out-full2.png  used on input line 1306.
-(luatex.def)             Requested size: 230.46739pt x 230.47363pt.
-
-Overfull \vbox (513.70349pt too high) detected at line 1306
- []
-
-[94
-
-<../results/CV-fused/large-fused-5k/coef-plots/coef-plot-full.png><../results/CV-fused/large-fused-5k/coef-plots/coef-plot-drop-out-full1.png><../results/CV-fused/large-fused-5k/coef-plots/coef-plot-drop-out-full2.png>] [95
-
-]
-<../results/CV-fused/noclust-large-fused-5k-gamma-01/best-lambda-res.png, id=936, 165.9801pt x 232.7094pt>
-File: ../results/CV-fused/noclust-large-fused-5k-gamma-01/best-lambda-res.png Graphic file (type png)
-<use ../results/CV-fused/noclust-large-fused-5k-gamma-01/best-lambda-res.png>
-Package luatex.def Info: ../results/CV-fused/noclust-large-fused-5k-gamma-01/best-lambda-res.png  used on input line 1315.
-(luatex.def)             Requested size: 138.2795pt x 193.88376pt.
 [96
 
-<../results/CV-fused/noclust-large-fused-5k-gamma-01/best-lambda-res.png>]
-<ma-presentation_files/figure-beamer/pred-fold-fused-nolcust-01-1.pdf, id=943, 722.7pt x 505.89pt>
-File: ma-presentation_files/figure-beamer/pred-fold-fused-nolcust-01-1.pdf Graphic file (type pdf)
-<use ma-presentation_files/figure-beamer/pred-fold-fused-nolcust-01-1.pdf>
-Package luatex.def Info: ma-presentation_files/figure-beamer/pred-fold-fused-nolcust-01-1.pdf  used on input line 1331.
-(luatex.def)             Requested size: 230.46739pt x 161.32458pt.
+<./ma-presentation_files/figure-beamer/pred-plot-full-fused-sub-1.pdf>]
+<../results/CV-fused/large-fused-5k/coef-plots/coef-plot-full.png, id=951, 505.89pt x 505.89pt>
+File: ../results/CV-fused/large-fused-5k/coef-plots/coef-plot-full.png Graphic file (type png)
+<use ../results/CV-fused/large-fused-5k/coef-plots/coef-plot-full.png>
+Package luatex.def Info: ../results/CV-fused/large-fused-5k/coef-plots/coef-plot-full.png  used on input line 1465.
+(luatex.def)             Requested size: 169.01036pt x 169.01297pt.
 
-LaTeX Warning: Reference `(' on page 97 undefined on input line 1331.
-
-
-Overfull \vbox (80.68425pt too high) detected at line 1331
+Overfull \vbox (29.0554pt too high) detected at line 1465
  []
 
 [97
 
+<../results/CV-fused/large-fused-5k/coef-plots/coef-plot-full.png>]
+<../results/CV-fused/large-fused-5k/coef-plots/coef-plot-drop-out-full1.png, id=959, 505.89pt x 505.89pt>
+File: ../results/CV-fused/large-fused-5k/coef-plots/coef-plot-drop-out-full1.png Graphic file (type png)
+<use ../results/CV-fused/large-fused-5k/coef-plots/coef-plot-drop-out-full1.png>
+Package luatex.def Info: ../results/CV-fused/large-fused-5k/coef-plots/coef-plot-drop-out-full1.png  used on input line 1485.
+(luatex.def)             Requested size: 169.01036pt x 169.01297pt.
+<../results/CV-fused/large-fused-5k/coef-plots/coef-plot-drop-out-full2.png, id=960, 505.89pt x 505.89pt>
+File: ../results/CV-fused/large-fused-5k/coef-plots/coef-plot-drop-out-full2.png Graphic file (type png)
+<use ../results/CV-fused/large-fused-5k/coef-plots/coef-plot-drop-out-full2.png>
+Package luatex.def Info: ../results/CV-fused/large-fused-5k/coef-plots/coef-plot-drop-out-full2.png  used on input line 1485.
+(luatex.def)             Requested size: 169.01036pt x 169.01297pt.
+
+Overfull \vbox (289.88795pt too high) detected at line 1485
+ []
+
+[98
+
+<../results/CV-fused/large-fused-5k/coef-plots/coef-plot-drop-out-full1.png><../results/CV-fused/large-fused-5k/coef-plots/coef-plot-drop-out-full2.png>] [99
+
+]
+<../results/CV-fused/noclust-large-fused-5k-gamma-01/best-lambda-res2.png, id=977, 505.89pt x 505.89pt>
+File: ../results/CV-fused/noclust-large-fused-5k-gamma-01/best-lambda-res2.png Graphic file (type png)
+<use ../results/CV-fused/noclust-large-fused-5k-gamma-01/best-lambda-res2.png>
+Package luatex.def Info: ../results/CV-fused/noclust-large-fused-5k-gamma-01/best-lambda-res2.png  used on input line 1501.
+(luatex.def)             Requested size: 138.2795pt x 138.28264pt.
+[100
+
+<../results/CV-fused/noclust-large-fused-5k-gamma-01/best-lambda-res2.png>]
+<ma-presentation_files/figure-beamer/pred-fold-fused-nolcust-01-1.pdf, id=985, 722.7pt x 505.89pt>
+File: ma-presentation_files/figure-beamer/pred-fold-fused-nolcust-01-1.pdf Graphic file (type pdf)
+<use ma-presentation_files/figure-beamer/pred-fold-fused-nolcust-01-1.pdf>
+Package luatex.def Info: ma-presentation_files/figure-beamer/pred-fold-fused-nolcust-01-1.pdf  used on input line 1517.
+(luatex.def)             Requested size: 230.46739pt x 161.32458pt.
+
+LaTeX Warning: Reference `(' on page 101 undefined on input line 1517.
+
+
+Overfull \vbox (80.68425pt too high) detected at line 1517
+ []
+
+[101
+
 <./ma-presentation_files/figure-beamer/pred-fold-fused-nolcust-01-1.pdf>]
 \openout4 = ma-presentation.vrb
  (./ma-presentation.vrb
-<ma-presentation_files/figure-beamer/pred-plot-full-fused-noclust-01-1.pdf, id=959, 722.7pt x 505.89pt>
+<ma-presentation_files/figure-beamer/pred-plot-full-fused-noclust-01-1.pdf, id=1001, 722.7pt x 505.89pt>
 File: ma-presentation_files/figure-beamer/pred-plot-full-fused-noclust-01-1.pdf Graphic file (type pdf)
 <use ma-presentation_files/figure-beamer/pred-plot-full-fused-noclust-01-1.pdf>
 Package luatex.def Info: ma-presentation_files/figure-beamer/pred-plot-full-fused-noclust-01-1.pdf  used on input line 5.
 (luatex.def)             Requested size: 230.46739pt x 161.32458pt.
 )
-Overfull \vbox (59.53568pt too high) detected at line 1347
- []
-
-[98
-
-<./ma-presentation_files/figure-beamer/pred-plot-full-fused-noclust-01-1.pdf>]
-<../results/CV-fused/noclust-large-fused-5k-gamma-01/coef-plots/coef-plot-full.png, id=971, 505.89pt x 505.89pt>
-File: ../results/CV-fused/noclust-large-fused-5k-gamma-01/coef-plots/coef-plot-full.png Graphic file (type png)
-<use ../results/CV-fused/noclust-large-fused-5k-gamma-01/coef-plots/coef-plot-full.png>
-Package luatex.def Info: ../results/CV-fused/noclust-large-fused-5k-gamma-01/coef-plots/coef-plot-full.png  used on input line 1356.
-(luatex.def)             Requested size: 230.46739pt x 230.47363pt.
-<../results/CV-fused/noclust-large-fused-5k-gamma-01/coef-plots/coef-plot-drop-out-full1.png, id=972, 505.89pt x 505.89pt>
-File: ../results/CV-fused/noclust-large-fused-5k-gamma-01/coef-plots/coef-plot-drop-out-full1.png Graphic file (type png)
-<use ../results/CV-fused/noclust-large-fused-5k-gamma-01/coef-plots/coef-plot-drop-out-full1.png>
-Package luatex.def Info: ../results/CV-fused/noclust-large-fused-5k-gamma-01/coef-plots/coef-plot-drop-out-full1.png  used on input line 1356.
-(luatex.def)             Requested size: 230.46739pt x 230.47363pt.
-<../results/CV-fused/noclust-large-fused-5k-gamma-01/coef-plots/coef-plot-drop-out-full2.png, id=973, 505.89pt x 505.89pt>
-File: ../results/CV-fused/noclust-large-fused-5k-gamma-01/coef-plots/coef-plot-drop-out-full2.png Graphic file (type png)
-<use ../results/CV-fused/noclust-large-fused-5k-gamma-01/coef-plots/coef-plot-drop-out-full2.png>
-Package luatex.def Info: ../results/CV-fused/noclust-large-fused-5k-gamma-01/coef-plots/coef-plot-drop-out-full2.png  used on input line 1356.
-(luatex.def)             Requested size: 230.46739pt x 230.47363pt.
-
-Overfull \vbox (513.70349pt too high) detected at line 1356
- []
-
-[99
-
-<../results/CV-fused/noclust-large-fused-5k-gamma-01/coef-plots/coef-plot-full.png><../results/CV-fused/noclust-large-fused-5k-gamma-01/coef-plots/coef-plot-drop-out-full1.png><../results/CV-fused/noclust-large-fused-5k-gamma-01/coef-plots/coef-plot-drop-out-full2.png>] [100
-
-]
-<../results/CV-fused/noclust-large-fused-5k-gamma-005/best-lambda-res.png, id=988, 505.89pt x 505.89pt>
-File: ../results/CV-fused/noclust-large-fused-5k-gamma-005/best-lambda-res.png Graphic file (type png)
-<use ../results/CV-fused/noclust-large-fused-5k-gamma-005/best-lambda-res.png>
-Package luatex.def Info: ../results/CV-fused/noclust-large-fused-5k-gamma-005/best-lambda-res.png  used on input line 1365.
-(luatex.def)             Requested size: 138.2795pt x 138.28264pt.
-[101
-
-<../results/CV-fused/noclust-large-fused-5k-gamma-005/best-lambda-res.png>]
-<ma-presentation_files/figure-beamer/pred-fold-fused-noclust-005-1.pdf, id=996, 722.7pt x 505.89pt>
-File: ma-presentation_files/figure-beamer/pred-fold-fused-noclust-005-1.pdf Graphic file (type pdf)
-<use ma-presentation_files/figure-beamer/pred-fold-fused-noclust-005-1.pdf>
-Package luatex.def Info: ma-presentation_files/figure-beamer/pred-fold-fused-noclust-005-1.pdf  used on input line 1381.
-(luatex.def)             Requested size: 230.46739pt x 161.32458pt.
-
-LaTeX Warning: Reference `(' on page 102 undefined on input line 1381.
-
-
-Overfull \vbox (80.68425pt too high) detected at line 1381
+Overfull \vbox (59.53568pt too high) detected at line 1533
  []
 
 [102
 
+<./ma-presentation_files/figure-beamer/pred-plot-full-fused-noclust-01-1.pdf>]
+<../results/CV-fused/noclust-large-fused-5k-gamma-01/coef-plots/coef-plot-full.png, id=1013, 505.89pt x 505.89pt>
+File: ../results/CV-fused/noclust-large-fused-5k-gamma-01/coef-plots/coef-plot-full.png Graphic file (type png)
+<use ../results/CV-fused/noclust-large-fused-5k-gamma-01/coef-plots/coef-plot-full.png>
+Package luatex.def Info: ../results/CV-fused/noclust-large-fused-5k-gamma-01/coef-plots/coef-plot-full.png  used on input line 1545.
+(luatex.def)             Requested size: 169.01036pt x 169.01297pt.
+
+Overfull \vbox (29.0554pt too high) detected at line 1545
+ []
+
+[103
+
+<../results/CV-fused/noclust-large-fused-5k-gamma-01/coef-plots/coef-plot-full.png>] [104
+
+]
+<../results/CV-fused/noclust-large-fused-5k-gamma-005/best-lambda-res.png, id=1029, 505.89pt x 505.89pt>
+File: ../results/CV-fused/noclust-large-fused-5k-gamma-005/best-lambda-res.png Graphic file (type png)
+<use ../results/CV-fused/noclust-large-fused-5k-gamma-005/best-lambda-res.png>
+Package luatex.def Info: ../results/CV-fused/noclust-large-fused-5k-gamma-005/best-lambda-res.png  used on input line 1561.
+(luatex.def)             Requested size: 138.2795pt x 138.28264pt.
+[105
+
+<../results/CV-fused/noclust-large-fused-5k-gamma-005/best-lambda-res.png>]
+<ma-presentation_files/figure-beamer/pred-fold-fused-noclust-005-1.pdf, id=1037, 722.7pt x 505.89pt>
+File: ma-presentation_files/figure-beamer/pred-fold-fused-noclust-005-1.pdf Graphic file (type pdf)
+<use ma-presentation_files/figure-beamer/pred-fold-fused-noclust-005-1.pdf>
+Package luatex.def Info: ma-presentation_files/figure-beamer/pred-fold-fused-noclust-005-1.pdf  used on input line 1577.
+(luatex.def)             Requested size: 230.46739pt x 161.32458pt.
+
+LaTeX Warning: Reference `(' on page 106 undefined on input line 1577.
+
+
+Overfull \vbox (80.68425pt too high) detected at line 1577
+ []
+
+[106
+
 <./ma-presentation_files/figure-beamer/pred-fold-fused-noclust-005-1.pdf>]
 \openout4 = ma-presentation.vrb
  (./ma-presentation.vrb
-<ma-presentation_files/figure-beamer/pred-plot-full-fused-noclust-05-1.pdf, id=1011, 722.7pt x 505.89pt>
+<ma-presentation_files/figure-beamer/pred-plot-full-fused-noclust-05-1.pdf, id=1052, 722.7pt x 505.89pt>
 File: ma-presentation_files/figure-beamer/pred-plot-full-fused-noclust-05-1.pdf Graphic file (type pdf)
 <use ma-presentation_files/figure-beamer/pred-plot-full-fused-noclust-05-1.pdf>
 Package luatex.def Info: ma-presentation_files/figure-beamer/pred-plot-full-fused-noclust-05-1.pdf  used on input line 5.
 (luatex.def)             Requested size: 230.46739pt x 161.32458pt.
 )
-Overfull \vbox (59.53568pt too high) detected at line 1397
+Overfull \vbox (59.53568pt too high) detected at line 1593
  []
 
-[103
+[107
 
 <./ma-presentation_files/figure-beamer/pred-plot-full-fused-noclust-05-1.pdf>]
-<../results/CV-fused/noclust-large-fused-5k-gamma-005/coef-plots/coef-plot-full.png, id=1023, 505.89pt x 505.89pt>
+<../results/CV-fused/noclust-large-fused-5k-gamma-005/coef-plots/coef-plot-full.png, id=1064, 505.89pt x 505.89pt>
 File: ../results/CV-fused/noclust-large-fused-5k-gamma-005/coef-plots/coef-plot-full.png Graphic file (type png)
 <use ../results/CV-fused/noclust-large-fused-5k-gamma-005/coef-plots/coef-plot-full.png>
-Package luatex.def Info: ../results/CV-fused/noclust-large-fused-5k-gamma-005/coef-plots/coef-plot-full.png  used on input line 1406.
-(luatex.def)             Requested size: 230.46739pt x 230.47363pt.
-<../results/CV-fused/noclust-large-fused-5k-gamma-005/coef-plots/coef-plot-drop-out-full1.png, id=1024, 505.89pt x 505.89pt>
+Package luatex.def Info: ../results/CV-fused/noclust-large-fused-5k-gamma-005/coef-plots/coef-plot-full.png  used on input line 1609.
+(luatex.def)             Requested size: 169.01036pt x 169.01297pt.
+<../results/CV-fused/noclust-large-fused-5k-gamma-005/coef-plots/coef-plot-drop-out-full1.png, id=1065, 505.89pt x 505.89pt>
 File: ../results/CV-fused/noclust-large-fused-5k-gamma-005/coef-plots/coef-plot-drop-out-full1.png Graphic file (type png)
 <use ../results/CV-fused/noclust-large-fused-5k-gamma-005/coef-plots/coef-plot-drop-out-full1.png>
-Package luatex.def Info: ../results/CV-fused/noclust-large-fused-5k-gamma-005/coef-plots/coef-plot-drop-out-full1.png  used on input line 1406.
+Package luatex.def Info: ../results/CV-fused/noclust-large-fused-5k-gamma-005/coef-plots/coef-plot-drop-out-full1.png  used on input line 1609.
 (luatex.def)             Requested size: 230.46739pt x 230.47363pt.
-<../results/CV-fused/noclust-large-fused-5k-gamma-005/coef-plots/coef-plot-drop-out-full2.png, id=1025, 505.89pt x 505.89pt>
+<../results/CV-fused/noclust-large-fused-5k-gamma-005/coef-plots/coef-plot-drop-out-full2.png, id=1066, 505.89pt x 505.89pt>
 File: ../results/CV-fused/noclust-large-fused-5k-gamma-005/coef-plots/coef-plot-drop-out-full2.png Graphic file (type png)
 <use ../results/CV-fused/noclust-large-fused-5k-gamma-005/coef-plots/coef-plot-drop-out-full2.png>
-Package luatex.def Info: ../results/CV-fused/noclust-large-fused-5k-gamma-005/coef-plots/coef-plot-drop-out-full2.png  used on input line 1406.
+Package luatex.def Info: ../results/CV-fused/noclust-large-fused-5k-gamma-005/coef-plots/coef-plot-drop-out-full2.png  used on input line 1609.
 (luatex.def)             Requested size: 230.46739pt x 230.47363pt.
 
-Overfull \vbox (513.70349pt too high) detected at line 1406
+Overfull \vbox (507.6426pt too high) detected at line 1609
  []
 
-[104
+[108
 
-<../results/CV-fused/noclust-large-fused-5k-gamma-005/coef-plots/coef-plot-full.png><../results/CV-fused/noclust-large-fused-5k-gamma-005/coef-plots/coef-plot-drop-out-full1.png><../results/CV-fused/noclust-large-fused-5k-gamma-005/coef-plots/coef-plot-drop-out-full2.png>] [105
+<../results/CV-fused/noclust-large-fused-5k-gamma-005/coef-plots/coef-plot-full.png><../results/CV-fused/noclust-large-fused-5k-gamma-005/coef-plots/coef-plot-drop-out-full1.png><../results/CV-fused/noclust-large-fused-5k-gamma-005/coef-plots/coef-plot-drop-out-full2.png>] [109
 
-] [106
+] [110
 
 ]
 \tf@nav=\write6
@@ -2019,25 +2006,25 @@ Overfull \vbox (513.70349pt too high) detected at line 1406
 LaTeX Warning: There were undefined references.
 
 Package rerunfilecheck Info: File `ma-presentation.out' has not changed.
-(rerunfilecheck)             Checksum: 9C26BC03484DC6EFF80A29A3307477E5;2891.
+(rerunfilecheck)             Checksum: 282B33B50435E12AB98642F9351E249D;2778.
 )
 
 Here is how much of LuaTeX's memory you used:
- 36101 strings out of 477356
+ 36152 strings out of 477356
  125031,1373583 words of node,token memory allocated
  6701 words of node memory still in use:
    49 hlist, 8 vlist, 5 rule, 25 disc, 6 local_par, 16 math, 174 glue, 32 kern, 30 penalty, 430 glyph, 147 attribute, 79 glue_spec, 147 attribute_list, 1 shape, 5 write, 1 user_defined, 3 pdf_action, 38 pdf_colorstack nodes
-   avail lists: 1:1,2:263,3:199,4:220,5:230,6:28,7:3171,8:62,9:336,10:17,11:248
- 54856 multiletter control sequences out of 65536+600000
- 91 fonts using 19596671 bytes
+   avail lists: 1:1,2:293,3:200,4:238,5:216,6:31,7:3194,8:62,9:336,10:17,11:271
+ 54890 multiletter control sequences out of 65536+600000
+ 94 fonts using 19873283 bytes
  101i,13n,121p,1883b,790s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
 warning  (pdf backend): unreferenced destination with name '\('
 <c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmmono10-regular.otf><c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmroman8-regular.otf><c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmroman10-regular.otf><c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm-math/latinmodern-math.otf><c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm-math/latinmodern-math.otf><c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmsans10-oblique.otf><c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm-math/latinmodern-math.otf><c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmsans8-regular.otf><c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmsans10-regular.otf><c:/Users/Mufasa/AppData/Roaming/TinyTeX/texmf-dist/fonts/opentype/public/lm/lmsans10-bold.otf>
-Output written on ma-presentation.pdf (106 pages, 10153854 bytes).
+Output written on ma-presentation.pdf (110 pages, 9817086 bytes).
 
-PDF statistics: 1126 PDF objects out of 1200 (max. 8388607)
- 865 compressed objects within 9 object streams
- 364 named destinations out of 1000 (max. 131072)
- 144 words of extra memory for PDF output out of 10000 (max. 100000000)
+PDF statistics: 1170 PDF objects out of 1200 (max. 8388607)
+ 906 compressed objects within 10 object streams
+ 399 named destinations out of 1000 (max. 131072)
+ 136 words of extra memory for PDF output out of 10000 (max. 100000000)
 

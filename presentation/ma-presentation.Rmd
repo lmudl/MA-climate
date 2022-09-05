@@ -168,8 +168,14 @@ p <- precip_means_loc_plot +  precip_sds_loc_plot  +
 p
 ```
 
-## Precipitation Glyph Plots
+## Glyph Plots
 
+- The mean and standard deviation in the CAB don't show the development over time.
+- We can display time series with spatial structure with so-called *glyph-plots*.
+- Here a glyph is one time series of precipitation shown at its location in the CAB.
+- We show the time series after removing the seasonal component to inspect the trends.
+
+## Precipitation Glyph Plots
 
 ```{r, echo=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
@@ -245,14 +251,12 @@ knitr::include_graphics("../pres-plots/des-data/q-corr-0.jpg")
 - We explore this further using $k$-means clustering:
     + find optimal $k$ via PCA and gap statistic
     + apply k-means to original precipitation data
-- We compare k-means with and without PCA, via the gap statistic
 - Ultimate goal is to improve predictions by applying a model to each cluster separately
 
 ## $k$-means
 
 - Our objective is to find $k$ internally homogeneous and externally heterogeneous clusters
 - Similarity is measured by the euclidean distance
-
 \begin{equation} 
 d(x_i,x_{i'}) = \sum_{j=1}^p(x_{ij}-x_{i'j})^2=||x_i-x_{i'}||^2
 (\#eq:eucl-dist)
@@ -276,6 +280,7 @@ cluster and $N_k = \sum_{i=1}^N I(C(i)=k)$.
 - The number of clusters (i.e $k$) has to be defined beforehand
 - Let $W_k$ be $W(C)$ for fix $k$
 - We compare $W_k$ from the precipitation data with average $W^*_k$ from $B$ Monte Carlo sampled data sets
+- If our data has $k$-clusters we expect $W_k$ to be smaller than average $W^{*}_k$
 
 \begin{equation}
 Gap(k) = E\{log(W^{*}_k) \} - log(W_k).
@@ -288,11 +293,10 @@ Gap(k) = E\{log(W^{*}_k) \} - log(W_k).
 Gap(k) \geq Gap(k+1) - s_{k+1}
 \end{equation}
 
-- $s_{k+1}$ is $sd_k\sqrt{1+1/B}$, and $sd$ the standard deviation of log(W^{*}_{k})
+## Gap statistic
 
-## PCA
-
-- Before running k-means we center the precipitation data and apply a PCA to reduce the large number of correlated variables to a few
+- $s_{k+1}$ is $sd_k\sqrt{1+1/B}$, and $sd$ the standard deviation of $log(W^{*}_{k})$
+- Before running the gap statistic and k-means we center the precipitation data and apply a PCA to reduce the large number of correlated variables to a few
 - The new variables are linear combinations of the original variables
 - Here: Each variable is a month of precipitation data in the CAB
 
@@ -306,7 +310,7 @@ scree + ylim(c(0,0.5))
 ## Screeplot
 
 - The "elbow" be observe in the screeplot suggest 3 or 4 principal components
-- The first 3 and 4 first PC explain 67.77 and 70.79 of the variance respectively.
+- The first 3 and 4 first PC explain $67.77 \%$ and $70.79 \%$ of the variance respectively.
 - We compare the gap statistic results for 3 and 4 PC
 
 ## Gap statistic results
@@ -331,6 +335,8 @@ km_pca_map_plot +
 after centered PCA, using 3 PC's and applying k-means")
 ```
 
+## Clustering results
+
 - We find 5 clusters of different sizes
 - The found clusters are almost completely spatially coherent
 although we did not include any spatial dependencies in the clustering
@@ -344,25 +350,32 @@ although we did not include any spatial dependencies in the clustering
 
 ## Definition of the lasso
 
-- In our setting $n << p$, so the lasso is a natural choice (tibshirani1996regression)
+- In our setting $n << p$, so the lasso is a natural choice (@tibshirani1996regression)
 - We consider the lasso regression problem:
 
 \begin{equation}
 \min_{\beta_0, \beta} \frac{1}{N} \sum_{i=1}^N l(y_i,\beta_0 + \beta^Tx_i) + \lambda||\beta||_1 (\#eq:glmnet)
 \end{equation}
 
+- $\lambda||\beta||_1$ introduces sparsity in the coefficient vector
 - The problem is solved using coordinate descent (@van2007prediction)
-- Due to the time dependencies in our data normal Cross Validation may be unjustified
+- We use the glmnet package (@glmnet-package)
 
 ## Model validation
 
 - To find the best $\lambda$, we can use k-fold cross validation, to achieve a Bias-Variance trade-off (@hastie2009elements).
+- We introduce bias by using less parameters ($\lambda > 0$),
+but decrease the prediction variance by doing so.
+<!-- - We introduce estimation bias by using less parameters, but decrease variance in predictions -->
+<!-- - And hope that the decrease in variance exceeds the increase estimation bias -->
 - Classic cross validation uses the data efficiently, but we want to avoid predicting past values learned from future data.
-- We dont't want to predict past precipitation with models that learned on future data.
+- We don't want to predict past precipitation with models that learned on future data.
 
 ## Forward validation
 
-```{r, fig.cap='Different schemes of validation approaches for time series data (@schnaubelt2019comparison).'}
+(ref:caption) Different schemes of validation approaches for time series data (@schnaubelt2019comparison).
+
+```{r, fig.cap='(ref:caption)'}
 knitr::include_graphics("../thesis/validation-schemes.png")
 ```
 
@@ -394,6 +407,17 @@ k
 - Since we have 5 folds, we have 5 prediction errors for each value of the $\lambda$-vector
 - Choose $\lambda_{\min}$ as the $\lambda$ that minimizes average MSE over all folds
 - Fit model on complete selection data with $\lambda_{\min}$ and compute MSE on evaluation data
+
+## Lasso settings and results
+
+- We compare different settings for the lasso:
+    + Lasso
+    + Standardized SST
+    + De-seasonalized SST
+    + Differentiated SST
+    + Lasso on clusters found by $k$-means
+- Lasso with standardized SST gave the best results
+- Clustering only improved on one cluster
 
 ## Lasso - MSE on FV test sets
 
@@ -430,7 +454,7 @@ d <- round(d, 2)
 # lambda 3.52, 1.26
 d <- rbind(d, c(917.28, 1.26))
 d <- cbind(c("Fold 1", "Fold 2", "Fold 3", "Fold 4", "Fold 5", "Best"), d)
-p1 + p2 + p3 + p4 + p5 + gridExtra::tableGrob(d, theme = ttheme_default(base_size = 6))
+p1 + p2 + p3 + p4 + p5 + gridExtra::tableGrob(d, theme = ttheme_default(base_size = 8))
 ```
 
 ## Lasso - Predictions on FV test sets
@@ -483,7 +507,7 @@ coef_full
 
 ## Lasso - All model results 
 
-```{r lasso-table, fig.cap ='Table of the MSE results for the different lasso models evaluated. The $\lambda$ refers to value that was found in forward validation and used to fit the final model. '}
+```{r lasso-table, fig.cap ='Table of the MSE results for the different lasso models evaluated. The $\\lambda$ refers to value that was found in forward validation and used to fit the final model.'}
 mse_og <- readRDS("../results/CV-lasso/test-lasso-og/mse-list.rds")
 mse_og <- round(unlist(mse_og),2)
 mse_stand <- readRDS("../results/CV-lasso/test-lasso-stand/mse-list.rds")
@@ -497,7 +521,7 @@ d2 <- rbind(mse_stand, mse_og, mse_diff, mse_deseas)
 colnames(d2) <- c("MSE", "Lambda")
 rownames(d2) <- c("Standardized", "Original", "Differentiated", "De-seasonalized")
 
-knitr::kable(d2, format = "pipe")
+knitr::kable(d2, format = "pipe", caption = 'Table of the MSE results for the different lasso models evaluated. The $\\lambda$ refers to value that was found in forward validation and used to fit the final model.')
 ```
 
 ## Lasso clustered results
@@ -549,7 +573,7 @@ colnames(m) <- c("", "MSE, Lasso")
 
 ```{r, fig.cap = 'Precipitation prediction and target values in the validation set for the 5 clusters found with $k$-means. Predictions in red and target values in black. The model was fitted on the full CV data with the lambda value that minimised the average MSE'}
 library(gridExtra)
-full_preds1 + full_preds2 + full_preds3 + full_preds4 + full_preds5 + gridExtra::tableGrob(m, theme = ttheme_default(base_size = 6))
+full_preds1 + full_preds2 + full_preds3 + full_preds4 + full_preds5 + gridExtra::tableGrob(m, theme = ttheme_default(base_size = 8))
 ```
 
 ## Summary lasso results 
@@ -575,8 +599,8 @@ path_to_model_folder <- "../results/CV-fused/noclust-large-fused-5k/"
 
 ## Definition of the fused lasso
 
-- Fused lasso, "fuses" predictors together ()
-- It penalizes the difference of close predictores
+- Fused lasso, "fuses" predictors together (@tibshirani2005sparsity)
+- It penalizes the difference of close predictors
 - Therefore close predictors should be similar
 
 \begin{equation}
@@ -592,7 +616,7 @@ controls the sparsity of the coefficients.
 
 ## Fused lasso optimization
 
-- Lets consider the problem in the notation of the generalized lasso problem
+- Lets consider the problem in the notation of the generalized lasso problem (@tibshirani2011solution)
 
 \begin{equation}
 \hat{\beta}=\underset{\beta \in \mathbb{R}^{p}}{\arg \min } \frac{1}{2}\|y-X \beta\|_{2}^{2}+\lambda\|D \beta\|_{1},
@@ -602,8 +626,10 @@ controls the sparsity of the coefficients.
 - where $y \in \mathbb{R}^n$ is the vector of the outcome, 
 $X \in \mathbb{R}^{n \times p}$ a predictor matrix, $D \in \mathbb{R}^{m \times p}$
 denotes a penalty matrix, and $\lambda \geq 0$ is a regularization parameter.
-- The dual path algorithm solves not the primal but the dual solution of the problem
+- The dual path algorithm solves not the primal but the dual solution of the problem (@arnold2016efficient)
 and computes the solution for a whole path instead of single values of $\lambda$.
+- We use the *genlasso* package and the *fusedlasso* function
+(@genlassopackage)
 
 ## 
 
@@ -623,6 +649,7 @@ the dual problem of \@ref(eq:gen-lasso) is then:
 \end{equation}
 
 - For general X and D with exploitable structure (as in our case), specialized implementations exist
+- The algorithm terminates when $\lambda=0$ or a maximum number of steps is reached (we chose 5000, default is 20000)
 
 
 ## Fused lasso graph structure
@@ -662,7 +689,10 @@ although some of the regions were included in the final lasso models
 
 ## Fused lasso settings
 
-- The considered fused lasso settings are: Fused lasso with clusters, fused lasso without clusters, fused lasso without clusters and sparsity (gamma: 0.01, 0.05, 0.1)
+- The considered fused lasso settings are: 
+  + Fused lasso with clusters
+  + Fused lasso without clusters
+  + Fused lasso without clusters and sparsity (gamma: 0.01, 0.05, 0.1)
 - Fused lasso without clusters and no sparsity showed best results
 
 ## Fused lasso results, clusters removed
@@ -677,10 +707,9 @@ although some of the regions were included in the final lasso models
 
 
 
-```{r, }
+```{r err-points-fused-noclust, out.width='45%', fig.cap='Error points in the fused lasso forward validation. The model uses a graph without sub-graphs. Each color represents one fold.'}
 knitr::include_graphics("err-line-plot-noclust.png")
 ```
-
 
 
 ## Fused lasso results, clusters removed
@@ -701,7 +730,7 @@ knitr::include_graphics("err-line-plot-noclust.png")
 # k + geom_point(aes(colour = factor(folds)))
 ```
 
-```{r}
+```{r err-line-fused-noclust, out.width='45%', fig.cap='Error lines in the fused lasso forward validation. The model uses a graph without sub-graphs. Each line represents one fold, the black line the mean for the common interval of the smoothed error lines. The red dashed-line shows the minimum of the mean.'}
 knitr::include_graphics("../results/CV-fused/noclust-large-fused-5k/best-lambda-res-noclust.png")
 ```
 
@@ -753,23 +782,23 @@ mse_full
 
 ## Coefficient plot
 
-```{r coef-plot-full-fused-og, eval=FALSE, fig.cap="Coefficient plot of the full fused lasso model."}
-coef_plot <- readRDS(paste0(path_to_model_folder,                "coef-plots/coef-plot-full.rds"))
-#coef_plot <- coef_plot + theme(legend.position = "bottom", text = element_text(size = 8))
-coef_plot$labels$colour <- "Coefficients"
-coef_plot$layers[[2]]$aes_params$size <- 0.75
-coef_plot_now <- coef_plot
-# coef_plot_now <- coef_plot_now + scale_colour_gradient2(name="Coefficients")
-ggsave(paste0(path_to_model_folder, "coef-plots/coef-plot-full.png"), plot = coef_plot_now)
+```{r , eval=FALSE}
+# coef_plot <- readRDS(paste0(path_to_model_folder,                "coef-plots/coef-plot-full.rds"))
+# #coef_plot <- coef_plot + theme(legend.position = "bottom", text = element_text(size = 8))
+# coef_plot$labels$colour <- "Coefficients"
+# coef_plot$layers[[2]]$aes_params$size <- 0.75
+# coef_plot_now <- coef_plot
+# # coef_plot_now <- coef_plot_now + scale_colour_gradient2(name="Coefficients")
+# ggsave(paste0(path_to_model_folder, "coef-plots/coef-plot-full.png"), plot = coef_plot_now)
 ```
 
-```{r}
+```{r coef-plot-full-fused-og, out.width = '55%', fig.cap='Coefficient plot of the final fused lasso model. Positive coefficient values are given in blue, negative values in red.'}
 knitr::include_graphics(paste0(path_to_model_folder, "coef-plots/coef-plot-full.png"))
 ```
 
 ## Coefficient plot, highest absolute values only
 
-```{r}
+```{r, out.width = '55%', fig.cap='Coefficient plot of the final fused lasso model. Positive coefficient values are given in blue, negative values in red. Only values outside the 0.975 and 0.025 quantile range are shown'}
 # coef_plot2 <- readRDS(paste0(path_to_model_folder,
 #                      "coef-plots/coef-plot-drop-out-full.rds"))
 #coef_plot <- coef_plot + theme(legend.position = "bottom", text = element_text(size = 8))
@@ -783,7 +812,7 @@ knitr::include_graphics(paste0(path_to_model_folder, "coef-plots/coef-plot-drop-
 
 ## Coefficient plot, lowest absolute values only
 
-```{r}
+```{r, out.width = '55%',  fig.cap='Coefficient plot of the final fused lasso model. Positive coefficient values are given in blue, negative values in red. Only values inside the 0.975 and 0.025 quantile range are shown'}
 knitr::include_graphics(paste0(path_to_model_folder, "coef-plots/coef-plot-drop-out-full2.png"))
 ```
 
@@ -815,10 +844,8 @@ d <- data.frame(row.names = c("No sub-graphs", "With sub-graphs",
                 "MSE" = c(mse_woc, mse_wc, mse_woc005, mse_woc01),
                 "Lambda" = c(bl_woc, bl_wc, bl_woc005, bl_woc01))
 
-knitr::kable(d)
-
+knitr::kable(d, format = "pipe", caption = 'Table of the MSE results for the different fused lasso models evaluated. The $\\lambda$ refers to value that was found in forward validation and used to fit the final model.')
 ```
-
 
 
 ## Fused lasso results summary
@@ -888,7 +915,11 @@ knitr::kable(d)
 - We could further improve the clustering method by taking into account spatial dependencies.
 - The fused lasso could be improved by using other model selection approaches or increasing the complexity of the graph structure.
 
-# 8. References {-}
+## Thank you
+
+Thanks for your attention! :)
+
+## References {.allowframebreaks}
 
 <div id="refs"></div>
 
@@ -935,7 +966,7 @@ rm(full_model)
 mm <- min(round(apply(err_mat, 1, mean),2))
 d <- rbind(d, c(mm, round(log(lambda),2)))
 d <- cbind(c("Fold 1", "Fold 2", "Fold 3", "Fold 4", "Fold 5", "Best"), d)
-p1 + p2 + p3 + p4 + p5 + gridExtra::tableGrob(d, theme = ttheme_default(base_size = 6))
+p1 + p2 + p3 + p4 + p5 + gridExtra::tableGrob(d, theme = ttheme_default(base_size = 8))
 ```
 
 ## Predictions on test set, for each Fold (Lasso original SST)
@@ -1030,7 +1061,7 @@ rm(full_model)
 mm <- min(round(apply(err_mat, 1, mean),2))
 d <- rbind(d, c(mm, round(log(lambda),2)))
 d <- cbind(c("Fold 1", "Fold 2", "Fold 3", "Fold 4", "Fold 5", "Best"), d)
-p1 + p2 + p3 + p4 + p5 + gridExtra::tableGrob(d, theme = ttheme_default(base_size = 6))
+p1 + p2 + p3 + p4 + p5 + gridExtra::tableGrob(d, theme = ttheme_default(base_size = 8))
 ```
 
 ## Predictions on test set, for each Fold (Lasso differentiated)
@@ -1141,7 +1172,7 @@ rm(full_model)
 mm <- min(round(apply(err_mat, 1, mean),2))
 d <- rbind(d, c(mm, round(log(lambda),2)))
 d <- cbind(c("Fold 1", "Fold 2", "Fold 3", "Fold 4", "Fold 5", "Best"), d)
-p1 + p2 + p3 + p4 + p5 + gridExtra::tableGrob(d, theme = ttheme_default(base_size = 6))
+p1 + p2 + p3 + p4 + p5 + gridExtra::tableGrob(d, theme = ttheme_default(base_size = 8))
 ```
 
 ## Predictions on test set, for each Fold (Lasso de-seasonalized)
@@ -1200,7 +1231,7 @@ path_to_model_folder <- "../results/CV-fused/large-fused-5k/"
 
 ## Error lines (Fused lasso with sub-graphs)
 
-```{r err-line-fused-sub, out.width='45%'}
+```{r err-line-fused-sub, out.width='45%', fig.cap='Error lines in the fused lasso forward validation. The model uses a graph including the sub-graphs. Each line represents one fold, the black line the mean for the common interval of the smoothed error lines. The red dashed-line shows the minimum of the mean.'}
 knitr::include_graphics(paste0(path_to_model_folder, "best-lambda-res.png"))
 ```
 
@@ -1245,7 +1276,7 @@ full_preds
 mse_full
 ```
 
-## Coefficient plot of the final model (Fused lasso with sub-graphs)
+## Coefficients plot of the final model (Fused lasso with sub-graphs)
 ```{r coef-plot-full-fused-sub, eval=FALSE, fig.cap="Coefficient plot of the full fused lasso model."}
 coef_plot <- readRDS(paste0(path_to_model_folder,
                             "coef-plots/coef-plot-full.rds"))
@@ -1256,11 +1287,12 @@ coef_plot_now <- coef_plot_now + scale_colour_gradient2(name="Coefficients")
 ggsave(paste0(path_to_model_folder, "coef-plots/coef-plot-full.png"), plot = coef_plot_now)
 ```
 
-```{r}
+```{r, out.width='55%', fig.cap='Coefficient plot of the final fused lasso model (fused lasso with sub-graphs). Positive coefficient values are given in blue, negative values in red.'}
 knitr::include_graphics(paste0(path_to_model_folder, "coef-plots/coef-plot-full.png"))
 ```
 
-```{r}
+## Coefficient plots of the final model (Fused lasso with sub-graphs)
+```{r, out.width= '55%', fig.cap='Coefficient plot of the final fused lasso model (fused lasso with sub-graphs). Positive coefficient values are given in blue, negative values in red. Only values outside the 0.975 and 0.025 quantile range are shown'}
 # coef_plot2 <- readRDS(paste0(path_to_model_folder,
 #                      "coef-plots/coef-plot-drop-out-full.rds"))
 #coef_plot <- coef_plot + theme(legend.position = "bottom", text = element_text(size = 8))
@@ -1271,7 +1303,7 @@ knitr::include_graphics(paste0(path_to_model_folder, "coef-plots/coef-plot-full.
 knitr::include_graphics(paste0(path_to_model_folder, "coef-plots/coef-plot-drop-out-full1.png"))
 
 ```
-```{r}
+```{r, out.width= '55%', fig.cap='Coefficient plot of the final fused lasso model (fused lasso with sub-graphs). Positive coefficient values are given in blue, negative values in red. Only values inside the 0.975 and 0.025 quantile range are shown'}
 knitr::include_graphics(paste0(path_to_model_folder, "coef-plots/coef-plot-drop-out-full2.png"))
 ```
 
@@ -1285,8 +1317,8 @@ path_to_model_folder <- "../results/CV-fused/noclust-large-fused-5k-gamma-01/"
 
 ## Error lines (Fused lasso without sub-graphs, gamma 0.1)
 
-```{r err-line-fused-noclust-01, out.width='45%'}
-knitr::include_graphics(paste0(path_to_model_folder, "best-lambda-res.png"))
+```{r err-line-fused-noclust-01, out.width='45%', fig.cap='Error lines in the fused lasso forward validation. The model uses a graph without sub-graphs and $\\gamma=0.1$. Each line represents one fold, the black line the mean for the common interval of the smoothed error lines. The red dashed-line shows the minimum of the mean.'}
+knitr::include_graphics(paste0(path_to_model_folder, "best-lambda-res2.png"))
 ```
 
 ## Prediction plots for each fold (Fused lasso without sub-graphs, gamma 0.1)
@@ -1341,11 +1373,11 @@ coef_plot_now <- coef_plot_now + scale_colour_gradient2(name="Coefficients")
 ggsave(paste0(path_to_model_folder, "coef-plots/coef-plot-full.png"), plot = coef_plot_now)
 ```
 
-```{r}
+```{r, out.width='55%', fig.cap ='Coefficient plot of the final fused lasso model (fused lasso without sub-graphs and $\\gamma=0.1$. Positive coefficient values are given in blue, negative values in red.'}
 knitr::include_graphics(paste0(path_to_model_folder, "coef-plots/coef-plot-full.png"))
 ```
 
-```{r}
+```{r, eval = FALSE}
 # coef_plot2 <- readRDS(paste0(path_to_model_folder,
 #                      "coef-plots/coef-plot-drop-out-full.rds"))
 #coef_plot <- coef_plot + theme(legend.position = "bottom", text = element_text(size = 8))
@@ -1356,7 +1388,7 @@ knitr::include_graphics(paste0(path_to_model_folder, "coef-plots/coef-plot-full.
 knitr::include_graphics(paste0(path_to_model_folder, "coef-plots/coef-plot-drop-out-full1.png"))
 
 ```
-```{r}
+```{r, eval = FALSE}
 knitr::include_graphics(paste0(path_to_model_folder, "coef-plots/coef-plot-drop-out-full2.png"))
 ```
 
@@ -1369,7 +1401,7 @@ path_to_model_folder <- "../results/CV-fused/noclust-large-fused-5k-gamma-005/"
 
 ## Error lines (Fused lasso without sub-graphs, gamma 0.05)
 
-```{r err-line-fused-noclust, out.width='45%'}
+```{r err-line-fused-noclust-005, out.width='45%', fig.cap='Error lines in the fused lasso forward validation. The model uses a graph without sub-graphs and $\\gamma=0.05$. Each line represents one fold, the black line the mean for the common interval of the smoothed error lines. The red dashed-line shows the minimum of the mean.'}
 knitr::include_graphics(paste0(path_to_model_folder, "best-lambda-res.png"))
 ```
 
@@ -1425,7 +1457,7 @@ coef_plot_now <- coef_plot_now + scale_colour_gradient2(name="Coefficients")
 ggsave(paste0(path_to_model_folder, "coef-plots/coef-plot-full.png"), plot = coef_plot_now)
 ```
 
-```{r}
+```{r, out.width='55%', fig.cap='Coefficient plot of the final fused lasso model (fused lasso without sub-graphs and $\\gamma=0.1$. Positive coefficient values are given in blue, negative values in red.'}
 knitr::include_graphics(paste0(path_to_model_folder, "coef-plots/coef-plot-full.png"))
 ```
 

@@ -33,13 +33,13 @@ path_to_model_folder <- "../results/CV-fused/noclust-large-fused-5k-gamma-01/"
 # p <- best_l_res$err_plot + geom_vline(xintercept=log(best_l_res$lambda_min),
 #                         linetype="dashed",
 #                 color = "red", size=0.5)
-# p2 <- p + ylim(0,2000)
-# ggsave(paste0(path_to_model_folder,"best-lambda-res.png"),
-#        p2)
+# #p2 <- p + ylim(0,2000)
+# ggsave(paste0(path_to_model_folder,"best-lambda-res2.png"),
+#        p)
 ```
 
 ```{r err-line-fused-og, out.width='45%'}
-knitr::include_graphics(paste0(path_to_model_folder, "best-lambda-res.png"))
+knitr::include_graphics(paste0(path_to_model_folder, "best-lambda-res2.png"))
 ```
 
 The error lines in the different folds differ in their trajectories as well
