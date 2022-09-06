@@ -100,7 +100,7 @@ After fitting the fused lasso on the original data and graph, we also fitted
 the fused lasso with original data on the graph without clusters.
 Comparing these models already showed us a hint that removing the clusters
 can improve the predictions, but after all it's only a minor solution, because
-differences in connectivenes in the graph is still existing.
+differences in connectives in the graph is still existing.
 For the sake of completeness we also tried standardizing the data for
 the normal and the graph without clusters, none of these two approaches was 
 better than the "plain" fused lasso version without clusters.

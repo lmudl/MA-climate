@@ -7,11 +7,13 @@ output:
   bookdown::pdf_book:
     latex_engine: lualatex
     toc: false
+    # extra_dependencies: ["amsfonts"]
     base_format: "function(..., number_sections) rmarkdown::beamer_presentation(...)"
     number_sections: false
     theme: "metropolis"
-    # includes:
+    includes:
     #  in_header: head.tex
+      in_header: head2.tex
     slide_level: 2
   ioslides_presentation:
     logo: "../thesis/sigillum.png"
@@ -128,9 +130,9 @@ knitr::include_graphics("../figures/early-warning-signals.jpg")
 
 ## The Data
 
-- Rain data from CHIRPS (Climate Hazards Group InfraRed Precipitation woth Station data, funk2015climate)
+- Rain data from CHIRPS (Climate Hazards Group InfraRed Precipitation woth Station data, @funk2015climate)
 - CHIRPS derived from in-situ and satellite data
-- SST data from ERSST (Extended Reconstructed Sea Surface Temperature, huang2017noaa)
+- SST data from ERSST (Extended Reconstructed Sea Surface Temperature, @huang2017noaa)
 - ERSST is reanalysis of observation data (made by ships and buoys for example), missing data filled by interpolation techniques
 - These are the same data sets as in @ciemer2020early
 
@@ -228,7 +230,7 @@ knitr::include_graphics("../pres-plots/og-data/corr-0.jpg")
 
 ## Correlation plot original SST
 
-```{r corr-0q, echo = FALSE, out.width='65%', out.height='65%',fig.show='hold',fig.align='center', fig.cap='Correlation plot between SST and mean precipitation in the CAB for timelag 0. Values between 0.975 and 0.25 quantiles are set  to 0.'}
+```{r corr-0q, echo = FALSE, out.width='65%', out.height='65%',fig.show='hold',fig.align='center', fig.cap='Correlation plot between SST and mean precipitation in the CAB for timelag 0. Values between the 97.5\\% and 2.5\\% quantiles are set to 0.'}
 knitr::include_graphics("../pres-plots/og-data/q-corr-0.jpg")
 ```
 
@@ -239,7 +241,7 @@ knitr::include_graphics("../pres-plots/des-data/corr-0.jpg")
 
 ## Correlation plot de-seasonalized SST
 
-```{r des-corr-0q, echo = FALSE, out.width='65%', out.height='65%',fig.show='hold',fig.align='center', fig.cap='Correlation plot between de-seasonalized SST and de-seasonalized mean precipitation in the CAB for timelag 0'}
+```{r des-corr-0q, echo = FALSE, out.width='65%', out.height='65%',fig.show='hold',fig.align='center', fig.cap='Correlation plot between de-seasonalized SST and de-seasonalized mean precipitation in the CAB for timelag 0. Values between the 97.5\\% and 2.5\\% quantiles are set to 0.'}
 knitr::include_graphics("../pres-plots/des-data/q-corr-0.jpg")
 ```
 
@@ -248,9 +250,9 @@ knitr::include_graphics("../pres-plots/des-data/q-corr-0.jpg")
 ## Clustering Motivation 
 
 - Our explorative analysis has shown spatial and temporal differences in the precipitation data
-- We explore this further using $k$-means clustering:
-    + find optimal $k$ via PCA and gap statistic
-    + apply k-means to original precipitation data
+- We explored this further using $k$-means clustering:
+    + found optimal $k$ via PCA and gap statistic
+    + applied $k$-means to the 3 first PC of the precipitation data
 - Ultimate goal is to improve predictions by applying a model to each cluster separately
 
 ## $k$-means
@@ -287,7 +289,7 @@ Gap(k) = E\{log(W^{*}_k) \} - log(W_k).
 (\#eq:gap)
 \end{equation}
 
-- We choose $k$ as smallest k such that 
+- We choose $k$ such that: 
 
 \begin{equation}
 Gap(k) \geq Gap(k+1) - s_{k+1}
@@ -354,7 +356,8 @@ although we did not include any spatial dependencies in the clustering
 - We consider the lasso regression problem:
 
 \begin{equation}
-\min_{\beta_0, \beta} \frac{1}{N} \sum_{i=1}^N l(y_i,\beta_0 + \beta^Tx_i) + \lambda||\beta||_1 (\#eq:glmnet)
+\min_{\beta_0, \beta} \frac{1}{N} \sum_{i=1}^N l(y_i,\beta_0 + \beta^Tx_i) + \lambda||\beta||_1 
+(\#eq:glmnet)
 \end{equation}
 
 - $\lambda||\beta||_1$ introduces sparsity in the coefficient vector
@@ -384,8 +387,8 @@ knitr::include_graphics("../thesis/validation-schemes.png")
 - We also want to ensure that each data point is only included once
 as training or test
 - The choice is then to use non-overlapping rolling window forward validation with 5 folds
-- We also use some part of the data as a hold-put test set that is not used in forward validation.
-- The model selection set are the first 360 months, and the hold-out test set consists of the months 371 to 432 (62 months).
+- We also use some part of the data as a hold-out test set that is not used in forward validation.
+- The forward validation set consists of the first 360 months, and the hold-out test contains the succeeding 62 months (months 371 to 432).
 - Each fold has 60 months of training and 14 months of test.
 
 ```{r, eval=FALSE, include = FALSE}
@@ -403,10 +406,10 @@ k
 
 - We compute a $\lambda$-vector of length $l$ for the complete model validation set
 - For each fold we fit $l$ models with this $\lambda$-vector
-- On each FV-test set we compute $l$ prediction errors
+- On each FV test set we compute $l$ prediction errors
 - Since we have 5 folds, we have 5 prediction errors for each value of the $\lambda$-vector
 - Choose $\lambda_{\min}$ as the $\lambda$ that minimizes average MSE over all folds
-- Fit model on complete selection data with $\lambda_{\min}$ and compute MSE on evaluation data
+- Fit model on complete FV data with $\lambda_{\min}$ and compute MSE on hold-out test set.
 
 ## Lasso settings and results
 
@@ -416,8 +419,11 @@ k
     + De-seasonalized SST
     + Differentiated SST
     + Lasso on clusters found by $k$-means
+- If we standardize or de-seasonalize we use the information from model fitting to transform the test data
+- We do this to avoid **information leakage**
 - Lasso with standardized SST gave the best results
 - Clustering only improved on one cluster
+- Here we show the results from the lasso with standardized SST and the final results from the lasso on clusters.
 
 ## Lasso - MSE on FV test sets
 
@@ -496,6 +502,14 @@ mse_full <- get_mse_from_pred_plot(full_preds)
 mse_full
 ```
 
+## Lasso - Predictions on hold-out test set
+
+- The final lasso model predicts seasonal cycles without major peaks or drops
+- It constantly fails to predict the spikes in precipitation
+- Low values are predicted better than high values
+- The predicted amplitudes get smaller over time
+
+
 ## Lasso - SST Regions, final model
 
 ```{r coef-plot-full-lasso-stand, fig.cap=paste("Coefficient plot of the full lasso model.")}
@@ -504,6 +518,13 @@ coef_full <- readRDS(paste0(path_to_model_folder,
 coef_full 
 
 ```
+
+## Lasso - SST Regions, final model
+
+- The lasso chooses coefficient values as single "points" that are generally not close to each other.
+- The lasso uses no information of the coefficients distances to each other.
+- Some areas with large coefficient values also showed high values in the correlation analysis.
+- From  an area with high correlation the lasso only choose on "point" and discards the others.
 
 ## Lasso - All model results 
 
@@ -524,7 +545,7 @@ rownames(d2) <- c("Standardized", "Original", "Differentiated", "De-seasonalized
 knitr::kable(d2, format = "pipe", caption = 'Table of the MSE results for the different lasso models evaluated. The $\\lambda$ refers to value that was found in forward validation and used to fit the final model.')
 ```
 
-## Lasso clustered results
+## Lasso - Results on clusters
 
 ```{r cluster-map2, echo = FALSE, out.width= '50%', fig.cap= "Spatial distribution of the found clusters in the CAB. We applied a centered PCA on the data and used 3 principal components before applying the k-means algorithm"}
 km_pca_map_plot <- readRDS(paste0("../results/clustering/km_pca_map_plot.rds"))
@@ -569,7 +590,7 @@ colnames(m) <- c("", "MSE, Lasso")
 
 ```
 
-## Lasso clustered results
+## Lasso - Results on clusters
 
 ```{r, fig.cap = 'Precipitation prediction and target values in the validation set for the 5 clusters found with $k$-means. Predictions in red and target values in black. The model was fitted on the full CV data with the lambda value that minimised the average MSE'}
 library(gridExtra)
@@ -590,6 +611,16 @@ full_preds1 + full_preds2 + full_preds3 + full_preds4 + full_preds5 + gridExtra:
 - Lasso chooses single "points" and not whole areas
 - The points chosen as coefficients differ in the models, and can be very far away from the CAB
 
+## Summary lasso results
+
+- We de-seasonalized SST to remove spurious correlations
+- We used seasonality from train to de-seasonalize test data.
+- This can be a problem if the seasonality differs from train to test.
+- To remove changing means and trends over time all together, we removed non-stationarity.
+- Non-stationarity can be removed by differentiation and we don't use information from train in test.
+- But we also loose information of the time series and did not improve with it either.
+- The standard deviations differ greatly across the SST, and some of the locations are not really "sea" area.
+- This might be an explanation why standardization improved our results here.
 
 # 6. The fused lasso
 
@@ -600,8 +631,8 @@ path_to_model_folder <- "../results/CV-fused/noclust-large-fused-5k/"
 ## Definition of the fused lasso
 
 - Fused lasso, "fuses" predictors together (@tibshirani2005sparsity)
-- It penalizes the difference of close predictors
-- Therefore close predictors should be similar
+<!-- - It penalizes the difference of close predictors -->
+<!-- - Therefore close predictors should be similar -->
 
 \begin{equation}
 \min_{\beta} 1/2 \sum_{i=1}^n(y_i - x_i^T\beta_i)^2 + \lambda \sum_{i,j \in E} |\beta_i - \beta_j| + \gamma \cdot \lambda \sum_{i=1}^p|\beta_i|
@@ -610,34 +641,38 @@ path_to_model_folder <- "../results/CV-fused/noclust-large-fused-5k/"
 
 - with $x_i$ being the $i$th row of the predictor matrix and 
 E is the edge set of an underlying graph.
+- The second term $\lambda \sum_{i,j \in E} |\beta_i - \beta_j|$ penalizes differences in connected coefficients.
 - The third term $\gamma \cdot \lambda \sum_{i=1}^p|\beta_i|$,
 controls the sparsity of the coefficients.
 - $\gamma=0$ leads to complete fusion of the coefficients (no sparsity) and $\gamma$ > 0 introduces sparsity to the solution, with higher values placing more priority on sparsity. 
 
 ## Fused lasso optimization
 
-- Lets consider the problem in the notation of the generalized lasso problem (@tibshirani2011solution)
+- Lets consider the problem in the notation of the generalized lasso problem (@tibshirani2011solution).
 
 \begin{equation}
-\hat{\beta}=\underset{\beta \in \mathbb{R}^{p}}{\arg \min } \frac{1}{2}\|y-X \beta\|_{2}^{2}+\lambda\|D \beta\|_{1},
+\hat{\beta} = \underset{\beta \in \mathbb{R}^{p}}{\min} \frac{1}{2}\|y-X \beta\|_{2}^{2}+\lambda\|D \beta\|_{1}
 (\#eq:gen-lasso)
 \end{equation}
 
 - where $y \in \mathbb{R}^n$ is the vector of the outcome, 
 $X \in \mathbb{R}^{n \times p}$ a predictor matrix, $D \in \mathbb{R}^{m \times p}$
 denotes a penalty matrix, and $\lambda \geq 0$ is a regularization parameter.
-- The dual path algorithm solves not the primal but the dual solution of the problem (@arnold2016efficient)
+- In our case D is the edge set of a given graph, where $m$ refer to the edges and $p$ to the nodes.
+- The problem is solved by the dual path algorithm (@arnold2016efficient)
+
+## Fused lasso optimization
+
+- The dual path algorithm solves not the primal but the dual solution of the problem 
 and computes the solution for a whole path instead of single values of $\lambda$.
 - We use the *genlasso* package and the *fusedlasso* function
 (@genlassopackage)
-
-## 
-
 - Let's consider the case when $X=I$ and $rank(X)=p$ (this is called the "signal approximator" case),
 the dual problem of \@ref(eq:gen-lasso) is then:
 
+
 \begin{equation}
-\hat{u} \in \underset{\substack{u \in \mathbb{R}^{\omega}}}{\arg \min } \frac{1}{2}\left\|y-D^{T} u\right\|_{\frac{2}{2}} \text { subject to }\|u\|_{\infty} \leq \lambda.
+\hat{u} \in \underset{\substack{u \in \mathbb{R}^{m}}}{\arg \min} \frac{1}{2}\left\|y-D^{T} u\right\|^{2}_{2} \text { subject to }\| u \|_{\infty} \leq \lambda.
 (\#eq:dual)
 \end{equation}
 
@@ -647,6 +682,9 @@ the dual problem of \@ref(eq:gen-lasso) is then:
 \hat{\beta}=y-D^{T} \hat{u} .
 (\#eq:dual-relate)
 \end{equation}
+
+
+## Fused lasso opimization
 
 - For general X and D with exploitable structure (as in our case), specialized implementations exist
 - The algorithm terminates when $\lambda=0$ or a maximum number of steps is reached (we chose 5000, default is 20000)
@@ -766,8 +804,10 @@ pred_plot_1 + pred_plot_2 + pred_plot_3 + pred_plot_4 +
 
 ## Fused lasso Prediction plot
 
-The predictions inside the folds are very similar to lasso without standardization, the same holds for the predictions from
-the full model, but the MSE improves here.
+- The predictions inside the folds are very similar to lasso without standardization
+- The same holds for the predictions from
+the full model
+- The MSE improves here and gives the best results overall.
 
 
 ## Full predictions
@@ -854,8 +894,10 @@ knitr::kable(d, format = "pipe", caption = 'Table of the MSE results for the dif
 - Removing the sub-graphs removed some of the optimization problems, but nodes with less edges are still less penalized
 - Implementing a validation strategy was more complex than for the lasso
 - We smoothed the error-lines in each fold over a common region to compute $\lambda_{\min}$
-- The coefficient plots reveal predictive areas with high negative values in the Baltic Sea and high positive values north east of Canada.
+- The coefficient plots reveal predictive connected areas with high negative values in the Baltic Sea and high positive values north east of Canada.
 - Since no sparsity is used, all areas obtain non-zero coefficient values
+- Some of regions with high coefficient values are included in the lasso as well in the fused lasso
+
 
 ## Fused lasso discussion
 
@@ -878,26 +920,26 @@ knitr::kable(d, format = "pipe", caption = 'Table of the MSE results for the dif
 ## Discussion 
 
 - Possible other approaches:
-- Allow for larger folds (introduces overlapping folds), or for crossing of train and test in time (past is predicted with future values)
-- Fit the full model with less data and discarding data that is far away from the hold-out validation set.
+  + Allow for larger folds (introduces overlapping folds), or for crossing of train and test in time (past is predicted with future values)
+  + Fit the full model with less data and discarding data that is far away from the hold-out validation set.
 - The results of the fused lasso will depend a lot on the graph structure, sub-graphs do not represent the real situation well
 - Creating a weighted graph or narrowing the SST "window" may improve performance.
 - Also, applying the fused lasso only on the best performing cluster from the lasso may yield better results.
 
-## Discussion Validation approach (maybe discuss this at the end)
+<!-- ## Discussion Validation approach (maybe discuss this at the end) -->
 
-- For the CAB we can not predict large values in the hold-out set, on cluster 2 it works a little better
-- Possible explanations:
-- Our validation approach works better when train and test set are similar in terms of seasonality and trend
-- When train and test differ, predictions might not work so well
-(test of stationarity in folds)
-- Differentiating and de-seasonalizing could not solve this problem
-- Predictions work better when the precipitation remains fairly stable over time, see Cluster 2
-- Final model uses complete model selection data,
-		possibly some of that information is not useful anymore if         it's toocfar away from hold-out time frame
-- Our validation approach is a trade-off between efficient use of data and acknowledging the time-dependence in the data
-- Possible challenges are non-stationarity and spurious correlations
-- Lasso chooses single points, if the predictive area changes, its coefficient is 0
+<!-- - For the CAB we can not predict large values in the hold-out set, on cluster 2 it works a little better -->
+<!-- - Possible explanations: -->
+<!-- - Our validation approach works better when train and test set are similar in terms of seasonality and trend -->
+<!-- - When train and test differ, predictions might not work so well -->
+<!-- (test of stationarity in folds) -->
+<!-- - Differentiating and de-seasonalizing could not solve this problem -->
+<!-- - Predictions work better when the precipitation remains fairly stable over time, see Cluster 2 -->
+<!-- - Final model uses complete model selection data, -->
+<!-- 		possibly some of that information is not useful anymore if         it's toocfar away from hold-out time frame -->
+<!-- - Our validation approach is a trade-off between efficient use of data and acknowledging the time-dependence in the data -->
+<!-- - Possible challenges are non-stationarity and spurious correlations -->
+<!-- - Lasso chooses single points, if the predictive area changes, its coefficient is 0 -->
 
 ## Conclusion
 

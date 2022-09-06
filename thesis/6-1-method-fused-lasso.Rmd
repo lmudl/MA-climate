@@ -86,6 +86,7 @@ $\hat{\beta}$ is computed as a function of $\lambda$, with fixed $\gamma$.
 
 
 ## Implementation
+
 The summary of the algorithm is taken from the paper proposing
 the implementation, @arnold2016efficient and the original paper introducing 
 the algorithm @tibshirani2011solution.
