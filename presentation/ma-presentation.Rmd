@@ -90,60 +90,54 @@ library(gridExtra)
 
 ## Motivation
 
-- The Amazon basin is a key hotspot of biodiversity, carbon storage and moisture recycling
+- The Amazon basin is a crucial ecosystem for biodiversity, carbon storage and moisture recycling
 
-- Hydrological extremes affect ecosystem and populations tremendously
+- Hydrological extremes can affect this ecosystem, populations and biomass carbon impact tremendously
 
-- Droughts in the Amazon rainforest can have severe biomass carbon impact 
-
-- Severe Amazon drought in 2010 had total biomass carbon impact of $2.2$ $PgC$, affected area $3 \textit{ mio } km^2$
-
-
-## Related work
+- Severe Amazon drought in 2010 had total biomass carbon impact of $2.2$ $PgC$, affected area $3 \textit{ mio } km^2$ [@lewis20112010]
 
 - @ciemer2020early established an early warning indicator
 for water deficits in the central Amazon basin (CAB)
 
-```{r cross, echo = FALSE, fig.align = 'center', out.width = '50%', fig.cap='Cross degree between sea surface temperature and continental rainfall anomalies. (Ciemer et al. (2020))'}
+## Related work
+
+```{r cross, echo = FALSE, fig.align = 'center', out.width = '50%', fig.cap='Cross degree between sea surface temperature and continental rainfall anomalies (Ciemer et al., 2020))'}
 knitr::include_graphics("../figures/cross-degree.jpg")
 ```
-
-- They investigated the correlation over time of NTAO and STAO
-and its relationship to droughts in the  CAB
 
 
 ## Early warning signal 
 
-```{r early, echo = FALSE, fig.align='center' ,out.width='75%', fig.cap='Early-warning signal for droughts in the central Amazon basin Ciemer et al. (2020).'}
+```{r early, echo = FALSE, fig.align='center' ,out.width='75%', fig.cap='Early-warning signal for droughts in the central Amazon basin (Ciemer et al., 2020).'}
 knitr::include_graphics("../figures/early-warning-signals.jpg")
 ```
 
-## Our Approach
+## Our approach
 
 - Inspect spatial and temporal characteristics in the raw data
-- Fit different models to predict precipitation directly from SST
-- Apply the lasso and fused lasso with different parameter settings (@tibshirani1996regression, @tibshirani2005sparsity)
-- Evaluate the models with forward validation for time series
+- Fit different models to predict precipitation directly from sea surface temperature (SST)
+- Apply the lasso and fused lasso with different parameter settings (@tibshirani1996regression and @tibshirani2005sparsity, respectively)
+- Evaluate the models with model validation techniques for time series
 
 
 # 2. Explorative analysis
 
-## The Data
+## The data
 
-- Rain data from CHIRPS (Climate Hazards Group InfraRed Precipitation woth Station data, @funk2015climate)
+- Rain data from CHIRPS in $mm/month$(Climate Hazards Group InfraRed Precipitation with Station data, @funk2015climate)
 - CHIRPS derived from in-situ and satellite data
 - SST data from ERSST (Extended Reconstructed Sea Surface Temperature, @huang2017noaa)
 - ERSST is reanalysis of observation data (made by ships and buoys for example), missing data filled by interpolation techniques
-- These are the same data sets as in @ciemer2020early
+- These are the same data sets as in @ciemer2020early, over the time span 1981 until 2016 (36 years).
 
-## Explorative Analysis Rain
+## Explorative analysis rain
 
 ```{r CAB, echo=FALSE, fig.cap="Location of the area under study. The central amazon basin (CAB) spanning across 0,-10 latitude and -70,-55 longitude", fig.align='center',out.width='50%'}
 cab_square_plot <- readRDS("../results/eda/cab_square_plot.rds")
 cab_square_plot + ggtitle("Location of area under study, central Amazon basin (CAB)")
 ```
 
-## Precipitation, Mean and SD
+## Precipitation, mean and SD
 
 ```{r , fig.cap="Precipitation mean at each location. The mean was computed over the whole time period"}
 precip_means_loc_plot <- readRDS("../results/eda/precip_means_loc_plot.rds")
@@ -170,14 +164,19 @@ p <- precip_means_loc_plot +  precip_sds_loc_plot  +
 p
 ```
 
-## Glyph Plots
+## Glyph lots
 
 - The mean and standard deviation in the CAB don't show the development over time.
 - We can display time series with spatial structure with so-called *glyph-plots*.
 - Here a glyph is one time series of precipitation shown at its location in the CAB.
-- We show the time series after removing the seasonal component to inspect the trends.
+- To see the trajectory of the time series more clearly, we show them after removing seasonality and scale them as:
 
-## Precipitation Glyph Plots
+\begin{equation}
+x_{rescaled} = \frac{x - \min(x)}{\max(x) - \min(x)}.
+(\#eq:rescale)
+\end{equation}
+
+## Precipitation glyph plots
 
 ```{r, echo=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
@@ -220,7 +219,7 @@ sst_means_loc_plot + sst_sds_loc_plot +
 - We show the correlations for the original as well as the seasonally adjusted data
 - The seasonal component was removed by using the stl algorithm that separates the time series into
 $$ \textit{Monthly Data}  = \textit{Seasonal} + \textit{Trend} + \textit{Remainder} $$
-- Two time series can appear correlated but after removing the seasonal component the correlation vanishes.
+- Two time series can appear correlated but after removing the seasonal component the correlation vanishes (spurious correlations).
 
 ## Correlation plot original SST
 
@@ -247,7 +246,7 @@ knitr::include_graphics("../pres-plots/des-data/q-corr-0.jpg")
 
 # 4. Clustering precipitation
 
-## Clustering Motivation 
+## Clustering motivation 
 
 - Our explorative analysis has shown spatial and temporal differences in the precipitation data
 - We explored this further using $k$-means clustering:
@@ -255,82 +254,9 @@ knitr::include_graphics("../pres-plots/des-data/q-corr-0.jpg")
     + applied $k$-means to the 3 first PC of the precipitation data
 - Ultimate goal is to improve predictions by applying a model to each cluster separately
 
-## $k$-means
-
-- Our objective is to find $k$ internally homogeneous and externally heterogeneous clusters
-- Similarity is measured by the euclidean distance
-\begin{equation} 
-d(x_i,x_{i'}) = \sum_{j=1}^p(x_{ij}-x_{i'j})^2=||x_i-x_{i'}||^2
-(\#eq:eucl-dist)
-\end{equation}
-
-## $k$-means
-
-- And we want to minimize the sum of distances inside all clusters, given by:
-
-\begin{equation} 
-W(C) = \frac{1}{2} \sum_{k=1}^{K} \sum_{C(i)=k} \sum_{C(i')=k} ||x_i-x_{i'}||^2 
-= \sum_{k=1}^K N_k \sum_{C(i)=k} ||x_i-\bar{x}_k ||^2
-(\#eq:wss)
-\end{equation}
-
-- where $\bar{x} = (\bar{x}_{1k},...,\bar{x}_{pk})$ stands for the mean vectors of the $k$-th
-cluster and $N_k = \sum_{i=1}^N I(C(i)=k)$. 
-
-## Gap Statistic
-
-- The number of clusters (i.e $k$) has to be defined beforehand
-- Let $W_k$ be $W(C)$ for fix $k$
-- We compare $W_k$ from the precipitation data with average $W^*_k$ from $B$ Monte Carlo sampled data sets
-- If our data has $k$-clusters we expect $W_k$ to be smaller than average $W^{*}_k$
-
-\begin{equation}
-Gap(k) = E\{log(W^{*}_k) \} - log(W_k).
-(\#eq:gap)
-\end{equation}
-
-- We choose $k$ such that: 
-
-\begin{equation}
-Gap(k) \geq Gap(k+1) - s_{k+1}
-\end{equation}
-
-## Gap statistic
-
-- $s_{k+1}$ is $sd_k\sqrt{1+1/B}$, and $sd$ the standard deviation of $log(W^{*}_{k})$
-- Before running the gap statistic and k-means we center the precipitation data and apply a PCA to reduce the large number of correlated variables to a few
-- The new variables are linear combinations of the original variables
-- Here: Each variable is a month of precipitation data in the CAB
-
-
-## Scree Plot, PCA after centering
-```{r, fig.cap='Scree plot of the Principal component analysis applied to the centered precipitation data.'}
-scree <-readRDS("../results/clustering/scree_plot_pca_centered.rds")
-scree + ylim(c(0,0.5))
-```
-
-## Screeplot
-
-- The "elbow" be observe in the screeplot suggest 3 or 4 principal components
-- The first 3 and 4 first PC explain $67.77 \%$ and $70.79 \%$ of the variance respectively.
-- We compare the gap statistic results for 3 and 4 PC
-
-## Gap statistic results
-```{r, fig.cap='Results of the gap statistic when applying k-means on 3 (left) and 4 (right) principal components of the precipitation data.'}
-p3 <- readRDS("../results/clustering/replotted_gap_pc3_centered_kmeans_plot.rds")
-p4 <- readRDS("../results/clustering/replotted_gap_pc4_centered_kmeans_plot.rds")
-p3 + p4
-```
-
-## Gap statistic results
-
-- The k-means gap statistic on the first 3 PC proposes 5 clusters
-- For 4 PC, 13 clusters are chosen
-- We chose 5 clusters since the result on 3 PC appears to be clearer and 5 clusters are more applicable than fitting the model evaluation on 13 clusters.
-
 ## Clustering results
 
-```{r cluster-map, echo = FALSE, out.width= '50%',fig.cap= "Spatial distribution of the found clusters in the CAB. We applied a centered PCA on the data and used 3 principal components before applying the k-means algorithm"}
+```{r cluster-map, echo = FALSE, out.width= '50%',fig.cap= "Spatial organization of the found clusters in the CAB. We applied a centered PCA on the data and used 3 principal components before applying the k-means algorithm"}
 km_pca_map_plot <- readRDS(paste0("../results/clustering/km_pca_map_plot.rds"))
 km_pca_map_plot + 
   ggtitle("Precipitation clusters in the CAB,
@@ -342,17 +268,15 @@ after centered PCA, using 3 PC's and applying k-means")
 - We find 5 clusters of different sizes
 - The found clusters are almost completely spatially coherent
 although we did not include any spatial dependencies in the clustering
-
-## Clustering results
-
-- Small exception is the "island" of cluster 1 (orange) inside cluster 4 (blue) and on the edge on cluster 3 (green)
+- The exception is the "island" of cluster 1 (orange) inside cluster 4 (blue) and on the edge on cluster 3 (green)
 - Usefulness of clustering can only be determined after model fitting on each cluster
+
 
 # 5. The lasso
 
 ## Definition of the lasso
 
-- In our setting $n << p$, so the lasso is a natural choice (@tibshirani1996regression)
+- In our setting $n << p$, so the lasso is a natural choice [@tibshirani1996regression}]
 - We consider the lasso regression problem:
 
 \begin{equation}
@@ -361,12 +285,12 @@ although we did not include any spatial dependencies in the clustering
 \end{equation}
 
 - $\lambda||\beta||_1$ introduces sparsity in the coefficient vector
-- The problem is solved using coordinate descent (@van2007prediction)
-- We use the glmnet package (@glmnet-package)
+- The problem is solved using coordinate descent [@van2007prediction]
+- We use the glmnet package [@glmnet-package]
 
 ## Model validation
 
-- To find the best $\lambda$, we can use k-fold cross validation, to achieve a Bias-Variance trade-off (@hastie2009elements).
+- To find the best $\lambda$, we can use k-fold cross validation, to achieve a Bias-Variance trade-off [@hastie2009elements].
 - We introduce bias by using less parameters ($\lambda > 0$),
 but decrease the prediction variance by doing so.
 <!-- - We introduce estimation bias by using less parameters, but decrease variance in predictions -->
@@ -376,7 +300,7 @@ but decrease the prediction variance by doing so.
 
 ## Forward validation
 
-(ref:caption) Different schemes of validation approaches for time series data (@schnaubelt2019comparison).
+(ref:caption) Different schemes of validation approaches for time series data [@schnaubelt2019comparison].
 
 ```{r, fig.cap='(ref:caption)'}
 knitr::include_graphics("../thesis/validation-schemes.png")
@@ -420,7 +344,7 @@ k
     + Differentiated SST
     + Lasso on clusters found by $k$-means
 - If we standardize or de-seasonalize we use the information from model fitting to transform the test data
-- We do this to avoid **information leakage**
+- We do this to avoid *information leakage*
 - Lasso with standardized SST gave the best results
 - Clustering only improved on one cluster
 - Here we show the results from the lasso with standardized SST and the final results from the lasso on clusters.
@@ -547,7 +471,7 @@ knitr::kable(d2, format = "pipe", caption = 'Table of the MSE results for the di
 
 ## Lasso - Results on clusters
 
-```{r cluster-map2, echo = FALSE, out.width= '50%', fig.cap= "Spatial distribution of the found clusters in the CAB. We applied a centered PCA on the data and used 3 principal components before applying the k-means algorithm"}
+```{r cluster-map2, echo = FALSE, out.width= '50%', fig.cap= "Spatial organization of the found clusters in the CAB. We applied a centered PCA on the data and used 3 principal components before applying the k-means algorithm"}
 km_pca_map_plot <- readRDS(paste0("../results/clustering/km_pca_map_plot.rds"))
 km_pca_map_plot + 
   ggtitle("Precipitation clusters in the CAB,
@@ -608,18 +532,23 @@ full_preds1 + full_preds2 + full_preds3 + full_preds4 + full_preds5 + gridExtra:
 - Lasso with standardized SST worked best
 - It can predict general seasonality, but still fails to predict peaks in precipitation
 - Clustering the CAB improves predictions only on one cluster, but on this cluster peaks can be predicted better than in the original model
-- Lasso chooses single "points" and not whole areas
-- The points chosen as coefficients differ in the models, and can be very far away from the CAB
+
 
 ## Summary lasso results
 
+<!-- - The points chosen as coefficients differ in the models, and can be very far away from the CAB -->
 - We de-seasonalized SST to remove spurious correlations
-- We used seasonality from train to de-seasonalize test data.
-- This can be a problem if the seasonality differs from train to test.
+  + Used seasonality from train to de-seasonalize test data.
+  + Can be a problem if seasonality differs from train to test, didn't improve results.
 - To remove changing means and trends over time all together, we removed non-stationarity.
-- Non-stationarity can be removed by differentiation and we don't use information from train in test.
-- But we also loose information of the time series and did not improve with it either.
+  + Non-stationarity can be removed by differentiation and we don't use information from train in test.
+  + But also loose information of the time series and did not improve either.
+  
+## Summary lasso results
+
 - The standard deviations differ greatly across the SST, and some of the locations are not really "sea" area.
+- Changes in temperatures can be more meaningful in some SST regions than in others.
+- Standardizing then makes the comparison easier.
 - This might be an explanation why standardization improved our results here.
 
 # 6. The fused lasso
@@ -630,7 +559,7 @@ path_to_model_folder <- "../results/CV-fused/noclust-large-fused-5k/"
 
 ## Definition of the fused lasso
 
-- Fused lasso, "fuses" predictors together (@tibshirani2005sparsity)
+- The Fused lasso, "fuses" predictors together, and chooses connected regions instead of single "points" [@tibshirani2005sparsity].
 <!-- - It penalizes the difference of close predictors -->
 <!-- - Therefore close predictors should be similar -->
 
@@ -643,12 +572,12 @@ path_to_model_folder <- "../results/CV-fused/noclust-large-fused-5k/"
 E is the edge set of an underlying graph.
 - The second term $\lambda \sum_{i,j \in E} |\beta_i - \beta_j|$ penalizes differences in connected coefficients.
 - The third term $\gamma \cdot \lambda \sum_{i=1}^p|\beta_i|$,
-controls the sparsity of the coefficients.
-- $\gamma=0$ leads to complete fusion of the coefficients (no sparsity) and $\gamma$ > 0 introduces sparsity to the solution, with higher values placing more priority on sparsity. 
+controls the sparsity of the coefficients, with higher values placing more priority on sparsity.
+<!-- - $\gamma=0$ leads to complete fusion of the coefficients (no sparsity) and $\gamma$ > 0 introduces sparsity to the solution, with higher values placing more priority on sparsity.  -->
 
 ## Fused lasso optimization
 
-- Lets consider the problem in the notation of the generalized lasso problem (@tibshirani2011solution).
+- Lets consider the problem in the notation of the generalized lasso problem [@tibshirani2011solution].
 
 \begin{equation}
 \hat{\beta} = \underset{\beta \in \mathbb{R}^{p}}{\min} \frac{1}{2}\|y-X \beta\|_{2}^{2}+\lambda\|D \beta\|_{1}
@@ -659,40 +588,12 @@ controls the sparsity of the coefficients.
 $X \in \mathbb{R}^{n \times p}$ a predictor matrix, $D \in \mathbb{R}^{m \times p}$
 denotes a penalty matrix, and $\lambda \geq 0$ is a regularization parameter.
 - In our case D is the edge set of a given graph, where $m$ refer to the edges and $p$ to the nodes.
-- The problem is solved by the dual path algorithm (@arnold2016efficient)
-
-## Fused lasso optimization
-
-- The dual path algorithm solves not the primal but the dual solution of the problem 
-and computes the solution for a whole path instead of single values of $\lambda$.
-- We use the *genlasso* package and the *fusedlasso* function
-(@genlassopackage)
-- Let's consider the case when $X=I$ and $rank(X)=p$ (this is called the "signal approximator" case),
-the dual problem of \@ref(eq:gen-lasso) is then:
-
-
-\begin{equation}
-\hat{u} \in \underset{\substack{u \in \mathbb{R}^{m}}}{\arg \min} \frac{1}{2}\left\|y-D^{T} u\right\|^{2}_{2} \text { subject to }\| u \|_{\infty} \leq \lambda.
-(\#eq:dual)
-\end{equation}
-
-- The primal and dual solutions, $\hat{\beta}$ and $\hat{u}$ are related by:
-
-\begin{equation}
-\hat{\beta}=y-D^{T} \hat{u} .
-(\#eq:dual-relate)
-\end{equation}
-
-
-## Fused lasso opimization
-
-- For general X and D with exploitable structure (as in our case), specialized implementations exist
-- The algorithm terminates when $\lambda=0$ or a maximum number of steps is reached (we chose 5000, default is 20000)
+- The problem is solved by the dual path algorithm, as implemented in the *genlasso* package [@arnold2016efficient].
 
 
 ## Fused lasso graph structure
 
-- We can use a graph as input in the fusedlasso function
+<!-- - We can use a graph as input in the fusedlasso function -->
 - We created a grid and deleted all nodes that were land regions
 - This induced subgraphs
 
@@ -733,7 +634,16 @@ although some of the regions were included in the final lasso models
   + Fused lasso without clusters and sparsity (gamma: 0.01, 0.05, 0.1)
 - Fused lasso without clusters and no sparsity showed best results
 
-## Fused lasso results, clusters removed
+## Fused lasso evaluation
+
+- Generally same setting as for lasso, 5 folds with train and test, choose $\lambda_{\min}$, refit with $\lambda_{\min}$, get MSE on hold-out test set.
+- But for the fused lasso we can not define the $\lambda$ vector beforehand.
+- $\lambda$-path is found by the dual path algorithm and the range of the paths can vary a lot.
+- So to find $\lambda_{\min}$ we search over the common range of all folds and interpolate to lines
+- $\lambda_{\min}$ is then the $\lambda$ that minimize MSE over all $\lambda$ of that common range
+
+
+## Fused lasso - MSE on FV test sets
 
 ```{r}
 # k <- readRDS("../results/CV-fused/noclust-large-fused-5k/err-mat-plots/err-line-plot.rds")
@@ -750,7 +660,7 @@ knitr::include_graphics("err-line-plot-noclust.png")
 ```
 
 
-## Fused lasso results, clusters removed
+## Fused lasso - MSE on FV test sets
 
 
 ```{r}
@@ -772,7 +682,7 @@ knitr::include_graphics("err-line-plot-noclust.png")
 knitr::include_graphics("../results/CV-fused/noclust-large-fused-5k/best-lambda-res-noclust.png")
 ```
 
-## Fused lasso results, Prediction plots
+## Fused lasso - Predictions on FV test sets
 
 ```{r}
 pred_plot_1 <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-fold-1.rds"))
@@ -802,7 +712,7 @@ pred_plot_1 + pred_plot_2 + pred_plot_3 + pred_plot_4 +
   pred_plot_5
 ```
 
-## Fused lasso Prediction plot
+## Fused lasso - Predictions on FV test sets
 
 - The predictions inside the folds are very similar to lasso without standardization
 - The same holds for the predictions from
@@ -810,7 +720,7 @@ the full model
 - The MSE improves here and gives the best results overall.
 
 
-## Full predictions
+## Fused lasso - Predictions on hold-out test set
 
 ```{r pred-plot-full-fused-og, fig.cap="Precipitation prediction and target values in the validation set. Predictions in red and target values in black. The model was fitted on the full CV data with the lambda value that minimised the average MSE"}
 full_preds <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-full.rds"))
@@ -820,7 +730,7 @@ mse_full
 ```
 
 
-## Coefficient plot
+## Fused lasso - SST regions, final model
 
 ```{r , eval=FALSE}
 # coef_plot <- readRDS(paste0(path_to_model_folder,                "coef-plots/coef-plot-full.rds"))
@@ -836,7 +746,7 @@ mse_full
 knitr::include_graphics(paste0(path_to_model_folder, "coef-plots/coef-plot-full.png"))
 ```
 
-## Coefficient plot, highest absolute values only
+## Fused lasso - SST regions, final model
 
 ```{r, out.width = '55%', fig.cap='Coefficient plot of the final fused lasso model. Positive coefficient values are given in blue, negative values in red. Only values outside the 0.975 and 0.025 quantile range are shown'}
 # coef_plot2 <- readRDS(paste0(path_to_model_folder,
@@ -850,13 +760,13 @@ knitr::include_graphics(paste0(path_to_model_folder, "coef-plots/coef-plot-drop-
 
 ```
 
-## Coefficient plot, lowest absolute values only
+## Fused lasso - SST regions, final model
 
 ```{r, out.width = '55%',  fig.cap='Coefficient plot of the final fused lasso model. Positive coefficient values are given in blue, negative values in red. Only values inside the 0.975 and 0.025 quantile range are shown'}
 knitr::include_graphics(paste0(path_to_model_folder, "coef-plots/coef-plot-drop-out-full2.png"))
 ```
 
-## Fused lasso results MSE
+## Fused lasso - All model results
 
 ```{r}
 # with clusters, without cluster and gamma, also best lambda
@@ -888,24 +798,26 @@ knitr::kable(d, format = "pipe", caption = 'Table of the MSE results for the dif
 ```
 
 
-## Fused lasso results summary
+## Summary fused lasso results
 
 - We compared different settings for the fused lasso, removing the sub-graphs and introducing no sparsity gave the best results
 - Removing the sub-graphs removed some of the optimization problems, but nodes with less edges are still less penalized
 - Implementing a validation strategy was more complex than for the lasso
 - We smoothed the error-lines in each fold over a common region to compute $\lambda_{\min}$
+
+## Summary fused lasso results
+
 - The coefficient plots reveal predictive connected areas with high negative values in the Baltic Sea and high positive values north east of Canada.
-- Since no sparsity is used, all areas obtain non-zero coefficient values
-- Some of regions with high coefficient values are included in the lasso as well in the fused lasso
+- Since no sparsity is used, all areas obtain non-zero coefficient values and some of regions with high coefficient values are included in the lasso as well in the fused lasso
 
 
-## Fused lasso discussion
+<!-- ## Fused lasso discussion -->
 
-- Computing the solution path is computationally expensive
-- The graph structure is highly influential and cost will scale with number of edges
-- While the best fused lasso approach performed best overall, it still is not able to predict high precipitation values
-- Possible improvements on optimization path: creating weighted graph (increases number of edges and cost), narrowing down the SST "window" (f.e as in @ciemer2020early)
-- Possible improvements on feature engineering: as for the lasso, differentiating, de-seasonalizing
+<!-- - Computing the solution path is computationally expensive -->
+<!-- - The graph structure is highly influential and cost will scale with number of edges -->
+<!-- - While the best fused lasso approach performed best overall, it still is not able to predict high precipitation values -->
+<!-- - Possible improvements on optimization path: creating weighted graph (increases number of edges and cost), narrowing down the SST "window" (f.e as in @ciemer2020early) -->
+<!-- - Possible improvements on feature engineering: as for the lasso, differentiating, de-seasonalizing -->
 
 # 7. Discussion & Conclusion
 
@@ -914,7 +826,7 @@ knitr::kable(d, format = "pipe", caption = 'Table of the MSE results for the dif
 - Our results suggest that precipitation can to some extend be predicted from SST directly.
 - The overall predictability of precipitation in the CAB differed between model selection and model evaluation phase.
 - For one part this might be due to the difference in the regions in the CAB, since clustering improved the results for one specific cluster.
-- Another explanation could be that our model selection approach was not optimal in its use of the data.
+- Another explanation could be that our model validation approach was not optimal in its use of the data.
 - We might have been to restrictive in exploiting the data or used data that became less relevant over time.
 
 ## Discussion 
@@ -923,7 +835,7 @@ knitr::kable(d, format = "pipe", caption = 'Table of the MSE results for the dif
   + Allow for larger folds (introduces overlapping folds), or for crossing of train and test in time (past is predicted with future values)
   + Fit the full model with less data and discarding data that is far away from the hold-out validation set.
 - The results of the fused lasso will depend a lot on the graph structure, sub-graphs do not represent the real situation well
-- Creating a weighted graph or narrowing the SST "window" may improve performance.
+- Creating a weighted graph (will increase cost) or narrowing the SST "window" may improve performance.
 - Also, applying the fused lasso only on the best performing cluster from the lasso may yield better results.
 
 <!-- ## Discussion Validation approach (maybe discuss this at the end) -->
@@ -946,14 +858,13 @@ knitr::kable(d, format = "pipe", caption = 'Table of the MSE results for the dif
 - In a descriptive analysis we found temporal and spatial patterns in the correlation of rain in the CAB and SST
 - The cluster analysis revealed 5 almost completely spatially coherent clusters in the CAB
 - Standardizing the features yielded the best results for the lasso
-- The lasso can predict the precipitation on the model selection test sets a lot better than in the hold-out test set
-- On the hold-out data the lasso fails to predict the peaks in precipitation
+- On the hold-out data the lasso fails to predict the peaks in precipitation, but can predict low values well.
 
 ## Conclusion 
 
 - We applied the fused lasso to our problem and implemented a model evaluation approach
 - The fused lasso improves predictive power compared to the lasso when the sub-graphs are removed
-- The fused lasso is still is not able to predict high values in precipitation well
+- The fused lasso is still is not able to predict high values in precipitation well, 
 - We could further improve the clustering method by taking into account spatial dependencies.
 - The fused lasso could be improved by using other model selection approaches or increasing the complexity of the graph structure.
 
@@ -966,6 +877,124 @@ Thanks for your attention! :)
 <div id="refs"></div>
 
 # Appendix {-}
+
+# Clustering {-}
+## $k$-means
+
+- Our objective is to find $k$ internally homogeneous and externally heterogeneous clusters [@hastie2009elements]
+- Similarity is measured by the euclidean distance
+
+\begin{equation} 
+d(x_i,x_{i'}) = \sum_{j=1}^p(x_{ij}-x_{i'j})^2=||x_i-x_{i'}||^2
+(\#eq:eucl-dist)
+\end{equation}
+
+## $k$-means
+
+- And we want to minimize the sum of distances inside all clusters, given by:
+
+\begin{equation} 
+W(C) = \frac{1}{2} \sum_{k=1}^{K} \sum_{C(i)=k} \sum_{C(i')=k} ||x_i-x_{i'}||^2 
+= \sum_{k=1}^K N_k \sum_{C(i)=k} ||x_i-\bar{x}_k ||^2
+(\#eq:wss)
+\end{equation}
+
+- where $\bar{x} = (\bar{x}_{1k},...,\bar{x}_{pk})$ stands for the mean vectors of the $k$-th
+cluster and $N_k = \sum_{i=1}^N I(C(i)=k)$. 
+
+## Gap Statistic
+
+- The number of clusters (i.e $k$) has to be defined beforehand
+- Let $W_k$ be $W(C)$ for fix $k$
+- We compare $W_k$ from the precipitation data with average $W^*_k$ from $B$ Monte Carlo sampled data sets
+- If our data has $k$-clusters we expect $W_k$ to be smaller than average $W^{*}_k$ (tibshirani2001estimating):
+
+\begin{equation}
+Gap(k) = E\{log(W^{*}_k) \} - log(W_k).
+(\#eq:gap)
+\end{equation}
+
+- We choose $k$ such that: 
+
+\begin{equation}
+Gap(k) \geq Gap(k+1) - s_{k+1}
+\end{equation}
+
+## Gap statistic
+
+- $s_{k+1}$ is $sd_k\sqrt{1+1/B}$, and $sd$ the standard deviation of $log(W^{*}_{k})$
+- Before running the gap statistic and k-means we center the precipitation data and apply a PCA to reduce the large number of correlated variables to a few
+- The new variables are linear combinations of the original variables
+- Here: Each variable is a month of precipitation data in the CAB
+
+## PCA
+
+- We use a principal component analysis to summarize the information in the p variables in a few new variables.
+- The new variables (principal components) are linear combinations of the original ones and are orthogonal to each other.
+- The first $k < p$ principal components explain the majority of the variance [@fahrmeir1996multivariate].
+
+## PCA 
+
+- We approximate our data with the rank-q linear model
+
+\begin{equation}
+f(\lambda) = \mu + V_q\lambda
+(\#eq:rank-lin)
+\end{equation}
+
+- with $\mu$ a location vector in $\mathbb{R}^p$ and $V_q$ is a $p \times q$ matrix
+with columns being orthogonal unit vectors. 
+- $\lambda$ is a $q$ vector
+of parameters.
+- We are trying to fit a hyperplane of rank q to the data.
+
+## PCA 
+
+- If we use least squares we have:
+
+\begin{equation} \min_{\mu, \{\lambda_i\}, V_q } \sum_{i=1}^N||x_i - \mu - V_q\lambda_i ||^2
+(\#eq:min-rec-1)
+\end{equation}
+
+- we have $\hat{\mu} = \bar{x}$ and
+$\hat{\lambda_i} = V_q^T(x_i - \bar{x})$, meaning we only need to find $V_q$.
+- and we find $V$ and by solving the singular value decomposition of X.
+
+\begin{equation} 
+X = UDV^T
+(\#eq:svd)
+\end{equation}
+
+- Here $UD$ gives us the principal components. And $H_qx_i=V_qV_q^Tx_i$ is the orthogonal projection of a observation $x_i$ to subspace that is spanned by the columns of $V_q$.
+
+## Scree Plot, PCA after centering
+```{r, fig.cap='Scree plot of the Principal component analysis applied to the centered precipitation data.'}
+scree <-readRDS("../results/clustering/scree_plot_pca_centered.rds")
+scree + ylim(c(0,0.5))
+```
+
+## Screeplot
+
+- The "elbow" be observe in the screeplot suggest 3 or 4 principal components
+- The first 3 and 4 first PC explain $67.77 \%$ and $70.79 \%$ of the variance respectively.
+- We compare the gap statistic results for 3 and 4 PC
+
+## Gap statistic results
+```{r, fig.cap='Results of the gap statistic when applying k-means on 3 (left) and 4 (right) principal components of the precipitation data.'}
+p3 <- readRDS("../results/clustering/replotted_gap_pc3_centered_kmeans_plot.rds")
+p4 <- readRDS("../results/clustering/replotted_gap_pc4_centered_kmeans_plot.rds")
+p3 + p4
+```
+
+## Gap statistic results
+
+- The k-means gap statistic on the first 3 PC proposes 5 clusters
+- For 4 PC, 13 clusters are chosen
+- We chose 5 clusters since the result on 3 PC appears to be clearer and 5 clusters are more applicable than fitting the model evaluation on 13 clusters.
+
+
+
+
 
 # Lasso on original SST {-}
 ## MSE in each fold (Lasso on original SST)
@@ -1164,14 +1193,14 @@ coef_full
 
 
 
-## Fused evaluation (maybe explain this when showing resutls)
+<!-- ## Fused evaluation (maybe explain this when showing resutls) -->
 
-- Generally same setting as for lasso, 5 folds with train and test, choose $\lambda_{\min}$, refit with $\lambda_{\min}$, get MSE on hold-out test set.
-- But for the fused lasso we can not define the $\lambda$ vector
-beforehand.
-- $\lambda$-path is found by dual path algorithm and the range of the paths can vary a lot!
-- So to find $\lambda_{\min}$ we search over the common range of all folds and interpolate to lines
-- $\lambda_{\min}$ is then the $\lambda$ that minimize MSE over all $\lambda$ of that common range
+<!-- - Generally same setting as for lasso, 5 folds with train and test, choose $\lambda_{\min}$, refit with $\lambda_{\min}$, get MSE on hold-out test set. -->
+<!-- - But for the fused lasso we can not define the $\lambda$ vector -->
+<!-- beforehand. -->
+<!-- - $\lambda$-path is found by dual path algorithm and the range of the paths can vary a lot! -->
+<!-- - So to find $\lambda_{\min}$ we search over the common range of all folds and interpolate to lines -->
+<!-- - $\lambda_{\min}$ is then the $\lambda$ that minimize MSE over all $\lambda$ of that common range -->
 
 
 
@@ -1264,6 +1293,42 @@ coef_full <- readRDS(paste0(path_to_model_folder,
 coef_full 
 ```
 
+# Fused lasso optimization {-}
+## Fused lasso optimization
+
+- The dual path algorithm solves not the primal but the dual solution of the problem 
+and computes the solution for a whole path instead of single values of $\lambda$.
+- We use the *genlasso* package and the *fusedlasso* function
+[@genlassopackage]
+- Let's consider the case when $X=I$ and $rank(X)=p$ (this is called the "signal approximator" case),
+the dual problem of \@ref(eq:gen-lasso) is then:
+
+
+\begin{equation}
+\hat{u} \in \underset{\substack{u \in \mathbb{R}^{m}}}{\arg \min} \frac{1}{2}\left\|y-D^{T} u\right\|^{2}_{2} \text { subject to }\| u \|_{\infty} \leq \lambda.
+(\#eq:dual)
+\end{equation}
+
+## Fused lasso opimization
+
+- The primal and dual solutions, $\hat{\beta}$ and $\hat{u}$ are related by:
+
+\begin{equation}
+\hat{\beta}=y-D^{T} \hat{u} .
+(\#eq:dual-relate)
+\end{equation}
+
+- For general X and D with exploitable structure (as in our case), specialized implementations exist.
+- The algorithm terminates when $\lambda=0$ or a maximum number of steps is reached (we chose 5000, default is 20000).
+
+## Fused lasso optimization
+
+- They use what they call algorithms 1 and 2.
+- Algorithm 2 is a modification of 1 for general X, for 
+sparse solves they add a small ridge penalty to X.
+- Since D is the incidence matrix, they make use of $DD^T$ is the Laplacian of the graph.
+- The Laplacian linear systems are then solved using a Cholesky decomposition (see Section 4 and 5 in @arnold2016efficient).
+
 # Fused lasso with sub-graphs {-}
 
 ```{r}
@@ -1334,7 +1399,7 @@ knitr::include_graphics(paste0(path_to_model_folder, "coef-plots/coef-plot-full.
 ```
 
 ## Coefficient plots of the final model (Fused lasso with sub-graphs)
-```{r, out.width= '55%', fig.cap='Coefficient plot of the final fused lasso model (fused lasso with sub-graphs). Positive coefficient values are given in blue, negative values in red. Only values outside the 0.975 and 0.025 quantile range are shown'}
+```{r, out.width= '55%', fig.cap='Coefficient plot of the final fused lasso model (fused lasso with sub-graphs). Positive coefficient values are given in blue, negative values in red. Only values outside the 97.5\\% and 2.5\\% quantile range are shown'}
 # coef_plot2 <- readRDS(paste0(path_to_model_folder,
 #                      "coef-plots/coef-plot-drop-out-full.rds"))
 #coef_plot <- coef_plot + theme(legend.position = "bottom", text = element_text(size = 8))
@@ -1345,7 +1410,7 @@ knitr::include_graphics(paste0(path_to_model_folder, "coef-plots/coef-plot-full.
 knitr::include_graphics(paste0(path_to_model_folder, "coef-plots/coef-plot-drop-out-full1.png"))
 
 ```
-```{r, out.width= '55%', fig.cap='Coefficient plot of the final fused lasso model (fused lasso with sub-graphs). Positive coefficient values are given in blue, negative values in red. Only values inside the 0.975 and 0.025 quantile range are shown'}
+```{r, out.width= '55%', fig.cap='Coefficient plot of the final fused lasso model (fused lasso with sub-graphs). Positive coefficient values are given in blue, negative values in red. Only values inside the 97.5\\% and 2.5\\% quantile range are shown'}
 knitr::include_graphics(paste0(path_to_model_folder, "coef-plots/coef-plot-drop-out-full2.png"))
 ```
 
@@ -1523,14 +1588,7 @@ knitr::include_graphics(paste0(path_to_model_folder, "coef-plots/coef-plot-drop-
 
 
 
-# Fused evaluation (maybe explain this when showing resutls) {-}
 
-- Generally same setting as for lasso, 5 folds with train and test, choose $\lambda_{\min}$, refit with $\lambda_{\min}$, get MSE on hold-out test set.
-- But for the fused lasso we can not define the $\lambda$ vector
-beforehand.
-- $\lambda$-path is found by dual path algorithm and the range of the paths can vary a lot!
-- So to find $\lambda_{\min}$ we search over the common range of all folds and interpolate to lines
-- $\lambda_{\min}$ is then the $\lambda$ that minimize MSE over all $\lambda$ of that common range
 
 
 
