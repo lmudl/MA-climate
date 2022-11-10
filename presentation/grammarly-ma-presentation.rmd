@@ -106,11 +106,11 @@ knitr::include_graphics("../figures/cross-degree.jpg")
 ```
 
 
-## Early warning signal 
+<!-- ## Early warning signal  -->
 
-```{r early, echo = FALSE, fig.align='center' ,out.width='75%', fig.cap='Early-warning signal for droughts in the central Amazon basin (Ciemer et al., 2020).'}
-knitr::include_graphics("../figures/early-warning-signals.jpg")
-```
+<!-- ```{r early, echo = FALSE, fig.align='center' ,out.width='75%', fig.cap='Early-warning signal for droughts in the central Amazon basin (Ciemer et al., 2020).'} -->
+<!-- knitr::include_graphics("../figures/early-warning-signals.jpg") -->
+<!-- ``` -->
 
 ## Our approach
 
@@ -132,7 +132,7 @@ knitr::include_graphics("../figures/early-warning-signals.jpg")
 
 ## Explorative analysis rain
 
-```{r CAB, echo=FALSE, fig.cap="Location of the area under study. The central amazon basin (CAB) spanning across 0,-10 latitude and -70,-55 longitude", fig.align='center',out.width='50%'}
+```{r CAB, echo=FALSE, fig.cap="Location of the area under study. The central amazon basin (CAB) spanning across 0,-10 latitude and -70,-55 longitude.", fig.align='center',out.width='50%'}
 cab_square_plot <- readRDS("../results/eda/cab_square_plot.rds")
 cab_square_plot + ggtitle("Location of area under study, central Amazon basin (CAB)")
 ```
@@ -250,8 +250,8 @@ knitr::include_graphics("../pres-plots/des-data/q-corr-0.jpg")
 
 - Our explorative analysis has shown spatial and temporal differences in the precipitation data.
 - We explored this further using $k$-means clustering:
-+ found optimal $k$ via PCA and gap statistic
-+ applied $k$-means to the three first PC of the precipitation data
+  + found optimal $k$ via PCA and gap statistic
+  + applied $k$-means to the three first PC of the precipitation data
 - Ultimate goal is to improve predictions by applying a model to each cluster separately.
 
 ## Clustering results
@@ -337,11 +337,11 @@ k
 ## Lasso settings and results
 
 - We compare different settings for the lasso:
-+ lasso
-+ Standardized SST
-+ De-seasonalized SST
-+ Differentiated SST
-+ lasso on clusters found by $k$-means
+  + Lasso
+  + Standardized SST
+  + De-seasonalized SST
+  + Differentiated SST
+  + Lasso on clusters found by $k$-means
 - If we standardize or de-seasonalize we use the information from model fitting to transform the test data.
 - We do this to avoid *information leakage*.
 - Lasso with standardized SST gave the best results.
@@ -418,7 +418,7 @@ pred_plot_1 + pred_plot_2 + pred_plot_3 + pred_plot_4 +
 
 ## Lasso - Predictions on the hold-out test set
 
-```{r pred-plot-full-lasso-stand, fig.cap="Precipitation prediction and target values in the validation set. Predictions in red and target values in black. The model was fitted on the full CV data with the lambda value that minimised the average MSE"}
+```{r pred-plot-full-lasso-stand, fig.cap="Precipitation prediction and target values in the validation set. Predictions in red and target values in black. The model was fitted on the full CV data with the lambda value that minimised the average MSE."}
 full_preds <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-full.rds"))
 full_preds
 mse_full <- get_mse_from_pred_plot(full_preds)
@@ -470,7 +470,7 @@ knitr::kable(d2, format = "pipe", caption = 'Table of the MSE results for the di
 
 ## Lasso - Results on clusters
 
-```{r cluster-map2, echo = FALSE, out.width= '50%', fig.cap= "Spatial organization of the found clusters in the CAB. We applied a centered PCA on the data and used three principal components before applying the k-means algorithm"}
+```{r cluster-map2, echo = FALSE, out.width= '50%', fig.cap= "Spatial organization of the found clusters in the CAB. We applied a centered PCA on the data and used three principal components before applying the k-means algorithm."}
 km_pca_map_plot <- readRDS(paste0("../results/clustering/km_pca_map_plot.rds"))
 km_pca_map_plot + 
   ggtitle("Precipitation clusters in the CAB,
@@ -515,19 +515,19 @@ colnames(m) <- c("", "MSE, Lasso")
 
 ## Lasso - Results on clusters
 
-```{r, fig.cap = 'Precipitation prediction and target values in the validation set for the 5 clusters found with $k$-means. Predictions are in red and target values in black. The model was fitted on the full CV data with the lambda value that minimized the average MSE'}
+```{r, fig.cap = 'Precipitation prediction and target values in the validation set for the 5 clusters found with $k$-means. Predictions are in red and target values in black. The model was fitted on the full CV data with the lambda value that minimized the average MSE.'}
 library(gridExtra)
 full_preds1 + full_preds2 + full_preds3 + full_preds4 + full_preds5 + gridExtra::tableGrob(m, theme = ttheme_default(base_size = 8))
 ```
 
 ## Summary lasso results 
 
-- We compared different settings for the lasso:
-+ lasso
-+ Standardized SST
-+ De-seasonalized SST
-+ Differentiated SST
-+ lasso on clusters found by $k$-means
+- We compared different settings for the lasso
+  + Lasso
+  + Standardized SST
+  + De-seasonalized SST
+  + Differentiated SST
+  + Lasso on clusters found by $k$-means
 - Lasso with standardized SST worked best.
 - It can predict general seasonality but still fails to predict peaks in precipitation.
 - Clustering the CAB improves predictions only on one cluster, but on this cluster, peaks can be predicted better than in the original model.
@@ -537,11 +537,11 @@ full_preds1 + full_preds2 + full_preds3 + full_preds4 + full_preds5 + gridExtra:
 
 <!-- - The points chosen as coefficients differ in the models, and can be very far away from the CAB -->
 - We de-seasonalized SST to remove spurious correlations:
-+ Used seasonality from train to de-seasonalize test data.
-+ Can be a problem if seasonality differs from train to test, didn't improve results.
+  + Used seasonality from train to de-seasonalize test data.
+  + Can be a problem if seasonality differs from train to test, didn't improve results.
 - To remove changing means and trends over time altogether, we removed non-stationarity.
-+ Non-stationarity can be removed by differentiation, and we do not use information from training during testing.
-+ But also loose information of the time series and did not improve either.
+  + Non-stationarity can be removed by differentiation, and we do not use information from training during testing.
+  + But also loose information of the time series and did not improve either.
 
 ## Summary lasso results
 
@@ -586,16 +586,15 @@ controls the sparsity of the coefficients, with higher values placing more prior
 - where $y \in \mathbb{R}^n$ is the vector of the outcome, 
 $X \in \mathbb{R}^{n \times p}$ a predictor matrix, $D \in \mathbb{R}^{m \times p}$
 denotes a penalty matrix, and $\lambda \geq 0$ is a regularization parameter.
-- In our case D is the edge set of a given graph, where $m$ refer to the edges and $p$ to the nodes.
+- In our case D is the oriented incidence matrix of a given graph, where $m$ refer to the edges and $p$ to the nodes.
 - The problem is solved by the dual path algorithm, implemented in the *genlasso* package [@arnold2016efficient].
-
 
 ## Fused lasso graph structure
 
 <!-- - We can use a graph as input in the fusedlasso function -->
 - We created a grid and deleted all nodes that were land regions, but this induced sub-graphs.
 
-```{r graph-plot2, fig.cap='Graph of the SST and land areas used in the fused lasso', message=FALSE, warning=FALSE}
+```{r graph-plot2, fig.cap='Graph of the SST and land areas used in the fused lasso.', message=FALSE, warning=FALSE}
 library(igraph)
 k <- readRDS("../data/processed/graph_sst.rds")
 cl <- clusters(k)
@@ -627,9 +626,9 @@ although some of the regions were included in the final lasso models.
 ## Fused lasso settings
 
 - The considered fused lasso settings are: 
-+ Fused lasso with clusters
-+ Fused lasso without clusters
-+ Fused lasso without clusters and sparsity (gamma: 0.01, 0.05, 0.1)
+  + Fused lasso with clusters
+  + Fused lasso without clusters
+  + Fused lasso without clusters and sparsity (gamma: 0.01, 0.05, 0.1)
 - Fused lasso without clusters and no sparsity showed the best results
 
 ## Fused lasso evaluation
@@ -720,7 +719,7 @@ the full model.
 
 ## Fused lasso - Predictions on hold-out test set
 
-```{r pred-plot-full-fused-og, fig.cap="Precipitation prediction and target values in the validation set. Predictions in red and target values in black. The model was fitted on the full CV data with the lambda value that minimised the average MSE"}
+```{r pred-plot-full-fused-og, fig.cap="Precipitation prediction and target values in the validation set. Predictions in red and target values in black. The model was fitted on the full CV data with the lambda value that minimised the average MSE."}
 full_preds <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-full.rds"))
 mse_full <- get_mse_from_pred_plot(full_preds)
 full_preds
@@ -746,7 +745,7 @@ knitr::include_graphics(paste0(path_to_model_folder, "coef-plots/coef-plot-full.
 
 ## Fused lasso - SST regions, final model
 
-```{r, out.width = '55%', fig.cap='Coefficient plot of the final fused lasso model. Positive coefficient values are given in blue, negative values in red. Only values outside the 0.975 and 0.025 quantile range are shown'}
+```{r, out.width = '55%', fig.cap='Coefficient plot of the final fused lasso model. Positive coefficient values are given in blue, negative values in red. Only values outside the 0.975 and 0.025 quantile range are shown.'}
 # coef_plot2 <- readRDS(paste0(path_to_model_folder,
 #                      "coef-plots/coef-plot-drop-out-full.rds"))
 #coef_plot <- coef_plot + theme(legend.position = "bottom", text = element_text(size = 8))
@@ -760,7 +759,7 @@ knitr::include_graphics(paste0(path_to_model_folder, "coef-plots/coef-plot-drop-
 
 ## Fused lasso - SST regions, final model
 
-```{r, out.width = '55%',  fig.cap='Coefficient plot of the final fused lasso model. Positive coefficient values are given in blue, negative values in red. Only values inside the 0.975 and 0.025 quantile range are shown'}
+```{r, out.width = '55%',  fig.cap='Coefficient plot of the final fused lasso model. Positive coefficient values are given in blue, negative values in red. Only values inside the 0.975 and 0.025 quantile range are shown.'}
 knitr::include_graphics(paste0(path_to_model_folder, "coef-plots/coef-plot-drop-out-full2.png"))
 ```
 
@@ -1070,7 +1069,7 @@ pred_plot_5
 
 ## Predictions on External Test Set (Lasso on original SST)
 
-```{r pred-plot-full-lasso-og, fig.cap="Precipitation prediction and target values in the validation set. Predictions in red and target values in black. The model was fitted on the full CV data with the lambda value that minimised the average MSE"}
+```{r pred-plot-full-lasso-og, fig.cap="Precipitation prediction and target values in the validation set. Predictions in red and target values in black. The model was fitted on the full CV data with the lambda value that minimised the average MSE."}
 full_preds <- readRDS(paste0(path_to_model_folder, "/pred-plots/pred-plot-full.rds"))
 full_preds
 mse_full <- get_mse_from_pred_plot(full_preds)

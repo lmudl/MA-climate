@@ -1,0 +1,4 @@
+module load R
+module load netcdf-c/4.6.2/intel/parallel
+cd MA-climate
+Rscript code/R/
